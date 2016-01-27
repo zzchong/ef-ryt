@@ -10,7 +10,7 @@ import java.io.Serializable;
  * Created by Administrator on 2016/1/18.
  */
 @Entity
-@Table(name = "ef_app_info")
+@Table(name = "app_platform_info")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class AppDevice  implements Serializable{
     private String id;

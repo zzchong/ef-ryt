@@ -1,27 +1,26 @@
 package com.efeiyi.ec.art.filter;
 
 /**
- * Created by Administrator on 2015/11/2.
+ * Created by kayson on 2015/11/2.
  *
  */
 
 
 
-        import java.io.IOException;
-
-        import javax.servlet.FilterChain;
-        import javax.servlet.ServletException;
-        import javax.servlet.http.HttpServletRequest;
-        import javax.servlet.http.HttpServletResponse;
-        import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 
 /**
  * 登录过滤器
  * <功能详细描述>
  *
- * @author  chenlujun
- * @version  [版本号, 2014年10月11日]
+ * @author  kayson
+ * @version  [版本号, 2015年11月2日]
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */

@@ -24,14 +24,14 @@ public class EfeiyiPush {
     private static Logger logger = Logger.getLogger(EfeiyiPush.class);
 
     public static final String TITLE = "融艺投";
-    public static final String ALERT = "XXX评论了你";
+    public static final String ALERT = "评论了你";
     public static final String MSG_CONTENT = "融艺投祝大家新春快乐";
     public static final String REGISTRATION_ID = "0900e8d85ef";
     public static final String TAG = "tag_api";
 
     //public  static JPushClient jpushClient=null;
 
-    public static void SendPush(String appKey ,String masterSecret) {
+    public static void SendPush(String appKey ,String masterSecret, com.efeiyi.ec.art.model.Message message) {
 
         JPushClient jpushClient = new JPushClient(masterSecret, appKey);
 
@@ -46,7 +46,7 @@ public class EfeiyiPush {
         //生成推送的内容，这里我们先测试全部推送
         //PushPayload payload=buildPushObject_all_alias_alert();
 
-        PushPayload payload=buildPushObject_android_and_ios();
+        PushPayload payload=buildPushObject_android_and_ios(message);
         try {
             System.out.println(payload.toString());
             PushResult result = jpushClient.sendPush(payload);
@@ -87,7 +87,7 @@ public class EfeiyiPush {
                 .build();
     }
 
-    public static PushPayload buildPushObject_android_and_ios() {
+    public static PushPayload buildPushObject_android_and_ios(com.efeiyi.ec.art.model.Message message) {
         return PushPayload.newBuilder()
                 .setPlatform(Platform.android_ios())
                 .setAudience(Audience.all())
@@ -96,7 +96,7 @@ public class EfeiyiPush {
                         .setAlert(MSG_CONTENT)
                         .addPlatformNotification(AndroidNotification.newBuilder()
                                 .setTitle(TITLE)
-                                .setAlert(ALERT)
+                                .setAlert(message.getFromUser().getName()+ALERT+message.getContent())
                                 .addExtra("extra_key", "extra_value")
                                 .build())
                         .addPlatformNotification(IosNotification.newBuilder()

@@ -2,7 +2,7 @@ package com.efeiyi.ec.art.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
-
+import com.efeiyi.ec.art.organization.model.User;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -15,7 +15,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class PushUserBinding implements Serializable {
     private String id;
-    private String User;
+    private User user;
     private String cid;
 
     @Id
@@ -28,14 +28,16 @@ public class PushUserBinding implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    public String getUser() {
-        return User;
+    public User getUser() {
+        return user;
     }
 
-    public void setUser(String user) {
-        User = user;
+    public void setUser(User user) {
+        this.user = user;
     }
     @Column(name = "cid")
     public String getCid() {

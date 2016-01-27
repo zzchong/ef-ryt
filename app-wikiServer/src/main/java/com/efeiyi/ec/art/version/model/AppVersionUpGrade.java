@@ -12,7 +12,7 @@ import java.io.Serializable;
  *
  */
 @Entity
-@Table(name = "ef_app_version_upgrade")
+@Table(name = "app_version_upgrade")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class AppVersionUpGrade implements Serializable {
     private String id;

@@ -95,7 +95,7 @@ public class EPushController extends BaseController {
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
 
-            EfeiyiPush.SendPush(appKey, masterSecret);
+            EfeiyiPush.SendPush(appKey, masterSecret,message);
 
         } catch (Exception e) {
             logBean.setResultCode("10004");
@@ -116,7 +116,11 @@ public class EPushController extends BaseController {
 
 
     public  static void main(String[] args){
-        EfeiyiPush.SendPush(appKey, masterSecret);
+        Message message = new Message();
+        message.setContent("现年快乐");
+        message.setCreateDatetime(new Date());
+
+        EfeiyiPush.SendPush(appKey, masterSecret,message);
 
     }
 }

@@ -1,13 +1,13 @@
 package com.efeiyi.ec.art.model;
 
-import com.efeiyi.ec.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
-
+import com.efeiyi.ec.art.organization.model.User;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/1/25.
@@ -23,6 +23,10 @@ public class ArtworkComment implements Serializable {
     private String content;
     private User creator;
     private Date createDatetime;
+    private String status;
+    private String iswatch;
+    private ArtworkComment fatherComment;
+    private List<ArtworkComment> subComment;
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -67,5 +71,38 @@ public class ArtworkComment implements Serializable {
 
     public void setCreateDatetime(Date createDatetime) {
         this.createDatetime = createDatetime;
+    }
+    @Column(name = "status")
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    @Column(name = "iswatch")
+    public String getIswatch() {
+        return iswatch;
+    }
+
+    public void setIswatch(String iswatch) {
+        this.iswatch = iswatch;
+    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "father_comment_id")
+    public ArtworkComment getFatherComment() {
+        return fatherComment;
+    }
+
+    public void setFatherComment(ArtworkComment fatherComment) {
+        this.fatherComment = fatherComment;
+    }
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "fatherComment", cascade = CascadeType.ALL)
+    public List<ArtworkComment> getSubComment() {
+        return subComment;
+    }
+
+    public void setSubComment(List<ArtworkComment> subComment) {
+        this.subComment = subComment;
     }
 }
