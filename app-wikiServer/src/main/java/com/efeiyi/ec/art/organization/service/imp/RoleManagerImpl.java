@@ -1,6 +1,6 @@
 package com.efeiyi.ec.art.organization.service.imp;
 
-import com.efeiyi.ec.organization.model.Role;
+import com.efeiyi.ec.art.organization.model.Role;
 import com.efeiyi.ec.art.organization.service.RoleManager;
 import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.dao.XdoDao;

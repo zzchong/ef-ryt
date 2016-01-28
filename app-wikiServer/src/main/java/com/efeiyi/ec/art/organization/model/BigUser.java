@@ -1,8 +1,7 @@
 package com.efeiyi.ec.art.organization.model;
 
 
-import com.efeiyi.ec.master.model.Master;
-import com.efeiyi.ec.tenant.model.BigTenant;
+import com.efeiyi.ec.art.organization.model.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -26,7 +25,7 @@ public class BigUser {
     protected String status;      // 0假删  1用户/人员      2人员     3用户
     protected Integer workStatus;      //   -1  离职   1  正常
 
-    protected Master branch;
+    //protected Master branch;
     protected String pictureUrl;
     protected Role role;
     /*    protected String roleType;//角色类型  摄影师 经纪人 化妆师  管理员  修片师*/
@@ -56,15 +55,13 @@ public class BigUser {
 
     protected String cityId;//已开通城市（若addressCityId不在已开通城市时，此字段置空）
     protected String cityName;
-    protected BigTenant bigTenant;
     protected String provinceId;
     protected String addressCityId;
     protected String provinceName;
     protected String addressCityName;
-    protected AddressProvince addressProvince;
     protected Date lastLoginDatetime; //最后一次登陆时间
     protected BigDecimal redPacket;//红包（相当于钱包）
-
+/*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "province_id", updatable = false, insertable = false)
     public AddressProvince getAddressProvince() {
@@ -73,7 +70,7 @@ public class BigUser {
 
     public void setAddressProvince(AddressProvince addressProvince) {
         this.addressProvince = addressProvince;
-    }
+    }*/
 
     @Column(name = "province_id")
     public String getProvinceId() {
@@ -206,7 +203,7 @@ public class BigUser {
         this.workStatus = workStatus;
     }
 
-    @JsonIgnore
+ /*   @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_id")
     public BigTenant getBigTenant() {
@@ -226,7 +223,7 @@ public class BigUser {
 
     public void setBranch(Master branch) {
         this.branch = branch;
-    }
+    }*/
 
 /*    @Column(name = "role_type")
     public String getRoleType() {

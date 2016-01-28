@@ -1,8 +1,8 @@
 package com.efeiyi.ec.art.organization.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.efeiyi.ec.organization.model.Consumer;
-import com.efeiyi.ec.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.Consumer;
+import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.model.LogBean;
@@ -75,8 +75,15 @@ public class SigninController extends BaseController {
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
                     resultMap.put("userInfo",user);
+                }else{
+                    logBean.setResultCode("10003");
+                    logBean.setMsg("用户名或密码错误");
+                    baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                    resultMap.put("resultCode", "10003");
+                    resultMap.put("resultMsg", "用户名或密码错误");
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 logBean.setResultCode("10003");
                 logBean.setMsg("用户名或密码错误");
                 baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
@@ -205,7 +212,7 @@ public class SigninController extends BaseController {
                 resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                 logBean.setResultCode("10001");
                 logBean.setMsg("必选参数为空，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                 return resultMap;
             }
 
@@ -217,8 +224,8 @@ public class SigninController extends BaseController {
                 resultMap.put("resultCode", "10002");
                 resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
                 logBean.setResultCode("10002");
-                logBean.setMsg( "参数校验不合格，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                 return resultMap;
             }
 
@@ -231,7 +238,7 @@ public class SigninController extends BaseController {
                     resultMap.put("resultCode", "-1");
                     resultMap.put("resultMsg", "用户名已经存在");
                     logBean.setResultCode("-1");
-                    logBean.setMsg( "用户名已经存在");
+                    logBean.setMsg("用户名已经存在");
                 }else {
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
@@ -244,8 +251,8 @@ public class SigninController extends BaseController {
                 resultMap.put("resultCode", "10005");
                 resultMap.put("resultMsg", "查询数据出现异常");
                 logBean.setResultCode("10005");
-                logBean.setMsg( "查询数据出现异常");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                logBean.setMsg("查询数据出现异常");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                 return resultMap;
                 //e.printStackTrace();
             }

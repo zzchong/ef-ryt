@@ -1,7 +1,6 @@
 package com.efeiyi.ec.art.organization.service.imp;
 
-import com.efeiyi.ec.organization.model.BigUser;
-import com.efeiyi.ec.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.organization.OrganizationConst;
 import com.efeiyi.ec.art.organization.dao.UserDao;
 import com.efeiyi.ec.art.organization.service.UserManager;
@@ -40,7 +39,7 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
         this.userDao = userDao;
     }
 
-    @Override
+/*    @Override
     public List<BigUser> listBigUser(String teachAreaId) {
 
         String queryStr = "select u from BigUser u where u.teachArea.id=? and theStatus!=" + OrganizationConst.USER_THE_STATUS_DELETE;
@@ -53,11 +52,7 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
         userDao.saveOrUpdateObject(bigUser);
     }
 
-    public PageInfo pageBigUser(String teachAreaId, PageEntity pageEntity) {
-        String queryString = "from BigUser u where u.teachArea.id=?";
-        Object[] params = new Object[]{teachAreaId};
-        return userDao.getPageByConditions(pageEntity, queryString, params);
-    }
+  */
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
@@ -100,5 +95,10 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
     }
 
 
-
+    @Override
+    public PageInfo pageBigUser(String teachAreaId, PageEntity pageEntity) {
+        String queryString = "from BigUser u where u.teachArea.id=?";
+        Object[] params = new Object[]{teachAreaId};
+        return userDao.getPageByConditions(pageEntity, queryString, params);
+    }
 }

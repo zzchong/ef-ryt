@@ -6,9 +6,10 @@ import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.jpush.EfeiyiPush;
+import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.model.ArtworkComment;
 import com.efeiyi.ec.art.model.Message;
-import com.efeiyi.ec.organization.model.MyUser;
-import com.efeiyi.ec.organization.model.User;
+import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import org.apache.log4j.Logger;
@@ -35,9 +36,9 @@ public class EPushController extends BaseController {
 
     @Autowired
     BaseManager baseManager;
-    @RequestMapping(value = "/app/push.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/pushMesssage.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map login(HttpServletRequest request) {
+    public Map pushMesssage(HttpServletRequest request) {
         LogBean logBean = new LogBean();
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
@@ -109,6 +110,91 @@ public class EPushController extends BaseController {
     }
 
 
+    @RequestMapping(value = "/app/saveComment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map saveComment(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("content"))
+                    || jsonObj.getString("father_comment_id")== null || "".equals(jsonObj.getString("username"))
+                    || "".equals(jsonObj.getString("artwork_id")) || "".equals(jsonObj.getString("timestamp"))) {
+                logBean.setResultCode("10001");
+                logBean.setMsg("必选参数为空，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10001");
+                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                return resultMap;
+            }
+            String father_comment_id = jsonObj.getString("father_comment_id");
+
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("content", jsonObj.getString("content"));
+            treeMap.put("father_comment_id", father_comment_id);
+            treeMap.put("username", jsonObj.getString("username"));
+            treeMap.put("artwork_id", jsonObj.getString("artwork_id"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                return resultMap;
+            }
+
+            ArtworkComment artworkComment = new ArtworkComment();
+            artworkComment.setCreateDatetime(new Date());
+            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artwork_id"));
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("username", jsonObj.getString("username"));
+            User user = (User) baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_GET_APP, map);
+            ArtworkComment fatherArtworkComment =null;
+
+            if (artwork==null || user==null){
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                return resultMap;
+            }
+            artworkComment.setArtwork(artwork);
+            artworkComment.setContent(jsonObj.getString("content"));
+            artworkComment.setCreator(user);
+            artworkComment.setIswatch("0");
+            artworkComment.setCreateDatetime(new Date());
+            artworkComment.setStatus("0");
+            if(!"".equals(father_comment_id)){
+                fatherArtworkComment = (ArtworkComment)baseManager.getObject(ArtworkComment.class.getName(),father_comment_id);
+            }
+            artworkComment.setFatherComment(fatherArtworkComment);
+
+
+            baseManager.saveOrUpdate(Message.class.getName(),artworkComment);
+            logBean.setResultCode("0");
+            logBean.setMsg("成功");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "成功");
+
+            EfeiyiPush.SendPushComment(appKey, masterSecret, artworkComment);
+
+        } catch (Exception e) {
+            logBean.setResultCode("10004");
+            logBean.setMsg("未知错误，请联系管理员");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMap;
+        }
+        return resultMap;
+    }
 
 
 

@@ -1,5 +1,9 @@
 package com.efeiyi.ec.art.organization.model;
 
+import com.efeiyi.ec.art.organization.model.AddressCity;
+import com.efeiyi.ec.art.organization.model.AddressDistrict;
+import com.efeiyi.ec.art.organization.model.AddressProvince;
+import com.efeiyi.ec.art.organization.model.MyUser;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;

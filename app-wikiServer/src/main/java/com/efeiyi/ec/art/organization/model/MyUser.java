@@ -1,6 +1,5 @@
 package com.efeiyi.ec.art.organization.model;
 
-import com.efeiyi.ec.tenant.model.BigTenant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ming800.core.base.model.BaseUser;
@@ -52,27 +51,27 @@ public class MyUser implements Serializable, UserDetails ,BaseUser{
 
 
     private String tempPageUrl;
-    private BigTenant bigTenant;
+    //private BigTenant bigTenant;
     private Map<String, String> settingMap;
 
     private Integer utype; //总部用户，分公司用户
 
 
-    private BigUser bigUser;
+    //private BigUser bigUser;
 
 
     private Date lastLoginDatetime;//最后一次登陆时间
     private Date lastLogoutDatetime;//最后一次登陆时间
 
 
-    @Transient
+   /* @Transient
     public BigUser getBigUser() {
         return bigUser;
     }
 
     public void setBigUser(BigUser bigUser) {
         this.bigUser = bigUser;
-    }
+    }*/
 
     public MyUser() {
     }
@@ -87,7 +86,7 @@ public class MyUser implements Serializable, UserDetails ,BaseUser{
         this.role = role;
     }
 
-    @JsonIgnore
+ /*   @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tenant_id")
     public BigTenant getBigTenant() {
@@ -96,7 +95,7 @@ public class MyUser implements Serializable, UserDetails ,BaseUser{
 
     public void setBigTenant(BigTenant bigTenant) {
         this.bigTenant = bigTenant;
-    }
+    }*/
 
     @Column(name = "type")
     public Integer getUtype() {
@@ -113,6 +112,8 @@ public class MyUser implements Serializable, UserDetails ,BaseUser{
     public String getId() {
         return id;
     }
+
+
 
     public void setId(String id) {
         this.id = id;

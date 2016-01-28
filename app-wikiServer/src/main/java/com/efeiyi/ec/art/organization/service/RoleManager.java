@@ -1,7 +1,7 @@
 package com.efeiyi.ec.art.organization.service;
 
 
-import com.efeiyi.ec.organization.model.Role;
+import com.efeiyi.ec.art.organization.model.Role;
 
 /**
  * Created with IntelliJ IDEA.

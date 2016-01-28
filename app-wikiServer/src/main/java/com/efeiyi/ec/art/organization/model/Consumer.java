@@ -1,16 +1,16 @@
 package com.efeiyi.ec.art.organization.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by Administrator on 2015/5/28.
  */
 @Entity
 @Table(name = "organization_consumer")
-public class Consumer extends BigUser {
+public class Consumer extends com.efeiyi.ec.art.organization.model.BigUser {
     private BigDecimal deposit;
     private Integer score;
     private String unionid;

@@ -14,6 +14,7 @@ import cn.jpush.api.push.model.audience.AudienceTarget;
 import cn.jpush.api.push.model.notification.AndroidNotification;
 import cn.jpush.api.push.model.notification.IosNotification;
 import cn.jpush.api.push.model.notification.Notification;
+import com.efeiyi.ec.art.model.ArtworkComment;
 import org.apache.log4j.Logger;
 
 /**
@@ -35,16 +36,6 @@ public class EfeiyiPush {
 
         JPushClient jpushClient = new JPushClient(masterSecret, appKey);
 
-        //jpushClient = new JPushClient(masterSecret, appKey, 3);
-
-        // HttpProxy proxy = new HttpProxy("localhost", 3128);
-        // Can use this https proxy: https://github.com/Exa-Networks/exaproxy
-
-
-        // For push, all you need do is to build PushPayload object.
-        //PushPayload payload = buildPushObject_all_all_alert();
-        //生成推送的内容，这里我们先测试全部推送
-        //PushPayload payload=buildPushObject_all_alias_alert();
 
         PushPayload payload=buildPushObject_android_and_ios(message);
         try {
@@ -66,6 +57,34 @@ public class EfeiyiPush {
             logger.info("Msg ID: " + e.getMsgId());
         }
     }
+
+
+    public static void SendPushComment(String appKey ,String masterSecret, ArtworkComment comment) {
+
+        JPushClient jpushClient = new JPushClient(masterSecret, appKey);
+        PushPayload payload=buildPushObject_android_and_ios_withComment(comment);
+        try {
+            System.out.println(payload.toString());
+            PushResult result = jpushClient.sendPush(payload);
+            System.out.println(result+"................................");
+
+            logger.info("Got result - " + result);
+
+        } catch (APIConnectionException e) {
+            logger.error("Connection error. Should retry later. ", e);
+
+        } catch (APIRequestException e) {
+            e.printStackTrace();
+            logger.error("Error response from JPush server. Should review and fix it. ", e);
+            logger.info("HTTP Status: " + e.getStatus());
+            logger.info("Error Code: " + e.getErrorCode());
+            logger.info("Error Message: " + e.getErrorMessage());
+            logger.info("Msg ID: " + e.getMsgId());
+        }
+    }
+
+
+
 
     public static PushPayload buildPushObject_all_all_alert() {
         return PushPayload.alertAll(ALERT);
@@ -97,6 +116,30 @@ public class EfeiyiPush {
                         .addPlatformNotification(AndroidNotification.newBuilder()
                                 .setTitle(TITLE)
                                 .setAlert(message.getFromUser().getName()+ALERT+message.getContent())
+                                .addExtra("extra_key", "extra_value")
+                                .build())
+                        .addPlatformNotification(IosNotification.newBuilder()
+                                .setAlert(ALERT)
+                                .setBadge(5)
+                                .setSound("happy")
+                                .addExtra("from", "JPush")
+                                .incrBadge(1)
+                                .addExtra("extra_key", "extra_value").build())
+                        .build())
+                .build();
+    }
+
+
+    public static PushPayload buildPushObject_android_and_ios_withComment(ArtworkComment comment) {
+        return PushPayload.newBuilder()
+                .setPlatform(Platform.android_ios())
+                .setAudience(Audience.all())
+                        //.setAudience(Audience.registrationId(REGISTRATION_ID))
+                .setNotification(Notification.newBuilder()
+                        .setAlert(MSG_CONTENT)
+                        .addPlatformNotification(AndroidNotification.newBuilder()
+                                .setTitle(TITLE)
+                                .setAlert(comment.getFatherComment().getCreator().getName()+ALERT+comment.getContent())
                                 .addExtra("extra_key", "extra_value")
                                 .build())
                         .addPlatformNotification(IosNotification.newBuilder()

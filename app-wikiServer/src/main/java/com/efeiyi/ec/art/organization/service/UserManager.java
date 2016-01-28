@@ -1,6 +1,5 @@
 package com.efeiyi.ec.art.organization.service;
 
-import com.efeiyi.ec.organization.model.BigUser;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.taglib.PageEntity;
 
@@ -15,9 +14,9 @@ import java.util.List;
  */
 public interface UserManager {
 
-    public List<BigUser> listBigUser(String teachAreaId);
+  /*  public List<BigUser> listBigUser(String teachAreaId);
 
-    public void saveOrUpdateBigUser(BigUser bigUser);
+    public void saveOrUpdateBigUser(BigUser bigUser);*/
 
     public PageInfo pageBigUser(String teachAreaId, PageEntity pageEntity);
 }
