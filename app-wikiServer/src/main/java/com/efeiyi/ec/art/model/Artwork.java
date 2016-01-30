@@ -32,7 +32,7 @@ public class Artwork implements Serializable {
     private Date createDatetime;
     private List<ArtworkAttachment> artworkAttachment;
     private List<ArtworkComment> artworkComments;
-
+    private ArtworkDraw artworkDraw;
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -143,5 +143,13 @@ public class Artwork implements Serializable {
 
     public void setArtworkComments(List<ArtworkComment> artworkComments) {
         this.artworkComments = artworkComments;
+    }
+    @OneToOne(mappedBy = "artwork")
+    public ArtworkDraw getArtworkDraw() {
+        return artworkDraw;
+    }
+
+    public void setArtworkDraw(ArtworkDraw artworkDraw) {
+        this.artworkDraw = artworkDraw;
     }
 }
