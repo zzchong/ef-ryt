@@ -3,11 +3,13 @@ package com.efeiyi.ec.art.model;
 import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/1/25.
@@ -28,6 +30,9 @@ public class Artwork implements Serializable {
     private Date auctionEndDatetime;
     private User author;
     private Date createDatetime;
+    private List<ArtworkAttachment> artworkAttachment;
+    private List<ArtworkComment> artworkComments;
+
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -119,5 +124,24 @@ public class Artwork implements Serializable {
 
     public void setCreateDatetime(Date createDatetime) {
         this.createDatetime = createDatetime;
+    }
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+
+    public List<ArtworkAttachment> getArtworkAttachment() {
+        return artworkAttachment;
+    }
+
+    public void setArtworkAttachment(List<ArtworkAttachment> artworkAttachment) {
+        this.artworkAttachment = artworkAttachment;
+    }
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    public List<ArtworkComment> getArtworkComments() {
+        return artworkComments;
+    }
+
+    public void setArtworkComments(List<ArtworkComment> artworkComments) {
+        this.artworkComments = artworkComments;
     }
 }
