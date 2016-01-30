@@ -22,7 +22,7 @@ public class Artwork implements Serializable {
     private String id;
     private String title;
     private String brief;
-    private String status;  //融资1    拍卖21     抽奖31
+    private String status;  //融资1 拍卖21 抽奖31
     private BigDecimal investGoalMoney;
     private Date investStartDatetime;
     private Date investEndDatetime;
