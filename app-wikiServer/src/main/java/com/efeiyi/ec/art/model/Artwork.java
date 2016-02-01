@@ -33,7 +33,7 @@ public class Artwork implements Serializable {
     private List<ArtworkAttachment> artworkAttachment;
     private List<ArtworkComment> artworkComments;
     private ArtworkDraw artworkDraw;
-
+    private String picture_url;
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -151,5 +151,13 @@ public class Artwork implements Serializable {
 
     public void setArtworkDraw(ArtworkDraw artworkDraw) {
         this.artworkDraw = artworkDraw;
+    }
+    @Column(name = "picture_url")
+    public String getPicture_url() {
+        return picture_url;
+    }
+
+    public void setPicture_url(String picture_url) {
+        this.picture_url = picture_url;
     }
 }
