@@ -39,6 +39,7 @@ public class ArtworkController extends BaseController {
           resultMap.put("resultCode","0");
           resultMap.put("resultMsg","成功");
         } catch(Exception e){
+            e.printStackTrace();
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
             return resultMap;

@@ -2,7 +2,7 @@
 
 
 
-<module name="project" label="project" version="" package="com.efeiyi.ec.art" path="">
+<module name="artwork" label="artwork" version="" package="com.efeiyi.ec.art" path="">
 
     <entities>
         <entity name="Artwork" label="Artwork"
