@@ -33,6 +33,7 @@ public class SeckillProduct {
     private Integer limitAmount; //限购数量
     private String status; //秒杀状态
 
+    
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
