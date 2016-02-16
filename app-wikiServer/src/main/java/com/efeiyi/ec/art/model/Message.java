@@ -40,7 +40,7 @@ public class Message implements Serializable{
         this.content = content;
     }
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fromUser_id")
+    @JoinColumn(name = "from_user_id")
     public User getFromUser() {
         return fromUser;
     }
@@ -49,7 +49,7 @@ public class Message implements Serializable{
         this.fromUser = fromUser;
     }
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "targetUser_id")
+    @JoinColumn(name = "target_user_id")
     public User getTargetUser() {
         return targetUser;
     }
@@ -57,7 +57,7 @@ public class Message implements Serializable{
     public void setTargetUser(User targetUser) {
         this.targetUser = targetUser;
     }
-    @Column(name = "createDatetime")
+    @Column(name = "create_datetime")
     public Date getCreateDatetime() {
         return createDatetime;
     }

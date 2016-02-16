@@ -12,7 +12,7 @@ import java.util.Date;
  *
  */
 @Entity
-@Table(name = "ef_logs")
+@Table(name = "app_art_logs")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class LogBean  implements Serializable {
     private String id;

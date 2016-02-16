@@ -1,26 +1,28 @@
 package com.efeiyi.ec.art.model;
 
+import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
-import com.efeiyi.ec.art.organization.model.User;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * Created by Administrator on 2016/1/25.
+ * Created by Administrator on 2016/2/2.
  *
  */
 @Entity
-@Table(name = "app_art_work_draw")
+@Table(name = "app_notification")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class ArtworkDraw implements Serializable{
+public class Notification implements Serializable {//系统通知
     private String id;
-    private Artwork artwork;
-    private User luckyUser;
-    private User creator;
+    private String content;
+    private User targetUser;
     private Date createDatetime;
+    private Artwork artwork;
+
+
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -32,25 +34,26 @@ public class ArtworkDraw implements Serializable{
     public void setId(String id) {
         this.id = id;
     }
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "art_work_id")
-    public Artwork getArtwork() {
-        return artwork;
+
+    @Column(name = "content")
+    public String getContent() {
+        return content;
     }
 
-    public void setArtwork(Artwork artwork) {
-        this.artwork = artwork;
+    public void setContent(String content) {
+        this.content = content;
     }
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lucky_user_id")
-    public User getLuckyUser() {
-        return luckyUser;
+    @JoinColumn(name = "user_id")
+    public User getTargetUser() {
+        return targetUser;
     }
 
-    public void setLuckyUser(User luckyUser) {
-        this.luckyUser = luckyUser;
+    public void setTargetUser(User targetUser) {
+        this.targetUser = targetUser;
     }
-    @Column(name = "create_datetime")
+    @Column(name = "create_time")
     public Date getCreateDatetime() {
         return createDatetime;
     }
@@ -59,18 +62,14 @@ public class ArtworkDraw implements Serializable{
         this.createDatetime = createDatetime;
     }
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_user_id")
-    public User getCreator() {
-        return creator;
+    @JoinColumn(name = "art_work_id")
+    public Artwork getArtwork() {
+        return artwork;
     }
 
-    public void setCreator(User creator) {
-        this.creator = creator;
+    public void setArtwork(Artwork artwork) {
+        this.artwork = artwork;
     }
 }
-
-
-
-
 
 
