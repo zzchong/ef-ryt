@@ -13,7 +13,7 @@ import java.util.Date;
  *
  */
 @Entity
-@Table(name = "app_notification")
+@Table(name = "app_art_notification")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Notification implements Serializable {//系统通知
     private String id;
