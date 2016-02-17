@@ -156,7 +156,7 @@ public class EfeiyiPush {
     public static PushPayload buildPushObject_ios_tagAnd_alertWithExtrasAndMessage() {
         return PushPayload.newBuilder()
                 .setPlatform(Platform.ios())
-                .setAudience(Audience.tag_and("tag1", "tag_all"))
+                .setAudience(Audience.registrationId("tag1", "tag_all"))
                 .setNotification(Notification.newBuilder()
                         .addPlatformNotification(IosNotification.newBuilder()
                                 .setAlert(ALERT)

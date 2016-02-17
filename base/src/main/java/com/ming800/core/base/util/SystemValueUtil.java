@@ -46,13 +46,13 @@ public class SystemValueUtil {
                     }
                     break;
 
-                case "MY_TENANT":
+            /*    case "MY_TENANT":
                     if (type.equals("id")) {
                         resultValue = BaseUserUtil.getMyUser().getBigTenant().getId();
                     } else {
                         resultValue = BaseUserUtil.getMyUser().getBigTenant();
                     }
-                    break;
+                    break;*/
 
              /*   case "MY_ROLE":
                     if (type.equals("id")) {

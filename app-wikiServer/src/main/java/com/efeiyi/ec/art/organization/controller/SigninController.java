@@ -1,12 +1,14 @@
 package com.efeiyi.ec.art.organization.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.efeiyi.ec.art.model.PushUserBinding;
 import com.efeiyi.ec.art.organization.model.Consumer;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
+import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import org.apache.log4j.Logger;
@@ -67,7 +69,7 @@ public class SigninController extends BaseController {
             map.put("username", jsonObj.getString("username"));
             MyUser user;
             try {
-                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_GET, map);
+                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user.getPassword().equals(jsonObj.getString("password"))) {
                     logBean.setResultCode("0");
                     logBean.setMsg("成功");
@@ -149,7 +151,7 @@ public class SigninController extends BaseController {
             map.put("username", jsonObj.getString("username"));
             MyUser user;
             try {
-                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_GET, map);
+                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user!=null && user.getId()!=null) {
                     resultMap.put("resultCode", "-1");
                     resultMap.put("resultMsg", "用户名已经存在");
@@ -207,7 +209,7 @@ public class SigninController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
-                    "".equals(jsonObj.getString("password")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("truename2"))) {
+                "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("truename2"))) {
                 resultMap.put("resultCode", "10001");
                 resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                 logBean.setResultCode("10001");
@@ -233,7 +235,7 @@ public class SigninController extends BaseController {
             map.put("username", jsonObj.getString("username"));
             MyUser user;
             try {
-                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_GET, map);
+                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user!=null && user.getId()!=null) {
                     resultMap.put("resultCode", "-1");
                     resultMap.put("resultMsg", "用户名已经存在");
@@ -278,10 +280,94 @@ public class SigninController extends BaseController {
         Pattern p ;
         Matcher m ;
         boolean b;
-        p = Pattern.compile("^[1][3,4,5,8][0-9]{9}$"); // 验证手机号
+        p = Pattern.compile("^[1][3,4,5,7,8][0-9]{9}$"); // 验证手机号
         m = p.matcher(str);
         b = m.matches();
         return b;
     }
+
+
+
+    @RequestMapping(value = "/app/userBinding.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map JpushBinding(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
+                    "".equals(jsonObj.getString("cid")) || "".equals(jsonObj.getString("timestamp"))
+                   ) {
+                resultMap.put("resultCode", "10001");
+                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                logBean.setResultCode("10001");
+                logBean.setMsg("必选参数为空，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                return resultMap;
+            }
+
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("username", jsonObj.getString("username"));
+            treeMap.put("cid", jsonObj.getString("cid"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                return resultMap;
+            }
+
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("username", jsonObj.getString("username"));
+            User user;
+            try {
+                user = (User) baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_GET, map);
+                if (user==null || user.getId()==null) {
+                    resultMap.put("resultCode", "10007");
+                    resultMap.put("resultMsg", "用户名不存在");
+                    logBean.setResultCode("10007");
+                    logBean.setMsg("用户名不存在");
+                    baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                    return resultMap;
+                }
+                PushUserBinding pushUserBinding = new PushUserBinding();
+                pushUserBinding.setCid(jsonObj.getString("cid"));
+                pushUserBinding.setUser(user);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+                logBean.setResultCode("0");
+                logBean.setMsg("成功");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            } catch (Exception e) {
+                resultMap.put("resultCode", "10005");
+                resultMap.put("resultMsg", "查询数据出现异常");
+                logBean.setResultCode("10005");
+                logBean.setMsg("查询数据出现异常");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                return resultMap;
+                //e.printStackTrace();
+            }
+
+
+        } catch(Exception e){
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            logBean.setResultCode("10004");
+            logBean.setMsg("未知错误，请联系管理员");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            return resultMap;
+        }
+        return resultMap;
+    }
+
+
+
+
 
 }
