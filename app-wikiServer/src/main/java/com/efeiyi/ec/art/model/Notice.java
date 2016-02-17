@@ -41,7 +41,7 @@ public class Notice implements Serializable{
         this.content = content;
     }
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from—_user_id")
+    @JoinColumn(name = "from_user_id")
     public User getFromUser() {
         return fromUser;
     }
