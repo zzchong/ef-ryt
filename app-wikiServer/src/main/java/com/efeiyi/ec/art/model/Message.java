@@ -20,6 +20,7 @@ public class Message implements Serializable{
     private User fromUser;
     private User targetUser;
     private Date createDatetime;
+    private String isRead; //0 未读 1 已读
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -64,6 +65,15 @@ public class Message implements Serializable{
 
     public void setCreateDatetime(Date createDatetime) {
         this.createDatetime = createDatetime;
+    }
+
+    @Column(name = "is_read")
+    public String getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(String isRead) {
+        this.isRead = isRead;
     }
 }
 

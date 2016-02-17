@@ -18,5 +18,47 @@
 
             </does>
         </entity>
+
+        <entity name="Notice" label="通知"
+                basic="simple" others=""
+                model="com.efeiyi.ec.art.model.Notice">
+            <does>
+                <do name="listNotice" access="" label="通知列表">
+                    <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
+                        <condition name="targetUser.id" defaultValue="0" operation="eq"/>
+                        <condition name="isRead" defaultValue="0" operation="eq"/>
+                    </query>
+                </do>
+
+            </does>
+        </entity>
+
+        <entity name="Message" label="私信"
+                basic="simple" others=""
+                model="com.efeiyi.ec.art.model.Message">
+            <does>
+                <do name="listMessage" access="" label="通知列表">
+                    <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
+                        <condition name="targetUser.id" defaultValue="0" operation="eq"/>
+                        <condition name="isRead" defaultValue="0" operation="eq"/>
+                    </query>
+                </do>
+
+            </does>
+        </entity>
+
+        <entity name="Reply" label="通知"
+                basic="simple" others=""
+                model="com.efeiyi.ec.art.model.Reply">
+            <does>
+                <do name="listReply" access="" label="通知列表">
+                    <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
+                        <condition name="targetUser.id" defaultValue="0" operation="eq"/>
+                        <condition name="isRead" defaultValue="0" operation="eq"/>
+                    </query>
+                </do>
+
+            </does>
+        </entity>
     </entities>
 </module>
