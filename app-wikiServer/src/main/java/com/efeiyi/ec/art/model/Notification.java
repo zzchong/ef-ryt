@@ -53,7 +53,7 @@ public class Notification implements Serializable {//系统通知
     public void setTargetUser(User targetUser) {
         this.targetUser = targetUser;
     }
-    @Column(name = "create_time")
+    @Column(name = "create_datetime")
     public Date getCreateDatetime() {
         return createDatetime;
     }
