@@ -93,7 +93,7 @@ public class ProfileController extends BaseController{
         LogBean logBean = new LogBean();
         TreeMap treeMap = new TreeMap();
         JSONObject jsonObj;
-        MyUser user = null;
+        MyUser user;
         try {
             jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
@@ -130,19 +130,52 @@ public class ProfileController extends BaseController{
             List<MyUser> users = baseManager.listObject(xQuery);
             if (users != null && users.size() > 0){
                 user = users.get(0);
-            }
-            if ("11".equals(type)){
-
-            }else if("12".equals(type)){
-                String regExp = "^((13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$";
-                Pattern pattern = Pattern.compile(regExp);
-                Matcher matcher = pattern.matcher(content);
-                boolean flag = matcher.find();
-                if (flag){
-
+                if ("11".equals(type)){
+                    user.setName2(content);
+                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    logBean.setResultCode("0");
+                    logBean.setMsg("成功");
+                    baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                    resultMap.put("resultCode","0");
+                    resultMap.put("resultMsg","请求成功");
+                    resultMap.put("userInfo",user);
+                }else if("12".equals(type)){
+                    /**
+                     * 这里的手机号码验证仅包含{13/15/18}开头的号段
+                     * 有需要的可以再增加其他的
+                     */
+                    String regExp = "^((13[0-9])|(15[0-9])|(18[0-9]))\\d{8}$";
+                    Pattern pattern = Pattern.compile(regExp);
+                    Matcher matcher = pattern.matcher(content);
+                    boolean flag = matcher.find();
+                    if (flag){
+                        user.setUsername(content);
+                        baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                        logBean.setResultCode("0");
+                        logBean.setMsg("成功");
+                        baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                        resultMap.put("resultCode","0");
+                        resultMap.put("resultMsg","请求成功");
+                        resultMap.put("userInfo",user);
+                    }else{
+                        logBean.setResultCode("10002");
+                        logBean.setMsg("参数校验不合格，请仔细检查");
+                        baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                        resultMap.put("resultCode", "10002");
+                        resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                    }
+                }else if("13".equals(type)){
+                    /**
+                     * 此处为编辑签名的操作
+                     * 修改model后添加业务逻辑
+                     */
                 }
-            }else if("13".equals(type)){
-
+            }else{
+                logBean.setResultCode("10008");
+                logBean.setMsg("查无数据,稍后再试");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10008");
+                resultMap.put("resultMsg", "查无数据,稍后再试");
             }
         } catch (Exception e) {
             logBean.setResultCode("10004");

@@ -36,6 +36,7 @@ public class SigninController extends BaseController {
     @ResponseBody
     public Map login(HttpServletRequest request) {
         LogBean logBean = new LogBean();
+        logBean.setApiName("login");
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
         try {
@@ -108,6 +109,7 @@ public class SigninController extends BaseController {
     @ResponseBody
     public Map register(HttpServletRequest request) {
         LogBean logBean = new LogBean();
+        logBean.setApiName("register");
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
         try {
@@ -202,6 +204,7 @@ public class SigninController extends BaseController {
     @ResponseBody
     public Map checkUserName(HttpServletRequest request) {
         LogBean logBean = new LogBean();
+        logBean.setApiName("checkUserName");
         Map<String, String> resultMap = new HashMap<String, String>();
         TreeMap treeMap = new TreeMap();
         try {
@@ -292,6 +295,7 @@ public class SigninController extends BaseController {
     @ResponseBody
     public Map JpushBinding(HttpServletRequest request) {
         LogBean logBean = new LogBean();
+        logBean.setApiName("userBinding");
         Map<String, String> resultMap = new HashMap<String, String>();
         TreeMap treeMap = new TreeMap();
         try {
