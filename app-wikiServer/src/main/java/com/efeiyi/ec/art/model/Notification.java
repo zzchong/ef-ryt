@@ -21,7 +21,8 @@ public class Notification implements Serializable {//系统通知
     private User targetUser;
     private Date createDatetime;
     private Artwork artwork;
-
+    private String isWatch;// 0 未读 1 已读
+    private String status; // 是否删除
 
 
     @Id
@@ -70,6 +71,25 @@ public class Notification implements Serializable {//系统通知
     public void setArtwork(Artwork artwork) {
         this.artwork = artwork;
     }
+
+    @Column(name = "is_watch")
+    public String getIsWatch() {
+        return isWatch;
+    }
+
+    public void setIsWatch(String isWatch) {
+        this.isWatch = isWatch;
+    }
+
+    @Column(name = "status")
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 }
 
 
