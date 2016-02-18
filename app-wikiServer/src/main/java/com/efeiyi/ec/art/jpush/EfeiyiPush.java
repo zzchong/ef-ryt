@@ -27,7 +27,7 @@ public class EfeiyiPush {
     public static final String TITLE = "融艺投";
     public static final String ALERT = "评论了你";
     public static final String MSG_CONTENT = "融艺投祝大家新春快乐";
-    public static final String REGISTRATION_ID = "0900e8d85ef";
+    public static final String REGISTRATION_ID = "140fe1da9ea99f1a9bc";
     public static final String TAG = "tag_api";
 
     //public  static JPushClient jpushClient=null;
@@ -109,13 +109,13 @@ public class EfeiyiPush {
     public static PushPayload buildPushObject_android_and_ios(com.efeiyi.ec.art.model.Message message) {
         return PushPayload.newBuilder()
                 .setPlatform(Platform.android_ios())
-                .setAudience(Audience.all())
-                //.setAudience(Audience.registrationId(REGISTRATION_ID))
+                //.setAudience(Audience.all())
+                .setAudience(Audience.registrationId(REGISTRATION_ID))
                 .setNotification(Notification.newBuilder()
                         .setAlert(MSG_CONTENT)
                         .addPlatformNotification(AndroidNotification.newBuilder()
                                 .setTitle(TITLE)
-                                .setAlert(message.getFromUser().getName()+ALERT+message.getContent())
+                                .setAlert(ALERT+message.getContent())
                                 .addExtra("extra_key", "extra_value")
                                 .build())
                         .addPlatformNotification(IosNotification.newBuilder()

@@ -344,6 +344,7 @@ public class SigninController extends BaseController {
                 logBean.setResultCode("0");
                 logBean.setMsg("成功");
                 baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
             } catch (Exception e) {
                 resultMap.put("resultCode", "10005");
                 resultMap.put("resultMsg", "查询数据出现异常");
