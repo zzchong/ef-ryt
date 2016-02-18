@@ -167,7 +167,7 @@ public class EPushController extends BaseController {
             artworkComment.setArtwork(artwork);
             artworkComment.setContent(jsonObj.getString("content"));
             artworkComment.setCreator(user);
-            artworkComment.setIswatch("0");
+            artworkComment.setIsWatch("0");
             artworkComment.setCreateDatetime(new Date());
             artworkComment.setStatus("0");
             if(!"".equals(father_comment_id)){
