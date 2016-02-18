@@ -19,14 +19,15 @@
             </does>
         </entity>
 
-        <entity name="Notice" label="通知"
+        <entity name="Notification" label="通知"
                 basic="simple" others=""
-                model="com.efeiyi.ec.art.model.Notice">
+                model="com.efeiyi.ec.art.model.Notification">
             <does>
-                <do name="listNotice" access="" label="通知列表">
+                <do name="lisNotification" access="" label="通知列表">
                     <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
                         <condition name="targetUser.id" defaultValue="0" operation="eq"/>
-                        <condition name="isRead" defaultValue="0" operation="eq"/>
+                        <condition name="isWatch" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="1" operation="eq"/>
                     </query>
                 </do>
 
@@ -37,27 +38,28 @@
                 basic="simple" others=""
                 model="com.efeiyi.ec.art.model.Message">
             <does>
-                <do name="listMessage" access="" label="通知列表">
+                <do name="listMessage" access="" label="私信列表">
                     <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
                         <condition name="targetUser.id" defaultValue="0" operation="eq"/>
-                        <condition name="isRead" defaultValue="0" operation="eq"/>
+                        <condition name="isWatch" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="1" operation="eq"/>
                     </query>
                 </do>
 
             </does>
         </entity>
 
-        <entity name="Reply" label="通知"
+        <entity name="ArtworkComment" label="评论"
                 basic="simple" others=""
-                model="com.efeiyi.ec.art.model.Reply">
+                model="com.efeiyi.ec.art.model.ArtworkComment">
             <does>
-                <do name="listReply" access="" label="通知列表">
+                <do name="listArtworkComment" access="" label="评论列表">
                     <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
-                        <condition name="targetUser.id" defaultValue="0" operation="eq"/>
-                        <condition name="isRead" defaultValue="0" operation="eq"/>
+                        <condition name="fatherComment.creator.id" defaultValue="0" operation="eq"/>
+                        <condition name="isWatch" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="1" operation="eq"/>
                     </query>
                 </do>
-
             </does>
         </entity>
     </entities>

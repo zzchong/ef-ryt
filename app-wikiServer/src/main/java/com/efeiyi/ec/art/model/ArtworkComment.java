@@ -24,7 +24,7 @@ public class ArtworkComment implements Serializable {
     private User creator;
     private Date createDatetime;
     private String status;
-    private String iswatch;
+    private String isWatch;
     private ArtworkComment fatherComment;
     private List<ArtworkComment> subComment;
 
@@ -80,14 +80,17 @@ public class ArtworkComment implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
     @Column(name = "is_watch")
-    public String getIswatch() {
-        return iswatch;
+    public String getIsWatch() {
+        return isWatch;
     }
 
-    public void setIswatch(String iswatch) {
-        this.iswatch = iswatch;
+    public void setIsWatch(String isWatch) {
+        this.isWatch = isWatch;
     }
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "father_comment_id")
     public ArtworkComment getFatherComment() {
