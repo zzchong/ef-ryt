@@ -20,7 +20,7 @@ public class LogBean  implements Serializable {
     private String msg;
     private String requestMessage;
     private Date createDate;
-
+    private String apiName;
 
 
 
@@ -64,5 +64,14 @@ public class LogBean  implements Serializable {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    @Column(name = "api")
+    public String getApiName() {
+        return apiName;
+    }
+
+    public void setApiName(String apiName) {
+        this.apiName = apiName;
     }
 }
