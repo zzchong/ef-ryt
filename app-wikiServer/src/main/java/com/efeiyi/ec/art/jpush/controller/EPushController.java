@@ -30,8 +30,8 @@ import java.util.*;
 public class EPushController extends BaseController {
     private static Logger logger = Logger.getLogger(EPushController.class);
 
-    private static final String appKey ="adc8111aff90e4f46f525f17";
-    private static final String masterSecret = "68ced939e490df0ce2b19901";
+    private static final String appKey ="d1573e16403c2482826bbd35";
+    private static final String masterSecret = "0b6ca44da0dfe0b7ea6331f1";
 
 
     @Autowired
@@ -205,7 +205,7 @@ public class EPushController extends BaseController {
         Message message = new Message();
         message.setContent("现年快乐");
         message.setCreateDatetime(new Date());
-
+        //message.setFromUser(new User());
         EfeiyiPush.SendPush(appKey, masterSecret,message);
 
     }
