@@ -11,11 +11,11 @@ import java.io.InputStream;
 public class JsonAcceptUtil {
 
     public static JSONObject receiveJson(HttpServletRequest request) throws  Exception{
-
+            request.setCharacterEncoding("utf-8");
             InputStream inputStream = request.getInputStream();
             byte[] bytes = new byte[request.getContentLength()];
             inputStream.read(bytes);
-            String param = new String(bytes);
+            String param = new String(bytes,"UTF-8");
             JSONObject jsonObj = (JSONObject) JSONObject.parse(param);
             return jsonObj;
     }
