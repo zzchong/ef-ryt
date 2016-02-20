@@ -8,9 +8,10 @@ import com.efeiyi.ec.art.organization.model.MyUser;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.XQuery;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -20,11 +21,11 @@ import java.util.regex.Pattern;
 /**
  * Created by Administrator on 2016/2/17.
  */
-@RestController
+@Controller
 public class ProfileController extends BaseController{
     private static Logger logger = Logger.getLogger(ProfileController.class);
 
-
+    @ResponseBody
     @RequestMapping(value = "/app/userDatum.do", method = RequestMethod.POST)
     public Map getUserProfile(HttpServletRequest request) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -56,28 +57,29 @@ public class ProfileController extends BaseController{
                 resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
                 return resultMap;
             }
-            XQuery xQuery = new XQuery("formUser_default",request);
-            xQuery.put("username",username);
+            XQuery xQuery = new XQuery("listUser_default", request);
+            xQuery.put("username", username);
+            xQuery.put("status",0);
             List<MyUser> users = baseManager.listObject(xQuery);
-            if (users != null && users.size() > 0){
+            if (users != null && users.size() > 0) {
                 MyUser user = users.get(0);
                 logBean.setResultCode("0");
                 logBean.setMsg("请求成功");
                 baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                resultMap.put("resultCode","0");
-                resultMap.put("resultMsg","成功");
-                resultMap.put("userInfo",user);
-            }else{
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+                resultMap.put("userInfo", user);
+            } else {
                 logBean.setResultCode("10008");
                 logBean.setMsg("查无数据,稍后再试");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                 resultMap.put("resultCode", "10008");
                 resultMap.put("resultMsg", "查无数据,稍后再试");
             }
         } catch (Exception e) {
             logBean.setResultCode("10004");
             logBean.setMsg("未知错误，请联系管理员");
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
             return resultMap;
@@ -87,6 +89,14 @@ public class ProfileController extends BaseController{
     }
 
 
+    /**
+     * 编辑用户资料接口
+     * 接口调用路径 /app/editProfile.do
+     * @param request
+     * 参数type决定编辑哪项资料   type 11/昵称  type 12/手机号码  type 13/签名
+     * @return
+     */
+    @ResponseBody
     @RequestMapping(value = "/app/editProfile.do", method = RequestMethod.POST)
     public Map editProfile(HttpServletRequest request) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -127,6 +137,7 @@ public class ProfileController extends BaseController{
             }
             XQuery xQuery = new XQuery("formUser_byId",request);
             xQuery.put("id",userId);
+            xQuery.put("status",0);
             List<MyUser> users = baseManager.listObject(xQuery);
             if (users != null && users.size() > 0){
                 user = users.get(0);
