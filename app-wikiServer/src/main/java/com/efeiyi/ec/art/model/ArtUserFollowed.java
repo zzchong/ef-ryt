@@ -58,7 +58,7 @@ public class ArtUserFollowed implements Serializable{
     public void setType(String type) {
         this.type = type;
     }
-    @Column(name="createDatetime")
+    @Column(name="create_datetime")
     public Date getCreateDatetime() {
         return createDatetime;
     }
