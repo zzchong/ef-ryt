@@ -1,6 +1,7 @@
 package com.efeiyi.ec.art.model;
 
 import com.efeiyi.ec.art.organization.model.MyUser;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "app_organization_artist")
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Artist extends MyUser{
 
     private String brief; // 简介(短)
