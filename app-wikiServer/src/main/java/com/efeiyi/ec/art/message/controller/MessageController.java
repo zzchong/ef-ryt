@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -229,7 +230,14 @@ public class MessageController extends BaseController {
 //                    objectList =  (List<ArtworkComment>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
 //                    objectList =  (List<ArtworkComment>)baseManager.listObject(AppConfig.SQL_REPLY_GET_APP, map);
                 }else if("2".equals(type)){
-                    objectList =  (List<Message>)baseManager.listObject(AppConfig.SQL_MESSAGE_GET_APP, map);
+                    objectList = new ArrayList();
+                    List<Message> objectTempList =  (List<Message>)baseManager.listObject(AppConfig.SQL_MESSAGE_GET_APP, map);
+                    List<Long> numberList = (List<Long>)baseManager.listObject(AppConfig.SQL_MESSAGE_GET_NUM_APP, map);
+                    for(int i=0;i<objectTempList.size();i++){
+                        Message message =  objectTempList.get(i);
+                        message.setIsRead(numberList.get(i));
+                        objectList.add(message);
+                    }
                 }else {
                     logBean.setResultCode("10002");
                     logBean.setMsg("参数校验不合格，请仔细检查");
