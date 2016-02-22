@@ -169,11 +169,11 @@ public class ProfileController extends BaseController{
                         resultMap.put("resultMsg","请求成功");
                         resultMap.put("userInfo",user);
                     }else{
-                        logBean.setResultCode("10002");
-                        logBean.setMsg("参数校验不合格，请仔细检查");
+                        logBean.setResultCode("10006");
+                        logBean.setMsg("手机号码校验不合格");
                         baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                        resultMap.put("resultCode", "10002");
-                        resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                        resultMap.put("resultCode", "10006");
+                        resultMap.put("resultMsg", "手机号码校验不合格");
                     }
                 }else if("13".equals(type)){
                     /**
