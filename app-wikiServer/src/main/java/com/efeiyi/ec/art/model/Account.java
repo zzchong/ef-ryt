@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/2/20.
@@ -22,12 +23,12 @@ public class Account implements Serializable {
     private User user;//关联用户
     private String type;//账户类别
     private String number;//账号
-    private BankCard bankCard;//关联的银行卡
     private String password;//提现或交易密码
     private BigDecimal currentBalance;//当前余额
     private BigDecimal currentUsableBalance;//当前可用余额
     private String status;
     private Date createDatetime;
+    private List<BankCard> bankCards;//关联的银行卡
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -80,14 +81,16 @@ public class Account implements Serializable {
     public void setNumber(String number) {
         this.number = number;
     }
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account")
-    public BankCard getBankCard() {
-        return bankCard;
+    public List<BankCard> getBankCards() {
+        return bankCards;
     }
 
-    public void setBankCard(BankCard bankCard) {
-        this.bankCard = bankCard;
+    public void setBankCards(List<BankCard> bankCards) {
+        this.bankCards = bankCards;
     }
+
     @Column(name = "password")
     public String getPassword() {
         return password;
