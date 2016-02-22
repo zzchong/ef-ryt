@@ -27,7 +27,7 @@ public class EfeiyiPush {
     public static final String TITLE = "融艺投";
     public static final String ALERT = "评论了你";
     public static final String MSG_CONTENT = "融艺投祝大家新春快乐";
-    public static final String REGISTRATION_ID = "140fe1da9ea99f1a9bc";
+    public static final String REGISTRATION_ID = "18071adc030f0bd22f9";
     public static final String TAG = "tag_api";
 
     //public  static JPushClient jpushClient=null;

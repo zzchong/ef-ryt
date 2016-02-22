@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.model;
 
+import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
@@ -17,8 +18,8 @@ import java.util.Date;
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class ArtUserFollowed implements Serializable{
     private String id;
-    private User user;//被关注着
-    private User follower;//关注者
+    private MyUser user;//被关注着
+    private MyUser follower;//关注者
     private String status;
     private String type;//1.关注艺术家 2.关注普通用户
     private Date createDatetime;
@@ -35,11 +36,11 @@ public class ArtUserFollowed implements Serializable{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    public User getUser() {
+    public MyUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(MyUser user) {
         this.user = user;
     }
     @Column(name="status")
@@ -58,7 +59,7 @@ public class ArtUserFollowed implements Serializable{
     public void setType(String type) {
         this.type = type;
     }
-    @Column(name="createDatetime")
+    @Column(name="create_datetime")
     public Date getCreateDatetime() {
         return createDatetime;
     }
@@ -68,11 +69,11 @@ public class ArtUserFollowed implements Serializable{
     }
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id")
-    public User getFollower() {
+    public MyUser getFollower() {
         return follower;
     }
 
-    public void setFollower(User follower) {
+    public void setFollower(MyUser follower) {
         this.follower = follower;
     }
 }

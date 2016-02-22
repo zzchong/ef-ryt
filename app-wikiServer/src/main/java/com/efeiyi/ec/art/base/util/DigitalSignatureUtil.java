@@ -2,6 +2,7 @@ package com.efeiyi.ec.art.base.util;
 
 import com.efeiyi.ec.art.base.util.AppConfig;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,14 +17,15 @@ public class DigitalSignatureUtil {
         try {
             java.security.MessageDigest md = java.security.MessageDigest
                     .getInstance("MD5");
-            byte[] array = md.digest(md5.getBytes());
+            byte[] array = md.digest(md5.getBytes("utf-8"));
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < array.length; ++i) {
                 sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100)
                         .substring(1, 3));
             }
             return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
+        } catch (java.security.NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -31,7 +33,7 @@ public class DigitalSignatureUtil {
   public static Boolean verify(TreeMap map,String signmsg)throws  Exception{
       boolean flag = false;
       StringBuffer str = new StringBuffer();
-      for(Iterator it = map.keySet().iterator();it.hasNext();){// ��������
+      for(Iterator it = map.keySet().iterator();it.hasNext();){
           Object key = it.next();
           Object Value = map.get(key);
           str.append(key).append("=").append(Value).append("&");
@@ -39,7 +41,7 @@ public class DigitalSignatureUtil {
       str.append("key=" + AppConfig.appKey);
 
       String md5Value = MD5(str.toString());
-
+      System.out.println(str.toString()+"======>"+md5Value);
       if(md5Value.equals(signmsg)){
           flag = true;
       }
@@ -63,7 +65,7 @@ public class DigitalSignatureUtil {
         str.append("key=" + AppConfig.appKey);
 
         String md5Value = MD5(str.toString());
-
+        System.out.println(str.toString()+"======>"+md5Value);
         return md5Value;
     }
 
