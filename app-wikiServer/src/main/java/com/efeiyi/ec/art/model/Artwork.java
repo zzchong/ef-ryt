@@ -108,7 +108,7 @@ public class Artwork implements Serializable {
     public void setAuctionEndDatetime(Date auctionEndDatetime) {
         this.auctionEndDatetime = auctionEndDatetime;
     }
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     public User getAuthor() {
         return author;
@@ -160,4 +160,6 @@ public class Artwork implements Serializable {
     public void setPicture_url(String picture_url) {
         this.picture_url = picture_url;
     }
+
+
 }
