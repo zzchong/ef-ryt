@@ -1,11 +1,13 @@
 package com.efeiyi.ec.art.model;
 
 import com.efeiyi.ec.art.organization.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -18,6 +20,12 @@ import java.util.Date;
 public class Account implements Serializable {
     private String id;
     private User user;//关联用户
+    private String type;//账户类别
+    private String number;//账号
+    private BankCard bankCard;//关联的银行卡
+    private String password;//提现或交易密码
+    private BigDecimal currentBalance;//当前余额
+    private BigDecimal currentUsableBalance;//当前可用余额
     private String status;
     private Date createDatetime;
     @Id
@@ -31,7 +39,8 @@ public class Account implements Serializable {
         this.id = id;
     }
 
-
+   @OneToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "user_id")
     public User getUser() {
         return user;
     }
@@ -54,5 +63,53 @@ public class Account implements Serializable {
 
     public void setCreateDatetime(Date createDatetime) {
         this.createDatetime = createDatetime;
+    }
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    @Column(name = "number")
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account")
+    public BankCard getBankCard() {
+        return bankCard;
+    }
+
+    public void setBankCard(BankCard bankCard) {
+        this.bankCard = bankCard;
+    }
+    @Column(name = "password")
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    @Column(name = "currentBalance")
+    public BigDecimal getCurrentBalance() {
+        return currentBalance;
+    }
+
+    public void setCurrentBalance(BigDecimal currentBalance) {
+        this.currentBalance = currentBalance;
+    }
+    @Column(name = "currentUsableBalance")
+    public BigDecimal getCurrentUsableBalance() {
+        return currentUsableBalance;
+    }
+
+    public void setCurrentUsableBalance(BigDecimal currentUsableBalance) {
+        this.currentUsableBalance = currentUsableBalance;
     }
 }
