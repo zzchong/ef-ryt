@@ -21,7 +21,7 @@ public class ArtUserFollowed implements Serializable{
     private User follower;//关注者
     private String status;
     private String type;//1.关注艺术家 2.关注普通用户
-    private Date createDatetime;
+    private Date createDateTime;
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -60,11 +60,11 @@ public class ArtUserFollowed implements Serializable{
     }
     @Column(name="create_datetime")
     public Date getCreateDatetime() {
-        return createDatetime;
+        return createDateTime;
     }
 
-    public void setCreateDatetime(Date createDatetime) {
-        this.createDatetime = createDatetime;
+    public void setCreateDatetime(Date createDateTime) {
+        this.createDateTime = createDateTime;
     }
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id")
