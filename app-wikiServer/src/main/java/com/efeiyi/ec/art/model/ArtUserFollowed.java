@@ -3,6 +3,7 @@ package com.efeiyi.ec.art.model;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -34,6 +35,7 @@ public class ArtUserFollowed implements Serializable{
         this.id = id;
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public MyUser getUser() {
@@ -67,6 +69,8 @@ public class ArtUserFollowed implements Serializable{
     public void setCreateDatetime(Date createDatetime) {
         this.createDatetime = createDatetime;
     }
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id")
     public MyUser getFollower() {

@@ -35,12 +35,9 @@ public class Master extends User implements Serializable {
     private String backgroundUrl;
     private String provinceName;//籍贯
     private AddressProvince originProvince; //籍贯（省）
-    private String status;         // 正常，删除，停止，隐藏
+    private String theStatus;         // 正常，删除，停止，隐藏
     private String logoUrl;
-    private String projectName ;
     private String masterSpeech;
-    private String followStatus;
-    private Date createDateTime;
     private List<Artwork> artworks;
     @Column(name = "master_speech")
     public String getMasterSpeech() {
@@ -51,44 +48,14 @@ public class Master extends User implements Serializable {
         this.masterSpeech = masterSpeech;
     }
 
-    @Transient
-    public String getFollowStatus() {
-        return followStatus;
+    @Column(name = "the_status")
+    public String getTheStatus() {
+        return theStatus;
     }
 
-    public void setFollowStatus(String followStatus) {
-        this.followStatus = followStatus;
+    public void setTheStatus(String theStatus) {
+        this.theStatus = theStatus;
     }
-
-    @Transient
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    @Column(name = "status")
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-
-    @Column(name = "create_datetime")
-    public Date getCreateDateTime() {
-        return createDateTime;
-    }
-
-    public void setCreateDateTime(Date createDateTime) {
-        this.createDateTime = createDateTime;
-    }
-
-
 
     @Column(name = "brief")
     public String getBrief() {
