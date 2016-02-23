@@ -3,6 +3,8 @@ package com.efeiyi.ec.art.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 import com.efeiyi.ec.art.organization.model.User;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -51,6 +53,7 @@ public class ArtworkInvest implements Serializable{
         this.price = price;
     }
     @Column(name = "status")
+    @Where(clause = "status=1")
     public String getStatus() {
         return status;
     }

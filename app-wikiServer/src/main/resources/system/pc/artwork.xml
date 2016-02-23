@@ -15,10 +15,27 @@
                         <condition name="id" defaultValue="0" operation="ne"/>
                     </query>
                 </do>
-
+                <do name="listArtwork" access="" label="Artwork列表"
+                    result="json">
+                    <query name="default" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="author.id" defaultValue="0" operation="eq"/>
+                    </query>
+                </do>
             </does>
         </entity>
-
+        <entity name="ArtUserFollowed" label="ArtUserFollowed"
+                basic="simple" others=""
+                model="com.efeiyi.ec.art.model.ArtUserFollowed">
+            <does>
+                <do name="listArtUserFollowed" access="" label="ArtUserFollowed列表"
+                    result="json">
+                    <query name="default" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="follower.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="1" operation="eq"/>
+                    </query>
+                </do>
+            </does>
+        </entity>
         <entity name="Notification" label="通知"
                 basic="simple" others=""
                 model="com.efeiyi.ec.art.model.Notification">

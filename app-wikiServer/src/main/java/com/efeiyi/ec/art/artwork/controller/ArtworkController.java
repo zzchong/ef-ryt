@@ -7,6 +7,7 @@ import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.model.Master;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -186,6 +188,82 @@ public class ArtworkController extends BaseController {
     }
 
 
+    /**
+     * 艺术家页面
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/masterView.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map masterView(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        List objectList = null;
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
+                logBean.setResultCode("10001");
+                logBean.setMsg("必选参数为空，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10001");
+                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                return resultMap;
+            }
+            //校验数字签名
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("masterId",jsonObj.getString("masterId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                return resultMap;
+            }
+            //艺术家个人介绍
+            Master master = (Master)baseManager.getObject(Master.class.getName(),jsonObj.getString("masterId"));
+            //关注人数
+            XQuery xQuery = new XQuery("listArtUserFollowed_default",request);
+            xQuery.put("follower_id",jsonObj.getString("masterId"));
+            Integer followedNum = baseManager.listObject(xQuery).size();
+
+            xQuery = new XQuery("listArtwork_default",request);
+            xQuery.put("author_id",jsonObj.getString("masterId"));
+            List<Artwork> artworks = (List<Artwork>)baseManager.listObject(xQuery);
+            //投资者
+            Integer investsNum = 0;
+            //融资金额
+            Double  investsMoney = 0.00;
+            for(Artwork artwork :artworks){
+                 investsNum += artwork.getArtworkInvests().size();
+                 investsMoney += artwork.getInvestsMoney().doubleValue();
+            }
+
+            logBean.setResultCode("0");
+            logBean.setMsg("成功");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            resultMap.put("resultCode","0");
+            resultMap.put("resultMsg","成功");
+            resultMap.put("master",master);
+            resultMap.put("investsNum",investsNum);
+            resultMap.put("investsMoney",investsMoney);
+            resultMap.put("followedNum",followedNum);
+        } catch(Exception e){
+            e.printStackTrace();
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMap;
+        }
+
+        return resultMap;
+    }
+
+
     public  static  void  main(String [] arg) throws Exception {
 
 
@@ -199,16 +277,21 @@ public class ArtworkController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("timestamp", timestamp);
         /**investorArtWork.do测试加密参数**/
-        map.put("artWorkId","qydeyugqqiugdi");
+//        map.put("artWorkId","qydeyugqqiugdi");
+//        map.put("timestamp", timestamp);
+
+        /**masterView.do测试加密参数**/
+        map.put("masterId","icjxkedl0000b6i0");
         map.put("timestamp", timestamp);
+
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/investorArtWork.do";
+        String url = "http://192.168.1.80:8001/app/masterView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorIndex.do测试 **/
-        String json = "{\"artWorkId\":\"qydeyugqqiugdi\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
@@ -238,4 +321,7 @@ public class ArtworkController extends BaseController {
 
         }
     }
+
+
+
 }

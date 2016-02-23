@@ -19,8 +19,8 @@ import java.util.Date;
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class ArtUserFollowed implements Serializable{
     private String id;
-    private MyUser user;//被关注着
-    private MyUser follower;//关注者
+    private MyUser user;//关注着
+    private MyUser follower;//被关注者
     private String status;
     private String type;//1.关注艺术家 2.关注普通用户
     private Date createDatetime;

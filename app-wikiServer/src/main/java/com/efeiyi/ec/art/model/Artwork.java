@@ -1,6 +1,7 @@
 package com.efeiyi.ec.art.model;
 
 import com.efeiyi.ec.art.organization.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Where;
@@ -32,9 +33,11 @@ public class Artwork implements Serializable {
     private Date createDatetime;
     private List<ArtworkAttachment> artworkAttachment;
     private List<ArtworkComment> artworkComments;
+    private List<ArtworkInvest> artworkInvests;
     private ArtworkDraw artworkDraw;
     private String picture_url;
-    private Integer investorsNum; //投资人数
+    private String step; //1 : 审核阶段  2 融资阶段  3 制作阶段  4 拍卖阶段  5 抽奖阶段  9 技术
+    private BigDecimal investsMoney;//已筹金额
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -129,7 +132,6 @@ public class Artwork implements Serializable {
 
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
-
     public List<ArtworkAttachment> getArtworkAttachment() {
         return artworkAttachment;
     }
@@ -162,12 +164,38 @@ public class Artwork implements Serializable {
         this.picture_url = picture_url;
     }
 
-    @Column(name = "investors_num")
-    public Integer getInvestorsNum() {
-        return investorsNum;
+    @Column(name = "step")
+    public String getStep() {
+        return step;
     }
 
-    public void setInvestorsNum(Integer investorsNum) {
-        this.investorsNum = investorsNum;
+    public void setStep(String step) {
+        this.step = step;
+    }
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    public List<ArtworkInvest> getArtworkInvests() {
+        return artworkInvests;
+    }
+
+    public void setArtworkInvests(List<ArtworkInvest> artworkInvests) {
+        this.artworkInvests = artworkInvests;
+    }
+
+    @Transient
+    public  BigDecimal getInvestsMoney(){
+        Double temp = 0.00;
+        if(artworkInvests!=null){
+            for(ArtworkInvest artworkInvest :artworkInvests){
+                temp += artworkInvest.getPrice().doubleValue();
+            }
+            investsMoney = new BigDecimal(temp);
+        }
+        return  investsMoney;
+    }
+
+    public void setInvestsMoney(BigDecimal investsMoney) {
+        this.investsMoney = investsMoney;
     }
 }
