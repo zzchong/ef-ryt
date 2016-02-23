@@ -24,13 +24,12 @@ import java.util.regex.Pattern;
  * Created by Administrator on 2016/2/17.
  */
 @Controller
-public class ProfileController extends BaseController{
+public class ProfileController extends BaseController {
     private static Logger logger = Logger.getLogger(ProfileController.class);
 
     /**
      * 获取用户资料
-     * @param request
-     * 接口调用路径 /app/userDatum.do
+     * @param request 接口调用路径 /app/userDatum.do
      * @return
      */
     @ResponseBody
@@ -67,7 +66,7 @@ public class ProfileController extends BaseController{
             }
             XQuery xQuery = new XQuery("listUser_default", request);
             xQuery.put("username", username);
-            xQuery.put("status",0);
+            xQuery.put("status", 0);
             List<MyUser> users = baseManager.listObject(xQuery);
             if (users != null && users.size() > 0) {
                 MyUser user = users.get(0);
@@ -99,8 +98,7 @@ public class ProfileController extends BaseController{
     /**
      * 编辑用户资料接口
      * 接口调用路径 /app/editProfile.do
-     * @param request
-     * 参数type决定编辑哪项资料   type 11/昵称  type 12/手机号码  type 13/签名
+     * @param request 参数type决定编辑哪项资料   type 11/昵称  type 12/手机号码  type 13/签名
      * @return
      */
     @ResponseBody
@@ -142,18 +140,18 @@ public class ProfileController extends BaseController{
                 resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
                 return resultMap;
             }
-            user = (MyUser) baseManager.getObject(MyUser.class.getName(),userId);
-            if (user != null && user.getId() != null){
-                if ("11".equals(type)){
+            user = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
+            if (user != null && user.getId() != null) {
+                if ("11".equals(type)) {
                     user.setName2(content);
-                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    baseManager.saveOrUpdate(MyUser.class.getName(), user);
                     logBean.setResultCode("0");
                     logBean.setMsg("成功");
-                    baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                    resultMap.put("resultCode","0");
-                    resultMap.put("resultMsg","请求成功");
-                    resultMap.put("userInfo",user);
-                }else if("12".equals(type)){
+                    baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                    resultMap.put("resultCode", "0");
+                    resultMap.put("resultMsg", "请求成功");
+                    resultMap.put("userInfo", user);
+                } else if ("12".equals(type)) {
                     /**
                      * 这里的手机号码验证仅包含{13/15/18}开头的号段
                      * 有需要的可以再增加其他的
@@ -162,39 +160,39 @@ public class ProfileController extends BaseController{
                     Pattern pattern = Pattern.compile(regExp);
                     Matcher matcher = pattern.matcher(content);
                     boolean flag = matcher.find();
-                    if (flag){
+                    if (flag) {
                         user.setUsername(content);
-                        baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                        baseManager.saveOrUpdate(MyUser.class.getName(), user);
                         logBean.setResultCode("0");
                         logBean.setMsg("成功");
-                        baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                        resultMap.put("resultCode","0");
-                        resultMap.put("resultMsg","请求成功");
-                        resultMap.put("userInfo",user);
-                    }else{
+                        baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                        resultMap.put("resultCode", "0");
+                        resultMap.put("resultMsg", "请求成功");
+                        resultMap.put("userInfo", user);
+                    } else {
                         logBean.setResultCode("10006");
                         logBean.setMsg("手机号码校验不合格");
                         baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                         resultMap.put("resultCode", "10006");
                         resultMap.put("resultMsg", "手机号码校验不合格");
                     }
-                }else if("13".equals(type)){
+                } else if ("13".equals(type)) {
                     /**
                      * 此处为编辑签名的操作
                      * 修改model后添加业务逻辑
                      */
                 }
-            }else{
+            } else {
                 logBean.setResultCode("10008");
                 logBean.setMsg("查无数据,稍后再试");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                 resultMap.put("resultCode", "10008");
                 resultMap.put("resultMsg", "查无数据,稍后再试");
             }
         } catch (Exception e) {
             logBean.setResultCode("10004");
             logBean.setMsg("未知错误，请联系管理员");
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
             return resultMap;
@@ -211,7 +209,7 @@ public class ProfileController extends BaseController{
      */
     @ResponseBody
     @RequestMapping(value = "/app/savePassword.do", method = RequestMethod.POST)
-    public Map savePassword(HttpServletRequest request){
+    public Map savePassword(HttpServletRequest request) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         LogBean logBean = new LogBean();
         TreeMap treeMap = new TreeMap();
@@ -244,29 +242,29 @@ public class ProfileController extends BaseController{
                 resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
                 return resultMap;
             }
-            LinkedHashMap<String,Object> queryMap = new LinkedHashMap<>();
-            queryMap.put("userId",userId);
-            Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_ACCOUNT_BY_USER_ID,queryMap);
-            if (account != null && account.getId() != null){
+            LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
+            queryMap.put("userId", userId);
+            Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_ACCOUNT_BY_USER_ID, queryMap);
+            if (account != null && account.getId() != null) {
                 account.setPassword(level_two_pwd);
-                baseManager.saveOrUpdate(Account.class.getName(),account);
+                baseManager.saveOrUpdate(Account.class.getName(), account);
                 logBean.setResultCode("0");
                 logBean.setMsg("成功");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                resultMap.put("resultCode","0");
-                resultMap.put("resultMsg","请求成功");
-                resultMap.put("account",account);
-            }else{
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "请求成功");
+                resultMap.put("account", account);
+            } else {
                 logBean.setResultCode("10008");
                 logBean.setMsg("查无数据,稍后再试");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                 resultMap.put("resultCode", "10008");
                 resultMap.put("resultMsg", "查无数据,稍后再试");
             }
         } catch (Exception e) {
             logBean.setResultCode("10004");
             logBean.setMsg("未知错误，请联系管理员");
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
             return resultMap;
