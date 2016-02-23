@@ -105,13 +105,14 @@ public class ArtUserFollowedController extends BaseController {
     public static void main(String[] args) throws Exception {
         boolean cd = false;
         long timestamp = System.currentTimeMillis();
-        String num = "15538398530";
-        String userId = "iiv2np9v2x7eg6yh";
+//        String num = "15538398530";
+//        String userId = "ih36t7ir18t05e6w";
+        String artUserFollowId = "ikyrqmwffnzt643w";
 //        String type = "12";
-        String type = "1";
-        String content = "13565585985";
-        String size = "11";
-        String index = "1";
+//        String type = "1";
+//        String content = "13565585985";
+//        String size = "11";
+//        String index = "1";
         String signmsg;
         TreeMap map = new TreeMap();
 //        if (cd) {
@@ -121,22 +122,24 @@ public class ArtUserFollowedController extends BaseController {
 //            map.put("type", type);
 //            map.put("content", content);
 //        }
-        map.put("userId", userId);
-        map.put("type", type);
-        map.put("pageIndex", index);
-        map.put("pageSize", size);
+        map.put("artUserFollowId", artUserFollowId);
+        map.put("identifier", "1");
+//        map.put("followId", "iewqdsuy9vee7dae");
+//        map.put("followType", "2");
         map.put("timestamp", timestamp);
         signmsg = DigitalSignatureUtil.encrypt(map);
         System.out.println(signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.68:8080/app/userFollowed.do";
+        String url = "http://192.168.1.68:8080/app/changeFollowStatus.do";
         HttpPost httppost = new HttpPost(url);
 
-        String userDatum = "{\"username\":\"15538398530\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-        String editProfile = "{\"userId\":\"iiv2np9v2x7eg6yh\",\"type\":\"12\",\"content\":\"13565585985\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-        String userFollowed = "{\"userId\":\"iiv2np9v2x7eg6yh\",\"type\":\"1\",\"pageSize\":\"" + size + "\",\"pageIndex\":\"" + index + "\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+//        String userDatum = "{\"username\":\"15538398530\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+//        String editProfile = "{\"userId\":\"iiv2np9v2x7eg6yh\",\"type\":\"12\",\"content\":\"13565585985\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+//        String userFollowed = "{\"userId\":\"iiv2np9v2x7eg6yh\",\"type\":\"1\",\"pageSize\":\"" + size + "\",\"pageIndex\":\"" + index + "\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+//        String changeFollowStatus = "{\"userId\":\"ih36t7ir18t05e6w\",\"followId\":\"iewqdsuy9vee7dae\",\"identifier\":\"0\",\"followType\":\"2\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String changeFollowStatus = "{\"artUserFollowId\":\"ikyrqmwffnzt643w\",\"identifier\":\"1\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
 
-        String json = userFollowed;
+        String json = changeFollowStatus;
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
@@ -202,13 +205,14 @@ public class ArtUserFollowedController extends BaseController {
                         return resultMap;
                     }
                     ArtUserFollowed userFollowed = new ArtUserFollowed();
-                    MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(), followId);
                     MyUser myUser = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
+                    MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(), followId);
                     userFollowed.setUser(myUser);
                     userFollowed.setFollower(user);
                     userFollowed.setCreateDatetime(new Date());
                     userFollowed.setStatus("1");
                     userFollowed.setType(followType);
+                    baseManager.saveOrUpdate(ArtUserFollowed.class.getName(),userFollowed);
                     logBean.setResultCode("0");
                     logBean.setMsg("请求成功");
                     baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
