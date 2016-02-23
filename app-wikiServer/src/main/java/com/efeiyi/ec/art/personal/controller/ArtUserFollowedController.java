@@ -103,29 +103,12 @@ public class ArtUserFollowedController extends BaseController {
     }
 
     public static void main(String[] args) throws Exception {
-        boolean cd = false;
         long timestamp = System.currentTimeMillis();
-//        String num = "15538398530";
-//        String userId = "ih36t7ir18t05e6w";
         String artUserFollowId = "ikyrqmwffnzt643w";
-//        String type = "12";
-//        String type = "1";
-//        String content = "13565585985";
-//        String size = "11";
-//        String index = "1";
         String signmsg;
         TreeMap map = new TreeMap();
-//        if (cd) {
-//            map.put("username", num);
-//        } else {
-//            map.put("userId", userId);
-//            map.put("type", type);
-//            map.put("content", content);
-//        }
         map.put("artUserFollowId", artUserFollowId);
         map.put("identifier", "1");
-//        map.put("followId", "iewqdsuy9vee7dae");
-//        map.put("followType", "2");
         map.put("timestamp", timestamp);
         signmsg = DigitalSignatureUtil.encrypt(map);
         System.out.println(signmsg);
@@ -133,10 +116,6 @@ public class ArtUserFollowedController extends BaseController {
         String url = "http://192.168.1.68:8080/app/changeFollowStatus.do";
         HttpPost httppost = new HttpPost(url);
 
-//        String userDatum = "{\"username\":\"15538398530\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-//        String editProfile = "{\"userId\":\"iiv2np9v2x7eg6yh\",\"type\":\"12\",\"content\":\"13565585985\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-//        String userFollowed = "{\"userId\":\"iiv2np9v2x7eg6yh\",\"type\":\"1\",\"pageSize\":\"" + size + "\",\"pageIndex\":\"" + index + "\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-//        String changeFollowStatus = "{\"userId\":\"ih36t7ir18t05e6w\",\"followId\":\"iewqdsuy9vee7dae\",\"identifier\":\"0\",\"followType\":\"2\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
         String changeFollowStatus = "{\"artUserFollowId\":\"ikyrqmwffnzt643w\",\"identifier\":\"1\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
 
         String json = changeFollowStatus;
