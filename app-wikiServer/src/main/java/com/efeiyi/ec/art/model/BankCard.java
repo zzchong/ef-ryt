@@ -35,7 +35,7 @@ public class BankCard implements Serializable{
     public void setId(String id) {
         this.id = id;
     }
-    @Column(name = "cardNum")
+    @Column(name = "card_num")
     public String getCardNum() {
         return cardNum;
     }
@@ -59,7 +59,7 @@ public class BankCard implements Serializable{
     public void setStatus(String status) {
         this.status = status;
     }
-    @Column(name = "bankName")
+    @Column(name = "bank_name")
     public String getBankName() {
         return BankName;
     }
@@ -76,7 +76,7 @@ public class BankCard implements Serializable{
     public void setAccount(Account account) {
         this.account = account;
     }
-    @Column(name = "createDatetime")
+    @Column(name = "create_datetime")
     public Date getCreateDatetime() {
         return createDatetime;
     }

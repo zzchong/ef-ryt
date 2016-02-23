@@ -13,12 +13,6 @@
                         <condition name="username" defaultValue="1" operation="eq"/>
                     </query>
                 </do>
-                <do name="formUser" access="" label="" result="json">
-                    <query name="byId" label="默认" type="auto" orderBy="id:desc">
-                        <condition name="id" defaultValue="0" operation="eq"/>
-                        <condition name="status" defaultValue="0" operation="ne"/>
-                    </query>
-                </do>
             </does>
         </entity>
     </entities>

@@ -8,6 +8,7 @@ public class AppConfig {
     public static final String appKey = "BL2QEuXUXNoGbNeHObD4EzlX+KuGc70U";
     public static final String SQL_MYUSER_GET ="from MyUser WHERE username= :username AND status<>'0'";
     public static final String SQL_USER_GET ="from User WHERE username= :username AND status<>'0'";
+    public static final String SQL_ACCOUNT_BY_USER_ID = "from Account a where a.user.id = :userId and status <> '0'";
     public static final String SQL_APP_VERSION_INFO ="from AppVersionUpGrade WHERE platform= :platform AND status<>'0'";
     public static final String SQL_USER_GET_APP ="from User WHERE username= :username AND status<>'0'";
     public static final String SQL_MESSAGE_GET_APP ="select m FROM Message m where targetUser.id = :userId and status = '1' and isWatch='0' GROUP BY fromUser.id ORDER BY createDatetime DESC";
