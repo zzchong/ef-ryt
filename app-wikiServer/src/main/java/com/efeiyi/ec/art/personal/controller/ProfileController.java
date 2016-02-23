@@ -2,8 +2,10 @@ package com.efeiyi.ec.art.personal.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
+import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
+import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.XQuery;
@@ -25,6 +27,12 @@ import java.util.regex.Pattern;
 public class ProfileController extends BaseController{
     private static Logger logger = Logger.getLogger(ProfileController.class);
 
+    /**
+     * 获取用户资料
+     * @param request
+     * 接口调用路径 /app/userDatum.do
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/app/userDatum.do", method = RequestMethod.POST)
     public Map getUserProfile(HttpServletRequest request) {
@@ -88,7 +96,6 @@ public class ProfileController extends BaseController{
         return resultMap;
     }
 
-
     /**
      * 编辑用户资料接口
      * 接口调用路径 /app/editProfile.do
@@ -135,12 +142,8 @@ public class ProfileController extends BaseController{
                 resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
                 return resultMap;
             }
-            XQuery xQuery = new XQuery("formUser_byId",request);
-            xQuery.put("id",userId);
-            xQuery.put("status",0);
-            List<MyUser> users = baseManager.listObject(xQuery);
-            if (users != null && users.size() > 0){
-                user = users.get(0);
+            user = (MyUser) baseManager.getObject(MyUser.class.getName(),userId);
+            if (user != null && user.getId() != null){
                 if ("11".equals(type)){
                     user.setName2(content);
                     baseManager.saveOrUpdate(MyUser.class.getName(),user);
@@ -188,6 +191,70 @@ public class ProfileController extends BaseController{
                 resultMap.put("resultCode", "10008");
                 resultMap.put("resultMsg", "查无数据,稍后再试");
             }
+        } catch (Exception e) {
+            logBean.setResultCode("10004");
+            logBean.setMsg("未知错误，请联系管理员");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMap;
+        }
+
+        return resultMap;
+    }
+
+
+    /**
+     * 保存用户提现密码
+     * 接口调用路径 /app/savePassword.do
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/app/savePassword.do", method = RequestMethod.POST)
+    public Map savePassword(HttpServletRequest request){
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        LogBean logBean = new LogBean();
+        TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj;
+        try {
+            jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId"))
+                    || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("level_two_pwd"))) {
+                logBean.setResultCode("10001");
+                logBean.setMsg("必选参数为空，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                resultMap.put("resultCode", "10001");
+                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                return resultMap;
+            }
+            String signmsg = jsonObj.getString("signmsg");
+            String userId = jsonObj.getString("userId");
+            String level_two_pwd = jsonObj.getString("level_two_pwd");
+            treeMap.put("userId", userId);
+            treeMap.put("level_two_pwd", level_two_pwd);
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (!verify) {
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                return resultMap;
+            }
+            LinkedHashMap<String,Object> queryMap = new LinkedHashMap<>();
+            queryMap.put("userId",userId);
+            Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_ACCOUNT_BY_USER_ID,queryMap);
+            account.setPassword(level_two_pwd);
+            baseManager.saveOrUpdate(Account.class.getName(),account);
+            logBean.setResultCode("0");
+            logBean.setMsg("成功");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            resultMap.put("resultCode","0");
+            resultMap.put("resultMsg","请求成功");
+            resultMap.put("account",account);
         } catch (Exception e) {
             logBean.setResultCode("10004");
             logBean.setMsg("未知错误，请联系管理员");
