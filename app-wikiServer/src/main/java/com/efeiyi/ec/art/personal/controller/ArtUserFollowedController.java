@@ -104,19 +104,19 @@ public class ArtUserFollowedController extends BaseController {
 
     public static void main(String[] args) throws Exception {
         long timestamp = System.currentTimeMillis();
-        String artUserFollowId = "ikyrqmwffnzt643w";
+        String level_two_pwd = "123456";
         String signmsg;
         TreeMap map = new TreeMap();
-        map.put("artUserFollowId", artUserFollowId);
-        map.put("identifier", "1");
+        map.put("level_two_pwd", level_two_pwd);
+        map.put("userId", "ih36t7ir18t05e6w");
         map.put("timestamp", timestamp);
         signmsg = DigitalSignatureUtil.encrypt(map);
         System.out.println(signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.68:8080/app/changeFollowStatus.do";
+        String url = "http://192.168.1.68:8080/app/savePassword.do";
         HttpPost httppost = new HttpPost(url);
 
-        String changeFollowStatus = "{\"artUserFollowId\":\"ikyrqmwffnzt643w\",\"identifier\":\"1\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String changeFollowStatus = "{\"userId\":\"ih36t7ir18t05e6w\",\"level_two_pwd\":\"123456\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
 
         String json = changeFollowStatus;
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);

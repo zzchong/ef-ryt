@@ -247,14 +247,22 @@ public class ProfileController extends BaseController{
             LinkedHashMap<String,Object> queryMap = new LinkedHashMap<>();
             queryMap.put("userId",userId);
             Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_ACCOUNT_BY_USER_ID,queryMap);
-            account.setPassword(level_two_pwd);
-            baseManager.saveOrUpdate(Account.class.getName(),account);
-            logBean.setResultCode("0");
-            logBean.setMsg("成功");
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-            resultMap.put("resultCode","0");
-            resultMap.put("resultMsg","请求成功");
-            resultMap.put("account",account);
+            if (account != null && account.getId() != null){
+                account.setPassword(level_two_pwd);
+                baseManager.saveOrUpdate(Account.class.getName(),account);
+                logBean.setResultCode("0");
+                logBean.setMsg("成功");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode","0");
+                resultMap.put("resultMsg","请求成功");
+                resultMap.put("account",account);
+            }else{
+                logBean.setResultCode("10008");
+                logBean.setMsg("查无数据,稍后再试");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10008");
+                resultMap.put("resultMsg", "查无数据,稍后再试");
+            }
         } catch (Exception e) {
             logBean.setResultCode("10004");
             logBean.setMsg("未知错误，请联系管理员");
