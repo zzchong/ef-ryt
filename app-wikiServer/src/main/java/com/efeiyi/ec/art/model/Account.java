@@ -57,7 +57,7 @@ public class Account implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
-    @Column(name = "createDatetime")
+    @Column(name = "create_datetime")
     public Date getCreateDatetime() {
         return createDatetime;
     }
@@ -99,7 +99,7 @@ public class Account implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
-    @Column(name = "currentBalance")
+    @Column(name = "current_balance")
     public BigDecimal getCurrentBalance() {
         return currentBalance;
     }
@@ -107,7 +107,7 @@ public class Account implements Serializable {
     public void setCurrentBalance(BigDecimal currentBalance) {
         this.currentBalance = currentBalance;
     }
-    @Column(name = "currentUsableBalance")
+    @Column(name = "current_usable_balance")
     public BigDecimal getCurrentUsableBalance() {
         return currentUsableBalance;
     }
