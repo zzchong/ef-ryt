@@ -34,6 +34,7 @@ public class Artwork implements Serializable {
     private List<ArtworkComment> artworkComments;
     private ArtworkDraw artworkDraw;
     private String picture_url;
+    private Integer investorsNum; //投资人数
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -161,5 +162,12 @@ public class Artwork implements Serializable {
         this.picture_url = picture_url;
     }
 
+    @Column(name = "investors_num")
+    public Integer getInvestorsNum() {
+        return investorsNum;
+    }
 
+    public void setInvestorsNum(Integer investorsNum) {
+        this.investorsNum = investorsNum;
+    }
 }
