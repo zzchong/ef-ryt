@@ -67,7 +67,9 @@ public class ArtworkController extends BaseController {
     }
 
     /**
-     *  融资接口
+     * 融资首页 接口
+     * @param request
+     * @return
      */
 
     @RequestMapping(value = "/app/investorIndex.do", method = RequestMethod.POST)
@@ -127,6 +129,63 @@ public class ArtworkController extends BaseController {
         return resultMap;
     }
 
+
+    /**
+     * 融资项目 详情页
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/investorArtWork.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map investorArtWork(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        List objectList = null;
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
+                logBean.setResultCode("10001");
+                logBean.setMsg("必选参数为空，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10001");
+                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                return resultMap;
+            }
+            //校验数字签名
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("artWorkId",jsonObj.getString("artWorkId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                return resultMap;
+            }
+
+            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
+            logBean.setResultCode("0");
+            logBean.setMsg("成功");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            resultMap.put("resultCode","0");
+            resultMap.put("resultMsg","成功");
+            resultMap.put("artwork",artwork);
+        } catch(Exception e){
+            e.printStackTrace();
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMap;
+        }
+
+        return resultMap;
+    }
+
+
     public  static  void  main(String [] arg) throws Exception {
 
 
@@ -136,17 +195,20 @@ public class ArtworkController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**investorIndex.do测试加密参数**/
-        map.put("pageSize","1");
-        map.put("pageNum","1");
+//        map.put("pageSize","1");
+//        map.put("pageNum","1");
+//        map.put("timestamp", timestamp);
+        /**investorArtWork.do测试加密参数**/
+        map.put("artWorkId","qydeyugqqiugdi");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/investorIndex.do";
+        String url = "http://192.168.1.80:8001/app/investorArtWork.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorIndex.do测试 **/
-        String json = "{\"pageSize\":\"1\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"artWorkId\":\"qydeyugqqiugdi\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
