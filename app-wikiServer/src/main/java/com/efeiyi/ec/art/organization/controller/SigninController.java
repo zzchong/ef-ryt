@@ -2,8 +2,8 @@ package com.efeiyi.ec.art.organization.controller;
 
 import cn.jmessage.api.JMessageClient;
 import cn.jmessage.api.common.model.RegisterInfo;
-import cn.jpush.api.common.APIConnectionException;
-import cn.jpush.api.common.APIRequestException;
+import cn.jpush.api.common.resp.APIConnectionException;
+import cn.jpush.api.common.resp.APIRequestException;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.model.PushUserBinding;
 import com.efeiyi.ec.art.organization.model.Consumer;
@@ -402,7 +402,15 @@ public class SigninController extends BaseController {
             String res = client.registerUsers(users.toArray(regUsers));
             logger.info(res);
             return  res;
-        } catch(Exception e){
+        } catch (APIConnectionException e) {
+            logger.error("Connection error. Should retry later. ", e);
+            return null;
+        } catch (APIRequestException e) {
+            logger.error("Error response from JPush server. Should review and fix it. ", e);
+            logger.info("HTTP Status: " + e.getStatus());
+            logger.info("Error Message: " + e.getMessage());
+            return null;
+        }catch(Exception e){
             logger.info("Error Message: " + e.getMessage());
             return null;
         }
