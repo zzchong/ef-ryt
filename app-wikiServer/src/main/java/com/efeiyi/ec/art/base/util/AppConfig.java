@@ -14,4 +14,6 @@ public class AppConfig {
     public static final String SQL_MESSAGE_GET_APP ="select m FROM Message m where targetUser.id = :userId and status = '1' and isWatch='0' GROUP BY fromUser.id ORDER BY createDatetime DESC";
     public static final String SQL_MESSAGE_GET_NUM_APP ="select COUNT(targetUser.id)  FROM Message m where targetUser.id = :userId and status = '1' and isWatch='0' GROUP BY fromUser.id ORDER BY createDatetime DESC";
     public static final String SQL_MESSAGE_DETAIL_GET_APP ="from Message where (targetUser.id = :userId and fromUser.id = :fromUserId) or (targetUser.id = :fromUserId and targetUser.id = :fromUserId)  ORDER BY createDatetime DESC";
+    public static final String SQL_INVEST_MONEY_APP = "select SUM(price) FROM ArtworkInvest where creator.id = :userId GROUP BY artwork.id ORDER BY createDatetime DESC";
+    public static final String SQL_INVEST_ARTWORK_APP = "FROM ArtworkInvest where creator.id = :userId GROUP BY artwork.id ORDER BY createDatetime DESC";
 }

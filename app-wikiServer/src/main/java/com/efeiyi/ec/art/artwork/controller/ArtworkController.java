@@ -3,11 +3,16 @@ package com.efeiyi.ec.art.artwork.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
+import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.model.ArtworkInvest;
+import com.efeiyi.ec.art.model.InvestReward;
 import com.efeiyi.ec.art.model.Master;
+import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
+import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
@@ -264,6 +269,93 @@ public class ArtworkController extends BaseController {
     }
 
 
+    /**
+     * 游客页面
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/guestView.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map guestView(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        List objectList = null;
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
+                logBean.setResultCode("10001");
+                logBean.setMsg("必选参数为空，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10001");
+                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                return resultMap;
+            }
+            //校验数字签名
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("userId",jsonObj.getString("userId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                return resultMap;
+            }
+            //游客信息
+            User user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+            //
+            XQuery xQuery = new XQuery("listArtworkInvest_default",request);
+            xQuery.put("creator_id",jsonObj.getString("userId"));
+            List<ArtworkInvest> artworkInvests = (List<ArtworkInvest>)baseManager.listObject(xQuery);
+            //查询数据参数
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("userId", jsonObj.getString("userId"));
+            //投资项目
+            List<ArtworkInvest> artworkInvests1 = (List<ArtworkInvest>)baseManager.listObject(AppConfig.SQL_INVEST_ARTWORK_APP, map);
+            List<BigDecimal> investMoney = (List<BigDecimal>)baseManager.listObject(AppConfig.SQL_INVEST_MONEY_APP, map);
+            List<ArtWorkInvestBean> artworks = new ArrayList<>();
+            for (int i = 0;i<artworkInvests1.size();i++){
+                ArtWorkInvestBean artWorkInvestBean = new ArtWorkInvestBean();
+                artWorkInvestBean.setArtwork(artworkInvests1.get(i).getArtwork());
+                artWorkInvestBean.setInvestMoney(investMoney.get(i));
+                artworks.add(artWorkInvestBean);
+            }
+            //投资金额
+            Double investsMoney = 0.00;
+            for (ArtworkInvest artworkInvest : artworkInvests){
+                investsMoney += artworkInvest.getPrice().doubleValue();
+            }
+            //投资回报
+            Double reward = 0.00;
+            xQuery = new XQuery("listInvestReward_default",request);
+            xQuery.put("investUser_id",jsonObj.getString("userId"));
+            List<InvestReward> investRewards = (List<InvestReward>)baseManager.listObject(xQuery);
+            for (InvestReward investReward : investRewards){
+                reward += investReward.getReward().doubleValue();
+            }
+            logBean.setResultCode("0");
+            logBean.setMsg("成功");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            resultMap.put("resultCode","0");
+            resultMap.put("resultMsg","成功");
+            resultMap.put("user",user);
+            resultMap.put("artworks",artworks);
+            resultMap.put("investsMoney",investsMoney);
+            resultMap.put("reward",reward);
+        } catch(Exception e){
+            e.printStackTrace();
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMap;
+        }
+
+        return resultMap;
+    }
     public  static  void  main(String [] arg) throws Exception {
 
 
@@ -281,17 +373,19 @@ public class ArtworkController extends BaseController {
 //        map.put("timestamp", timestamp);
 
         /**masterView.do测试加密参数**/
-        map.put("masterId","icjxkedl0000b6i0");
+//        map.put("masterId","icjxkedl0000b6i0");
+//        map.put("timestamp", timestamp);
+        /**guestView.do测试加密参数**/
+        map.put("userId","1");
         map.put("timestamp", timestamp);
-
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/masterView.do";
+        String url = "http://192.168.1.80:8001/app/guestView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorIndex.do测试 **/
-        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"userId\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
