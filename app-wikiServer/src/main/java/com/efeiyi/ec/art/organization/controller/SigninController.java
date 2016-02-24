@@ -310,7 +310,7 @@ public class SigninController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                     "".equals(jsonObj.getString("cid")) || "".equals(jsonObj.getString("timestamp"))
-                    || "".equals(jsonObj.getString("password"))) {
+                    || "".equals(jsonObj.getString("password")) || "".equals(jsonObj.getString("nickname"))) {
                 resultMap.put("resultCode", "10001");
                 resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                 logBean.setResultCode("10001");
@@ -321,6 +321,7 @@ public class SigninController extends BaseController {
 
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("username", jsonObj.getString("username"));
+            treeMap.put("nickname", jsonObj.getString("nickname"));
             treeMap.put("password", jsonObj.getString("password"));
             treeMap.put("cid", jsonObj.getString("cid"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
@@ -350,7 +351,7 @@ public class SigninController extends BaseController {
                 PushUserBinding pushUserBinding = new PushUserBinding();
                 pushUserBinding.setCid(jsonObj.getString("cid"));
                 pushUserBinding.setUser(user);
-                String res = RegisterUsers(jsonObj.getString("username"),jsonObj.getString("password"));//若果绑定失败，人工处理
+                String res = RegisterUsers(jsonObj.getString("nickname"),jsonObj.getString("password"));//若果绑定失败，人工处理
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "成功");
                 logBean.setResultCode("0");
