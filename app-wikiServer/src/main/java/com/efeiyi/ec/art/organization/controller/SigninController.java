@@ -1,5 +1,9 @@
 package com.efeiyi.ec.art.organization.controller;
 
+import cn.jmessage.api.JMessageClient;
+import cn.jmessage.api.common.model.RegisterInfo;
+import cn.jpush.api.common.resp.APIConnectionException;
+import cn.jpush.api.common.resp.APIRequestException;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.model.PushUserBinding;
 import com.efeiyi.ec.art.organization.model.Consumer;
@@ -30,6 +34,8 @@ import java.util.regex.Pattern;
 @Controller
 public class SigninController extends BaseController {
     private static Logger logger = Logger.getLogger(SigninController.class);
+    private static final String appKey ="d1573e16403c2482826bbd35";
+    private static final String masterSecret = "0b6ca44da0dfe0b7ea6331f1";
     @Autowired
     BaseManager baseManager;
     @RequestMapping(value = "/app/login.do", method = RequestMethod.POST)
@@ -304,7 +310,7 @@ public class SigninController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                     "".equals(jsonObj.getString("cid")) || "".equals(jsonObj.getString("timestamp"))
-                   ) {
+                    || "".equals(jsonObj.getString("password")) ) {
                 resultMap.put("resultCode", "10001");
                 resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                 logBean.setResultCode("10001");
@@ -315,6 +321,8 @@ public class SigninController extends BaseController {
 
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("username", jsonObj.getString("username"));
+            //treeMap.put("nickname", jsonObj.getString("nickname"));
+            treeMap.put("password", jsonObj.getString("password"));
             treeMap.put("cid", jsonObj.getString("cid"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
@@ -343,10 +351,12 @@ public class SigninController extends BaseController {
                 PushUserBinding pushUserBinding = new PushUserBinding();
                 pushUserBinding.setCid(jsonObj.getString("cid"));
                 pushUserBinding.setUser(user);
+                String res = RegisterUsers(jsonObj.getString("username"),jsonObj.getString("password"));//若果绑定失败，人工处理
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "成功");
                 logBean.setResultCode("0");
                 logBean.setMsg("成功");
+                logBean.setExtend1(res);
                 baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                 baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
             } catch (Exception e) {
@@ -372,7 +382,39 @@ public class SigninController extends BaseController {
     }
 
 
+    public static String RegisterUsers(String username,String password) {
+        JMessageClient client = new JMessageClient(appKey, masterSecret);
 
+        try {
+
+            List<RegisterInfo> users = new ArrayList<RegisterInfo>();
+
+            RegisterInfo user = RegisterInfo.newBuilder()
+                    .setUsername(username)
+                    .setPassword(password)
+                    .build();
+
+
+            users.add(user);
+
+            RegisterInfo[] regUsers = new RegisterInfo[users.size()];
+
+            String res = client.registerUsers(users.toArray(regUsers));
+            logger.info(res);
+            return  res;
+        } catch (APIConnectionException e) {
+            logger.error("Connection error. Should retry later. ", e);
+            return null;
+        } catch (APIRequestException e) {
+            logger.error("Error response from JPush server. Should review and fix it. ", e);
+            logger.info("HTTP Status: " + e.getStatus());
+            logger.info("Error Message: " + e.getMessage());
+            return null;
+        }catch(Exception e){
+            logger.info("Error Message: " + e.getMessage());
+            return null;
+        }
+    }
 
 
 }

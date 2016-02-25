@@ -21,7 +21,7 @@ public class LogBean  implements Serializable {
     private String requestMessage;
     private Date createDate;
     private String apiName;
-
+    private String extend1;//添加一个扩展字段
 
 
     @Id
@@ -73,5 +73,13 @@ public class LogBean  implements Serializable {
 
     public void setApiName(String apiName) {
         this.apiName = apiName;
+    }
+    @Column(name = "extend1")
+    public String getExtend1() {
+        return extend1;
+    }
+
+    public void setExtend1(String extend1) {
+        this.extend1 = extend1;
     }
 }
