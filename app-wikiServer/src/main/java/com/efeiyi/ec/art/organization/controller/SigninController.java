@@ -13,8 +13,12 @@ import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.service.SmsCheckManager;
+import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.p.PConst;
+import com.ming800.core.util.VerificationCodeGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,6 +40,7 @@ public class SigninController extends BaseController {
     private static Logger logger = Logger.getLogger(SigninController.class);
     private static final String appKey ="d1573e16403c2482826bbd35";
     private static final String masterSecret = "0b6ca44da0dfe0b7ea6331f1";
+    private SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
     @Autowired
     BaseManager baseManager;
     @RequestMapping(value = "/app/login.do", method = RequestMethod.POST)
@@ -177,6 +182,7 @@ public class SigninController extends BaseController {
                 return resultMap;
             }
            //***************************************保存用户信息
+            request.getSession().removeAttribute(jsonObj.getString("username"));//session移除验证码
             Consumer myUser = new Consumer();
             myUser.setUsername(jsonObj.getString("username"));
             myUser.setPassword(jsonObj.getString("password"));
@@ -380,6 +386,134 @@ public class SigninController extends BaseController {
         }
         return resultMap;
     }
+
+
+    //注册验证码
+    @RequestMapping(value = "/app/sendCode.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map registerSendCode(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("sendCode");
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
+                 "".equals(jsonObj.getString("timestamp"))) {
+                resultMap.put("resultCode", "10001");
+                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                logBean.setResultCode("10001");
+                logBean.setMsg("必选参数为空，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                return resultMap;
+            }
+
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("username", jsonObj.getString("username"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                return resultMap;
+            }
+            String verificationCode = VerificationCodeGenerator.createVerificationCode();
+
+            String message = this.smsCheckManager.send(jsonObj.getString("username"), verificationCode, "1104699", PConst.TIANYI);
+            request.getSession().setAttribute(jsonObj.getString("username"), verificationCode);
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "成功");
+            resultMap.put("message",message);//响应的用户信息
+            logBean.setResultCode("0");
+            logBean.setMsg("成功");
+
+        } catch(Exception e){
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            logBean.setResultCode("10004");
+            logBean.setMsg("未知错误，请联系管理员");
+            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            return resultMap;
+        }
+        return resultMap;
+    }
+
+   //校验验证码
+   @RequestMapping(value = "/app/verifyCode.do", method = RequestMethod.POST)
+   @ResponseBody
+   public Map verifyCode(HttpServletRequest request) {
+       LogBean logBean = new LogBean();
+       logBean.setApiName("verifyCode");
+       Map<String, String> resultMap = new HashMap<String, String>();
+       TreeMap treeMap = new TreeMap();
+       try {
+           JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+           logBean.setCreateDate(new Date());
+           logBean.setRequestMessage(jsonObj.toString());
+           if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
+                   "".equals(jsonObj.getString("timestamp"))|| "".equals(jsonObj.getString("code"))) {
+               resultMap.put("resultCode", "10001");
+               resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+               logBean.setResultCode("10001");
+               logBean.setMsg("必选参数为空，请仔细检查");
+               baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+               return resultMap;
+           }
+
+           String signmsg = jsonObj.getString("signmsg");
+           treeMap.put("username", jsonObj.getString("username"));
+           treeMap.put("code", jsonObj.getString("code"));
+           treeMap.put("timestamp", jsonObj.getString("timestamp"));
+           boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+           if (verify != true) {
+               resultMap.put("resultCode", "10002");
+               resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+               logBean.setResultCode("10002");
+               logBean.setMsg("参数校验不合格，请仔细检查");
+               baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+               return resultMap;
+           }
+          String code= request.getSession().getAttribute(jsonObj.getString("username")).toString();
+          if (code!=null && code.equals(jsonObj.getString("code"))){
+              resultMap.put("resultCode", "0");
+              resultMap.put("resultMsg", "成功");
+              logBean.setResultCode("0");
+              logBean.setMsg("成功");
+          }else{
+              resultMap.put("resultCode", "100010");
+              resultMap.put("resultMsg", "验证码验证失败");
+              logBean.setResultCode("100010");
+              logBean.setMsg("验证码验证失败");
+          }
+
+
+       } catch(Exception e){
+           resultMap.put("resultCode", "10004");
+           resultMap.put("resultMsg", "未知错误，请联系管理员");
+           logBean.setResultCode("10004");
+           logBean.setMsg("未知错误，请联系管理员");
+           baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+           return resultMap;
+       }
+       return resultMap;
+   }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public static String RegisterUsers(String username,String password) {
