@@ -26,7 +26,7 @@ public class Artwork implements Serializable {
     private String status;  //0 可用  1 废弃
     private BigDecimal investGoalMoney;
     private Date investStartDatetime;//融资开始时间
-    private Date investEndDatetime;
+    private Date investEndDatetime;//融资结束时间、创作开始时间
     private Date auctionStartDatetime;//拍卖开始时间
     private Date auctionEndDatetime;
     private User author;
