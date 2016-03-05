@@ -14,7 +14,7 @@ import java.util.Date;
 @Entity
 @Table(name = "app_art_work_message")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class ArtworkMessage implements Serializable{
+public class ArtworkMessage implements Serializable{//项目动态
     private String id;
     private String content;
     private User creator;
