@@ -23,7 +23,7 @@ public class Artwork implements Serializable {
     private String id;
     private String title;
     private String brief;
-    private String status;  //融资1 拍卖21 抽奖31
+    private String status;  //0 可用  1 废弃
     private BigDecimal investGoalMoney;
     private Date investStartDatetime;//融资开始时间
     private Date investEndDatetime;
@@ -36,9 +36,10 @@ public class Artwork implements Serializable {
     private List<ArtworkInvest> artworkInvests;
     private ArtworkDraw artworkDraw;
     private String picture_url;
-    private String step; //1 : 审核阶段  2 融资阶段  3 制作阶段  4 拍卖阶段  5 抽奖阶段  9 技术
+    private String step; //1 : 审核阶段
     private BigDecimal investsMoney;//已筹金额
-    private Date creationEndDatetime;
+    private Date creationEndDatetime;//创作完成时间=融资结束时间+30(默认)
+    private String type;//2 融资阶段  3 制作阶段  4 拍卖阶段  5 抽奖阶段
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -207,5 +208,14 @@ public class Artwork implements Serializable {
 
     public void setCreationEndDatetime(Date creationEndDatetime) {
         this.creationEndDatetime = creationEndDatetime;
+    }
+
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
