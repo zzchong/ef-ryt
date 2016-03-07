@@ -41,7 +41,7 @@ public class DigitalSignatureUtil {
       str.append("key=" + AppConfig.appKey);
 
       String md5Value = MD5(str.toString());
-      System.out.println(str.toString()+"======>"+md5Value);
+      //System.out.println(str.toString()+"======>"+md5Value);
       if(md5Value.equals(signmsg)){
           flag = true;
       }
@@ -65,7 +65,7 @@ public class DigitalSignatureUtil {
         str.append("key=" + AppConfig.appKey);
 
         String md5Value = MD5(str.toString());
-        System.out.println(str.toString()+"======>"+md5Value);
+        //System.out.println(str.toString()+"======>"+md5Value);
         return md5Value;
     }
 

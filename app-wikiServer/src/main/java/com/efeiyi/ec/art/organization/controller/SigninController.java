@@ -431,7 +431,7 @@ public class SigninController extends BaseController {
             resultMap.put("message",message);//响应的用户信息
             logBean.setResultCode("0");
             logBean.setMsg("成功");
-
+            baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
         } catch(Exception e){
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
@@ -484,6 +484,7 @@ public class SigninController extends BaseController {
               resultMap.put("resultMsg", "成功");
               logBean.setResultCode("0");
               logBean.setMsg("成功");
+              baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
           }else{
               resultMap.put("resultCode", "100010");
               resultMap.put("resultMsg", "验证码验证失败");
