@@ -478,7 +478,17 @@ public class SigninController extends BaseController {
                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                return resultMap;
            }
-          String code= request.getSession().getAttribute(jsonObj.getString("username")).toString();
+
+           if(request.getSession().getAttribute(jsonObj.getString("username")).toString()==null){
+               resultMap.put("resultCode", "100011");
+               resultMap.put("resultMsg", "验证码失效，请重新发送");
+               logBean.setResultCode("100011");
+               logBean.setMsg("验证码失效，请重新发送");
+               baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+               return resultMap;
+           }
+
+           String code= request.getSession().getAttribute(jsonObj.getString("username")).toString();
           if (code!=null && code.equals(jsonObj.getString("code"))){
               resultMap.put("resultCode", "0");
               resultMap.put("resultMsg", "成功");
