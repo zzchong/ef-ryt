@@ -5,7 +5,9 @@ import cn.jmessage.api.common.model.RegisterInfo;
 import cn.jpush.api.common.resp.APIConnectionException;
 import cn.jpush.api.common.resp.APIRequestException;
 import com.alibaba.fastjson.JSONObject;
+import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.PushUserBinding;
+import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.Consumer;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
@@ -18,13 +20,19 @@ import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.p.PConst;
+import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.util.VerificationCodeGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -43,6 +51,10 @@ public class SigninController extends BaseController {
     private SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
     @Autowired
     BaseManager baseManager;
+    @Autowired
+    ResultMapHandler resultMapHandler;
+    @Autowired
+    AliOssUploadManager aliOssUploadManager;
     @RequestMapping(value = "/app/login.do", method = RequestMethod.POST)
     @ResponseBody
     public Map login(HttpServletRequest request) {
@@ -513,6 +525,146 @@ public class SigninController extends BaseController {
        }
        return resultMap;
    }
+
+
+    @RequestMapping(value = "/app/completeUserInfo.do", method = RequestMethod.POST)
+    @ResponseBody
+    public  Map paramBind(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile headPortrait
+
+       /* Map<String, List<Object>> paramsMap = new HashMap<>();
+        paramsMap = params;//参数列表*/
+
+        LogBean logBean = new LogBean();
+        logBean.setApiName("completeUserInfo");
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(request.getParameter("username").toString()+" "+request.getParameter("nickname").toString()
+            +" "+request.getParameter("sex").toString()+" "+request.getParameter("timestamp").toString());
+            if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("username")) ||
+                    "".equals(request.getParameter("timestamp")) || "".equals(request.getParameter("nickname "))
+                    || "".equals(request.getParameter("sex "))) {
+
+                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+                return resultMap;
+            }
+
+            String signmsg = request.getParameter("signmsg").toString();
+            treeMap.put("username", request.getParameter("username"));
+            treeMap.put("nickname", request.getParameter("nickname"));
+            treeMap.put("sex", request.getParameter("sex"));
+            treeMap.put("timestamp", request.getParameter("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+                return resultMap;
+            }
+
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("username",request.getParameter("username").toString());
+            BigUser user;
+            try {
+                user = (BigUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_BIGUSER_GET, map);
+                if (user!=null && user.getId()!=null) {
+                    String url = "app/" + request.getParameter("username").toString() + ".jpg";
+                    String pictureUrl = "http://http://pro.efeiyi.com//"+url+"@!pc-classify-right";
+                    MultipartFile headPortrait = ((MultipartHttpServletRequest) request).getFile("headPortrait");
+                    //将用户头像上传至阿里云
+                    aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi",pictureUrl);
+                    user.setName2(request.getParameter("username").toString());
+                    user.setSex(Integer.parseInt(request.getParameter("sex ").toString()));
+                    user.setPictureUrl(pictureUrl);
+                    baseManager.saveOrUpdate(BigUser.class.getName(),user);
+                }else {
+                    return  resultMapHandler.handlerResult("10007","未知错误，请联系管理员",logBean);
+                }
+
+            } catch (Exception e) {
+                resultMap = resultMapHandler.handlerResult("10005","户名不存在",logBean);
+                return resultMap;
+            }
+
+        } catch(Exception e){
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+        return resultMap;
+
+
+    }
+
+
+
+
+    @RequestMapping(value = "/app/test.do", method = RequestMethod.POST)
+    @ResponseBody
+    public  Map test(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile photo) {
+        Map paramsMap = new HashMap<>();
+        request.getParameter("sex");
+        MultipartFile formFile1 = ((MultipartHttpServletRequest) request).getFile("headPortrait");
+       /*
+        paramsMap = params;*/
+        //System.out.println(paramsMap.get("name").get(0));
+        return paramsMap;
+    }
+    @RequestMapping(value = "/app/test2.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map completeUserInfo(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("completeUserInfo");
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
+                    "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("nickname "))
+                    || "".equals(jsonObj.getString("sex "))) {
+
+                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+                return resultMap;
+            }
+
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("username", jsonObj.getString("username"));
+            treeMap.put("nickname", jsonObj.getString("nickname"));
+            treeMap.put("sex", jsonObj.getString("sex"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+                return resultMap;
+            }
+
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("username", jsonObj.getString("username"));
+            BigUser user;
+            try {
+                user = (BigUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
+                if (user!=null && user.getId()!=null) {
+                    //将用户头像上传至阿里云
+                    //aliOssUploadManager.uploadFile();
+                    user.setName2(jsonObj.getString("username"));
+                    user.setSex(Integer.parseInt(jsonObj.getString("sex ")));
+                    //user.setPictureUrl();
+                    baseManager.saveOrUpdate(BigUser.class.getName(),user);
+                }else {
+                    return  resultMapHandler.handlerResult("10007","未知错误，请联系管理员",logBean);
+                }
+
+            } catch (Exception e) {
+                resultMap = resultMapHandler.handlerResult("10005","户名不存在",logBean);
+                return resultMap;
+            }
+
+        } catch(Exception e){
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+        return resultMap;
+    }
+
 
 
 

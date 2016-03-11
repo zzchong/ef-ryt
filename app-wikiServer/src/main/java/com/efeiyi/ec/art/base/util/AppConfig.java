@@ -7,6 +7,7 @@ package com.efeiyi.ec.art.base.util;
 public class AppConfig {
     public static final String appKey = "BL2QEuXUXNoGbNeHObD4EzlX+KuGc70U";
     public static final String SQL_MYUSER_GET ="from MyUser WHERE username= :username AND status<>'0'";
+    public static final String SQL_BIGUSER_GET ="from BigUser WHERE username= :username AND status<>'0'";
     public static final String SQL_USER_GET ="from User WHERE username= :username AND status<>'0'";
     public static final String SQL_ACCOUNT_BY_USER_ID = "from Account a where a.user.id = :userId and status <> '0'";
     public static final String SQL_APP_VERSION_INFO ="from AppVersionUpGrade WHERE platform= :platform AND status<>'0'";
