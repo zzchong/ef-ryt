@@ -550,7 +550,6 @@ public class SigninController extends BaseController {
                 resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
                 return resultMap;
             }
-
             String signmsg = request.getParameter("signmsg").toString();
             treeMap.put("username", request.getParameter("username"));
             treeMap.put("nickname", request.getParameter("nickname"));
