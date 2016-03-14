@@ -12,6 +12,7 @@ import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkInvest;
 import com.efeiyi.ec.art.model.InvestReward;
 import com.efeiyi.ec.art.model.Master;
+import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
@@ -111,15 +112,12 @@ public class ArtworkController extends BaseController {
 
             String hql = "from Artwork WHERE 1=1 and status = '1'  order by createDatetime desc";
             artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
-            List<Artwork> objectList = new ArrayList<>();
+            List<ArtWorkBean> objectList = new ArrayList<>();
             for (Artwork artwork : artworkList){
-                 if(artwork.getAuthor()!=null){
-                     if("10000".equals(artwork.getAuthor().getType())){
-                         Master master = ((Master) baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-                         artwork.setMaster(master);
-                         objectList.add(artwork);
-                     }
-                 }
+                       ArtWorkBean artWorkBean = new ArtWorkBean();
+                       artWorkBean.setArtwork(artwork);
+                       artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+                       objectList.add(artWorkBean);
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             if (objectList!= null && !objectList.isEmpty()){
@@ -170,12 +168,12 @@ public class ArtworkController extends BaseController {
             }
 
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
-            if(artwork.getAuthor()!=null){
-                if("10000".equals(artwork.getAuthor().getType())){
-                    Master master = ((Master) baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-                    artwork.setMaster(master);
-                }
-            }
+//            if(artwork.getAuthor()!=null){
+//                if("10000".equals(artwork.getAuthor().getType())){
+//                    Master master = ((Master) baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+//                    artwork.setMaster(master);
+//                }
+//            }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("artwork",artwork);
         } catch(Exception e){

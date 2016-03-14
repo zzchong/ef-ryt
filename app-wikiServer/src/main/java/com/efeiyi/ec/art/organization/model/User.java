@@ -14,7 +14,7 @@ import java.util.Date;
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "organization_user")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class User {
 
     private String id;
@@ -117,6 +117,14 @@ public class User {
         return "User{" +
                 "id='" + id + '\'' +
                 ", username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", pictureUrl='" + pictureUrl + '\'' +
+                ", cityId='" + cityId + '\'' +
+                ", password='" + password + '\'' +
+                ", role=" + role +
+                ", status='" + status + '\'' +
+                ", createDatetime=" + createDatetime +
+                ", type='" + type + '\'' +
                 '}';
     }
 

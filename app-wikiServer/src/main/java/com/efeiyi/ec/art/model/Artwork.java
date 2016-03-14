@@ -30,7 +30,7 @@ public class Artwork implements Serializable {
     private Date auctionStartDatetime;//拍卖开始时间
     private Date auctionEndDatetime;
     private User author;
-    private Master master;
+//    private Master master;
     private Date createDatetime;
     private List<ArtworkAttachment> artworkAttachment;
     private List<ArtworkComment> artworkComments;
@@ -115,6 +115,7 @@ public class Artwork implements Serializable {
     public void setAuctionEndDatetime(Date auctionEndDatetime) {
         this.auctionEndDatetime = auctionEndDatetime;
     }
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     public User getAuthor() {
@@ -220,12 +221,13 @@ public class Artwork implements Serializable {
         this.type = type;
     }
 
-    @Transient
-    public Master getMaster() {
-        return master;
-    }
-
-    public void setMaster(Master master) {
-        this.master = master;
-    }
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "author_id")
+//    public Master getMaster() {
+//        return master;
+//    }
+//
+//    public void setMaster(Master master) {
+//        this.master = master;
+//    }
 }
