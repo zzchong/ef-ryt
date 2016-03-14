@@ -5,8 +5,11 @@ import com.ming800.core.base.service.BaseManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,12 +22,16 @@ public class ResultMapHandler {
     private static Logger logger = Logger.getLogger(ResultMapHandler.class);
     @Autowired
     BaseManager baseManager;
+
     public  Map handlerResult(String code,String msg,LogBean logBean) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String flag = PlatformVersionUtil.CheckAgent(request);
         Map<String, String> resultMap = new HashMap<String, String>();
         resultMap.put("resultCode", code);
         resultMap.put("resultMsg", msg);
         logBean.setResultCode(code);
         logBean.setMsg(msg);
+        logBean.setExtend1(flag);
         baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
         return resultMap;
     }
