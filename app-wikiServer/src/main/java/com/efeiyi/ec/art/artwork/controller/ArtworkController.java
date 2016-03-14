@@ -170,6 +170,12 @@ public class ArtworkController extends BaseController {
             }
 
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
+            if(artwork.getAuthor()!=null){
+                if("10000".equals(artwork.getAuthor().getType())){
+                    Master master = ((Master) baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+                    artwork.setMaster(master);
+                }
+            }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("artwork",artwork);
         } catch(Exception e){
