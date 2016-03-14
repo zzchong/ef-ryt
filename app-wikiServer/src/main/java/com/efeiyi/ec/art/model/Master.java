@@ -22,8 +22,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "app_master")
-@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class Master extends BigUser{
+public class Master extends User implements Serializable{
 
     private String brief; // 简介(短)
     private String title; // 头衔/称号
@@ -157,6 +156,7 @@ public class Master extends BigUser{
     }
 
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
     public List<Artwork> getArtworks() {
         return artworks;

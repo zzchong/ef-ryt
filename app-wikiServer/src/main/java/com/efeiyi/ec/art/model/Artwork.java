@@ -30,6 +30,7 @@ public class Artwork implements Serializable {
     private Date auctionStartDatetime;//拍卖开始时间
     private Date auctionEndDatetime;
     private User author;
+    private Master master;
     private Date createDatetime;
     private List<ArtworkAttachment> artworkAttachment;
     private List<ArtworkComment> artworkComments;
@@ -217,5 +218,14 @@ public class Artwork implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Transient
+    public Master getMaster() {
+        return master;
+    }
+
+    public void setMaster(Master master) {
+        this.master = master;
     }
 }

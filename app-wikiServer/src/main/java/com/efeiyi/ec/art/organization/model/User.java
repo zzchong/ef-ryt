@@ -14,6 +14,7 @@ import java.util.Date;
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "organization_user")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
     private String id;
@@ -25,6 +26,7 @@ public class User {
     private Role role;
     private String status;
     protected Date createDatetime;
+    private String type; //00000 普通用户 10000 艺术家
 
     @JsonIgnore
     @Column(name = "password")
@@ -84,6 +86,18 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BigUser user = (BigUser) o;
+
+        if (!id.equals(user.id)) return false;
+        if (!username.equals(user.username)) return false;
+
+        return true;
+    }
 
     @Override
     public int hashCode() {
@@ -96,6 +110,14 @@ public class User {
             }
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                '}';
     }
 
     @Column(name = "status")
@@ -126,4 +148,12 @@ public class User {
         this.createDatetime = createDatetime;
     }
 
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }
