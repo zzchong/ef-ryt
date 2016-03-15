@@ -21,6 +21,7 @@ import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.p.PConst;
 import com.ming800.core.p.service.AliOssUploadManager;
+import com.ming800.core.util.CookieTool;
 import com.ming800.core.util.VerificationCodeGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -151,7 +153,6 @@ public class SigninController extends BaseController {
                 return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
             }
            //***************************************保存用户信息
-            request.getSession().removeAttribute(jsonObj.getString("username"));//session移除验证码
             Consumer myUser = new Consumer();
             myUser.setUsername(jsonObj.getString("username"));
             myUser.setPassword(jsonObj.getString("password"));
@@ -301,7 +302,7 @@ public class SigninController extends BaseController {
     //注册验证码
     @RequestMapping(value = "/app/sendCode.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map registerSendCode(HttpServletRequest request) {
+    public Map registerSendCode(HttpServletRequest request) {//添加同步
         LogBean logBean = new LogBean();
         logBean.setApiName("sendCode");
         Map<String, String> resultMap = new HashMap<String, String>();
@@ -320,17 +321,16 @@ public class SigninController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             String verificationCode = VerificationCodeGenerator.createVerificationCode();
             String message = this.smsCheckManager.send(jsonObj.getString("username"), verificationCode, "1104699", PConst.TIANYI);
-            request.getSession().setAttribute(jsonObj.getString("username"), verificationCode);
+            request.getSession().setAttribute(jsonObj.getString("username").toString(), verificationCode);
+            CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 10000000);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("message",message);//响应的用户信息
         } catch(Exception e){
-            resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-            return resultMap;
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
         return resultMap;
     }
@@ -361,13 +361,14 @@ public class SigninController extends BaseController {
                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
                return resultMap;
            }
-
-           if(request.getSession().getAttribute(jsonObj.getString("username")).toString()==null){
+           Cookie cookie = CookieTool.getCookieByName(request, jsonObj.getString("username").toString());
+           String code =  cookie.getValue();
+           if(code==null){
                resultMap = resultMapHandler.handlerResult("100011","验证码失效，请重新发送",logBean);
                return resultMap;
            }
 
-           String code= request.getSession().getAttribute(jsonObj.getString("username")).toString();
+
           if (code!=null && code.equals(jsonObj.getString("code"))){
               resultMap = resultMapHandler.handlerResult("0","成功",logBean);
           }else{
