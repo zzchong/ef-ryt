@@ -15,7 +15,7 @@ public class PlatformVersionUtil {
     {
        String flag ="";
         String agent = request.getHeader("User-Agent");
-        String[] keywords = { "Android", "iPhone", "iPod", "iPad", "Windows Phone", "MQQBrowser" };
+        String[] keywords = { "Android", "iPhone", "iPod", "iPad", "Windows Phone", "MQQBrowser","CFNetwork" };
 
         //排除 Windows 桌面系统
         if (!agent.contains("Windows NT") || (agent.contains("Windows NT") && agent.contains("compatible; MSIE 9.0;")))
@@ -27,6 +27,9 @@ public class PlatformVersionUtil {
                 {
                     if (agent.contains(item))
                     {
+                        if (item.equals("CFNetwork")){
+                            flag ="ios";
+                        }
                         flag = item;
                         break;
                     }

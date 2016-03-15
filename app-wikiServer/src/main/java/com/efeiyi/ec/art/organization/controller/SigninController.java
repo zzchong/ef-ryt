@@ -153,7 +153,7 @@ public class SigninController extends BaseController {
                 return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
             }
            //***************************************保存用户信息
-            Consumer myUser = new Consumer();
+            MyUser myUser = new MyUser();
             myUser.setUsername(jsonObj.getString("username"));
             myUser.setPassword(jsonObj.getString("password"));
             //myUser.setName2(jsonObj.getString("truename2"));
@@ -161,14 +161,14 @@ public class SigninController extends BaseController {
             myUser.setAccountLocked(false);
             myUser.setCredentialsExpired(false);
             myUser.setEnabled(true);
-            myUser.setStatus("1");
+            myUser.setStatus(1);
             myUser.setCreateDatetime(new Date());
-            baseManager.saveOrUpdate(Consumer.class.getName(),myUser);
+            baseManager.saveOrUpdate(MyUser.class.getName(),myUser);
             resultMap = resultMapHandler.handlerResult("0","注册成功！",logBean);
             resultMap.put("userInfo",myUser);//响应的用户信息
             return  resultMap;
         } catch (Exception e) {
-
+             e.printStackTrace();
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
     }
@@ -325,7 +325,6 @@ public class SigninController extends BaseController {
             }
             String verificationCode = VerificationCodeGenerator.createVerificationCode();
             String message = this.smsCheckManager.send(jsonObj.getString("username"), verificationCode, "1104699", PConst.TIANYI);
-            request.getSession().setAttribute(jsonObj.getString("username").toString(), verificationCode);
             CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 10000000);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("message",message);//响应的用户信息
