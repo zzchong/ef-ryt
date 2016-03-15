@@ -110,7 +110,7 @@ public class ArtworkController extends BaseController {
                 return resultMap;
             }
 
-            String hql = "from Artwork WHERE 1=1 and status = '1'  order by createDatetime desc";
+            String hql = "from Artwork WHERE 1=1 and status = '1'  order by investStartDatetime asc";
             artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
             List<ArtWorkBean> objectList = new ArrayList<>();
             for (Artwork artwork : artworkList){
@@ -168,14 +168,11 @@ public class ArtworkController extends BaseController {
             }
 
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
-//            if(artwork.getAuthor()!=null){
-//                if("10000".equals(artwork.getAuthor().getType())){
-//                    Master master = ((Master) baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-//                    artwork.setMaster(master);
-//                }
-//            }
+            ArtWorkBean artWorkBean = new ArtWorkBean();
+            artWorkBean.setArtwork(artwork);
+            artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("artwork",artwork);
+            resultMap.put("object",artWorkBean);
         } catch(Exception e){
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -236,6 +233,7 @@ public class ArtworkController extends BaseController {
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("master",master);
+            resultMap.put("artWorkList",artworks);
             resultMap.put("investsNum",investsNum);
             resultMap.put("investsMoney",investsMoney);
             resultMap.put("followedNum",followedNum);
@@ -296,6 +294,7 @@ public class ArtworkController extends BaseController {
                 ArtWorkInvestBean artWorkInvestBean = new ArtWorkInvestBean();
                 artWorkInvestBean.setArtwork(artworkInvests1.get(i).getArtwork());
                 artWorkInvestBean.setInvestMoney(investMoney.get(i));
+                artWorkInvestBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artworkInvests1.get(i).getArtwork().getAuthor().getId()));
                 artworks.add(artWorkInvestBean);
             }
             //投资金额
@@ -334,9 +333,9 @@ public class ArtworkController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**investorIndex.do测试加密参数**/
-        map.put("pageSize","5");
-        map.put("pageNum","1");
-        map.put("timestamp", timestamp);
+//        map.put("pageSize","5");
+//        map.put("pageNum","1");
+//        map.put("timestamp", timestamp);
         /**investorArtWork.do测试加密参数**/
 //        map.put("artWorkId","qydeyugqqiugdi");
 //        map.put("timestamp", timestamp);
@@ -345,16 +344,16 @@ public class ArtworkController extends BaseController {
 //        map.put("masterId","icjxkedl0000b6i0");
 //        map.put("timestamp", timestamp);
         /**guestView.do测试加密参数**/
-//        map.put("userId","1");
-//        map.put("timestamp", timestamp);
+        map.put("userId","1");
+        map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/investorIndex.do";
+        String url = "http://192.168.1.80:8001/app/guestView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorIndex.do测试 **/
-        String json = "{\"pageSize\":\"5\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"userId\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();

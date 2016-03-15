@@ -1,6 +1,7 @@
 package com.efeiyi.ec.art.modelConvert;
 
 import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.model.Master;
 import com.efeiyi.ec.art.organization.model.User;
 
 import java.math.BigDecimal;
@@ -16,6 +17,8 @@ public class ArtWorkInvestBean {
 
     private BigDecimal investMoney;
 
+    private Master master;
+
     public Artwork getArtwork() {
         return artwork;
     }
@@ -30,5 +33,13 @@ public class ArtWorkInvestBean {
 
     public void setInvestMoney(BigDecimal investMoney) {
         this.investMoney = investMoney;
+    }
+
+    public Master getMaster() {
+        return master;
+    }
+
+    public void setMaster(Master master) {
+        this.master = master;
     }
 }

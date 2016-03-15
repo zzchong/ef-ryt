@@ -140,6 +140,7 @@ public class BigUser {
         this.name = name;
     }
 
+    @JsonIgnore
     @Column(name = "password")
     public String getPassword() {
         return password;
@@ -234,6 +235,7 @@ public class BigUser {
         this.roleType = roleType;
     }*/
 
+    @JsonIgnore
     @Column(name = "account_enabled")
     public Boolean getEnabled() {
         return enabled;
@@ -243,6 +245,7 @@ public class BigUser {
         this.enabled = enabled;
     }
 
+    @JsonIgnore
     @Column(name = "account_expired")
     public Boolean getAccountExpired() {
         return accountExpired;
@@ -252,6 +255,7 @@ public class BigUser {
         this.accountExpired = accountExpired;
     }
 
+    @JsonIgnore
     @Column(name = "account_locked")
     public Boolean getAccountLocked() {
         return accountLocked;
@@ -261,6 +265,7 @@ public class BigUser {
         this.accountLocked = accountLocked;
     }
 
+    @JsonIgnore
     @Column(name = "credentials_expited")
     public Boolean getCredentialsExpired() {
         return credentialsExpired;
@@ -290,6 +295,7 @@ public class BigUser {
         this.confirmPassword = confirmPassword;
     }
 
+    @JsonIgnore
     @Transient
     public String getOldPassword() {
         return oldPassword;
