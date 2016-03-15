@@ -213,15 +213,8 @@ public class SigninController extends BaseController {
             } catch (Exception e) {
                 return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
             }
-
-
         } catch(Exception e){
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            logBean.setResultCode("10004");
-            logBean.setMsg("未知错误，请联系管理员");
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-            return resultMap;
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
     }
     /**
@@ -384,7 +377,7 @@ public class SigninController extends BaseController {
 
     @RequestMapping(value = "/app/completeUserInfo.do", method = RequestMethod.POST)
     @ResponseBody
-    public  Map paramBind(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile headPortrait
+    public  Map completeUserInfo(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile headPortrait
 
        /* Map<String, List<Object>> paramsMap = new HashMap<>();
         paramsMap = params;//参数列表*/
@@ -451,7 +444,7 @@ public class SigninController extends BaseController {
 
 
 
-    @RequestMapping(value = "/app/test.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/test.do", method = RequestMethod.POST)//测试方法
     @ResponseBody
     public  Map test(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile photo) {
         Map paramsMap = new HashMap<>();
@@ -462,73 +455,6 @@ public class SigninController extends BaseController {
         //System.out.println(paramsMap.get("name").get(0));
         return paramsMap;
     }
-    @RequestMapping(value = "/app/test2.do", method = RequestMethod.POST)
-    @ResponseBody
-    public Map completeUserInfo(HttpServletRequest request) {
-        LogBean logBean = new LogBean();
-        logBean.setApiName("completeUserInfo");
-        Map<String, String> resultMap = new HashMap<String, String>();
-        TreeMap treeMap = new TreeMap();
-        try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
-            logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(jsonObj.toString());
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
-                    "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("nickname "))
-                    || "".equals(jsonObj.getString("sex "))) {
-
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
-            }
-
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("username", jsonObj.getString("username"));
-            treeMap.put("nickname", jsonObj.getString("nickname"));
-            treeMap.put("sex", jsonObj.getString("sex"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
-            }
-
-            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("username", jsonObj.getString("username"));
-            BigUser user;
-            try {
-                user = (BigUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
-                if (user!=null && user.getId()!=null) {
-                    //将用户头像上传至阿里云
-                    //aliOssUploadManager.uploadFile();
-                    user.setName2(jsonObj.getString("username"));
-                    user.setSex(Integer.parseInt(jsonObj.getString("sex ")));
-                    //user.setPictureUrl();
-                    baseManager.saveOrUpdate(BigUser.class.getName(),user);
-                }else {
-                    return  resultMapHandler.handlerResult("10007","未知错误，请联系管理员",logBean);
-                }
-
-            } catch (Exception e) {
-                resultMap = resultMapHandler.handlerResult("10005","户名不存在",logBean);
-                return resultMap;
-            }
-
-        } catch(Exception e){
-            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-        }
-        return resultMap;
-    }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
