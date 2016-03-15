@@ -42,7 +42,54 @@
         });
         return false;
     }
+    $(document).ready(function(){
+        transdate(1457951615632);
+    });
 
+    function transdate(endTime){
+        var mytime=new Array();
+        var timestamp = Date.parse(new Date());
+        var oldTime = parseInt(endTime);
+        var intervalTime = (timestamp - oldTime)/1000;
+
+       if((intervalTime/60/60/24)>=1){//>=1 day
+           var day = parseInt(intervalTime/60/60/24);
+           var hour = parseInt((intervalTime-(day*60*60*24))/60/60);
+           var min =parseInt((intervalTime-(day*60*60*24)-(hour*60*60))/60);
+           var sec = parseInt(intervalTime-(day*60*60*24)-(hour*60*60)-min*60);
+           mytime[0] =day;
+           mytime[1] =hour;
+           mytime[2] =min;
+           mytime[2] =sec;
+           alert (mytime[0]+" "+mytime[1]+" "+mytime[2]+" "+mytime[3]);
+           return mytime;
+       }else if((intervalTime/60/60/24)<1 && (intervalTime/60/60)>=1){
+           var hour = parseInt((intervalTime)/60/60);
+           var min =parseInt((intervalTime-(hour*60*60))/60);
+           var sec = parseInt(intervalTime-(hour*60*60)-min*60);
+           mytime[0] =hour;
+           mytime[1] =min;
+           mytime[2] =sec;
+           alert (mytime[0]+" "+mytime[1]+" "+mytime[2]);
+           return mytime;
+       }else if((intervalTime/60/60)<1 && (intervalTime/60)>=1){
+           var min =parseInt((intervalTime)/60);
+           var sec = parseInt(intervalTime-min*60);
+           mytime[0] ="";
+           mytime[1] =min;
+           mytime[2] =sec;
+           alert (mytime[0]+" "+mytime[1]+" "+mytime[2]);
+           return mytime;
+       }else if((intervalTime/60)<1 && intervalTime>0){
+           var sec = intervalTime;
+           mytime[0] ="";
+           mytime[1] ="";
+           mytime[2] =sec;
+           alert (mytime[0]+" "+mytime[1]+" "+mytime[2]);
+           return mytime;
+       }
+
+    }
 </script>
 
 </body>
