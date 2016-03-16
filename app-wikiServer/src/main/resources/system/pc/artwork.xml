@@ -123,5 +123,24 @@
                 </do>
             </does>
         </entity>
+
+        <entity name="ArtWorkMessage" label="Artwork"
+                basic="simple" others=""
+                model="com.efeiyi.ec.art.model.ArtworkMessage">
+            <does>
+                <do name="plistArtworkMessage" access="" label="ArtworkMessage列表"
+                    result="json">
+                    <query name="default" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="id" defaultValue="0" operation="ne"/>
+                    </query>
+                </do>
+                <do name="listArtworkMessage" access="" label="ArtworkMessage列表"
+                    result="json">
+                    <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
+                        <condition name="artwork.id" defaultValue="0" operation="eq"/>
+                    </query>
+                </do>
+            </does>
+        </entity>
     </entities>
 </module>
