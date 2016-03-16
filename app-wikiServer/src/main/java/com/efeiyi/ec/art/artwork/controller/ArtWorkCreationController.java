@@ -128,6 +128,7 @@ public class ArtWorkCreationController extends BaseController {
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("artWorkId",jsonObj.getString("artWorkId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
@@ -152,7 +153,7 @@ public class ArtWorkCreationController extends BaseController {
             //剩余时长
             String restTime = getDistanceTimes(str3,str1);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("artwork",artWorkBean);
+            resultMap.put("object",artWorkBean);
             resultMap.put("artworkMessageList",artworkMessageList);
             resultMap.put("createdTime",createdTime);
             resultMap.put("restTime",restTime);
@@ -166,7 +167,8 @@ public class ArtWorkCreationController extends BaseController {
         return resultMap;
     }
 
-    public static String getDistanceTimes(String str1, String str2) {
+    //时间比较
+    private String getDistanceTimes(String str1, String str2) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         Date one;
         Date two;
@@ -180,7 +182,7 @@ public class ArtWorkCreationController extends BaseController {
             long time2 = two.getTime();
             long diff ;
 
-                diff = time1 - time2;
+            diff = time1 - time2;
 
             day = diff / (24 * 60 * 60 * 1000);
             hour = (diff / (60 * 60 * 1000) - day * 24);
@@ -192,41 +194,31 @@ public class ArtWorkCreationController extends BaseController {
         String time = day+"日"+hour+"时"+min+"分";
         return time;
     }
-
     public  static  void  main(String [] arg) throws Exception {
 
 
         String appKey = "BL2QEuXUXNoGbNeHObD4EzlX+KuGc70U";
         long timestamp = System.currentTimeMillis();
-
         Map<String, Object> map = new HashMap<String, Object>();
 
-        /**investorIndex.do测试加密参数**/
-//        map.put("pageSize","5");
+        /**artWorkCreationList.do测试加密参数**/
 //        map.put("pageNum","1");
-//        map.put("timestamp", timestamp);
-        /**investorArtWork.do测试加密参数**/
-//        map.put("artWorkId","qydeyugqqiugdi");
-//        map.put("timestamp", timestamp);
-
-        /**masterView.do测试加密参数**/
-//        map.put("masterId","icjxkedl0000b6i0");
-//        map.put("timestamp", timestamp);
-        /**guestView.do测试加密参数**/
-        map.put("userId","1");
+//        map.put("pageSize","5");
+        /**artWorkCreationView.do测试加密参数**/
+        map.put("artWorkId","qydeyugqqiugd2");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/guestView.do";
+        String url = "http://192.168.1.80:8001/app/artWorkCreationView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
-        /**json参数  investorIndex.do测试 **/
-        String json = "{\"userId\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
-
+        /**json参数  artWorkCreationList.do测试 **/
+//        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        /**json参数  artWorkCreationView.do测试 **/
+        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
-
 
         StringEntity stringEntity = new StringEntity(jsonString,"utf-8");
         stringEntity.setContentType("text/json");
