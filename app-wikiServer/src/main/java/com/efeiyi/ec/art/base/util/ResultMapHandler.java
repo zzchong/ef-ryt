@@ -10,6 +10,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class ResultMapHandler {
     BaseManager baseManager;
 
     public  Map handlerResult(String code,String msg,LogBean logBean) {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = getRequest();
         String flag = PlatformVersionUtil.CheckAgent(request);
         Map<String, String> resultMap = new HashMap<String, String>();
         resultMap.put("resultCode", code);
@@ -34,5 +35,15 @@ public class ResultMapHandler {
         logBean.setExtend1(flag);
         baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
         return resultMap;
+    }
+
+    public HttpServletRequest getRequest(){
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        return request;
+    }
+    public HttpServletResponse getResponse(){
+
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        return response;
     }
 }
