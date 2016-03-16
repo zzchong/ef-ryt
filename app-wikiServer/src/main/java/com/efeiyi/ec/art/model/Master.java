@@ -33,12 +33,15 @@ public class Master extends BigUser implements Serializable{
     private String content; // 简介(长)
     private String presentAddress; //现居地
     private String backgroundUrl;
-    private String provinceName;//籍贯
+    private String provinceName;//籍贯/详细地址
     private AddressProvince originProvince; //籍贯（省）
     private String theStatus;         // 正常，删除，停止，隐藏
     private String logoUrl;
     private String masterSpeech;
     private List<Artwork> artworks;
+    private String artCategory;
+    private String titleCertificate;
+
     @Column(name = "master_speech")
     public String getMasterSpeech() {
         return masterSpeech;
@@ -167,10 +170,21 @@ public class Master extends BigUser implements Serializable{
         this.artworks = artworks;
     }
 
-    @Override
-    public String toString() {
-        return "Master{" +
-                "brief='" + brief + '\'' +
-                '}';
+    @Column(name = "art_category")
+    public String getArtCategory() {
+        return artCategory;
+    }
+
+    public void setArtCategory(String artCategory) {
+        this.artCategory = artCategory;
+    }
+
+    @Column(name = "title_certificate")
+    public String getTitleCertificate() {
+        return titleCertificate;
+    }
+
+    public void setTitleCertificate(String titleCertificate) {
+        this.titleCertificate = titleCertificate;
     }
 }
