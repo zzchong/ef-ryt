@@ -27,10 +27,14 @@ public class PlatformVersionUtil {
                 {
                     if (agent.contains(item))
                     {
+
+                        flag = item;
                         if (item.equals("CFNetwork")){
                             flag ="ios";
                         }
-                        flag = item;
+                        if (item.equals("okhttp")){
+                            flag ="Android";
+                        }
                         break;
                     }
                 }

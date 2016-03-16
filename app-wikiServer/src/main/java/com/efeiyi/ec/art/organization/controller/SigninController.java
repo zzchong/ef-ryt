@@ -441,7 +441,53 @@ public class SigninController extends BaseController {
 
     }
 
+    //找回密码
+    @RequestMapping(value = "/app/retrievePassword.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map retrievePassword(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("retrievePassword");
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
+                    "".equals(jsonObj.getString("timestamp"))|| "".equals(jsonObj.getString("password"))) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("username", jsonObj.getString("username"));
+            treeMap.put("password", jsonObj.getString("password"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("username", jsonObj.getString("username"));
+            MyUser user;
+            try {
+                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
+                if (user!=null && user.getId()!=null) {
+                    user.setPassword(jsonObj.getString("password"));
+                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    return  resultMapHandler.handlerResult("0","成功",logBean);
+                }else {
 
+                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
+                }
+            } catch (Exception e) {
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+            }
+
+
+        } catch(Exception e){
+            resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+            return resultMap;
+        }
+    }
 
 
     @RequestMapping(value = "/app/test.do", method = RequestMethod.POST)//测试方法
