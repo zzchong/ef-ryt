@@ -62,7 +62,7 @@ public class MyUser implements Serializable, UserDetails ,BaseUser{
 
     private Date lastLoginDatetime;//最后一次登陆时间
     private Date lastLogoutDatetime;//最后一次登陆时间
-
+    protected Date createDatetime;
 
    /* @Transient
     public BigUser getBigUser() {
@@ -397,7 +397,14 @@ public class MyUser implements Serializable, UserDetails ,BaseUser{
     public void setSource(String source) {
         this.source = source;
     }
+    @Column(name = "create_datetime")
+    public Date getCreateDatetime() {
+        return createDatetime;
+    }
 
+    public void setCreateDatetime(Date createDatetime) {
+        this.createDatetime = createDatetime;
+    }
 //    @Column(name = "rd_end_day")
 //    public Date getRdEndDay() {
 //        return rdEndDay;

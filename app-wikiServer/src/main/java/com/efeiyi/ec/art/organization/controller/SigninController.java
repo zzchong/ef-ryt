@@ -21,6 +21,7 @@ import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.p.PConst;
 import com.ming800.core.p.service.AliOssUploadManager;
+import com.ming800.core.util.CookieTool;
 import com.ming800.core.util.VerificationCodeGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -67,12 +69,8 @@ public class SigninController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) || "".equals(jsonObj.getString("password")) || "".equals(jsonObj.getString("timestamp"))) {
-                logBean.setResultCode("10001");
-                logBean.setMsg("必选参数为空，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
 
             String signmsg = jsonObj.getString("signmsg");
@@ -81,12 +79,8 @@ public class SigninController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                logBean.setResultCode("10002");
-                logBean.setMsg("参数校验不合格，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
+
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
@@ -95,34 +89,19 @@ public class SigninController extends BaseController {
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user.getPassword().equals(jsonObj.getString("password"))) {
-                    logBean.setResultCode("0");
-                    logBean.setMsg("成功");
-                    baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                    resultMap.put("resultCode", "0");
-                    resultMap.put("resultMsg", "成功");
+                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
                     resultMap.put("userInfo",user);
                 }else{
-                    logBean.setResultCode("10003");
-                    logBean.setMsg("用户名或密码错误");
-                    baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                    resultMap.put("resultCode", "10003");
-                    resultMap.put("resultMsg", "用户名或密码错误");
+
+                    resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                logBean.setResultCode("10003");
-                logBean.setMsg("用户名或密码错误");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                resultMap.put("resultCode", "10003");
-                resultMap.put("resultMsg", "用户名或密码错误");
+
+                resultMap = resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
             }
         } catch (Exception e) {
-            logBean.setResultCode("10004");
-            logBean.setMsg("未知错误，请联系管理员");
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
         return resultMap;
     }
@@ -140,37 +119,25 @@ public class SigninController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
-                "".equals(jsonObj.getString("password")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("truename2"))) {
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                logBean.setResultCode("10001");
-                logBean.setMsg("必选参数为空，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                return resultMap;
+                "".equals(jsonObj.getString("password")) || "".equals(jsonObj.getString("timestamp")) ) {//|| "".equals(jsonObj.getString("truename2"))
+
+                return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
 
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("username", jsonObj.getString("username"));
             treeMap.put("password", jsonObj.getString("password"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            treeMap.put("truename2", jsonObj.getString("truename2"));
+            //treeMap.put("truename2", jsonObj.getString("truename2"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                logBean.setResultCode("10002");
-                logBean.setMsg("参数校验不合格，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                return resultMap;
+
+                return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             boolean flagg= isMobile(jsonObj.getString("username"));
             if(flagg==false){
-                resultMap.put("resultCode", "10006");
-                resultMap.put("resultMsg", "手机号码校验不合格");
-                logBean.setResultCode("10006");
-                logBean.setMsg("手机号码校验不合格");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                return resultMap;
+
+                return  resultMapHandler.handlerResult("10006","手机号码校验不合格",logBean);
             }
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
             map.put("username", jsonObj.getString("username"));
@@ -178,49 +145,32 @@ public class SigninController extends BaseController {
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user!=null && user.getId()!=null) {
-                    resultMap.put("resultCode", "-1");
-                    resultMap.put("resultMsg", "用户名已经存在");
-                    logBean.setResultCode("-1");
-                    logBean.setMsg("用户名已经存在");
-                    baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                    return resultMap;
+
+                    return  resultMapHandler.handlerResult("-1","用户名已经存在",logBean);
                 }
             }catch(Exception e){
-                resultMap.put("resultCode", "10005");
-                resultMap.put("resultMsg", "查询数据出现异常");
-                logBean.setResultCode("10005");
-                logBean.setMsg("查询数据出现异常");
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-                return resultMap;
+
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
             }
            //***************************************保存用户信息
-            request.getSession().removeAttribute(jsonObj.getString("username"));//session移除验证码
-            Consumer myUser = new Consumer();
+            MyUser myUser = new MyUser();
             myUser.setUsername(jsonObj.getString("username"));
             myUser.setPassword(jsonObj.getString("password"));
-            myUser.setName2(jsonObj.getString("truename2"));
+            //myUser.setName2(jsonObj.getString("truename2"));
             myUser.setAccountExpired(false);
             myUser.setAccountLocked(false);
             myUser.setCredentialsExpired(false);
             myUser.setEnabled(true);
-            myUser.setStatus("1");
+            myUser.setStatus(1);
             myUser.setCreateDatetime(new Date());
-            baseManager.saveOrUpdate(Consumer.class.getName(),myUser);
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "注册成功！");
-            logBean.setResultCode("0");
-            logBean.setMsg( "注册成功！");
+            baseManager.saveOrUpdate(MyUser.class.getName(),myUser);
+            resultMap = resultMapHandler.handlerResult("0","注册成功！",logBean);
             resultMap.put("userInfo",myUser);//响应的用户信息
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
+            return  resultMap;
         } catch (Exception e) {
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            logBean.setResultCode("10004");
-            logBean.setMsg("未知错误，请联系管理员");
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-            return resultMap;
+             e.printStackTrace();
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
-        return resultMap;
     }
 
 
@@ -237,25 +187,15 @@ public class SigninController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                 "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("truename2"))) {
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                logBean.setResultCode("10001");
-                logBean.setMsg("必选参数为空，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                return resultMap;
-            }
+                return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+        }
 
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("username", jsonObj.getString("username"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                logBean.setResultCode("10002");
-                logBean.setMsg("参数校验不合格，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                return resultMap;
+                return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
@@ -264,38 +204,18 @@ public class SigninController extends BaseController {
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user!=null && user.getId()!=null) {
-                    resultMap.put("resultCode", "-1");
-                    resultMap.put("resultMsg", "用户名已经存在");
-                    logBean.setResultCode("-1");
-                    logBean.setMsg("用户名已经存在");
+
+                    return  resultMapHandler.handlerResult("-1","用户名已经存在",logBean);
                 }else {
-                    resultMap.put("resultCode", "0");
-                    resultMap.put("resultMsg", "成功");
-                    logBean.setResultCode("0");
-                    logBean.setMsg("成功");
 
+                    return  resultMapHandler.handlerResult("0","成功",logBean);
                 }
-                baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
             } catch (Exception e) {
-                resultMap.put("resultCode", "10005");
-                resultMap.put("resultMsg", "查询数据出现异常");
-                logBean.setResultCode("10005");
-                logBean.setMsg("查询数据出现异常");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                return resultMap;
-                //e.printStackTrace();
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
             }
-
-
         } catch(Exception e){
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            logBean.setResultCode("10004");
-            logBean.setMsg("未知错误，请联系管理员");
-            baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
-            return resultMap;
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
-        return resultMap;
     }
     /**
      * 手机号验证
@@ -329,8 +249,7 @@ public class SigninController extends BaseController {
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                     "".equals(jsonObj.getString("cid")) || "".equals(jsonObj.getString("timestamp"))
                     || "".equals(jsonObj.getString("password")) ) {
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("username", jsonObj.getString("username"));
@@ -340,8 +259,7 @@ public class SigninController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
             map.put("username", jsonObj.getString("username"));
@@ -349,8 +267,7 @@ public class SigninController extends BaseController {
             try {
                 user = (User) baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_GET, map);
                 if (user==null || user.getId()==null) {
-                    resultMap = resultMapHandler.handlerResult("10007","用户名不存在",logBean);
-                    return resultMap;
+                    return resultMapHandler.handlerResult("10007","用户名不存在",logBean);
                 }
                 PushUserBinding pushUserBinding = new PushUserBinding();
                 pushUserBinding.setCid(jsonObj.getString("cid"));
@@ -360,13 +277,11 @@ public class SigninController extends BaseController {
                 resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
                 baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
             } catch (Exception e) {
-                resultMap = resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
                 //e.printStackTrace();
             }
         } catch(Exception e){
-            resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-            return resultMap;
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
         return resultMap;
     }
@@ -375,7 +290,7 @@ public class SigninController extends BaseController {
     //注册验证码
     @RequestMapping(value = "/app/sendCode.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map registerSendCode(HttpServletRequest request) {
+    public Map registerSendCode(HttpServletRequest request) {//添加同步
         LogBean logBean = new LogBean();
         logBean.setApiName("sendCode");
         Map<String, String> resultMap = new HashMap<String, String>();
@@ -386,25 +301,22 @@ public class SigninController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                  "".equals(jsonObj.getString("timestamp"))) {
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("username", jsonObj.getString("username"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             String verificationCode = VerificationCodeGenerator.createVerificationCode();
             String message = this.smsCheckManager.send(jsonObj.getString("username"), verificationCode, "1104699", PConst.TIANYI);
-            request.getSession().setAttribute(jsonObj.getString("username"), verificationCode);
+            CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 10000000);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("message",message);//响应的用户信息
         } catch(Exception e){
-            resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-            return resultMap;
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
         return resultMap;
     }
@@ -423,8 +335,7 @@ public class SigninController extends BaseController {
            logBean.setRequestMessage(jsonObj.toString());
            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                    "".equals(jsonObj.getString("timestamp"))|| "".equals(jsonObj.getString("code"))) {
-               resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-               return resultMap;
+               return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
            }
            String signmsg = jsonObj.getString("signmsg");
            treeMap.put("username", jsonObj.getString("username"));
@@ -432,16 +343,15 @@ public class SigninController extends BaseController {
            treeMap.put("timestamp", jsonObj.getString("timestamp"));
            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
            if (verify != true) {
-               resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-               return resultMap;
+               return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+           }
+           Cookie cookie = CookieTool.getCookieByName(request, jsonObj.getString("username").toString());
+           String code =  cookie.getValue();
+           if(code==null){
+               return  resultMapHandler.handlerResult("100011","验证码失效，请重新发送",logBean);
            }
 
-           if(request.getSession().getAttribute(jsonObj.getString("username")).toString()==null){
-               resultMap = resultMapHandler.handlerResult("100011","验证码失效，请重新发送",logBean);
-               return resultMap;
-           }
 
-           String code= request.getSession().getAttribute(jsonObj.getString("username")).toString();
           if (code!=null && code.equals(jsonObj.getString("code"))){
               resultMap = resultMapHandler.handlerResult("0","成功",logBean);
           }else{
@@ -449,8 +359,7 @@ public class SigninController extends BaseController {
           }
 
        } catch(Exception e){
-           resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-           return resultMap;
+           return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
        }
        return resultMap;
    }
@@ -458,7 +367,7 @@ public class SigninController extends BaseController {
 
     @RequestMapping(value = "/app/completeUserInfo.do", method = RequestMethod.POST)
     @ResponseBody
-    public  Map paramBind(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile headPortrait
+    public  Map completeUserInfo(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile headPortrait
 
        /* Map<String, List<Object>> paramsMap = new HashMap<>();
         paramsMap = params;//参数列表*/
@@ -522,10 +431,56 @@ public class SigninController extends BaseController {
 
     }
 
+    //找回密码
+    @RequestMapping(value = "/app/retrievePassword.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map retrievePassword(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("retrievePassword");
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
+                    "".equals(jsonObj.getString("timestamp"))|| "".equals(jsonObj.getString("password"))) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("username", jsonObj.getString("username"));
+            treeMap.put("password", jsonObj.getString("password"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("username", jsonObj.getString("username"));
+            MyUser user;
+            try {
+                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
+                if (user!=null && user.getId()!=null) {
+                    user.setPassword(jsonObj.getString("password"));
+                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    return  resultMapHandler.handlerResult("0","成功",logBean);
+                }else {
+
+                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
+                }
+            } catch (Exception e) {
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+            }
 
 
+        } catch(Exception e){
+            resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+            return resultMap;
+        }
+    }
 
-    @RequestMapping(value = "/app/test.do", method = RequestMethod.POST)
+
+    @RequestMapping(value = "/app/test.do", method = RequestMethod.POST)//测试方法
     @ResponseBody
     public  Map test(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile photo) {
         Map paramsMap = new HashMap<>();
@@ -536,73 +491,6 @@ public class SigninController extends BaseController {
         //System.out.println(paramsMap.get("name").get(0));
         return paramsMap;
     }
-    @RequestMapping(value = "/app/test2.do", method = RequestMethod.POST)
-    @ResponseBody
-    public Map completeUserInfo(HttpServletRequest request) {
-        LogBean logBean = new LogBean();
-        logBean.setApiName("completeUserInfo");
-        Map<String, String> resultMap = new HashMap<String, String>();
-        TreeMap treeMap = new TreeMap();
-        try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
-            logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(jsonObj.toString());
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
-                    "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("nickname "))
-                    || "".equals(jsonObj.getString("sex "))) {
-
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
-            }
-
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("username", jsonObj.getString("username"));
-            treeMap.put("nickname", jsonObj.getString("nickname"));
-            treeMap.put("sex", jsonObj.getString("sex"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
-            }
-
-            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("username", jsonObj.getString("username"));
-            BigUser user;
-            try {
-                user = (BigUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
-                if (user!=null && user.getId()!=null) {
-                    //将用户头像上传至阿里云
-                    //aliOssUploadManager.uploadFile();
-                    user.setName2(jsonObj.getString("username"));
-                    user.setSex(Integer.parseInt(jsonObj.getString("sex ")));
-                    //user.setPictureUrl();
-                    baseManager.saveOrUpdate(BigUser.class.getName(),user);
-                }else {
-                    return  resultMapHandler.handlerResult("10007","未知错误，请联系管理员",logBean);
-                }
-
-            } catch (Exception e) {
-                resultMap = resultMapHandler.handlerResult("10005","户名不存在",logBean);
-                return resultMap;
-            }
-
-        } catch(Exception e){
-            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-        }
-        return resultMap;
-    }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
