@@ -142,5 +142,24 @@
                 </do>
             </does>
         </entity>
+
+        <entity name="ArtworkBidding" label="Artwork"
+                basic="simple" others=""
+                model="com.efeiyi.ec.art.model.ArtworkBidding">
+            <does>
+                <do name="plistArtworkBidding" access="" label="ArtworkBidding列表"
+                    result="json">
+                    <query name="default" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="id" defaultValue="0" operation="ne"/>
+                    </query>
+                </do>
+                <do name="listArtworkBidding" access="" label="ArtworkBidding列表"
+                    result="json">
+                    <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
+                        <condition name="artwork.id" defaultValue="0" operation="eq"/>
+                    </query>
+                </do>
+            </does>
+        </entity>
     </entities>
 </module>
