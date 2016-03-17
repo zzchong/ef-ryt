@@ -97,7 +97,7 @@ public class AuctionController extends BaseController {
                 String str1 = sdf.format(new Date());
                 if(artworkBiddingList!=null){
                     artwork.setAuctionNum(artworkBiddingList.size());
-                    artwork.setArtworkBidding(artworkBiddingList.get(0));
+                    artwork.setNewBidingPrice(artworkBiddingList.get(0).getPrice());
                     String str2 = sdf.format(artworkBiddingList.get(0).getCreateDatetime());
                     artwork.setNewBiddingDate(TimeUtil.getDistanceTimes(str1,str2));
                 }
@@ -109,7 +109,6 @@ public class AuctionController extends BaseController {
 
 
             }
-
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("objectList",objectList);
         } catch(Exception e){
@@ -162,7 +161,7 @@ public class AuctionController extends BaseController {
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
             List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>)baseManager.listObject(xQuery);
             //最新竞价记录
-            artWorkBean.getArtwork().setArtworkBidding(artworkBiddingList.get(0));
+            artWorkBean.getArtwork().setNewBidingPrice(artworkBiddingList.get(0).getPrice());
             //有效竞价次数
             Integer num = 0;
             if(artworkBiddingList!=null){
@@ -197,17 +196,19 @@ public class AuctionController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**artWorkAuctionList.do测试加密参数**/
-        map.put("pageNum","1");
-        map.put("pageSize","5");
+//        map.put("pageNum","1");
+//        map.put("pageSize","5");
+        /**artWorkAuctionView.do测试加密参数**/
+        map.put("artWorkId","qydeyugqqiugd2");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/artWorkAuctionList.do";
+        String url = "http://192.168.1.80:8001/app/artWorkAuctionView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  artWorkAuctionList.do测试 **/
-        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
