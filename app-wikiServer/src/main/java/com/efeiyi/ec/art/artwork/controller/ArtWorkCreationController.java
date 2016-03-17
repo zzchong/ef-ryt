@@ -12,6 +12,7 @@ import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
@@ -149,9 +150,9 @@ public class ArtWorkCreationController extends BaseController {
             String str1 = sdf.format(new Date());
             String str2 = sdf.format(artwork.getInvestEndDatetime());
             String str3 = sdf.format(artwork.getCreationEndDatetime());
-            String createdTime = getDistanceTimes(str1,str2);
+            String createdTime = TimeUtil.getDistanceTimes(str1,str2);
             //剩余时长
-            String restTime = getDistanceTimes(str3,str1);
+            String restTime = TimeUtil.getDistanceTimes(str3,str1);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("object",artWorkBean);
             resultMap.put("artworkMessageList",artworkMessageList);
@@ -167,33 +168,7 @@ public class ArtWorkCreationController extends BaseController {
         return resultMap;
     }
 
-    //时间比较
-    private String getDistanceTimes(String str1, String str2) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        Date one;
-        Date two;
-        long day = 0;
-        long hour = 0;
-        long min = 0;
-        try {
-            one = sdf.parse(str1);
-            two = sdf.parse(str2);
-            long time1 = one.getTime();
-            long time2 = two.getTime();
-            long diff ;
 
-            diff = time1 - time2;
-
-            day = diff / (24 * 60 * 60 * 1000);
-            hour = (diff / (60 * 60 * 1000) - day * 24);
-            min = ((diff / (60 * 1000)) - day * 24 * 60 - hour * 60);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        long[] times = {day, hour, min};
-        String time = day+"日"+hour+"时"+min+"分";
-        return time;
-    }
     public  static  void  main(String [] arg) throws Exception {
 
 

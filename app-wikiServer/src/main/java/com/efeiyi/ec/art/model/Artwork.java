@@ -41,6 +41,10 @@ public class Artwork implements Serializable {
     private BigDecimal investsMoney;//已筹金额
     private Date creationEndDatetime;//创作完成时间=融资结束时间+30(默认)
     private String type;//1 融资阶段  2 制作阶段  3 拍卖阶段  4 抽奖阶段
+
+    private  Integer  auctionNum;//竞价记录
+    private  ArtworkBidding artworkBidding;//最新的出价记录
+    private  String newBiddingDate;//最新出价时间
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -230,4 +234,32 @@ public class Artwork implements Serializable {
 //    public void setMaster(Master master) {
 //        this.master = master;
 //    }
+
+
+    @Transient
+    public String getNewBiddingDate() {
+        return newBiddingDate;
+    }
+
+    public void setNewBiddingDate(String newBiddingDate) {
+        this.newBiddingDate = newBiddingDate;
+    }
+
+    @Transient
+    public Integer getAuctionNum() {
+        return auctionNum;
+    }
+
+    public void setAuctionNum(Integer auctionNum) {
+        this.auctionNum = auctionNum;
+    }
+
+    @Transient
+    public ArtworkBidding getArtworkBidding() {
+        return artworkBidding;
+    }
+
+    public void setArtworkBidding(ArtworkBidding artworkBidding) {
+        this.artworkBidding = artworkBidding;
+    }
 }
