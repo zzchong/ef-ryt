@@ -333,9 +333,9 @@ public class ArtworkController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**investorIndex.do测试加密参数**/
-//        map.put("pageSize","5");
-//        map.put("pageNum","1");
-//        map.put("timestamp", timestamp);
+        map.put("pageSize","3");
+        map.put("pageNum","1");
+        map.put("timestamp", timestamp);
         /**investorArtWork.do测试加密参数**/
 //        map.put("artWorkId","qydeyugqqiugdi");
 //        map.put("timestamp", timestamp);
@@ -344,16 +344,16 @@ public class ArtworkController extends BaseController {
 //        map.put("masterId","icjxkedl0000b6i0");
 //        map.put("timestamp", timestamp);
         /**guestView.do测试加密参数**/
-        map.put("userId","1");
+//        map.put("userId","1");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/guestView.do";
+        String url = "http://192.168.1.80:8001/app/investorIndex.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorIndex.do测试 **/
-        String json = "{\"userId\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
