@@ -226,10 +226,10 @@ public class ArtworkController extends BaseController {
             //投资者
             Integer investsNum = 0;
             //融资金额
-            Double  investsMoney = 0.00;
+            BigDecimal  investsMoney = new BigDecimal(0);
             for(Artwork artwork :artworks){
                  investsNum += artwork.getArtworkInvests().size();
-                 investsMoney += artwork.getInvestsMoney().doubleValue();
+                 investsMoney = investsMoney.add(artwork.getInvestsMoney());
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("master",master);
@@ -298,17 +298,17 @@ public class ArtworkController extends BaseController {
                 artworks.add(artWorkInvestBean);
             }
             //投资金额
-            Double investsMoney = 0.00;
+            BigDecimal investsMoney = new BigDecimal(0);
             for (ArtworkInvest artworkInvest : artworkInvests){
-                investsMoney += artworkInvest.getPrice().doubleValue();
+                investsMoney = investsMoney.add(artworkInvest.getPrice());
             }
             //投资回报
-            Double reward = 0.00;
+            BigDecimal reward = new BigDecimal(0);
             xQuery = new XQuery("listInvestReward_default",request);
             xQuery.put("investUser_id",jsonObj.getString("userId"));
             List<InvestReward> investRewards = (List<InvestReward>)baseManager.listObject(xQuery);
             for (InvestReward investReward : investRewards){
-                reward += investReward.getReward().doubleValue();
+                reward = reward.add(investReward.getReward());
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("user",user);
