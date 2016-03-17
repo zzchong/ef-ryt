@@ -249,8 +249,7 @@ public class SigninController extends BaseController {
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                     "".equals(jsonObj.getString("cid")) || "".equals(jsonObj.getString("timestamp"))
                     || "".equals(jsonObj.getString("password")) ) {
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("username", jsonObj.getString("username"));
@@ -260,8 +259,7 @@ public class SigninController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
             map.put("username", jsonObj.getString("username"));
@@ -269,8 +267,7 @@ public class SigninController extends BaseController {
             try {
                 user = (User) baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_GET, map);
                 if (user==null || user.getId()==null) {
-                    resultMap = resultMapHandler.handlerResult("10007","用户名不存在",logBean);
-                    return resultMap;
+                    return resultMapHandler.handlerResult("10007","用户名不存在",logBean);
                 }
                 PushUserBinding pushUserBinding = new PushUserBinding();
                 pushUserBinding.setCid(jsonObj.getString("cid"));
@@ -280,13 +277,11 @@ public class SigninController extends BaseController {
                 resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
                 baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
             } catch (Exception e) {
-                resultMap = resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
                 //e.printStackTrace();
             }
         } catch(Exception e){
-            resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-            return resultMap;
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
         return resultMap;
     }
@@ -306,8 +301,7 @@ public class SigninController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                  "".equals(jsonObj.getString("timestamp"))) {
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("username", jsonObj.getString("username"));
@@ -318,7 +312,7 @@ public class SigninController extends BaseController {
             }
             String verificationCode = VerificationCodeGenerator.createVerificationCode();
             String message = this.smsCheckManager.send(jsonObj.getString("username"), verificationCode, "1104699", PConst.TIANYI);
-            CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 10000000);
+            CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 120);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("message",message);//响应的用户信息
         } catch(Exception e){
@@ -341,8 +335,7 @@ public class SigninController extends BaseController {
            logBean.setRequestMessage(jsonObj.toString());
            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) ||
                    "".equals(jsonObj.getString("timestamp"))|| "".equals(jsonObj.getString("code"))) {
-               resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-               return resultMap;
+               return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
            }
            String signmsg = jsonObj.getString("signmsg");
            treeMap.put("username", jsonObj.getString("username"));
@@ -350,14 +343,12 @@ public class SigninController extends BaseController {
            treeMap.put("timestamp", jsonObj.getString("timestamp"));
            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
            if (verify != true) {
-               resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-               return resultMap;
+               return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
            }
            Cookie cookie = CookieTool.getCookieByName(request, jsonObj.getString("username").toString());
            String code =  cookie.getValue();
            if(code==null){
-               resultMap = resultMapHandler.handlerResult("100011","验证码失效，请重新发送",logBean);
-               return resultMap;
+               return  resultMapHandler.handlerResult("100011","验证码失效，请重新发送",logBean);
            }
 
 
@@ -368,8 +359,7 @@ public class SigninController extends BaseController {
           }
 
        } catch(Exception e){
-           resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-           return resultMap;
+           return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
        }
        return resultMap;
    }

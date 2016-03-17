@@ -33,8 +33,8 @@ public class Artwork implements Serializable {
 //    private Master master;
     private Date createDatetime;
     private List<ArtworkAttachment> artworkAttachment;
-    private List<ArtworkComment> artworkComments;
-    private List<ArtworkInvest> artworkInvests;
+    private List<ArtworkComment> artworkComments;//项目评论
+    private List<ArtworkInvest> artworkInvests;//项目投资
     private ArtworkDraw artworkDraw;
     private String picture_url;
     private String step; //1 : 审核阶段
