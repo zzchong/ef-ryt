@@ -57,10 +57,7 @@ public class ProfileController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) || "".equals(jsonObj.getString("timestamp"))) {
-                resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             String username = jsonObj.getString("username");
@@ -68,10 +65,7 @@ public class ProfileController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
-                resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             XQuery xQuery = new XQuery("listUser_default", request);
             xQuery.put("username", username);
@@ -80,19 +74,12 @@ public class ProfileController extends BaseController {
             if (users != null && users.size() > 0) {
                 MyUser user = users.get(0);
                 resultMapHandler.handlerResult("0", "请求成功", logBean);
-                resultMap.put("resultCode", "0");
-                resultMap.put("resultMsg", "成功");
                 resultMap.put("userInfo", user);
             } else {
-                resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
-                resultMap.put("resultCode", "10008");
-                resultMap.put("resultMsg", "查无数据,稍后再试");
+                return resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
             }
         } catch (Exception e) {
-            resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
         return resultMap;
@@ -120,10 +107,7 @@ public class ProfileController extends BaseController {
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId"))
                     || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("type"))
                     || "".equals(jsonObj.getString("content"))) {
-                resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             String userId = jsonObj.getString("userId");
@@ -135,10 +119,7 @@ public class ProfileController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
-                resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             user = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
             if (user != null && user.getId() != null) {
@@ -146,8 +127,6 @@ public class ProfileController extends BaseController {
                     user.setName2(content);
                     baseManager.saveOrUpdate(MyUser.class.getName(), user);
                     resultMapHandler.handlerResult("0", "请求成功", logBean);
-                    resultMap.put("resultCode", "0");
-                    resultMap.put("resultMsg", "请求成功");
                     resultMap.put("userInfo", user);
                 } else if ("12".equals(type)) {
                     /**
@@ -162,13 +141,9 @@ public class ProfileController extends BaseController {
                         user.setUsername(content);
                         baseManager.saveOrUpdate(MyUser.class.getName(), user);
                         resultMapHandler.handlerResult("0", "请求成功", logBean);
-                        resultMap.put("resultCode", "0");
-                        resultMap.put("resultMsg", "请求成功");
                         resultMap.put("userInfo", user);
                     } else {
-                        resultMapHandler.handlerResult("10006", "手机号码校验不合格", logBean);
-                        resultMap.put("resultCode", "10006");
-                        resultMap.put("resultMsg", "手机号码校验不合格");
+                        return resultMapHandler.handlerResult("10006", "手机号码校验不合格", logBean);
                     }
                 } else if ("13".equals(type)) {
                     /**
@@ -177,15 +152,10 @@ public class ProfileController extends BaseController {
                      */
                 }
             } else {
-                resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
-                resultMap.put("resultCode", "10008");
-                resultMap.put("resultMsg", "查无数据,稍后再试");
+                return resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
             }
         } catch (Exception e) {
-            resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
         return resultMap;
@@ -211,12 +181,7 @@ public class ProfileController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId"))
                     || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("level_two_pwd"))) {
-                logBean.setResultCode("10001");
-                logBean.setMsg("必选参数为空，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             String userId = jsonObj.getString("userId");
@@ -226,12 +191,7 @@ public class ProfileController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
-                logBean.setResultCode("10002");
-                logBean.setMsg("参数校验不合格，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
             queryMap.put("userId", userId);
@@ -239,26 +199,13 @@ public class ProfileController extends BaseController {
             if (account != null && account.getId() != null) {
                 account.setPassword(level_two_pwd);
                 baseManager.saveOrUpdate(Account.class.getName(), account);
-                logBean.setResultCode("0");
-                logBean.setMsg("成功");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                resultMap.put("resultCode", "0");
-                resultMap.put("resultMsg", "请求成功");
+                resultMapHandler.handlerResult("0", "请求成功", logBean);
                 resultMap.put("account", account);
             } else {
-                logBean.setResultCode("10008");
-                logBean.setMsg("查无数据,稍后再试");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                resultMap.put("resultCode", "10008");
-                resultMap.put("resultMsg", "查无数据,稍后再试");
+                return resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
             }
         } catch (Exception e) {
-            logBean.setResultCode("10004");
-            logBean.setMsg("未知错误，请联系管理员");
-            baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
         return resultMap;
@@ -293,10 +240,7 @@ public class ProfileController extends BaseController {
             String titleCertificate = jsonObj.getString("titleCertificate");
             if ("".equals(signmsg) || "".equals(name) || "".equals(timestamp) || "".equals(username) || "".equals(userId)
                     || "".equals(province) || "".equals(provinceName) || "".equals(artCategory) || "".equals(titleCertificate)) {
-                resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             treeMap.put("name", name);
             treeMap.put("userId", userId);
@@ -308,10 +252,7 @@ public class ProfileController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
-                resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             MyUser myUser = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
             myUser.setName(name);
@@ -327,10 +268,7 @@ public class ProfileController extends BaseController {
             baseManager.saveOrUpdate(MyUser.class.getName(), myUser);
 
         } catch (Exception e) {
-            resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
         return resultMap;
     }
@@ -397,10 +335,7 @@ public class ProfileController extends BaseController {
             String timestamp = jsonObj.getString("timestamp");
             if ("".equals(signmsg) || "".equals(userId) || "".equals(timestamp)
                     || "".equals(index) || "".equals(size)) {
-                resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             treeMap.put("userId", userId);
             treeMap.put("pageIndex", index);
@@ -408,10 +343,7 @@ public class ProfileController extends BaseController {
             treeMap.put("timestamp", timestamp);
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
-                resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
             User user = (User) baseManager.getObject(User.class.getName(), userId);
@@ -469,18 +401,11 @@ public class ProfileController extends BaseController {
                 reward = reward.add(investReward.getReward());
             }
             ConvertArtWork convert = ConvertArtWorkUtil.convert(invests, followedList.size(), toFollowedList.size(), investMoney, sumInvestsMoney, reward, user);
-            logBean.setResultCode("0");
-            logBean.setMsg("请求成功");
             resultMapHandler.handlerResult("0", "请求成功", logBean);
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "成功");
             resultMap.put("pageInfo", convert);
             System.out.print(convert);
         } catch (Exception e) {
-            resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
         return resultMap;
@@ -506,10 +431,7 @@ public class ProfileController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId"))
                     || "".equals(jsonObj.getString("timestamp"))) {
-                resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             String userId = jsonObj.getString("userId");
@@ -517,18 +439,12 @@ public class ProfileController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
-                resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             Master master = (Master) baseManager.getObject(Master.class.getName(), userId);
             System.out.println(master);
         } catch (Exception e) {
-            resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
         return resultMap;
