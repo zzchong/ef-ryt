@@ -154,7 +154,6 @@ public class AuctionController extends BaseController {
 
             //项目信息
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
-
                 ArtWorkBean artWorkBean = new ArtWorkBean();
                 artWorkBean.setArtwork(artwork);
                 artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
@@ -162,6 +161,14 @@ public class AuctionController extends BaseController {
             XQuery xQuery = new XQuery("listArtworkBidding_default",request);
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
             List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>)baseManager.listObject(xQuery);
+            //最新竞价记录
+            artWorkBean.getArtwork().setArtworkBidding(artworkBiddingList.get(0));
+            //有效竞价次数
+            Integer num = 0;
+            if(artworkBiddingList!=null){
+                num = artworkBiddingList.size();
+            }
+            artWorkBean.getArtwork().setAuctionNum(num);
             //项目动态
             xQuery = new XQuery("listArtworkMessage_default",request);
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));

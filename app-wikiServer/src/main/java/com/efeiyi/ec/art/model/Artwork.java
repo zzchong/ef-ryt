@@ -42,7 +42,7 @@ public class Artwork implements Serializable {
     private Date creationEndDatetime;//创作完成时间=融资结束时间+30(默认)
     private String type;//1 融资阶段  2 制作阶段  3 拍卖阶段  4 抽奖阶段
 
-    private  Integer  auctionNum;//竞价记录
+    private  Integer  auctionNum;//竞价记录次数
     private  ArtworkBidding artworkBidding;//最新的出价记录
     private  String newBiddingDate;//最新出价时间
     @Id
