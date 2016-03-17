@@ -54,10 +54,7 @@ public class ArtUserFollowedController extends BaseController {
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
                     "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("type")) ||
                     "".equals(jsonObj.getString("pageIndex")) || "".equals(jsonObj.getString("pageSize"))) {
-                resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             String userId = jsonObj.getString("userId");
@@ -71,10 +68,7 @@ public class ArtUserFollowedController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
-                resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
             xQuery.put("follower_id", userId);
@@ -86,14 +80,9 @@ public class ArtUserFollowedController extends BaseController {
             PageInfo pageInfo = baseManager.listPageInfo(xQuery);
             List<ArtUserFollowed> followedList = pageInfo.getList();
             resultMapHandler.handlerResult("0", "请求成功", logBean);
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "成功");
             resultMap.put("pageInfoList", followedList);
         } catch (Exception e) {
-            resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
         return resultMap;
@@ -157,10 +146,7 @@ public class ArtUserFollowedController extends BaseController {
                 if ("0".equals(jsonObj.getString("identifier"))){
                     if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("followId")) ||
                             "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("followType"))) {
-                        resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                        resultMap.put("resultCode", "10001");
-                        resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                        return resultMap;
+                        return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
                     }
                     String signmsg = jsonObj.getString("signmsg");
                     String userId = jsonObj.getString("userId");
@@ -174,10 +160,7 @@ public class ArtUserFollowedController extends BaseController {
                     treeMap.put("timestamp", jsonObj.getString("timestamp"));
                     boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
                     if (!verify) {
-                        resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                        resultMap.put("resultCode", "10002");
-                        resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                        return resultMap;
+                        return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
                     }
                     ArtUserFollowed userFollowed = new ArtUserFollowed();
                     MyUser myUser = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
@@ -189,15 +172,10 @@ public class ArtUserFollowedController extends BaseController {
                     userFollowed.setType(followType);
                     baseManager.saveOrUpdate(ArtUserFollowed.class.getName(),userFollowed);
                     resultMapHandler.handlerResult("0", "请求成功", logBean);
-                    resultMap.put("resultCode", "0");
-                    resultMap.put("resultMsg", "成功");
                     resultMap.put("artUserFollowed", userFollowed);
                 }else if("1".equals(jsonObj.getString("identifier"))){
                     if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("artUserFollowId"))){
-                        resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                        resultMap.put("resultCode", "10001");
-                        resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                        return resultMap;
+                        return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
                     }
                     String signmsg = jsonObj.getString("signmsg");
                     String artUserFollowId = jsonObj.getString("artUserFollowId");
@@ -207,30 +185,19 @@ public class ArtUserFollowedController extends BaseController {
                     treeMap.put("timestamp", jsonObj.getString("timestamp"));
                     boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
                     if (!verify) {
-                        resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                        resultMap.put("resultCode", "10002");
-                        resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                        return resultMap;
+                        return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
                     }
                     ArtUserFollowed userFollowed = (ArtUserFollowed) baseManager.getObject(ArtUserFollowed.class.getName(),artUserFollowId);
                     userFollowed.setStatus("0");
                     baseManager.saveOrUpdate(ArtUserFollowed.class.getName(),userFollowed);
                     resultMapHandler.handlerResult("0", "请求成功", logBean);
-                    resultMap.put("resultCode", "0");
-                    resultMap.put("resultMsg", "成功");
                     resultMap.put("artUserFollowed", userFollowed);
                 }
             } else {
-                resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
         } catch (Exception e) {
-            resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
         return resultMap;
