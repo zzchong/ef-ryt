@@ -282,8 +282,9 @@ public class ProfileController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/app/uploadFile.do", method = RequestMethod.POST)
-    public String uploadFile(HttpServletRequest request , String userId , String dataType) {
+    public String uploadFile(HttpServletRequest request , String userId) {
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+        MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(),userId);
         Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         String identify = sdf.format(new Date());
@@ -297,9 +298,6 @@ public class ProfileController extends BaseController {
                 url = "app/" + fileName.substring(0, fileName.indexOf(".jpg")) + identify + ".jpg";
             } else if ("png".equals(prefix)) {
                 url = "app/" + fileName.substring(0, fileName.indexOf(".png")) + identify + ".png";
-            }
-            if ("".equals(dataType)) {
-
             }
             try {
                 aliOssUploadManager.uploadFile(mf, "artWork", url);
