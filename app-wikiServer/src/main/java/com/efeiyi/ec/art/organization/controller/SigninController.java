@@ -312,7 +312,7 @@ public class SigninController extends BaseController {
             }
             String verificationCode = VerificationCodeGenerator.createVerificationCode();
             String message = this.smsCheckManager.send(jsonObj.getString("username"), verificationCode, "1104699", PConst.TIANYI);
-            CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 10000000);
+            CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 120);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("message",message);//响应的用户信息
         } catch(Exception e){

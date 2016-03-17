@@ -9,8 +9,10 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath*:config/applicationContext-*.xml,/WEB-INF/applicationContext-*.xml</param-value>
     </context-param>
-
-
+    <!-- session 2分钟之内失效-->
+    <session-config>
+        <session-timeout>2</session-timeout>
+    </session-config>
 
     <!--编码配置-->
     <filter>
