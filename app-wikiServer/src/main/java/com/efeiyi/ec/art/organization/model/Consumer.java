@@ -1,3 +1,4 @@
+/*
 package com.efeiyi.ec.art.organization.model;
 
 
@@ -5,9 +6,11 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+*/
 /**
  * Created by Administrator on 2015/5/28.
- */
+ *//*
+
 @Entity
 @Table(name = "organization_consumer")
 public class Consumer extends com.efeiyi.ec.art.organization.model.BigUser {
@@ -53,16 +56,19 @@ public class Consumer extends com.efeiyi.ec.art.organization.model.BigUser {
         this.balance = balance;
     }
 
-   /* @ManyToMany(fetch = FetchType.LAZY,mappedBy = "consumer")
+   */
+/* @ManyToMany(fetch = FetchType.LAZY,mappedBy = "consumer")
     public List<ProjectContent> getProjectContents() {
         return projectContents;
     }
 
     public void setProjectContents(List<ProjectContent> projectContents) {
         this.projectContents = projectContents;
-    }*/
+    }*//*
+
    @Override
    public String toString() {
        return "Consumer{id = " + id + "}";
    }
 }
+*/
