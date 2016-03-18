@@ -426,7 +426,7 @@ public class SigninController extends BaseController {
                     user.setPictureUrl(pictureUrl);
                     baseManager.saveOrUpdate(BigUser.class.getName(),user);
                     resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-                    resultMap.put("url",pictureUrl);
+                    resultMap.put("headPortraitURI",pictureUrl);
                     return resultMap;
                 }else {
                     return  resultMapHandler.handlerResult("10007","未知错误，请联系管理员",logBean);
