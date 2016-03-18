@@ -69,9 +69,9 @@ public class AuctionController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("artWorkAuctionList");
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
@@ -80,8 +80,7 @@ public class AuctionController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
             //项目信息
@@ -113,9 +112,7 @@ public class AuctionController extends BaseController {
             resultMap.put("objectList",objectList);
         } catch(Exception e){
             e.printStackTrace();
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
 
         return resultMap;
@@ -137,9 +134,9 @@ public class AuctionController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("artWorkAuctionView");
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
@@ -147,8 +144,7 @@ public class AuctionController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
             //项目信息
@@ -179,9 +175,8 @@ public class AuctionController extends BaseController {
             resultMap.put("artWorkMessage",artworkMessageList);
         } catch(Exception e){
             e.printStackTrace();
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
 
         return resultMap;

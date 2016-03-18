@@ -69,9 +69,9 @@ public class ArtWorkCreationController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("artWorkCreationList");
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
@@ -80,8 +80,7 @@ public class ArtWorkCreationController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
             String hql = "from Artwork WHERE 1=1 and status = '1' and type = '2' order by investStartDatetime asc";
@@ -97,9 +96,7 @@ public class ArtWorkCreationController extends BaseController {
             resultMap.put("objectList",objectList);
         } catch(Exception e){
             e.printStackTrace();
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
 
         return resultMap;
@@ -122,9 +119,9 @@ public class ArtWorkCreationController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("artWorkCreationView");
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
@@ -132,8 +129,7 @@ public class ArtWorkCreationController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
@@ -160,9 +156,7 @@ public class ArtWorkCreationController extends BaseController {
             resultMap.put("restTime",restTime);
         } catch(Exception e){
             e.printStackTrace();
-            resultMap.put("resultCode", "10004");
-            resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMap;
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
 
         return resultMap;
