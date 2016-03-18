@@ -8,7 +8,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.PushUserBinding;
 import com.efeiyi.ec.art.organization.model.BigUser;
-import com.efeiyi.ec.art.organization.model.Consumer;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.AppConfig;
@@ -37,6 +36,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -395,8 +397,7 @@ public class SigninController extends BaseController {
             treeMap.put("timestamp", request.getParameter("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                resultMap = resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
@@ -405,28 +406,41 @@ public class SigninController extends BaseController {
             try {
                 user = (BigUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_BIGUSER_GET, map);
                 if (user!=null && user.getId()!=null) {
-                    String url = "app/" + request.getParameter("username").toString() + ".jpg";
-                    String pictureUrl = "http://http://pro.efeiyi.com//"+url+"@!pc-classify-right";
                     MultipartFile headPortrait = ((MultipartHttpServletRequest) request).getFile("headPortrait");
+                    String fileType = "";
+                    if(headPortrait.getContentType().contains("jpg")){
+                        fileType = ".jpg";
+                    }else if(headPortrait.getContentType().contains("jpeg")){
+                        fileType = ".jpeg";
+                    }else if(headPortrait.getContentType().contains("png")||headPortrait.getContentType().contains("PNG")){
+                        fileType = ".png";
+                    }else if(headPortrait.getContentType().contains("gif")){
+                        fileType = ".gif";
+                    }
+                    String url = "headPortrait/" + request.getParameter("username").toString() + fileType;
+                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url+"@!ryt_head_portrai";
                     //将用户头像上传至阿里云
-                    aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi",pictureUrl);
+                    aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi2",url);
                     user.setName2(request.getParameter("username").toString());
-                    user.setSex(Integer.parseInt(request.getParameter("sex ").toString()));
+                    user.setSex(Integer.parseInt(request.getParameter("sex").toString()));
                     user.setPictureUrl(pictureUrl);
                     baseManager.saveOrUpdate(BigUser.class.getName(),user);
+                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap.put("url",pictureUrl);
+                    return resultMap;
                 }else {
                     return  resultMapHandler.handlerResult("10007","未知错误，请联系管理员",logBean);
                 }
 
             } catch (Exception e) {
-                resultMap = resultMapHandler.handlerResult("10005","户名不存在",logBean);
-                return resultMap;
+                e.printStackTrace();
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
             }
 
         } catch(Exception e){
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
-        return resultMap;
+
 
 
     }

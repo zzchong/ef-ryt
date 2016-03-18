@@ -43,8 +43,8 @@
         return false;
     }
     $(document).ready(function(){
-        transdate(1457951615632);
-        alert(parseInt(40<<5));
+        //transdate(1457951615632);
+        //alert(parseInt(40<<5));
     });
 
     function transdate(endTime){
