@@ -387,8 +387,7 @@ public class SigninController extends BaseController {
                     "".equals(request.getParameter("timestamp")) || "".equals(request.getParameter("nickname "))
                     || "".equals(request.getParameter("sex "))) {
 
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                return resultMap;
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = request.getParameter("signmsg").toString();
             treeMap.put("username", request.getParameter("username"));
