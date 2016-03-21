@@ -23,6 +23,7 @@ public class Artwork implements Serializable {
     private String id;
     private String title;
     private String brief;
+    private String description;//项目介绍
     private String status;  //0 可用  1 废弃
     private BigDecimal investGoalMoney;
     private Date investStartDatetime;//融资开始时间
@@ -272,5 +273,14 @@ public class Artwork implements Serializable {
 
     public void setNewCreationDate(String newCreationDate) {
         this.newCreationDate = newCreationDate;
+    }
+
+    @Column(name = "description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
