@@ -86,7 +86,16 @@ public class ArtWorkCreationController extends BaseController {
             String hql = "from Artwork WHERE 1=1 and status = '1' and type = '2' order by investStartDatetime asc";
             artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
             List<ArtWorkBean> objectList = new ArrayList<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+            String str1 = sdf.format(new Date());
             for (Artwork artwork : artworkList){
+                //项目动态
+                XQuery xQuery = new XQuery("listArtworkMessage_default",request);
+                xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
+                List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
+                if(artworkMessageList!=null){
+                    artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1,sdf.format(artworkMessageList.get(0).getCreateDatetime())));
+                }
                 ArtWorkBean artWorkBean = new ArtWorkBean();
                 artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
                 artWorkBean.setArtwork(artwork);
