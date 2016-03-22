@@ -166,8 +166,17 @@ public class ArtworkController extends BaseController {
             ArtWorkBean artWorkBean = new ArtWorkBean();
             artWorkBean.setArtwork(artwork);
             artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+
+            XQuery xQuery = new XQuery("listArtworkInvest1_default",request);
+            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
+            List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>)baseManager.listObject(xQuery);
+            List<User> userList = new ArrayList<>();
+            for(ArtworkInvest artworkInvest : artworkInvestList){
+                userList.add(artworkInvest.getCreator());
+            }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("object",artWorkBean);
+            resultMap.put("investUserList",userList);
         } catch(Exception e){
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -322,12 +331,12 @@ public class ArtworkController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**investorIndex.do测试加密参数**/
-        map.put("pageSize","3");
-        map.put("pageNum","1");
-        map.put("timestamp", timestamp);
-        /**investorArtWork.do测试加密参数**/
-//        map.put("artWorkId","qydeyugqqiugdi");
+//        map.put("pageSize","3");
+//        map.put("pageNum","1");
 //        map.put("timestamp", timestamp);
+        /**investorArtWork.do测试加密参数**/
+        map.put("artWorkId","qydeyugqqiugdi");
+        map.put("timestamp", timestamp);
 
         /**masterView.do测试加密参数**/
 //        map.put("masterId","icjxkedl0000b6i0");
@@ -337,12 +346,12 @@ public class ArtworkController extends BaseController {
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/investorIndex.do";
+        String url = "http://192.168.1.80:8001/app/investorArtWork.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorIndex.do测试 **/
-        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"artWorkId\":\"qydeyugqqiugdi\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
