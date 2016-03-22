@@ -103,7 +103,7 @@
                 </do>
                 <do name="listArtworkInvest1" access="" label="ArtworkInvest列表"
                     result="json">
-                    <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
+                    <query name="default" label="默认" type="auto" orderBy="price:desc">
                         <condition name="artwork.id" defaultValue="0" operation="eq"/>
                         <condition name="status" defaultValue="1" operation="eq"/>
                     </query>
