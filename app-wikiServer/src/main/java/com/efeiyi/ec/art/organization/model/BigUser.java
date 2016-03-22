@@ -1,7 +1,6 @@
 package com.efeiyi.ec.art.organization.model;
 
 
-import com.efeiyi.ec.art.organization.model.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
