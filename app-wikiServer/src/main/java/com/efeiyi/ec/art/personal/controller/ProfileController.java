@@ -263,7 +263,7 @@ public class ProfileController extends BaseController {
             myUser.setName(name);
             myUser.setUsername(username);
             Master master = new Master();
-            master.setStatus("1");
+//            master.setStatus("1");
             AddressProvince addressProvince = (AddressProvince) baseManager.getObject(AddressProvince.class.getName(), province);
             master.setOriginProvince(addressProvince);
             master.setProvinceName(provinceName);
@@ -288,8 +288,12 @@ public class ProfileController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/app/uploadFile.do", method = RequestMethod.POST)
     public String uploadFile(HttpServletRequest request , String userId) {
-        Master master = (Master) baseManager.getObject(Master.class.getName(),userId);
-
+//        Master master = (Master) baseManager.getObject(Master.class.getName(),userId);
+        MyUser myUser = new MyUser();
+        baseManager.saveOrUpdate(MyUser.class.getName(),myUser);
+        Master master = new Master();
+        master.setId(myUser.getId());
+        baseManager.saveOrUpdate(Master.class.getName(),master);
 /*
         MultipartHttpServletRequest multipartRequest =  (MultipartHttpServletRequest) request;
         List<MultipartFile> oneList = multipartRequest.getFiles("one");

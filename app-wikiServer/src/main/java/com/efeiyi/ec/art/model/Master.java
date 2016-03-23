@@ -5,6 +5,7 @@ import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,8 +24,8 @@ import java.util.List;
 @Entity
 @Table(name = "app_master")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class Master extends BigUser implements Serializable{
-
+public class Master implements Serializable{
+    private String id;
     private String brief; // 简介(短)
     private String title; // 头衔/称号
     private String favicon; //网站头像
@@ -38,12 +39,34 @@ public class Master extends BigUser implements Serializable{
     private String theStatus;         // 正常，删除，停止，隐藏
     private String logoUrl;
     private String masterSpeech;
+    private User user; //大师跟用户的关系映射
     private List<Artwork> artworks;
     private String artCategory;
     private String titleCertificate;
     private List<ArtMasterAttachment> workShopPhotos;//工作室照片
     private List<ArtMasterAttachment> worksPhotos;//作品照片
 
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Id
+    @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
+    @GeneratedValue(generator = "id")
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @Column(name = "master_speech")
     public String getMasterSpeech() {
