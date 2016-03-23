@@ -41,6 +41,9 @@ public class Master extends BigUser implements Serializable{
     private List<Artwork> artworks;
     private String artCategory;
     private String titleCertificate;
+    private List<ArtMasterAttachment> workShopPhotos;//工作室照片
+    private List<ArtMasterAttachment> worksPhotos;//作品照片
+
 
     @Column(name = "master_speech")
     public String getMasterSpeech() {
@@ -186,5 +189,25 @@ public class Master extends BigUser implements Serializable{
 
     public void setTitleCertificate(String titleCertificate) {
         this.titleCertificate = titleCertificate;
+    }
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "master")
+    public List<ArtMasterAttachment> getWorkShopPhotos() {
+        return workShopPhotos;
+    }
+
+    public void setWorkShopPhotos(List<ArtMasterAttachment> workShopPhotos) {
+        this.workShopPhotos = workShopPhotos;
+    }
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "master")
+    public List<ArtMasterAttachment> getWorksPhotos() {
+        return worksPhotos;
+    }
+
+    public void setWorksPhotos(List<ArtMasterAttachment> worksPhotos) {
+        this.worksPhotos = worksPhotos;
     }
 }

@@ -8,90 +8,33 @@
 
 </head>
 <body>
-<form name="form1" id="form1">
-    <p>name:<input type="text" name="name" ></p>
-    <p>gender:<input type="radio" name="gender" value="1">male <input type="radio" name="gender" value="2">female</p>
-    <p>photo:<input type="file" name="headPortrait" id="headPortrait"></p>
-    <p><input type="button" name="b1" value="submit" onclick="fsubmit()"></p>
+<form action="<c:url value="/app/uploadFile.do" />" id="thisForm" method="post" enctype="multipart/form-data">
+    <input type="hidden" value="ih36t7ir18t05e6w" name="userId"/>
+    <p>name:<input type="file" name="two"/></p>
+    <p>gender:<input type="file" name="two"/></p>
+    <p>photo:<input type="file" name="one"/></p>
+    <p>photo:<input type="file" name="one"/></p>
+    <p><input type="button" value="submit" onclick="sendForm();"></p>
 </form>
-<div id="result"></div>
-
-
 <script type="text/javascript">
-
-    function fsubmit(){
-        var data = new FormData($('#form1')[0]);
+    function sendForm() {
+        var formData = new FormData($("#thisForm")[0]);
         $.ajax({
-            url: "<c:url value='/app/completeUserInfo.do'/>",
+            url: '<c:url value="/app/uploadFile.do"/>',
             type: 'POST',
-            data: data,
-            dataType: 'JSON',
+            data: formData,
+            async: false,
             cache: false,
+            contentType: false,
             processData: false,
-            contentType: false
-        }).done(function(ret){
-            if(ret['isSuccess']){
-                var result = '';
-                result += 'name=' + ret['name'] + '<br>';
-                result += 'gender=' + ret['gender'] + '<br>';
-                result += '<img src="' + ret['photo']  + '" width="100">';
-                $('#result').html(result);
-            }else{
-                alert('提交失敗');
+            success: function (data) {
+                alert(data);
+            },
+            error: function (msg) {
+                alert(msg);
             }
         });
-        return false;
-    }
-    $(document).ready(function(){
-        //transdate(1457951615632);
-        //alert(parseInt(40<<5));
-    });
-
-    function transdate(endTime){
-        var mytime=new Array();
-        var timestamp = Date.parse(new Date());
-        var oldTime = parseInt(endTime);
-        var intervalTime = (timestamp - oldTime)/1000;
-
-       if((intervalTime/60/60/24)>=1){//>=1 day
-           var day = parseInt(intervalTime/60/60/24);
-           var hour = parseInt((intervalTime-(day*60*60*24))/60/60);
-           var min =parseInt((intervalTime-(day*60*60*24)-(hour*60*60))/60);
-           var sec = parseInt(intervalTime-(day*60*60*24)-(hour*60*60)-min*60);
-           mytime[0] =day;
-           mytime[1] =hour;
-           mytime[2] =min;
-           mytime[2] =sec;
-           //alert (mytime[0]+" "+mytime[1]+" "+mytime[2]+" "+mytime[3]);
-           return mytime;
-       }else if((intervalTime/60/60/24)<1 && (intervalTime/60/60)>=1){
-           var hour = parseInt((intervalTime)/60/60);
-           var min =parseInt((intervalTime-(hour*60*60))/60);
-           var sec = parseInt(intervalTime-(hour*60*60)-min*60);
-           mytime[0] =hour;
-           mytime[1] =min;
-           mytime[2] =sec;
-           //alert (mytime[0]+" "+mytime[1]+" "+mytime[2]);
-           return mytime;
-       }else if((intervalTime/60/60)<1 && (intervalTime/60)>=1){
-           var min =parseInt((intervalTime)/60);
-           var sec = parseInt(intervalTime-min*60);
-           mytime[0] ="";
-           mytime[1] =min;
-           mytime[2] =sec;
-           //alert (mytime[0]+" "+mytime[1]+" "+mytime[2]);
-           return mytime;
-       }else if((intervalTime/60)<1 && intervalTime>0){
-           var sec = intervalTime;
-           mytime[0] ="";
-           mytime[1] ="";
-           mytime[2] =sec;
-           //alert (mytime[0]+" "+mytime[1]+" "+mytime[2]);
-           return mytime;
-       }
-
     }
 </script>
-
 </body>
 </html>
