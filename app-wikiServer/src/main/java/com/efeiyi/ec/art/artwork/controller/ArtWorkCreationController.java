@@ -95,6 +95,8 @@ public class ArtWorkCreationController extends BaseController {
                 List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
                 if(artworkMessageList!=null){
                     artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1,sdf.format(artworkMessageList.get(0).getCreateDatetime())));
+                }else {
+                    artwork.setNewCreationDate("暂无更新状态");
                 }
                 ArtWorkBean artWorkBean = new ArtWorkBean();
                 artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
