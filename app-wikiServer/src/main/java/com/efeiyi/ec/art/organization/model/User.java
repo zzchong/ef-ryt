@@ -3,6 +3,7 @@ package com.efeiyi.ec.art.organization.model;
 
 
 //import com.efeiyi.ec.zero.promotion.model.PromotionPlan;
+import com.efeiyi.ec.art.model.Master;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
@@ -27,6 +28,18 @@ public class User {
     private String status;
     protected Date createDatetime;
     private String type; //00000 普通用户 10000 艺术家
+    private Master master; //用户关联的大师
+
+
+    @OneToOne(mappedBy="user",fetch=FetchType.LAZY)
+    @JoinColumn(name = "master_id")
+    public Master getMaster() {
+        return master;
+    }
+
+    public void setMaster(Master master) {
+        this.master = master;
+    }
 
     @JsonIgnore
     @Column(name = "password")

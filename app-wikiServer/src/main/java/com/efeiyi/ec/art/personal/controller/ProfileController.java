@@ -6,9 +6,12 @@ import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ConvertArtWork;
 import com.efeiyi.ec.art.organization.model.AddressProvince;
+import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
+import com.ming800.core.base.dao.XdoDao;
+import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
@@ -34,11 +37,13 @@ import java.util.regex.Pattern;
 @Controller
 public class ProfileController extends BaseController {
     private static Logger logger = Logger.getLogger(ProfileController.class);
+
     @Autowired
     private AliOssUploadManager aliOssUploadManager;
     @Autowired
     ResultMapHandler resultMapHandler;
-
+    @Autowired
+    private XdoDaoSupport xdoDao;
     /**
      * 获取用户资料
      *
@@ -258,7 +263,7 @@ public class ProfileController extends BaseController {
             myUser.setName(name);
             myUser.setUsername(username);
             Master master = new Master();
-            master.setStatus("1");
+//            master.setStatus("1");
             AddressProvince addressProvince = (AddressProvince) baseManager.getObject(AddressProvince.class.getName(), province);
             master.setOriginProvince(addressProvince);
             master.setProvinceName(provinceName);
@@ -283,29 +288,71 @@ public class ProfileController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/app/uploadFile.do", method = RequestMethod.POST)
     public String uploadFile(HttpServletRequest request , String userId) {
-        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-        MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(),userId);
-        Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+//        Master master = (Master) baseManager.getObject(Master.class.getName(),userId);
+        MyUser myUser = new MyUser();
+        baseManager.saveOrUpdate(MyUser.class.getName(),myUser);
+        Master master = new Master();
+        master.setId(myUser.getId());
+        baseManager.saveOrUpdate(Master.class.getName(),master);
+/*
+        MultipartHttpServletRequest multipartRequest =  (MultipartHttpServletRequest) request;
+        List<MultipartFile> oneList = multipartRequest.getFiles("one");
+        List<MultipartFile> twoList = multipartRequest.getFiles("two");
+        if (!oneList.isEmpty()){
+            uploadFilePath(oneList,master,"1");
+        }
+        if (!twoList.isEmpty()){
+            uploadFilePath(twoList,master,"2");
+        }*/
+        return null;
+    }
+
+    public String uploadFilePath(List<MultipartFile> list , Master master , String msg){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         String identify = sdf.format(new Date());
-        String url = "";
-        for (Map.Entry<String, MultipartFile> entry : fileMap.entrySet()) {
-            //上传文件
-            MultipartFile mf = entry.getValue();
-            String fileName = mf.getOriginalFilename();//获取原文件名
-            String prefix = fileName.substring(fileName.indexOf("."), fileName.length());
-            if ("jpg".equals(prefix)) {
-                url = "app/" + fileName.substring(0, fileName.indexOf(".jpg")) + identify + ".jpg";
-            } else if ("png".equals(prefix)) {
-                url = "app/" + fileName.substring(0, fileName.indexOf(".png")) + identify + ".png";
+        List<ArtMasterAttachment> attachmentList = new ArrayList<>(3);
+        String url;
+        String pictureUrl;
+        if (!list.isEmpty()){
+            for (MultipartFile mf : list){
+                try {
+                    String fileName = mf.getOriginalFilename();//获取原文件名
+                    String file = fileName.substring(0, fileName.indexOf("."));
+                    String prefix = "";
+                    switch (mf.getContentType()){
+                        case "image/jpg":
+                            prefix = ".jpg";
+                            break;
+                        case "image/jpeg":
+                            prefix = ".jpeg";
+                            break;
+                        case "image/png":
+                            prefix = ".png";
+                            break;
+                        case "image/gif":
+                            prefix = ".gif";
+                            break;
+                    }
+                    url = "master/" + file + identify + prefix;
+                    pictureUrl = "http://rongyitou2.efeiyi.com/"+url+"@!ryt_head_portrai";
+                    aliOssUploadManager.uploadFile(mf, "ec-efeiyi2", url);
+                    ArtMasterAttachment attachment = new ArtMasterAttachment();
+                    attachment.setMaster(master);
+                    attachment.setUrl(pictureUrl);
+                    baseManager.saveOrUpdate(ArtMasterAttachment.class.getName(),attachment);
+                    attachmentList.add(attachment);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            try {
-                aliOssUploadManager.uploadFile(mf, "artWork", url);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if ("1".equals(msg)){
+                master.setWorksPhotos(attachmentList);
+            }else{
+                master.setWorkShopPhotos(attachmentList);
             }
+            baseManager.saveOrUpdate(Master.class.getName(),master);
         }
-        return null;
+        return "ok";
     }
 
 
