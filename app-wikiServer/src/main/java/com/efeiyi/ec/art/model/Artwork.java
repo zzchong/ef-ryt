@@ -122,7 +122,7 @@ public class Artwork implements Serializable {
     public void setAuctionEndDatetime(Date auctionEndDatetime) {
         this.auctionEndDatetime = auctionEndDatetime;
     }
-    @JsonIgnore
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     public User getAuthor() {

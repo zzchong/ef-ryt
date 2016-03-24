@@ -93,7 +93,7 @@ public class ArtWorkCreationController extends BaseController {
                 XQuery xQuery = new XQuery("listArtworkMessage_default",request);
                 xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
                 List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
-                if(artworkMessageList!=null){
+                if(artworkMessageList!=null&&artworkMessageList.size()!=0){
                     artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1,sdf.format(artworkMessageList.get(0).getCreateDatetime())));
                 }else {
                     artwork.setNewCreationDate("暂无更新状态");
