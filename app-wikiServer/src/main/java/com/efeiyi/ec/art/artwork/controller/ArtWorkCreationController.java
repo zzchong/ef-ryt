@@ -85,7 +85,7 @@ public class ArtWorkCreationController extends BaseController {
 
             String hql = "from Artwork WHERE 1=1 and status = '1' and type = '2' order by investStartDatetime asc";
             artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
-            List<ArtWorkBean> objectList = new ArrayList<>();
+//            List<ArtWorkBean> objectList = new ArrayList<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             String str1 = sdf.format(new Date());
             for (Artwork artwork : artworkList){
@@ -98,13 +98,13 @@ public class ArtWorkCreationController extends BaseController {
                 }else {
                     artwork.setNewCreationDate("暂无更新状态");
                 }
-                ArtWorkBean artWorkBean = new ArtWorkBean();
-                artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-                artWorkBean.setArtwork(artwork);
-                objectList.add(artWorkBean);
+//                ArtWorkBean artWorkBean = new ArtWorkBean();
+//             //   artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+//                artWorkBean.setArtwork(artwork);
+//                objectList.add(artWorkBean);
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("objectList",objectList);
+            resultMap.put("objectList",artworkList);
         } catch(Exception e){
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
@@ -145,9 +145,9 @@ public class ArtWorkCreationController extends BaseController {
 
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
             //项目 艺术家信息
-            ArtWorkBean artWorkBean = new ArtWorkBean();
-            artWorkBean.setArtwork(artwork);
-            artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+//            ArtWorkBean artWorkBean = new ArtWorkBean();
+//            artWorkBean.setArtwork(artwork);
+           // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
            //项目动态
             XQuery xQuery = new XQuery("listArtworkMessage_default",request);
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
@@ -161,7 +161,7 @@ public class ArtWorkCreationController extends BaseController {
             //剩余时长
             String restTime = TimeUtil.getDistanceTimes(str3,str1);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("object",artWorkBean);
+            resultMap.put("object",artwork);
             resultMap.put("artworkMessageList",artworkMessageList);
             resultMap.put("createdTime",createdTime);
             resultMap.put("restTime",restTime);

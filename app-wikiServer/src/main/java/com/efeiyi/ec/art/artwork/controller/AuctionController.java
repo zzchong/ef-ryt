@@ -86,7 +86,7 @@ public class AuctionController extends BaseController {
             //项目信息
             String hql = "from Artwork WHERE 1=1 and status = '1' and type = '3' order by investStartDatetime asc";
             artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
-            List<ArtWorkBean> objectList = new ArrayList<>();
+//            List<ArtWorkBean> objectList = new ArrayList<>();
             for (Artwork artwork : artworkList){
                 XQuery xQuery = new XQuery("listArtworkBidding_default",request);
                 xQuery.put("artwork_id",artwork.getId());
@@ -101,15 +101,15 @@ public class AuctionController extends BaseController {
                     artwork.setNewBiddingDate(TimeUtil.getDistanceTimes(str1,str2));
                 }
 
-                ArtWorkBean artWorkBean = new ArtWorkBean();
-                artWorkBean.setArtwork(artwork);
-                artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-                objectList.add(artWorkBean);
+//                ArtWorkBean artWorkBean = new ArtWorkBean();
+//                artWorkBean.setArtwork(artwork);
+//               // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+//                objectList.add(artWorkBean);
 
 
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("objectList",objectList);
+            resultMap.put("objectList",artworkList);
         } catch(Exception e){
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
@@ -149,28 +149,28 @@ public class AuctionController extends BaseController {
 
             //项目信息
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
-                ArtWorkBean artWorkBean = new ArtWorkBean();
-                artWorkBean.setArtwork(artwork);
-                artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+//                ArtWorkBean artWorkBean = new ArtWorkBean();
+//                artWorkBean.setArtwork(artwork);
+//               // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
             //竞价记录
             XQuery xQuery = new XQuery("listArtworkBidding_default",request);
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
             List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>)baseManager.listObject(xQuery);
             //最新竞价记录
-            artWorkBean.getArtwork().setNewBidingPrice(artworkBiddingList.get(0).getPrice());
+            artwork.setNewBidingPrice(artworkBiddingList.get(0).getPrice());
             //有效竞价次数
             Integer num = 0;
             if(artworkBiddingList!=null){
                 num = artworkBiddingList.size();
             }
-            artWorkBean.getArtwork().setAuctionNum(num);
+            artwork.setAuctionNum(num);
             //项目动态
             xQuery = new XQuery("listArtworkMessage_default",request);
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
             List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
 
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("artWorkBean",artWorkBean);
+            resultMap.put("artwork",artwork);
             resultMap.put("artWorkBidding",artworkBiddingList);
             resultMap.put("artWorkMessage",artworkMessageList);
         } catch(Exception e){
@@ -202,9 +202,10 @@ public class AuctionController extends BaseController {
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
-        /**json参数  artWorkAuctionList.do测试 **/
+        /**json参数  artWorkAuctionView.do测试 **/
         String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
-
+        /**json参数  artWorkAuctionList.do测试 **/
+//        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 

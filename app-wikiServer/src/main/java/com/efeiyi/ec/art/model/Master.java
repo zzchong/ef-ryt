@@ -46,7 +46,7 @@ public class Master implements Serializable{
     private List<ArtMasterAttachment> workShopPhotos;//工作室照片
     private List<ArtMasterAttachment> worksPhotos;//作品照片
 
-
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "user_id")
     public User getUser() {
@@ -232,5 +232,12 @@ public class Master implements Serializable{
 
     public void setWorksPhotos(List<ArtMasterAttachment> worksPhotos) {
         this.worksPhotos = worksPhotos;
+    }
+
+    @Override
+    public String toString() {
+        return "Master{" +
+                "id='" + id + '\'' +
+                '}';
     }
 }

@@ -110,16 +110,16 @@ public class ArtworkController extends BaseController {
 
             String hql = "from Artwork WHERE 1=1 and status = '1'  order by investStartDatetime asc";
             artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
-            List<ArtWorkBean> objectList = new ArrayList<>();
-            for (Artwork artwork : artworkList){
-                       ArtWorkBean artWorkBean = new ArtWorkBean();
-                       artWorkBean.setArtwork(artwork);
-                       artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-                       objectList.add(artWorkBean);
-            }
+//            List<ArtWorkBean> objectList = new ArrayList<>();
+//            for (Artwork artwork : artworkList){
+//                       ArtWorkBean artWorkBean = new ArtWorkBean();
+//                       artWorkBean.setArtwork(artwork);
+//                       artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+//                       objectList.add(artWorkBean);
+//            }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            if (objectList!= null && !objectList.isEmpty()){
-                resultMap.put("objectList",objectList);
+            if (artworkList!= null && !artworkList.isEmpty()){
+                resultMap.put("objectList",artworkList);
             }else {
                 resultMap.put("objectList",null);
             }
@@ -163,9 +163,9 @@ public class ArtworkController extends BaseController {
             }
 
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
-            ArtWorkBean artWorkBean = new ArtWorkBean();
-            artWorkBean.setArtwork(artwork);
-            artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
+//            ArtWorkBean artWorkBean = new ArtWorkBean();
+//            artWorkBean.setArtwork(artwork);
+         //   artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
 
             XQuery xQuery = new XQuery("listArtworkInvest1_default",request);
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
@@ -175,7 +175,7 @@ public class ArtworkController extends BaseController {
                 userList.add(artworkInvest.getCreator());
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("object",artWorkBean);
+            resultMap.put("object",artwork);
             resultMap.put("investUserList",userList);
         } catch(Exception e){
             e.printStackTrace();
@@ -220,11 +220,11 @@ public class ArtworkController extends BaseController {
             Master master = (Master)baseManager.getObject(Master.class.getName(),jsonObj.getString("masterId"));
             //关注人数
             XQuery xQuery = new XQuery("listArtUserFollowed_default",request);
-            xQuery.put("follower_id",jsonObj.getString("masterId"));
+            xQuery.put("follower_id",master.getUser().getId());
             Integer followedNum = baseManager.listObject(xQuery).size();
 
             xQuery = new XQuery("listArtwork_default",request);
-            xQuery.put("author_id",jsonObj.getString("masterId"));
+            xQuery.put("author_id",master.getUser().getId());
             List<Artwork> artworks = (List<Artwork>)baseManager.listObject(xQuery);
             //投资者
             Integer investsNum = 0;
@@ -294,7 +294,7 @@ public class ArtworkController extends BaseController {
                 ArtWorkInvestBean artWorkInvestBean = new ArtWorkInvestBean();
                 artWorkInvestBean.setArtwork(artworkInvests1.get(i).getArtwork());
                 artWorkInvestBean.setInvestMoney(investMoney.get(i));
-                artWorkInvestBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artworkInvests1.get(i).getArtwork().getAuthor().getId()));
+            //    artWorkInvestBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artworkInvests1.get(i).getArtwork().getAuthor().getId()));
                 artworks.add(artWorkInvestBean);
             }
             //投资金额
@@ -335,24 +335,29 @@ public class ArtworkController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("timestamp", timestamp);
         /**investorArtWork.do测试加密参数**/
-        map.put("artWorkId","qydeyugqqiugdi");
-        map.put("timestamp", timestamp);
+//        map.put("artWorkId","qydeyugqqiugdi");
+//        map.put("timestamp", timestamp);
 
         /**masterView.do测试加密参数**/
 //        map.put("masterId","icjxkedl0000b6i0");
 //        map.put("timestamp", timestamp);
         /**guestView.do测试加密参数**/
-//        map.put("userId","1");
+        map.put("userId","icjxkedl0000b6i0");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/investorArtWork.do";
+        String url = "http://192.168.1.80:8001/app/guestView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
+        /**json参数  investorArtWork.do测试 **/
+//        String json = "{\"artWorkId\":\"qydeyugqqiugdi\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  investorIndex.do测试 **/
-        String json = "{\"artWorkId\":\"qydeyugqqiugdi\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
-
+//        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        /**json参数  guestView.do测试 **/
+        String json = "{\"userId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        /**json参数  masterView.do测试 **/
+//        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
