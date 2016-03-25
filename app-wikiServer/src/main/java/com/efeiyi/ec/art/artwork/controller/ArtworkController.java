@@ -211,6 +211,8 @@ public class ArtworkController extends BaseController {
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("masterId",jsonObj.getString("masterId"));
+            treeMap.put("pageSize",jsonObj.getString("pageSize"));
+            treeMap.put("pageNum",jsonObj.getString("pageNum"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -223,9 +225,16 @@ public class ArtworkController extends BaseController {
             xQuery.put("follower_id",master.getUser().getId());
             Integer followedNum = baseManager.listObject(xQuery).size();
 
-            xQuery = new XQuery("listArtwork_default",request);
+//            xQuery = new XQuery("listArtwork_default",request);
+//            xQuery.put("author_id",master.getUser().getId());
+//            List<Artwork> artworks = (List<Artwork>)baseManager.listObject(xQuery);
+
+            xQuery = new XQuery("plistArtwork_default1",request);
             xQuery.put("author_id",master.getUser().getId());
-            List<Artwork> artworks = (List<Artwork>)baseManager.listObject(xQuery);
+            xQuery.getPageEntity().setSize(jsonObj.getInteger("pageSize"));
+            xQuery.getPageEntity().setIndex(jsonObj.getInteger("pageNum"));
+            PageInfo pageInfo = baseManager.listPageInfo(xQuery);
+            List<Artwork> artworks = (List<Artwork>)pageInfo.getList();
             //投资者
             Integer investsNum = 0;
             //融资金额
@@ -335,29 +344,31 @@ public class ArtworkController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("timestamp", timestamp);
         /**investorArtWork.do测试加密参数**/
-//        map.put("artWorkId","qydeyugqqiugdi");
+//        map.put("artWorkId","qydeyugqqiugd2");
 //        map.put("timestamp", timestamp);
 
         /**masterView.do测试加密参数**/
-//        map.put("masterId","icjxkedl0000b6i0");
+        map.put("pageSize","3");
+        map.put("pageNum","1");
+        map.put("masterId","icjxkedl0000b6i0");
 //        map.put("timestamp", timestamp);
         /**guestView.do测试加密参数**/
-        map.put("userId","icjxkedl0000b6i0");
+//        map.put("userId","icjxkedl0000b6i0");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/guestView.do";
+        String url = "http://192.168.1.80:8001/app/masterView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
-//        String json = "{\"artWorkId\":\"qydeyugqqiugdi\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+//        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  investorIndex.do测试 **/
 //        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  guestView.do测试 **/
-        String json = "{\"userId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+//        String json = "{\"userId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  masterView.do测试 **/
-//        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 

@@ -15,6 +15,12 @@
                         <condition name="id" defaultValue="0" operation="ne"/>
                     </query>
                 </do>
+                <do name="plistArtwork" access="" label="Artwork列表"
+                    result="json">
+                    <query name="default1" label="默认" type="auto" orderBy="createDatetime:desc">
+                        <condition name="author.id" defaultValue="0" operation="eq"/>
+                    </query>
+                </do>
                 <do name="listArtwork" access="" label="Artwork列表"
                     result="json">
                     <query name="default" label="默认" type="auto" orderBy="id:desc">
