@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmenu id="commonMenu">
+
+
+    <jnode id="efecOrderAndConsumer" access="admin,operational,o_operational,financial,product_manager,market" url="/main.do?jnodeId=rytManager" text_zh_CN="融艺投后台管理系统">
+        <jnode url="" id="orderManager" access="admin,operational,o_operational,financial,product_manager,market" state="closed" text_zh_CN="订单管理">
+            <jnode url="/basic/xm.do?qm=plistPurchaseOrder_default&amp;viewIdentify=orderProduct&amp;viewProductModel=order" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="订单列表">
+                <match url="/basic/xm.do?qm=plistPurchaseOrder_default&amp;viewIdentify=orderProduct&amp;viewProductModel=order"/>
+                <match url="/basic/xm.do?qm=viewPurchaseOrder&amp;viewIdentify=orderProduct"/>
+                <match url="/basic/xm.do?qm=viewPurchaseOrderProduct&amp;viewProductModel=order"/>
+                <match url="/basic/xm.do?qm=viewPurchaseOrderProduct&amp;viewIdentify=orderProduct"/>
+                <match url="/basic/xm.do?qm=viewProduct&amp;viewIdentify=orderProduct"/>
+                <match url="/basic/xm.do?qm=plistPurchaseOrder_search"/>
+                <match url="/basic/xm.do?qm=plistPurchaseOrder_default"/>
+
+            </jnode>
+
+
+        </jnode>
+
+
+
+
+    </jnode>
+
+
+
+
+
+</jmenu>
+
+
+
+
+
+
