@@ -35,10 +35,10 @@
     <tr>
       <td>${artwork.title}</td>
       <td>${artwork.author.name}</td>
-      <td>${artwork.title}</td>
-      <td>${artwork.author.name}</td>
-      <td>${artwork.title}</td>
-      <td>${artwork.author.name}</td>
+      <td>${artwork.step}</td>
+      <td>${artwork.investsMoney}/${artwork.investGoalMoney}</td>
+      <td>${artwork.auctionNum}</td>
+      <td>${artwork.sorts}</td>
       <td>${artwork.title}</td>
       <td>${artwork.createDatetime}</td>
     </tr>
