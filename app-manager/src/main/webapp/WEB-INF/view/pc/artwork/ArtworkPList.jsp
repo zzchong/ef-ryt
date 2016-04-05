@@ -16,7 +16,7 @@
 <html>
 <head>
   <title></title>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery-1.11.1.min.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/recommended.js'/>"></script>
 </head>
 <body>
 <table>
@@ -33,13 +33,20 @@
 
   <c:forEach items="${requestScope.pageInfo.list}" var="artwork">
     <tr>
+      <td>
+        <button onclick="showConfirm('提示','删除项目将会关联删除一切相关记录，确定删除吗',function(){removeProject('${artwork.id}')})"
+                class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span
+                class="am-icon-trash-o"></span> 删除
+        </button>
+      </td>
       <td>${artwork.title}</td>
       <td>${artwork.author.name}</td>
-      <td>${artwork.step}</td>
+      <td> <ming800:status name="orderType" dataType="Artwork.step"
+                           checkedValue="${artwork.step}"
+                           type="normal"/></td>
       <td>${artwork.investsMoney}/${artwork.investGoalMoney}</td>
       <td>${artwork.auctionNum}</td>
       <td>${artwork.sorts}</td>
-      <td>${artwork.title}</td>
       <td>${artwork.createDatetime}</td>
     </tr>
   </c:forEach>
@@ -50,7 +57,51 @@
     <ming800:pcPageParam name="conditions" value="${requestScope.conditions}"/>
   </ming800:pcPageList>
 </div>
+<script>
+  window.onload = function(){
 
+    <% if (request.getParameter("message") != null && !"".equalsIgnoreCase(request.getParameter("message")))
+     {
+    %>
+    alert("<%=request.getParameter("message")%>");
+    <% } %>
+  }
+  function removeProject(id){
+    $.ajax({
+      type: "post",
+      url: '<c:url value="/product/project/removeProject.do"/>',
+      cache: false,
+      dataType: "json",
+      data:{id:id},
+      success: function (data) {
+        console.log(data);
+        $("#"+data).remove();
+      }
+    });
+  }
+  function changeStatus(obj,id){
+    var status = $(obj).attr("status");
+    $.ajax({
+      type: "get",
+      url: '<c:url value="/product/project/updateStatus.do"/>',
+      cache: false,
+      dataType: "json",
+      data:{id:id,status:status},
+      success: function (data) {
+        $(obj).attr("status",data);
+        if(status=="1"){
+          $(obj).find("span").text("隐藏");
+          $(obj).attr("status","2");
+        }
+        if(status=="2"){
+          $(obj).find("span").text("显示");
+          $(obj).attr("status","1");
+        }
+      }
+    });
+  }
+
+</script>
 </body>
 </html>
 
