@@ -12,6 +12,7 @@
     <modules>
         <module>base</module>
         <module>base_resource</module>
+        <module>app-manager</module>
         <module>app-wikiServer</module>
     </modules>
 
