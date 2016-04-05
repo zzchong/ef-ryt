@@ -48,6 +48,7 @@ public class Artwork implements Serializable {
     private  Integer  auctionNum;//竞价记录次数
     private  BigDecimal newBidingPrice;//最新竞价价格
     private  String newBiddingDate;//最新出价时间
+    private  String sorts;//排序
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -236,7 +237,14 @@ public class Artwork implements Serializable {
         this.description = description;
     }
 
+    @Column(name = "sorts")
+    public String getSorts() {
+        return sorts;
+    }
 
+    public void setSorts(String sorts) {
+        this.sorts = sorts;
+    }
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "author_id")
