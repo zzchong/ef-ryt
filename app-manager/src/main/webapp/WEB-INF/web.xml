@@ -79,10 +79,6 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
-    <listener>
-    <listener-class>com.efeiyi.ec.system.zero.virtual.listener.VirtualPlanInitListener</listener-class>
-    </listener>
-
 
     <!-- 定义DispatcherServlet -->
     <servlet>
