@@ -439,10 +439,8 @@ public class SigninController extends BaseController {
         } catch(Exception e){
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
-
-
-
     }
+
 
     //找回密码
     @RequestMapping(value = "/app/retrievePassword.do", method = RequestMethod.POST)
@@ -519,8 +517,6 @@ public class SigninController extends BaseController {
                     .setUsername(username)
                     .setPassword(password)
                     .build();
-
-
             users.add(user);
 
             RegisterInfo[] regUsers = new RegisterInfo[users.size()];
