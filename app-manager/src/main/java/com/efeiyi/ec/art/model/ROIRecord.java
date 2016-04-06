@@ -19,7 +19,7 @@ import java.util.Date;
 public class ROIRecord implements Serializable {//投资收益记录表
     private String id;
     private BigDecimal currentBalance;//回报金额
-    private String status;//0 成功 1 失败
+    private String status;//1 成功 0 失败
     private Date createDatetime;//收益时间
     private Account account;//关联的账户
     private User user;//关联用户
