@@ -70,7 +70,7 @@ public class RechargeRecord implements Serializable {//充值记录表
     public void setStatus(String status) {
         this.status = status;
     }
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public User getUser() {
         return user;
