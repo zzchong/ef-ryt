@@ -22,6 +22,7 @@
                         <item label="待审核" value="10"/>
                         <item label="审核中" value="11"/>
                         <item label="审核通过" value="12"/>
+                        <item label="审核未通过，已驳回" value="13"/>
                         <item label="创作前" value="20"/>
                         <item label="创作中" value="21"/>
                         <item label="创作延时" value="22"/>
@@ -43,11 +44,20 @@
                         <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
                     </query>
 
-                    <query name="default1" label="快速查询" type="auto" orderBy="serial:desc">
-                        <condition name="name" operation="like" label="项目名称" inputType="text"/>
-                        <condition name="serial" operation="like" label="项目编号" inputType="text"/>
-                        <condition name="projectCategory.name" operation="like" label="类别名称" inputType="text"/>
+                    <query name="default1" label="全部状态" type="auto" orderBy="sorts:desc,createDatetime:desc">
                         <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
+                    </query>
+                    <query name="default2" label="融资" type="auto" orderBy="sorts:desc,createDatetime:desc">
+                        <condition name="status" defaultValue="1" operation="eq" inputType="default"/>
+                    </query>
+                    <query name="default3" label="制作" type="auto" orderBy="sorts:desc,createDatetime:desc">
+                        <condition name="status" defaultValue="2" operation="eq" inputType="default"/>
+                    </query>
+                    <query name="default4" label="拍卖" type="auto" orderBy="sorts:desc,createDatetime:desc">
+                        <condition name="status" defaultValue="3" operation="eq" inputType="default"/>
+                    </query>
+                    <query name="default5" label="抽奖" type="auto" orderBy="sorts:desc,createDatetime:desc">
+                        <condition name="status" defaultValue="4" operation="eq" inputType="default"/>
                     </query>
                 </do>
 

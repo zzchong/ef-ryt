@@ -19,6 +19,7 @@
   <script type="text/javascript" src="<c:url value='/scripts/recommended.js'/>"></script>
 </head>
 <body>
+<jsp:include page="/do/generateTabs.do?qm=${requestScope.qm}&conditions=${requestScope.conditions}"/>
 <table>
   <tr>
     <td width="20%">操作</td>
