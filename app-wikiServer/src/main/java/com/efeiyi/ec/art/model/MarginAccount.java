@@ -1,6 +1,5 @@
 package com.efeiyi.ec.art.model;
 
-import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -21,7 +20,9 @@ public class MarginAccount implements Serializable {
     private String id;
     private BigDecimal currentBalance;//当前余额
     private String status;//0 已冻结 1 已使用 3 已解冻
-    private Date createDatetime;
+    private Date createDatetime;//创建时间 即冻结时间
+    private Date endDatetime;//解冻时间/使用时间
+    private Artwork artwork;//关联的项目
     private Account account;//关联的账户
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -66,5 +67,22 @@ public class MarginAccount implements Serializable {
 
     public void setCreateDatetime(Date createDatetime) {
         this.createDatetime = createDatetime;
+    }
+    @Column(name = "endDatetime")
+    public Date getEndDatetime() {
+        return endDatetime;
+    }
+
+    public void setEndDatetime(Date endDatetime) {
+        this.endDatetime = endDatetime;
+    }
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artwork_id")
+    public Artwork getArtwork() {
+        return artwork;
+    }
+
+    public void setArtwork(Artwork artwork) {
+        this.artwork = artwork;
     }
 }
