@@ -202,12 +202,12 @@ public class MessageController extends BaseController {
                     resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                     return resultMap;
                 }else if("0".equals(type)){
-                    String hql = "from Notification WHERE targetUser.id=" +jsonObj.getString("userId") + " AND status<>'0'  order by createDatetime desc";
+                    String hql = "from Notification WHERE targetUser.id=" +"'"+jsonObj.getString("userId").toString()+"'" + " AND status<>'0'  order by createDatetime desc";
                     objectList =  (List<Notification>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
 //                    objectList =  (List<Notification>)baseManager.listObject(AppConfig.SQL_NOTICE_GET_APP, map);
                 }else if("1".equals(type)){
                     objectList = new ArrayList();
-                    String hql = "from ArtworkComment WHERE fatherComment.creator.id= "+jsonObj.getString("userId") + " AND status<>'0'  order by createDatetime desc";
+                    String hql = "from ArtworkComment WHERE fatherComment.creator.id= "+"'"+jsonObj.getString("userId").toString()+"'" + " AND status<>'0'  order by createDatetime desc";
                     List<ArtworkComment> objectTempList = (List<ArtworkComment>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
                     for (ArtworkComment artworkComment : objectTempList){
                         ArtworkCommentBean artworkCommentBean = new ArtworkCommentBean();
