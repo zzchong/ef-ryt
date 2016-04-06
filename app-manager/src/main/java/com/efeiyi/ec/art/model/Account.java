@@ -28,6 +28,7 @@ public class Account implements Serializable {
     private String status;
     private Date createDatetime;
     private List<BankCard> bankCards;//关联的银行卡
+    private List<MarginAccount> marginAccounts;//关联的保证金账户
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -114,4 +115,15 @@ public class Account implements Serializable {
     public void setCurrentUsableBalance(BigDecimal currentUsableBalance) {
         this.currentUsableBalance = currentUsableBalance;
     }
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account")
+    public List<MarginAccount> getMarginAccounts() {
+        return marginAccounts;
+    }
+
+    public void setMarginAccounts(List<MarginAccount> marginAccounts) {
+        this.marginAccounts = marginAccounts;
+    }
 }
+
+
