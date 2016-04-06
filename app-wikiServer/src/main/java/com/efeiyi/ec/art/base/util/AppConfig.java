@@ -17,4 +17,9 @@ public class AppConfig {
     public static final String SQL_MESSAGE_DETAIL_GET_APP ="from Message where (targetUser.id = :userId and fromUser.id = :fromUserId) or (targetUser.id = :fromUserId and targetUser.id = :fromUserId)  ORDER BY createDatetime DESC";
     public static final String SQL_INVEST_MONEY_APP = "select SUM(price) FROM ArtworkInvest where creator.id = :userId GROUP BY artwork.id ORDER BY createDatetime DESC";
     public static final String SQL_INVEST_ARTWORK_APP = "FROM ArtworkInvest where creator.id = :userId GROUP BY artwork.id ORDER BY createDatetime DESC";
+    public static final String GET_INVESTOR_TOP_LIST = "SELECT a.user_id,d.username, SUM(a.price),c.rois " +
+
+            "  FROM app_art_work_invest a ,organization_user d, " +
+            "  (SELECT b.user_id, SUM(b.currentBalance) as rois ,b.status  FROM  app_art_work_roi_record b WHERE  b.status<>'0' GROUP BY b.user_id) c"+
+            "  WHERE a.status<>'0' AND c.status<>'0' AND a.user_id = c.user_id AND  a.user_id = d.id GROUP BY a.user_id limit ";
 }

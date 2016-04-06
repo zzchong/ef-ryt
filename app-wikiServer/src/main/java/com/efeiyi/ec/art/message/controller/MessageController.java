@@ -254,14 +254,14 @@ public class MessageController extends BaseController {
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
-                    resultMap.put("objectList ",objectList);
+                    resultMap.put("objectList",objectList);
                 }else{
                     logBean.setResultCode("10008");
                     logBean.setMsg("查无数据,稍后再试");
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "10008");
                     resultMap.put("resultMsg", "查无数据,稍后再试");
-                    resultMap.put("objectList ",null);
+                    resultMap.put("objectList",null);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -335,14 +335,14 @@ public class MessageController extends BaseController {
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
-                    resultMap.put("objectList ",objectList);
+                    resultMap.put("objectList",objectList);
                 }else{
                     logBean.setResultCode("10008");
                     logBean.setMsg("查无数据,稍后再试");
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "10008");
                     resultMap.put("resultMsg", "查无数据,稍后再试");
-                    resultMap.put("objectList ",null);
+                    resultMap.put("objectList",null);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
