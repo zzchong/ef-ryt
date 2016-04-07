@@ -18,12 +18,12 @@ import java.util.Date;
 public class Notification implements Serializable {//系统通知
     private String id;
     private String content;
-    private User targetUser;
+    private User targetUser;//通知目标
     private Date createDatetime;
     private Artwork artwork;
     private String isWatch;// 0 未读 1 已读
     private String status; // 是否删除
-
+    private User fromUser;//触发用户 比如此人关注了targetUser
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -89,7 +89,15 @@ public class Notification implements Serializable {//系统通知
     public void setStatus(String status) {
         this.status = status;
     }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_user_id")
+    public User getFromUser() {
+        return fromUser;
+    }
 
+    public void setFromUser(User fromUser) {
+        this.fromUser = fromUser;
+    }
 }
 
 
