@@ -6,6 +6,7 @@ import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.model.ArtistBiddingTopListVO;
 import com.efeiyi.ec.art.model.ArtistTopListVO;
 import com.efeiyi.ec.art.model.InvestorTopListVO;
 import com.ming800.core.base.controller.BaseController;
@@ -123,7 +124,41 @@ public class RankListController extends BaseController {
 
 
 
+    @RequestMapping(value = "/app/2/getArtistTopList.do", method = RequestMethod.POST)//获取艺术家排行榜
+    @ResponseBody
+    public Map getArtistTopList2(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("getArtistTopList2");
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("pageNum")) ||
+                    "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("pageSize")) ) {
+                return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
 
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("pageSize",jsonObj.getString("pageSize"));
+            treeMap.put("pageNum",jsonObj.getString("pageNum"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+            Session session = xdoDao.getSession();
+            int beginNum = (jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize"));
+            String sqlString = AppConfig.GET_ARTIST_TOP_LIST2+beginNum+","+jsonObj.getInteger("pageSize");
+            List<ArtistBiddingTopListVO> list = session.createSQLQuery(sqlString).setResultTransformer(Transformers.aliasToBean(com.efeiyi.ec.art.model.ArtistBiddingTopListVO.class)).list();
+            resultMap = resultMapHandler.handlerResult("0","成功!",logBean);
+            resultMap.put("ArtistTopList",list);
+        } catch(Exception e){
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+        return  resultMap;
+    }
 
 
 
@@ -148,7 +183,7 @@ public class RankListController extends BaseController {
 
 
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.69:8001/app/getArtistTopList.do";
+        String url = "http://192.168.1.69:8001/app/2/getArtistTopList.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
