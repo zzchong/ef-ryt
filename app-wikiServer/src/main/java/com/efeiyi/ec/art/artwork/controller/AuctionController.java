@@ -14,6 +14,7 @@ import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
+import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import org.apache.http.HttpEntity;
@@ -52,6 +53,8 @@ public class AuctionController extends BaseController {
     @Autowired
     ResultMapHandler resultMapHandler;
 
+    @Autowired
+    BaseManager baseManager;
 
     /**
      * 拍卖首页
@@ -88,13 +91,14 @@ public class AuctionController extends BaseController {
             artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
 //            List<ArtWorkBean> objectList = new ArrayList<>();
             for (Artwork artwork : artworkList){
+
                 XQuery xQuery = new XQuery("listArtworkBidding_default",request);
                 xQuery.put("artwork_id",artwork.getId());
                 List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>)baseManager.listObject(xQuery);
                 //出价次数 当前价格 几分钟前
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
                 String str1 = sdf.format(new Date());
-                if(artworkBiddingList!=null){
+                if(artworkBiddingList!=null && !artworkBiddingList.isEmpty()){
                     artwork.setAuctionNum(artworkBiddingList.size());
                     artwork.setNewBidingPrice(artworkBiddingList.get(0).getPrice());
                     String str2 = sdf.format(artworkBiddingList.get(0).getCreateDatetime());
@@ -106,6 +110,18 @@ public class AuctionController extends BaseController {
 //               // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
 //                objectList.add(artWorkBean);
 
+            if("3".equals(artwork.getType()) && "32".equals(artwork.getStep())){//拍卖已经结束
+                LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+                param.put("artworkId", artwork.getId());
+                ArtworkBidding artworkBidding = (ArtworkBidding)baseManager.getUniqueObjectByConditions(AppConfig.GET_ART_WORK_WINNER,param);
+                if(artworkBidding!=null && artworkBidding.getId()!=null){
+                    artwork.setWinner(artworkBidding.getCreator()); //设置竞拍得主
+                }else {
+                    artwork.setWinner(new User()); //设置竞拍得主为空
+                }
+             }else {
+                artwork.setWinner(new User()); //设置竞拍得主为空
+            }
 
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);

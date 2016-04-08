@@ -271,13 +271,18 @@ public class SigninController extends BaseController {
                 if (user==null || user.getId()==null) {
                     return resultMapHandler.handlerResult("10007","用户名不存在",logBean);
                 }
-                PushUserBinding pushUserBinding = new PushUserBinding();
+                LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+                param.put("userId", user.getId());
+                PushUserBinding pushUserBinding = (PushUserBinding)baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_BINDING_GET, param);
+                if(pushUserBinding == null || pushUserBinding.getId() == null){
+                    pushUserBinding = new PushUserBinding();
+                    pushUserBinding.setUser(user);
+                }
                 pushUserBinding.setCid(jsonObj.getString("cid"));
-                pushUserBinding.setUser(user);
                 String res = RegisterUsers(jsonObj.getString("username"),jsonObj.getString("password"));//若果绑定失败，人工处理
                 logBean.setExtend1(res);
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
                 baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
+                resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             } catch (Exception e) {
                 return resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
                 //e.printStackTrace();

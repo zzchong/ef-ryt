@@ -48,6 +48,7 @@ public class Artwork implements Serializable {
     private  BigDecimal newBidingPrice;//最新竞价价格
     private  String newBiddingDate;//最新出价时间
     private  String sorts;//排序
+    private User winner;//竞拍得主
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -289,5 +290,14 @@ public class Artwork implements Serializable {
 
     public void setNewCreationDate(String newCreationDate) {
         this.newCreationDate = newCreationDate;
+    }
+
+    @Transient
+    public User getWinner() {
+        return winner;
+    }
+
+    public void setWinner(User winner) {
+        this.winner = winner;
     }
 }
