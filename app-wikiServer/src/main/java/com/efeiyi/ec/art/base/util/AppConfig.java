@@ -47,5 +47,5 @@ public class AppConfig {
 
     public static final String SQL_USER_BINDING_GET ="from PushUserBinding WHERE user.id= :userId ";
 
-    public static final String GET_ART_WORK_WINNER ="from ArtworkBidding WHERE artwork.id= :artworkId and status='1' order by price limit 0,1";
+    public static final String GET_ART_WORK_WINNER ="from ArtworkBidding a where a.artwork.id=:artworkId and status='1' ORDER BY a.price desc limit 0,1";
 }
