@@ -650,3 +650,33 @@ function deleteFile(attachmentId) {
         }
     });
 }
+
+//删除确认
+function myConfirm(url){
+    var DValue=document.getElementById("DValue");
+    DValue.setAttribute("style","display");
+
+    $('#my-confirm').modal({
+        //width:300,
+        //height:100,
+        onConfirm: function() {
+            window.location.href = url;
+        },
+        onCancel: function() {}
+    });
+}
+
+function myReject(url){
+    $('#my-reject').modal({
+        relatedTarget: this,
+        onConfirm: function(e) {
+            var message = e.data || "";
+            if(null == message || message.trim() == ""){
+                alert("驳回意见为必填项!");
+            }else{
+                window.location.href = url + "&message=" + message;
+            }
+        },
+        onCancel: function(e) {}
+    });
+}

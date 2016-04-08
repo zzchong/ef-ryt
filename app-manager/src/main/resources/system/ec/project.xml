@@ -60,8 +60,12 @@
                         <condition name="status" defaultValue="4" operation="eq" inputType="default"/>
                     </query>
                 </do>
-
-
+                <do name="viewArtwork" access="" label="artwork列表"
+                    result="/artwork/artworkView">
+                    <query name="default" label="默认" type="auto" orderBy="sorts:desc,createDatetime:desc">
+                        <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
+                    </query>
+                </do>
             </does>
         </entity>
 
