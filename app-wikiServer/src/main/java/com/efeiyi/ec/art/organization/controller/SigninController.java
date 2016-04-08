@@ -50,8 +50,8 @@ import java.util.regex.Pattern;
 @Controller
 public class SigninController extends BaseController {
     private static Logger logger = Logger.getLogger(SigninController.class);
-    private static final String appKey ="d1573e16403c2482826bbd35";
-    private static final String masterSecret = "0b6ca44da0dfe0b7ea6331f1";
+    private static final String appKey ="539b73fd73c82f1134120a57";
+    private static final String masterSecret = "fea912e000db6a462048f9ef";
     private SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
     @Autowired
     BaseManager baseManager;

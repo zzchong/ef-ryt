@@ -14,6 +14,7 @@ import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
+import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
@@ -55,6 +56,9 @@ public class AuctionController extends BaseController {
 
     @Autowired
     BaseManager baseManager;
+
+    @Autowired
+    private XdoDaoSupport xdoDao;
 
     /**
      * 拍卖首页
@@ -111,9 +115,9 @@ public class AuctionController extends BaseController {
 //                objectList.add(artWorkBean);
 
             if("3".equals(artwork.getType()) && "32".equals(artwork.getStep())){//拍卖已经结束
-                LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
-                param.put("artworkId", artwork.getId());
-                ArtworkBidding artworkBidding = (ArtworkBidding)baseManager.getUniqueObjectByConditions(AppConfig.GET_ART_WORK_WINNER,param);
+
+                //ArtworkBidding artworkBidding = (ArtworkBidding)baseManager.getUniqueObjectByConditions(AppConfig.GET_ART_WORK_WINNER,param);
+                ArtworkBidding artworkBidding = (ArtworkBidding)xdoDao.getSession().createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
                 if(artworkBidding!=null && artworkBidding.getId()!=null){
                     artwork.setWinner(artworkBidding.getCreator()); //设置竞拍得主
                 }else {
@@ -207,21 +211,21 @@ public class AuctionController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**artWorkAuctionList.do测试加密参数**/
-//        map.put("pageNum","1");
-//        map.put("pageSize","5");
+        map.put("pageNum","1");
+        map.put("pageSize","5");
         /**artWorkAuctionView.do测试加密参数**/
-        map.put("artWorkId","qydeyugqqiugd2");
+        //map.put("artWorkId","qydeyugqqiugd2");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/artWorkAuctionView.do";
+        String url = "http://192.168.1.69:8001/app/artWorkAuctionList.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  artWorkAuctionView.do测试 **/
-        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        //String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artWorkAuctionList.do测试 **/
-//        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
