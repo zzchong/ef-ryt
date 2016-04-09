@@ -16,8 +16,8 @@ import java.util.List;
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class NotificationTargetUser implements Serializable {
     private String id;
-    private List<User> targetUsers;//通知目标
-    private List<Notification> Notifications;//通知目标
+    private User targetUser;//通知目标
+    private Notification Notification;//通知目标
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -29,22 +29,23 @@ public class NotificationTargetUser implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_ID")
-    public List<User> getTargetUsers() {
-        return targetUsers;
+    public User getTargetUser() {
+        return targetUser;
     }
 
-    public void setTargetUsers(List<User> targetUsers) {
-        this.targetUsers = targetUsers;
+    public void setTargetUser(User targetUser) {
+        this.targetUser = targetUser;
     }
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notification_ID")
-    public List<Notification> getNotifications() {
-        return Notifications;
+    public com.efeiyi.ec.art.model.Notification getNotification() {
+        return Notification;
     }
 
-    public void setNotifications(List<Notification> notifications) {
-        Notifications = notifications;
+    public void setNotification(com.efeiyi.ec.art.model.Notification notification) {
+        Notification = notification;
     }
 }
