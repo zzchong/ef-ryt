@@ -1,5 +1,8 @@
 package com.efeiyi.ec.art.base.service;
 
+import com.efeiyi.ec.art.model.Artwork;
+
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -7,5 +10,5 @@ import java.util.concurrent.ExecutorService;
  *
  */
 public interface ThreadManager {
-    void startWork(ExecutorService pool) throws Exception;
+    void startWork(ExecutorService pool,List<Artwork> artworks) throws Exception;
 }
