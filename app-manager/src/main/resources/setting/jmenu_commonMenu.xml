@@ -31,8 +31,9 @@
                 <match url="/basic/xm.do?qm=plistArtwork_checkDefault&amp;checkProject=checkProject"/>
                 <match url="/basic/xm.do?qm=viewCheckArtwork&amp;checkProject=checkProject"/>
             </jnode>
-            <jnode url="" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="艺术家审核">
-                <!--<match url="/basic/xm.do?qm=plistPurchaseOrder_default&amp;viewIdentify=orderProduct&amp;viewProductModel=order"/>-->
+            <jnode url="/basic/xm.do?qm=plistCheckMaster_checkDefault&amp;checkMaster=checkMaster" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="艺术家审核">
+                <match url="/basic/xm.do?qm=plistCheckMaster_checkDefault&amp;checkMaster=checkMaster"/>
+                <match url="/basic/xm.do?qm=viewCheckMaster&amp;checkMaster=checkMaster"/>
             </jnode>
         </jnode>
     </jnode>

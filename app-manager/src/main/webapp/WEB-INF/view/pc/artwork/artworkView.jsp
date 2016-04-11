@@ -122,7 +122,7 @@
 <%--确认完成--%>
 <div class="am-btn-toolbar">
     <div class="am-btn-group am-btn-group-xs" style="width: 100%;">
-        <button onclick="myConfirm('/basic/')"
+        <button onclick="myConfirm('/basic/', 'F')"
                 class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 确认完成
         </button>
         <button onclick="myReject('23')"

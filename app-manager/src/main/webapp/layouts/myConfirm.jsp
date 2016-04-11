@@ -3,7 +3,8 @@
     <div class="am-modal-dialog">
         <%--<div class="am-modal-hd">删除确认</div>--%>
         <div class="am-modal-bd">
-            <div id="DValue" style="display:none">确定要<font color="red">完成</font>吗？</div>
+            <div id="DValue" style="display:none">确定要<font color="red">删除</font>？</div>
+            <div id="FValue" style="display:none">确定要<font color="red">完成</font>？</div>
         </div>
         <div class="am-modal-footer">
             <span class="am-modal-btn" data-am-modal-cancel>取消</span>

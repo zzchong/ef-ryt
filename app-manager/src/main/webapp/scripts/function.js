@@ -652,9 +652,17 @@ function deleteFile(attachmentId) {
 }
 
 //删除确认
-function myConfirm(url){
+function myConfirm(url, type){
     var DValue=document.getElementById("DValue");
-    DValue.setAttribute("style","display");
+    var FValue=document.getElementById("FValue");
+    if(type == "D"){
+        DValue.setAttribute("style","display");
+        FValue.setAttribute("style","display:none");
+    }
+    if(type == "F"){
+        DValue.setAttribute("style","display:none");
+        FValue.setAttribute("style","display");
+    }
 
     $('#my-confirm').modal({
         //width:300,
