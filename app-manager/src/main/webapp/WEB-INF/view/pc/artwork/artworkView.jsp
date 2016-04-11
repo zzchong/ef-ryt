@@ -40,7 +40,7 @@
     </tr>
     <tr>
         <td width="15%">
-            <button onclick="window.location.href = '/basic/xm.do?qm=viewArtwork&id=${artwork.id}';"
+            <button onclick="window.location.href = '/basic/xm.do?qm=viewInvestor&id=${object.id}';"
                     class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 查看所有投资者
             </button>
         </td>
@@ -73,35 +73,38 @@
         <td width="5%">更新时间</td>
     </tr>
     <c:forEach items="${object.artworkMessages}" var="artworkMessage" varStatus="x">
-        <tr>
-            <td width="15%">
-                <button onclick="window.location.href = '/basic/xm.do?qm=remove';"
-                        class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 删除动态
-                </button>
-            </td>
-            <td width="10%">${x.index + 1}</td>
-            <td width="10%"><img src="${object.picture_url}@!tanent-details-view"></td>
-            <td width="10%">${artworkMessage.content}</td>
-            <td width="5%">${artworkMessage.createDatetime}</td>
-        </tr>
+        <c:if test="${artworkMessage.status != 0}">
+            <tr id="${artworkMessage.id}">
+                <td width="15%">
+                    <button onclick="showConfirm('提示','删除项目将会关联删除一切相关记录，确定删除吗',function(){myRemove('${artworkMessage.id}','com.efeiyi.ec.art.model.ArtworkMessage')})"
+                            class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 删除动态
+                    </button>
+                </td>
+                <td width="10%">${x.index + 1}</td>
+                <td width="10%"><img src="${object.picture_url}@!tanent-details-view"></td>
+                <td width="10%">${artworkMessage.content}</td>
+                <td width="5%">${artworkMessage.createDatetime}</td>
+            </tr>
+        </c:if>
     </c:forEach>
 </table>
-<%--拍卖情况--%>
-<table>
-    <tr>
-        <td width="20%" colspan="5">
-            <div id="auction_status"></div>
-        </td>
-    </tr>
-    <tr>
-        <td width="15%">操作</td>
-        <td width="10%">拍卖情况</td>
-        <td width="10%">拍品得主</td>
-        <td width="10%">联系方式</td>
-        <td width="5%">起拍价</td>
-        <td width="5%">成交价</td>
-        <td width="5%">参拍人数</td>
-    </tr>
+<c:if test="${object.step >= 30}">
+    <%--拍卖情况--%>
+    <table>
+        <tr>
+            <td width="20%" colspan="5">
+                <div id="auction_status"></div>
+            </td>
+        </tr>
+        <tr>
+            <td width="15%">操作</td>
+            <td width="10%">拍卖情况</td>
+            <td width="10%">拍品得主</td>
+            <td width="10%">联系方式</td>
+            <td width="5%">起拍价</td>
+            <td width="5%">成交价</td>
+            <td width="5%">参拍人数</td>
+        </tr>
         <tr>
             <td width="15%">
                 <button onclick="window.location.href = '/basic/xm.do?qm=view';"
@@ -117,21 +120,25 @@
             <td width="5%">${object.newBidingPrice}</td>
             <td width="5%">${object.newBidingPrice}</td>
         </tr>
-</table>
+    </table>
+</c:if>
 <%--开奖情况--%>
 <%--确认完成--%>
-<div class="am-btn-toolbar">
-    <div class="am-btn-group am-btn-group-xs" style="width: 100%;">
-        <button onclick="myConfirm('/basic/', 'F')"
-                class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 确认完成
-        </button>
-        <button onclick="myReject('23')"
-                class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 驳回
-        </button>
+<c:if test="${object.step == '23'}">
+    <div id="${object.id}">
+        <div class="am-btn-toolbar">
+            <div class="am-btn-group am-btn-group-xs" style="width: 100%;">
+                <button onclick="showConfirm('提示','确定项目完成吗',function(){changeStatus('${object.id}',{'id': '${object.id}', 'clazz': 'com.efeiyi.ec.art.model.Artwork','step':'30'})})"
+                        class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 确认完成
+                </button>
+                <button onclick="myReject('${object.id}','com.efeiyi.ec.art.model.Artwork','25')"
+                        class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 驳回
+                </button>
+            </div>
+        </div>
     </div>
-</div>
-<%--<script src="<c:url value="/scripts/jquery-1.11.1.min.js"/>" ></script>--%>
-<script src="<c:url value="/scripts/function.js"/>" > </script>
+</c:if>
+<script src="<c:url value="/scripts/function.js"/>"></script>
 <script type="application/javascript">
     $("#financing_status").html("融资情况 ${object.investStartDatetime} - " + new Date().toLocaleString());
     $("#work_status").html("制作动态 ${object.investEndDatetime} - " + new Date().toLocaleString());
@@ -141,6 +148,56 @@
     ${object.investsMoney} / ${object.investGoalMoney} *
     100;
     $("#financing_progress").html(progress + "%");
+    function myRemove(id, clazz) {
+        $.ajax({
+            type: "get",
+            url: '<c:url value="/remove.do"/>',
+            cache: false,
+//            dataType: "json",
+            data: {"id": id, "clazz": clazz},
+            success: function (data) {
+                console.log(data);
+                $("#" + id).remove();
+            },
+            error: function (a) {
+                console.log(eval(a).responseText);
+            }
+        });
+        e
+    }
+    function changeStatus(id, jsonData) {
+        $.ajax({
+            type: "get",
+            url: '<c:url value="/updateObject.do"/>',
+            cache: false,
+//            dataType: "json",
+            data: jsonData,
+            success: function (data) {
+                if ($("#" + id) != "undefine") {
+                    $("#" + id).remove();
+                }
+            },
+            error: function (a, b, c) {
+                console.log(eval(a).responseText);
+            }
+        });
+    }
+    function myReject(id, clazz, step) {
+        $('#my-reject').modal({
+            relatedTarget: this,
+            onConfirm: function (e) {
+                var message = e.data || "";
+                if (null == message || message.trim() == "") {
+                    alert("驳回意见为必填项!");
+                } else {
+                    var jsonDate = {"id": id, "clazz": clazz, "step": step, "feedback": message};
+                    changeStatus(id, jsonDate);
+                }
+            },
+            onCancel: function (e) {
+            }
+        });
+    }
 </script>
 </body>
 </html>

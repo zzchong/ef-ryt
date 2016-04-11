@@ -33,11 +33,11 @@
     </tr>
 
     <c:forEach items="${requestScope.pageInfo.list}" var="artwork">
-        <tr>
+        <tr id="${artwork.id}">
             <td>
                 <div class="am-btn-toolbar">
                     <div class="am-btn-group am-btn-group-xs" style="width: 100%;">
-                        <button onclick="showConfirm('提示','删除项目将会关联删除一切相关记录，确定删除吗',function(){removeProject('${artwork.id}')})"
+                        <button onclick="showConfirm('提示','删除项目将会关联删除一切相关记录，确定删除吗',function(){myRemove('${artwork.id}','com.efeiyi.ec.art.model.Artwork')})"
                                 class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"> 删除
                         </button>
                         <button onclick="window.location.href = '/basic/xm.do?qm=viewArtwork&id=${artwork.id}';"
@@ -76,16 +76,19 @@
         alert("<%=request.getParameter("message")%>");
         <% } %>
     }
-    function removeProject(id) {
+    function myRemove(id, clazz) {
         $.ajax({
-            type: "post",
-            url: '<c:url value="/product/project/removeProject.do"/>',
+            type: "get",
+            url: '<c:url value="/remove.do?id="/>' + id + "&clazz=" + clazz + '',
             cache: false,
-            dataType: "json",
+//            dataType: "json",
             data: {id: id},
             success: function (data) {
                 console.log(data);
-                $("#" + data).remove();
+                $("#" + id).remove();
+            },
+            error: function (a) {
+                console.log(eval(a).responseText);
             }
         });
     }
