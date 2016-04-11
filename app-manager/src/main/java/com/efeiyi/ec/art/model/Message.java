@@ -24,7 +24,7 @@ public class Message implements Serializable{
     private String isWatch; //0 未读 1 已读
     private String status;
     private Long isRead;
-
+    private String cid;
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -92,9 +92,17 @@ public class Message implements Serializable{
     public Long getIsRead() {
         return isRead;
     }
-
+    @Transient
     public void setIsRead(Long isRead) {
         this.isRead = isRead;
+    }
+
+    public String getCid() {
+        return cid;
+    }
+
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 }
 

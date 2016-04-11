@@ -37,5 +37,5 @@ public class OrganizationConst {
     public static final Integer ROLE_SUPER_PERMISSION_FALSE = 2; //不具有超级权限
 
     //线程池数量
-    public static final Integer THREAD_POOL_CORE_COUNT = 3;  //核心线程数量
+    public static final Integer THREAD_POOL_CORE_COUNT = 5;  //核心线程数量
 }

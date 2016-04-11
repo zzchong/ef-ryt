@@ -45,7 +45,7 @@ public class Master implements Serializable{
     private String titleCertificate;
     private List<ArtMasterAttachment> workShopPhotos;//工作室照片
     private List<ArtMasterAttachment> worksPhotos;//作品照片
-
+    private String feedback;//审批意见
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -239,5 +239,13 @@ public class Master implements Serializable{
         return "Master{" +
                 "id='" + id + '\'' +
                 '}';
+    }
+    @Column(name = "feedback")
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
 }

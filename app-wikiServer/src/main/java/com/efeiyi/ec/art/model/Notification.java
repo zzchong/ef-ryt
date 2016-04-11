@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/2/2.
@@ -19,6 +20,7 @@ public class Notification implements Serializable {//系统通知
     private String id;
     private String content;
     private User targetUser;//通知目标
+    //private List<User> targetUsers;//通知目标
     private Date createDatetime;
     private Artwork artwork;
     private String isWatch;// 0 未读 1 已读
@@ -98,6 +100,18 @@ public class Notification implements Serializable {//系统通知
     public void setFromUser(User fromUser) {
         this.fromUser = fromUser;
     }
+
+ /*   @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "app_art_notification_targetUsers",
+            joinColumns = {@JoinColumn(name = "notification_ID", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_ID", referencedColumnName ="id")})
+    public List<User> getTargetUsers() {
+        return targetUsers;
+    }
+
+    public void setTargetUsers(List<User> targetUsers) {
+        this.targetUsers = targetUsers;
+    }*/
 }
 
 
