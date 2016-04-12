@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 import com.efeiyi.ec.art.organization.model.User;
@@ -40,6 +41,7 @@ public class ArtworkComment implements Serializable {
     }
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "art_work_id")
+    @JsonIgnore
     public Artwork getArtwork() {
         return artwork;
     }
@@ -93,6 +95,7 @@ public class ArtworkComment implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "father_comment_id")
+    @JsonIgnore
     public ArtworkComment getFatherComment() {
         return fatherComment;
     }
@@ -101,6 +104,7 @@ public class ArtworkComment implements Serializable {
         this.fatherComment = fatherComment;
     }
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "fatherComment", cascade = CascadeType.ALL)
+    @JsonIgnore
     public List<ArtworkComment> getSubComment() {
         return subComment;
     }
