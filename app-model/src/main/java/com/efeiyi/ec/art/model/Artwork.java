@@ -51,6 +51,7 @@ public class Artwork implements Serializable {
     private  String sorts;//排序
     private User winner;//竞拍得主
     private String feedback;//审批意见
+    private Integer duration;//创作时长
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -309,5 +310,13 @@ public class Artwork implements Serializable {
 
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+    @Column(name = "duration")
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 }
