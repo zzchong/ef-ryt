@@ -1,14 +1,11 @@
 package com.efeiyi.ec.art.model;
 
-import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+
 
 /**
  * Created by Administrator on 2016/4/12.
