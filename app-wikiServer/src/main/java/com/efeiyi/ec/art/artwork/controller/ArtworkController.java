@@ -541,7 +541,7 @@ public class ArtworkController extends BaseController {
             logBean.setApiName("releaseArtworkDynamic");
             if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
                     || "".equals(request.getParameter("content"))
-                    || "".equals(request.getParameter("artworkId"))
+                    || "".equals(request.getParameter("artworkId"))  || "".equals(request.getParameter("type"))
                     ) {
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
@@ -589,6 +589,7 @@ public class ArtworkController extends BaseController {
                                     aliOssUploadManager.uploadFile(file,"ec-efeiyi2",url);
                                     artworkMessageAttachment.setFileUri(pictureUrl);
                                     artworkMessageAttachment.setArtworkMessage(artworkMessage);
+                                    artworkMessageAttachment.setFileType(request.getParameter("type"));
                                     artworkMessageAttachments.add(artworkMessageAttachment);
                                 }
                             }
