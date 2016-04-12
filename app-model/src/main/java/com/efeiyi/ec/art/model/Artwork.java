@@ -41,7 +41,7 @@ public class Artwork implements Serializable {
     private String step; //1 : 审核阶段
     private BigDecimal investsMoney;//已筹金额
     private Date creationEndDatetime;//创作完成时间=融资结束时间+30(默认)
-    private String type;//1 融资阶段  2 制作阶段  3 拍卖阶段  4 抽奖阶段
+    private String type;//1 融资阶段  2 制作阶段  3 拍卖阶段  4 抽奖阶段   0 发起 5驳回
 
     private String newCreationDate;//最新创作时间
 
