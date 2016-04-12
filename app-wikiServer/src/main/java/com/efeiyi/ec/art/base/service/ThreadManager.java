@@ -10,5 +10,5 @@ import java.util.concurrent.ExecutorService;
  *
  */
 public interface ThreadManager {
-    void startWork(ExecutorService pool,List<Artwork> artworks) throws Exception;
+    void startWork(List<Artwork> artworks) throws Exception;
 }
