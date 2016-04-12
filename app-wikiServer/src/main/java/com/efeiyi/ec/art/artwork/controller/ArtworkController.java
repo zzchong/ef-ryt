@@ -14,10 +14,12 @@ import com.efeiyi.ec.art.model.InvestReward;
 import com.efeiyi.ec.art.model.Master;
 import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
+import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
+import com.ming800.core.p.service.AliOssUploadManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -32,6 +34,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -52,6 +56,9 @@ public class ArtworkController extends BaseController {
 
     @Autowired
     ResultMapHandler resultMapHandler;
+
+    @Autowired
+    AliOssUploadManager aliOssUploadManager;
 
     @RequestMapping(value = "/app/getArtWorkList.do", method = RequestMethod.POST)
     @ResponseBody
@@ -331,6 +338,90 @@ public class ArtworkController extends BaseController {
 
         return resultMap;
     }
+
+
+    /**
+     * 艺术家发起新的项目接口
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/initNewArtWork.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map initNewArtWork(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("guestView");
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))
+                    || "".equals(jsonObj.getString("title")) || "".equals(jsonObj.getString("brief")) || "".equals(jsonObj.getString("duration"))
+                    || "".equals(jsonObj.getString("userId"))) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            //校验数字签名
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("userId",jsonObj.getString("userId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            treeMap.put("title",jsonObj.getString("title"));
+            treeMap.put("brief", jsonObj.getString("brief"));
+            treeMap.put("duration",jsonObj.getString("duration"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("username",request.getParameter("username").toString());
+            BigUser user;
+            try {
+                user = (BigUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_BIGUSER_GET, map);
+                if (user!=null && user.getId()!=null) {
+                    MultipartFile headPortrait = ((MultipartHttpServletRequest) request).getFile("headPortrait");
+                    String fileType = "";
+                    if(headPortrait.getContentType().contains("jpg")){
+                        fileType = ".jpg";
+                    }else if(headPortrait.getContentType().contains("jpeg")){
+                        fileType = ".jpeg";
+                    }else if(headPortrait.getContentType().contains("png")||headPortrait.getContentType().contains("PNG")){
+                        fileType = ".png";
+                    }else if(headPortrait.getContentType().contains("gif")){
+                        fileType = ".gif";
+                    }
+                    String url = "headPortrait/" + request.getParameter("username").toString() + fileType;
+                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
+                    //将用户头像上传至阿里云
+                    aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi2",url);
+                    user.setName2(request.getParameter("username").toString());
+                    user.setSex(Integer.parseInt(request.getParameter("sex").toString()));
+                    user.setPictureUrl(pictureUrl);
+                    baseManager.saveOrUpdate(BigUser.class.getName(),user);
+                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap.put("headPortraitURI",pictureUrl);
+                    return resultMap;
+                }else {
+                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+            }
+
+
+        } catch(Exception e){
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
+        //return resultMap;
+    }
+
+
+
+
+
     public  static  void  main(String [] arg) throws Exception {
 
 
