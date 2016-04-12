@@ -7,6 +7,7 @@ import com.efeiyi.ec.art.organization.model.User;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/1/25.
@@ -22,7 +23,7 @@ public class ArtworkMessage implements Serializable{//项目动态
     private Date createDatetime;
     private Artwork artwork;
     private String status;
-
+    private List<ArtworkMessageAttachment> artworkMessageAttachments;
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -78,6 +79,15 @@ public class ArtworkMessage implements Serializable{//项目动态
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artworkMessage")
+    public List<ArtworkMessageAttachment> getArtworkMessageAttachments() {
+        return artworkMessageAttachments;
+    }
+
+    public void setArtworkMessageAttachments(List<ArtworkMessageAttachment> artworkMessageAttachments) {
+        this.artworkMessageAttachments = artworkMessageAttachments;
     }
 }
 
