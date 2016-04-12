@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -59,6 +60,8 @@ public class ArtworkController extends BaseController {
 
     @Autowired
     AliOssUploadManager aliOssUploadManager;
+
+
 
     @RequestMapping(value = "/app/getArtWorkList.do", method = RequestMethod.POST)
     @ResponseBody
@@ -341,7 +344,7 @@ public class ArtworkController extends BaseController {
 
 
     /**
-     * 艺术家发起新的项目接口
+     * 艺术家发起新的项目接口 一
      * @param request
      * @return
      */
@@ -358,7 +361,7 @@ public class ArtworkController extends BaseController {
             logBean.setApiName("guestView");
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))
                     || "".equals(jsonObj.getString("title")) || "".equals(jsonObj.getString("brief")) || "".equals(jsonObj.getString("duration"))
-                    || "".equals(jsonObj.getString("userId"))) {
+            || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("investGoalMoney"))) {
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             //校验数字签名
@@ -373,35 +376,63 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
-            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("username",request.getParameter("username").toString());
-            BigUser user;
+
+            User user = (User) baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
             try {
-                user = (BigUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_BIGUSER_GET, map);
                 if (user!=null && user.getId()!=null) {
-                    MultipartFile headPortrait = ((MultipartHttpServletRequest) request).getFile("headPortrait");
+                /*    CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+                    //判断 request 是否有文件上传,即多部分请求
+                    if(multipartResolver.isMultipart(request)) {
+                        //转换成多部分request
+                        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+                        //取得request中的所有文件名
+                        Iterator<String> iter = multiRequest.getFileNames();
+                        while (iter.hasNext()) {
+                            //取得上传文件
+                            MultipartFile file = multiRequest.getFile(iter.next());
+                            if (file != null) {
+                                //取得当前上传文件的文件名称
+                                String myFileName = file.getOriginalFilename();
+                                //如果名称不为“”,说明该文件存在，否则说明该文件不存在
+                                if (myFileName.trim() != "") {
+
+                                    //重命名上传后的文件名
+
+                                }
+                            }
+
+                           }
+                       }*/
+                    Artwork artwork = new Artwork();
+                    artwork.setType("0");
+                    artwork.setStep("10");
+                    artwork.setTitle(jsonObj.getString("title"));
+                    artwork.setBrief(jsonObj.getString("brief"));
+                    artwork.setDuration(jsonObj.getInteger("duration"));
+                    artwork.setCreateDatetime(new Date());
+                    artwork.setInvestGoalMoney(jsonObj.getBigDecimal("investGoalMoney"));
+                    MultipartFile artwork_img = ((MultipartHttpServletRequest) request).getFile("picture_url");
                     String fileType = "";
-                    if(headPortrait.getContentType().contains("jpg")){
+                    if(artwork_img.getContentType().contains("jpg")){
                         fileType = ".jpg";
-                    }else if(headPortrait.getContentType().contains("jpeg")){
+                    }else if(artwork_img.getContentType().contains("jpeg")){
                         fileType = ".jpeg";
-                    }else if(headPortrait.getContentType().contains("png")||headPortrait.getContentType().contains("PNG")){
+                    }else if(artwork_img.getContentType().contains("png")||artwork_img.getContentType().contains("PNG")){
                         fileType = ".png";
-                    }else if(headPortrait.getContentType().contains("gif")){
+                    }else if(artwork_img.getContentType().contains("gif")){
                         fileType = ".gif";
                     }
-                    String url = "headPortrait/" + request.getParameter("username").toString() + fileType;
+                    String url = "artwork/" + new  Date().getTime() + fileType;
                     String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
-                    //将用户头像上传至阿里云
-                    aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi2",url);
-                    user.setName2(request.getParameter("username").toString());
-                    user.setSex(Integer.parseInt(request.getParameter("sex").toString()));
-                    user.setPictureUrl(pictureUrl);
-                    baseManager.saveOrUpdate(BigUser.class.getName(),user);
+                    //将图片上传至阿里云
+                    aliOssUploadManager.uploadFile(artwork_img,"ec-efeiyi2",url);
+                    artwork.setPicture_url(pictureUrl);
+                    artwork.setAuthor(user);
+                    baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
                     resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-                    resultMap.put("headPortraitURI",pictureUrl);
+                    resultMap.put("userId",user.getId());
                     return resultMap;
-                }else {
+                        }else {
                     return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
                 }
             } catch (Exception e) {
@@ -415,7 +446,6 @@ public class ArtworkController extends BaseController {
             return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
 
-        //return resultMap;
     }
 
 
