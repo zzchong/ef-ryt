@@ -20,20 +20,22 @@
 </head>
 <body>
 <jsp:include page="/do/generateTabs.do?qm=${requestScope.qm}&conditions=${requestScope.conditions}"/>
+<jsp:include page="/layouts/myConfirm.jsp"/>
+<jsp:include page="/layouts/myReject.jsp"/>
 <table>
     <tr>
-        <td width="20%">操作</td>
-        <td width="15%">项目名称</td>
+        <td width="25%">操作</td>
+        <td width="10%">项目名称</td>
         <td width="10%">发起人</td>
-        <td width="10%">当前状态</td>
-        <td width="15%">融资金额(元)</td>
+        <td width="15%">当前状态</td>
+        <td width="10%">融资金额(元)</td>
         <td width="10%">投资人数</td>
         <td width="5%">排序</td>
         <td width="15%">项目创建时间</td>
     </tr>
 
     <c:forEach items="${requestScope.pageInfo.list}" var="artwork">
-        <tr id="${artwork.id}">
+        <tr>
             <td>
                 <div class="am-btn-toolbar">
                     <div class="am-btn-group am-btn-group-xs" style="width: 100%;">
@@ -46,14 +48,27 @@
                         <button onclick="showConfirm('提示','排序是什么鬼？',function(){alert('unknown operation');})"
                                 class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 排序
                         </button>
+                        <c:if test="${artwork.step == 23}">
+                            <span id="${artwork.id}">
+                                <button onclick="showConfirm('提示','确定项目完成吗',function(){changeStatus('${artwork.id}',{'id': '${artwork.id}', 'clazz': 'com.efeiyi.ec.art.model.Artwork','step':'30'})})"
+                                        class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 确认完成
+                                </button>
+                                <button onclick="myReject('${artwork.id}','com.efeiyi.ec.art.model.Artwork','25')"
+                                        class="am-btn am-btn-default am-btn-xs am-hide-sm-only"> 驳回
+                                </button>
+                            </span>
+                        </c:if>
                     </div>
                 </div>
             </td>
             <td>${artwork.title}</td>
             <td>${artwork.author.name}</td>
-            <td><ming800:status name="orderType" dataType="Artwork.step"
+            <td><ming800:status name="type" dataType="Artwork.type"
+                                checkedValue="${artwork.type}"
+                                type="normal"/>
+                <font color="red"><ming800:status name="step" dataType="Artwork.step"
                                 checkedValue="${artwork.step}"
-                                type="normal"/></td>
+                                type="normal"/></font></td>
             <td>${artwork.investsMoney}/${artwork.investGoalMoney}</td>
             <td>${artwork.auctionNum}</td>
             <td>${artwork.sorts}</td>
@@ -79,10 +94,10 @@
     function myRemove(id, clazz) {
         $.ajax({
             type: "get",
-            url: '<c:url value="/remove.do?id="/>' + id + "&clazz=" + clazz + '',
+            url: '<c:url value="/remove.do"/>',
             cache: false,
 //            dataType: "json",
-            data: {id: id},
+            data: {"id": id, "clazz": clazz},
             success: function (data) {
                 console.log(data);
                 $("#" + id).remove();
@@ -91,29 +106,41 @@
                 console.log(eval(a).responseText);
             }
         });
+        e
     }
-    function changeStatus(obj, id) {
-        var status = $(obj).attr("status");
+    function changeStatus(id, jsonData) {
         $.ajax({
             type: "get",
-            url: '<c:url value="/product/project/updateStatus.do"/>',
+            url: '<c:url value="/updateObject.do"/>',
             cache: false,
-            dataType: "json",
-            data: {id: id, status: status},
+//            dataType: "json",
+            data: jsonData,
             success: function (data) {
-                $(obj).attr("status", data);
-                if (status == "1") {
-                    $(obj).find("span").text("隐藏");
-                    $(obj).attr("status", "2");
+                if ($("#" + id) != "undefine") {
+                    $("#" + id).remove();
                 }
-                if (status == "2") {
-                    $(obj).find("span").text("显示");
-                    $(obj).attr("status", "1");
-                }
+            },
+            error: function (a, b, c) {
+                console.log(eval(a).responseText);
             }
         });
     }
-
+    function myReject(id, clazz, step) {
+        $('#my-reject').modal({
+            relatedTarget: this,
+            onConfirm: function (e) {
+                var message = e.data || "";
+                if (null == message || message.trim() == "") {
+                    alert("驳回意见为必填项!");
+                } else {
+                    var jsonDate = {"id": id, "clazz": clazz, "step": step, "feedback": message};
+                    changeStatus(id, jsonDate);
+                }
+            },
+            onCancel: function (e) {
+            }
+        });
+    }
 </script>
 </body>
 </html>
