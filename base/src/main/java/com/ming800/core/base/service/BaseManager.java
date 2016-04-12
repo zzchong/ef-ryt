@@ -58,6 +58,8 @@ public interface BaseManager {
 
     Object executeSql(String type, String queryStr, LinkedHashMap<String, Object> queryParamMap);
 
+    Object executeHql(String type, String queryStr, LinkedHashMap<String, Object> queryParamMap);
+
     Map<Field, List<StatusTypeItem>> listStatusType(String entityName, List<String> fieldNameList);
 
     Map<Field, List<StatusTypeItem>> listStatusType(String entityName, String[] fieldNameList);

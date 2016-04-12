@@ -41,5 +41,5 @@ public interface XdoDao {
 
     Object executeSql(String type, String queryStr, LinkedHashMap<String, Object> queryParamMap);
 
-
+    Object executeHql(String type, String queryStr, LinkedHashMap<String, Object> queryParamMap);
 }
