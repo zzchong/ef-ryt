@@ -36,6 +36,7 @@ public class Artwork implements Serializable {
     private List<ArtworkAttachment> artworkAttachment;
     private List<ArtworkComment> artworkComments;//项目评论
     private List<ArtworkInvest> artworkInvests;//项目投资
+    private List<ArtworkMessage> artworkMessages;//项目制作动态
     private ArtworkDraw artworkDraw;
     private String picture_url;
     private String step; //1 : 审核阶段
@@ -162,6 +163,16 @@ public class Artwork implements Serializable {
     public void setArtworkComments(List<ArtworkComment> artworkComments) {
         this.artworkComments = artworkComments;
     }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    public List<ArtworkMessage> getArtworkMessages() {
+        return artworkMessages;
+    }
+
+    public void setArtworkMessages(List<ArtworkMessage> artworkMessages) {
+        this.artworkMessages = artworkMessages;
+    }
+
     @OneToOne(mappedBy = "artwork")
     public ArtworkDraw getArtworkDraw() {
         return artworkDraw;

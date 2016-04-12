@@ -21,6 +21,7 @@ public class ArtworkMessage implements Serializable{//项目动态
     private User creator;
     private Date createDatetime;
     private Artwork artwork;
+    private String status;
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -68,6 +69,15 @@ public class ArtworkMessage implements Serializable{//项目动态
 
     public void setArtwork(Artwork artwork) {
         this.artwork = artwork;
+    }
+
+    @Column(name = "status")
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
 
