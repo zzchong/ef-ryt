@@ -53,6 +53,8 @@ public class Artwork implements Serializable {
     private User winner;//竞拍得主
     private String feedback;//审批意见
     private Integer duration;//创作时长
+
+    private Artworkdirection artworkdirection;
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -329,5 +331,15 @@ public class Artwork implements Serializable {
 
     public void setDuration(Integer duration) {
         this.duration = duration;
+    }
+
+    @OneToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
+    @JoinColumn(name = "artwork_direction_id")
+    public Artworkdirection getArtworkdirection() {
+        return artworkdirection;
+    }
+
+    public void setArtworkdirection(Artworkdirection artworkdirection) {
+        this.artworkdirection = artworkdirection;
     }
 }
