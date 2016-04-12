@@ -11,10 +11,12 @@
             <fields>
                 <field name="type" label="项目阶段" inputType="text">
                     <statusType fieldName="type">
+                        <item label="发起阶段" value="0"/>
                         <item label="融资阶段" value="1"/>
                         <item label="制作阶段" value="2"/>
                         <item label="拍卖阶段" value="3"/>
                         <item label="抽奖阶段" value="4"/>
+                        <item label="驳回" value="5"/>
                     </statusType>
                 </field>
                 <field name="step" label="项目阶段状态" inputType="text">

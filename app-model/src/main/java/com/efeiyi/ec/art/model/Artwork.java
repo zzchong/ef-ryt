@@ -41,7 +41,7 @@ public class Artwork implements Serializable {
     private String step; //1 : 审核阶段
     private BigDecimal investsMoney;//已筹金额
     private Date creationEndDatetime;//创作完成时间=融资结束时间+30(默认)
-    private String type;//1 融资阶段  2 制作阶段  3 拍卖阶段  4 抽奖阶段
+    private String type;//1 融资阶段  2 制作阶段  3 拍卖阶段  4 抽奖阶段   0 发起 5驳回
 
     private String newCreationDate;//最新创作时间
 
@@ -51,6 +51,7 @@ public class Artwork implements Serializable {
     private  String sorts;//排序
     private User winner;//竞拍得主
     private String feedback;//审批意见
+    private Integer duration;//创作时长
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -309,5 +310,13 @@ public class Artwork implements Serializable {
 
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+    @Column(name = "duration")
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 }
