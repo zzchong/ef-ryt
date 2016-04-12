@@ -1,8 +1,8 @@
 package com.efeiyi.ec.system.organization.dao.hibernate;
 
 
-import com.efeiyi.ec.system.organization.model.BigUser;
-import com.efeiyi.ec.system.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.BigUser;
+import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.system.organization.dao.UserDao;
 import com.ming800.core.base.dao.hibernate.BaseDaoSupport;
 import org.hibernate.Query;

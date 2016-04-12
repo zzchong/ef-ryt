@@ -1,7 +1,7 @@
 package com.efeiyi.ec.system.organization.service.impl;
 
 import com.efeiyi.ec.art.model.Master;
-import com.efeiyi.ec.system.organization.model.User;
+import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.system.organization.OrganizationConst;
 import com.efeiyi.ec.system.organization.service.BranchManager;
 import com.ming800.core.base.dao.XdoDao;

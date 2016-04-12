@@ -1,7 +1,7 @@
 package com.efeiyi.ec.system.organization.controller;
 
-import com.efeiyi.ec.system.organization.model.Permission;
-import com.efeiyi.ec.system.organization.model.Role;
+import com.efeiyi.ec.art.organization.model.Permission;
+import com.efeiyi.ec.art.organization.model.Role;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.Module;
 import com.ming800.core.does.service.ModuleManager;

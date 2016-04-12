@@ -1,7 +1,7 @@
 package com.efeiyi.ec.system.organization.controller;
 
-import com.efeiyi.ec.system.organization.model.Permission;
-import com.efeiyi.ec.system.organization.model.Role;
+import com.efeiyi.ec.art.organization.model.Permission;
+import com.efeiyi.ec.art.organization.model.Role;
 import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.base.service.XdoManager;

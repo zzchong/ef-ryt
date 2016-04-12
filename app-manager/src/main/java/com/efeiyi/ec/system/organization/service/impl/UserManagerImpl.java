@@ -1,7 +1,7 @@
 package com.efeiyi.ec.system.organization.service.impl;
 
-import com.efeiyi.ec.system.organization.model.BigUser;
-import com.efeiyi.ec.system.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.BigUser;
+import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.system.organization.OrganizationConst;
 import com.efeiyi.ec.system.organization.dao.UserDao;
 import com.efeiyi.ec.system.organization.service.UserManager;

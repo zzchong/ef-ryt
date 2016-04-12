@@ -1,7 +1,7 @@
 package com.efeiyi.ec.system.organization;
 
 
-import com.efeiyi.ec.system.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.MyUser;
 import com.ming800.core.base.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

@@ -3,7 +3,7 @@ package com.efeiyi.ec.system.organization.service;
 
 
 import com.efeiyi.ec.art.model.Master;
-import com.efeiyi.ec.system.organization.model.User;
+import com.efeiyi.ec.art.organization.model.User;
 
 import java.util.List;
 

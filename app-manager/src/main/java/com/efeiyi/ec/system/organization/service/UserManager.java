@@ -1,6 +1,6 @@
 package com.efeiyi.ec.system.organization.service;
 
-import com.efeiyi.ec.system.organization.model.BigUser;
+import com.efeiyi.ec.art.organization.model.BigUser;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.taglib.PageEntity;
 

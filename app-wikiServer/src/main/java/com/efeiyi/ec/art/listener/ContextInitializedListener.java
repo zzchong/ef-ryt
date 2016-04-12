@@ -1,7 +1,7 @@
 package com.efeiyi.ec.art.listener;
 
 import com.efeiyi.ec.art.base.util.ContextUtils;
-import com.efeiyi.ec.art.model.Capture;
+import com.efeiyi.ec.art.base.util.Capture;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
