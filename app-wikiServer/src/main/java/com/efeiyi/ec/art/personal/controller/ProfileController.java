@@ -44,6 +44,7 @@ public class ProfileController extends BaseController {
     ResultMapHandler resultMapHandler;
     @Autowired
     private XdoDaoSupport xdoDao;
+
     /**
      * 获取用户资料
      *
@@ -259,19 +260,20 @@ public class ProfileController extends BaseController {
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-            MyUser myUser = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
-            myUser.setName(name);
-            myUser.setUsername(username);
             Master master = new Master();
-//            master.setStatus("1");
+            master.setTheStatus("1");
             AddressProvince addressProvince = (AddressProvince) baseManager.getObject(AddressProvince.class.getName(), province);
             master.setOriginProvince(addressProvince);
             master.setProvinceName(provinceName);
             master.setArtCategory(artCategory);
             master.setTitleCertificate(titleCertificate);
+            User user = (User) baseManager.getObject(User.class.getName(), userId);
+            master.setUser(user);
+            System.out.print(master.getId());
             baseManager.saveOrUpdate(Master.class.getName(), master);
-            baseManager.saveOrUpdate(MyUser.class.getName(), myUser);
-
+            user.setMaster(master);
+            baseManager.saveOrUpdate(User.class.getName(), user);
+            resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
@@ -287,39 +289,60 @@ public class ProfileController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/app/uploadFile.do", method = RequestMethod.POST)
-    public String uploadFile(HttpServletRequest request , String userId) {
-//        Master master = (Master) baseManager.getObject(Master.class.getName(),userId);
-        MyUser myUser = new MyUser();
-        baseManager.saveOrUpdate(MyUser.class.getName(),myUser);
-        Master master = new Master();
-        master.setId(myUser.getId());
-        baseManager.saveOrUpdate(Master.class.getName(),master);
-/*
-        MultipartHttpServletRequest multipartRequest =  (MultipartHttpServletRequest) request;
-        List<MultipartFile> oneList = multipartRequest.getFiles("one");
-        List<MultipartFile> twoList = multipartRequest.getFiles("two");
-        if (!oneList.isEmpty()){
-            uploadFilePath(oneList,master,"1");
+    public Map uploadFile(HttpServletRequest request) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        LogBean logBean = new LogBean();
+        TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj;
+        try {
+            jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            String signmsg = jsonObj.getString("signmsg");
+            String timestamp = jsonObj.getString("timestamp");
+            String userId = jsonObj.getString("userId");
+            if ("".equals(signmsg) || "".equals(timestamp) || "".equals(userId)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            treeMap.put("userId", userId);
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (!verify) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            String querySql = "from Master m where m.user.id=:userId and m.theStatus = '1'";
+            LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
+            queryMap.put("userId", userId);
+            Master master = (Master) baseManager.getUniqueObjectByConditions(querySql, queryMap);
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+            List<MultipartFile> oneList = multipartRequest.getFiles("one");
+            List<MultipartFile> twoList = multipartRequest.getFiles("two");
+            if (!oneList.isEmpty()) {
+                uploadFilePath(oneList, master, "1");
+            }
+            if (!twoList.isEmpty()) {
+                uploadFilePath(twoList, master, "2");
+            }
+            resultMapHandler.handlerResult("0", "成功", logBean);
+        } catch (Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
-        if (!twoList.isEmpty()){
-            uploadFilePath(twoList,master,"2");
-        }*/
-        return null;
+        return resultMap;
     }
 
-    public String uploadFilePath(List<MultipartFile> list , Master master , String msg){
+    public String uploadFilePath(List<MultipartFile> list, Master master, String msg) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         String identify = sdf.format(new Date());
         List<ArtMasterAttachment> attachmentList = new ArrayList<>(3);
         String url;
         String pictureUrl;
-        if (!list.isEmpty()){
-            for (MultipartFile mf : list){
+        if (!list.isEmpty()) {
+            for (MultipartFile mf : list) {
                 try {
                     String fileName = mf.getOriginalFilename();//获取原文件名
                     String file = fileName.substring(0, fileName.indexOf("."));
                     String prefix = "";
-                    switch (mf.getContentType()){
+                    switch (mf.getContentType()) {
                         case "image/jpg":
                             prefix = ".jpg";
                             break;
@@ -334,23 +357,23 @@ public class ProfileController extends BaseController {
                             break;
                     }
                     url = "master/" + file + identify + prefix;
-                    pictureUrl = "http://rongyitou2.efeiyi.com/"+url+"@!ryt_head_portrai";
+                    pictureUrl = "http://rongyitou2.efeiyi.com/" + url + "@!ryt_head_portrai";
                     aliOssUploadManager.uploadFile(mf, "ec-efeiyi2", url);
                     ArtMasterAttachment attachment = new ArtMasterAttachment();
                     attachment.setMaster(master);
                     attachment.setUrl(pictureUrl);
-                    baseManager.saveOrUpdate(ArtMasterAttachment.class.getName(),attachment);
+                    baseManager.saveOrUpdate(ArtMasterAttachment.class.getName(), attachment);
                     attachmentList.add(attachment);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            if ("1".equals(msg)){
+            if ("1".equals(msg)) {
                 master.setWorksPhotos(attachmentList);
-            }else{
+            } else {
                 master.setWorkShopPhotos(attachmentList);
             }
-            baseManager.saveOrUpdate(Master.class.getName(),master);
+            baseManager.saveOrUpdate(Master.class.getName(), master);
         }
         return "ok";
     }
@@ -380,7 +403,7 @@ public class ProfileController extends BaseController {
             String timestamp = jsonObj.getString("timestamp");
             if ("".equals(signmsg) || "".equals(userId) || "".equals(timestamp)
                     || "".equals(index) || "".equals(size)) {
-                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             treeMap.put("userId", userId);
             treeMap.put("pageIndex", index);
@@ -476,7 +499,7 @@ public class ProfileController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId"))
                     || "".equals(jsonObj.getString("timestamp"))) {
-                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             String userId = jsonObj.getString("userId");
@@ -486,7 +509,15 @@ public class ProfileController extends BaseController {
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-            Master master = (Master) baseManager.getObject(Master.class.getName(), userId);
+            String querySql = "from Master m where m.user.id=:userId and m.theStatus = '1'";
+            LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
+            queryMap.put("userId", userId);
+            Master master = (Master) baseManager.getUniqueObjectByConditions(querySql, queryMap);
+            if (master != null && master.getId() != null) {
+                resultMap.put("master", master);
+            } else {
+                resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
+            }
             System.out.println(master);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
