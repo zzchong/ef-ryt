@@ -14,7 +14,6 @@ import java.util.List;
 
 /**
  * Created by Administrator on 2016/1/25.
- *
  */
 @Entity
 @Table(name = "app_art_work")
@@ -31,12 +30,13 @@ public class Artwork implements Serializable {
     private Date auctionStartDatetime;//拍卖开始时间
     private Date auctionEndDatetime;
     private User author;
-//    private Master master;
+    //    private Master master;
     private Date createDatetime;
     private List<ArtworkAttachment> artworkAttachment;
     private List<ArtworkComment> artworkComments;//项目评论
     private List<ArtworkInvest> artworkInvests;//项目投资
-    private List<ArtworkMessage> artworkMessages;//项目制作动态
+    private List<ArtworkMessage> artworkMessages;//项目制作动态 //后台制作动态查询应用
+    private List<ArtworkBidding> artworkBiddings;//项目竞价记录 //艺术家个人信息统计应用
     private ArtworkDraw artworkDraw;
     private String picture_url;
     private String step; //1 : 审核阶段
@@ -46,15 +46,16 @@ public class Artwork implements Serializable {
 
     private String newCreationDate;//最新创作时间
 
-    private  Integer  auctionNum;//竞价记录次数
-    private  BigDecimal newBidingPrice;//最新竞价价格
-    private  String newBiddingDate;//最新出价时间
-    private  String sorts;//排序
+    private Integer auctionNum;//竞价记录次数
+    private BigDecimal newBidingPrice;//最新竞价价格
+    private String newBiddingDate;//最新出价时间
+    private String sorts;//排序
     private User winner;//竞拍得主
     private String feedback;//审批意见
     private Integer duration;//创作时长
 
     private Artworkdirection artworkdirection;
+
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -65,6 +66,7 @@ public class Artwork implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
     @Column(name = "title")
     public String getTitle() {
         return title;
@@ -73,6 +75,7 @@ public class Artwork implements Serializable {
     public void setTitle(String title) {
         this.title = title;
     }
+
     @Column(name = "brief")
     public String getBrief() {
         return brief;
@@ -81,6 +84,7 @@ public class Artwork implements Serializable {
     public void setBrief(String brief) {
         this.brief = brief;
     }
+
     @Column(name = "status")
     public String getStatus() {
         return status;
@@ -89,6 +93,7 @@ public class Artwork implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
     @Column(name = "invest_goal_money")
     public BigDecimal getInvestGoalMoney() {
         return investGoalMoney;
@@ -97,6 +102,7 @@ public class Artwork implements Serializable {
     public void setInvestGoalMoney(BigDecimal investGoalMoney) {
         this.investGoalMoney = investGoalMoney;
     }
+
     @Column(name = "invest_start_datetime")
     public Date getInvestStartDatetime() {
         return investStartDatetime;
@@ -105,6 +111,7 @@ public class Artwork implements Serializable {
     public void setInvestStartDatetime(Date investStartDatetime) {
         this.investStartDatetime = investStartDatetime;
     }
+
     @Column(name = "invest_end_datetime")
     public Date getInvestEndDatetime() {
         return investEndDatetime;
@@ -113,6 +120,7 @@ public class Artwork implements Serializable {
     public void setInvestEndDatetime(Date investEndDatetime) {
         this.investEndDatetime = investEndDatetime;
     }
+
     @Column(name = "auction_start_datetime")
     public Date getAuctionStartDatetime() {
         return auctionStartDatetime;
@@ -121,6 +129,7 @@ public class Artwork implements Serializable {
     public void setAuctionStartDatetime(Date auctionStartDatetime) {
         this.auctionStartDatetime = auctionStartDatetime;
     }
+
     @Column(name = "auction_end_datetime")
     public Date getAuctionEndDatetime() {
         return auctionEndDatetime;
@@ -139,6 +148,7 @@ public class Artwork implements Serializable {
     public void setAuthor(User author) {
         this.author = author;
     }
+
     @Column(name = "create_datetime")
     public Date getCreateDatetime() {
         return createDatetime;
@@ -157,8 +167,9 @@ public class Artwork implements Serializable {
     public void setArtworkAttachment(List<ArtworkAttachment> artworkAttachment) {
         this.artworkAttachment = artworkAttachment;
     }
-    @OneToMany(fetch = FetchType.LAZY,cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
-            CascadeType.REMOVE }, mappedBy = "artwork")
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REFRESH,
+            CascadeType.REMOVE}, mappedBy = "artwork")
     public List<ArtworkComment> getArtworkComments() {
         return artworkComments;
     }
@@ -176,6 +187,16 @@ public class Artwork implements Serializable {
         this.artworkMessages = artworkMessages;
     }
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    @OrderBy(value = "createDatetime desc")
+    public List<ArtworkBidding> getArtworkBiddings() {
+        return artworkBiddings;
+    }
+
+    public void setArtworkBiddings(List<ArtworkBidding> artworkBiddings) {
+        this.artworkBiddings = artworkBiddings;
+    }
+
     @OneToOne(mappedBy = "artwork")
     public ArtworkDraw getArtworkDraw() {
         return artworkDraw;
@@ -184,6 +205,7 @@ public class Artwork implements Serializable {
     public void setArtworkDraw(ArtworkDraw artworkDraw) {
         this.artworkDraw = artworkDraw;
     }
+
     @Column(name = "picture_url")
     public String getPicture_url() {
         return picture_url;
@@ -213,15 +235,15 @@ public class Artwork implements Serializable {
     }
 
     @Transient
-    public  BigDecimal getInvestsMoney(){
+    public BigDecimal getInvestsMoney() {
         Double temp = 0.00;
-        if(artworkInvests!=null){
-            for(ArtworkInvest artworkInvest :artworkInvests){
+        if (artworkInvests != null) {
+            for (ArtworkInvest artworkInvest : artworkInvests) {
                 temp += artworkInvest.getPrice().doubleValue();
             }
             investsMoney = new BigDecimal(temp);
         }
-        return  investsMoney;
+        return investsMoney;
     }
 
     public void setInvestsMoney(BigDecimal investsMoney) {
@@ -245,6 +267,7 @@ public class Artwork implements Serializable {
     public void setType(String type) {
         this.type = type;
     }
+
     @Column(name = "description")
     public String getDescription() {
         return description;
@@ -294,7 +317,7 @@ public class Artwork implements Serializable {
 
     @Transient
     public BigDecimal getNewBidingPrice() {
-        return newBidingPrice;
+        return newBidingPrice = artworkBiddings.size() > 0 ? artworkBiddings.get(0).getPrice() : newBidingPrice;
     }
 
     public void setNewBidingPrice(BigDecimal newBidingPrice) {
@@ -309,6 +332,7 @@ public class Artwork implements Serializable {
     public void setNewCreationDate(String newCreationDate) {
         this.newCreationDate = newCreationDate;
     }
+
     @Transient
     public User getWinner() {
         return winner;
@@ -317,6 +341,7 @@ public class Artwork implements Serializable {
     public void setWinner(User winner) {
         this.winner = winner;
     }
+
     @Column(name = "feedback")
     public String getFeedback() {
         return feedback;
@@ -325,6 +350,7 @@ public class Artwork implements Serializable {
     public void setFeedback(String feedback) {
         this.feedback = feedback;
     }
+
     @Column(name = "duration")
     public Integer getDuration() {
         return duration;
@@ -334,7 +360,7 @@ public class Artwork implements Serializable {
         this.duration = duration;
     }
 
-    @OneToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "artwork_direction_id")
     public Artworkdirection getArtworkdirection() {
         return artworkdirection;

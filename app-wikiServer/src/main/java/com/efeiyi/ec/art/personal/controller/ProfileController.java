@@ -15,6 +15,14 @@ import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -526,4 +536,120 @@ public class ProfileController extends BaseController {
         return resultMap;
     }
 
+    @RequestMapping("/app/myArtwork.do")
+    @ResponseBody
+    public Map myArtwork(HttpServletRequest request) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        LogBean logBean = new LogBean();
+        TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj;
+        try {
+            jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            String signmsg = jsonObj.getString("signmsg");
+            String userId = jsonObj.getString("userId");
+            String index = jsonObj.getString("pageIndex");
+            String size = jsonObj.getString("pageSize");
+            String timestamp = jsonObj.getString("timestamp");
+            if ("".equals(signmsg) || "".equals(userId) || "".equals(timestamp)
+                    || "".equals(index) || "".equals(size)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            treeMap.put("userId", userId);
+            treeMap.put("timestamp", timestamp);
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (!verify) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            User user = (User) baseManager.getObject(User.class.getName(), userId);
+
+            //关注列表
+            XQuery beQuery = new XQuery("listArtUserFollowed_followed", request);
+            beQuery.put("user_id", userId);
+            List<ArtUserFollowed> followedList = baseManager.listObject(beQuery);
+            //被关注列表
+            XQuery toQuery = new XQuery("listArtUserFollowed_default", request);
+            toQuery.put("follower_id", userId);
+            List<ArtUserFollowed> toFollowedList = baseManager.listObject(toQuery);
+
+            //获取同一用户所有项目
+            LinkedHashMap queryMap = new LinkedHashMap();
+            queryMap.put("author", user);
+            List<Artwork> artworkList = baseManager.listObject(AppConfig.GET_ART_WORK_BY_ARTIST, queryMap);
+
+            //同一用户所有项目的总金额
+            BigDecimal sumInvestsMoney = new BigDecimal("0.00");
+            for (Artwork artwork : artworkList) {
+                sumInvestsMoney = sumInvestsMoney.add(artwork.getInvestsMoney());
+            }
+            //同一用户所有项目拍卖总金额
+            BigDecimal reward = new BigDecimal("0.00");
+            for (Artwork artwork : artworkList) {
+                reward = reward.add(artwork.getNewBidingPrice());
+            }
+
+            ConvertArtWork convert = ConvertArtWorkUtil.convert2(artworkList,followedList.size(), toFollowedList.size(), sumInvestsMoney, reward, user);
+            resultMapHandler.handlerResult("0", "请求成功", logBean);
+            resultMap.put("pageInfo", convert);
+            System.out.print(resultMap);
+
+        } catch (Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
+
+    public static void main(String[] arg) throws Exception {
+
+
+        String appKey = "BL2QEuXUXNoGbNeHObD4EzlX+KuGc70U";
+        long timestamp = System.currentTimeMillis();
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        /**artWorkCreationList.do测试加密参数**/
+//        map.put("pageNum","1");
+//        map.put("pageSize","5");
+        /**artWorkCreationView.do测试加密参数**/
+        map.put("userId", "igxhnwhnmhlwkvnw");
+        map.put("timestamp", timestamp);
+        String signmsg = DigitalSignatureUtil.encrypt(map);
+        HttpClient httpClient = new DefaultHttpClient();
+        String url = "http://192.168.1.41:8080/app/myArtwork.do";
+        HttpPost httppost = new HttpPost(url);
+        httppost.setHeader("Content-Type", "application/json;charset=utf-8");
+
+        /**json参数  artWorkCreationList.do测试 **/
+//        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        /**json参数  artWorkCreationView.do测试 **/
+        String json = "{\"userId\":\"igxhnwhnmhlwkvnw\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
+        String jsonString = jsonObj.toJSONString();
+
+        StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
+        stringEntity.setContentType("text/json");
+        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        httppost.setEntity(stringEntity);
+        System.out.println("url:  " + url);
+        try {
+            byte[] b = new byte[(int) stringEntity.getContentLength()];
+            System.out.println(stringEntity);
+            stringEntity.getContent().read(b);
+            System.out.println("报文:" + new String(b, "utf-8"));
+            HttpResponse response = httpClient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    entity.getContent(), "UTF-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            System.out.println(line);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
