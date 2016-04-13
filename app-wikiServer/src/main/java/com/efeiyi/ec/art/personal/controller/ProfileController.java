@@ -549,11 +549,12 @@ public class ProfileController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             String signmsg = jsonObj.getString("signmsg");
             String userId = jsonObj.getString("userId");
-            String index = jsonObj.getString("pageIndex");
-            String size = jsonObj.getString("pageSize");
+//            String index = jsonObj.getString("pageIndex");
+//            String size = jsonObj.getString("pageSize");
             String timestamp = jsonObj.getString("timestamp");
             if ("".equals(signmsg) || "".equals(userId) || "".equals(timestamp)
-                    || "".equals(index) || "".equals(size)) {
+//                    || "".equals(index) || "".equals(size)
+                    ) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             treeMap.put("userId", userId);
