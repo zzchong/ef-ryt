@@ -157,7 +157,8 @@ public class Artwork implements Serializable {
     public void setArtworkAttachment(List<ArtworkAttachment> artworkAttachment) {
         this.artworkAttachment = artworkAttachment;
     }
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    @OneToMany(fetch = FetchType.LAZY,cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
+            CascadeType.REMOVE }, mappedBy = "artwork")
     public List<ArtworkComment> getArtworkComments() {
         return artworkComments;
     }
