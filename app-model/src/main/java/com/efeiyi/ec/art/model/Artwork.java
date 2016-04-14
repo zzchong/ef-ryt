@@ -170,6 +170,7 @@ public class Artwork implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REFRESH,
             CascadeType.REMOVE}, mappedBy = "artwork")
+    @JsonIgnore
     public List<ArtworkComment> getArtworkComments() {
         return artworkComments;
     }
@@ -178,6 +179,7 @@ public class Artwork implements Serializable {
         this.artworkComments = artworkComments;
     }
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
     public List<ArtworkMessage> getArtworkMessages() {
         return artworkMessages;
@@ -189,6 +191,7 @@ public class Artwork implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
     @OrderBy(value = "createDatetime desc")
+    @JsonIgnore
     public List<ArtworkBidding> getArtworkBiddings() {
         return artworkBiddings;
     }
@@ -224,7 +227,7 @@ public class Artwork implements Serializable {
         this.step = step;
     }
 
-//    @JsonIgnore
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
     public List<ArtworkInvest> getArtworkInvests() {
         return artworkInvests;
