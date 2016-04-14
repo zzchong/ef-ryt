@@ -188,7 +188,7 @@ public class ArtworkController extends BaseController {
             List<ArtworkComment> artworkCommentList = null;
             //投资记录列表
             List<ArtworkInvest> artworkInvestList = null;
-            if("index".equals(jsonObj.getString("tab"))){
+            if("view".equals(jsonObj.getString("tab"))){
                 artworkdirection = artwork.getArtworkdirection();
                 artworkAttachmentList = artwork.getArtworkAttachment();
             }else if("comment".equals(jsonObj.getString("tab"))){
