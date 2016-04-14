@@ -206,6 +206,11 @@ public class BaseManagerImpl implements BaseManager {
         return xdoDao.executeSql(type, queryStr, queryParamMap);  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public Object executeHql(String type, String queryStr, LinkedHashMap<String, Object> queryParamMap) {
+        return xdoDao.executeHql(type, queryStr, queryParamMap);  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 /*    @Override
     public Boolean executeBranchData(String name) {
 

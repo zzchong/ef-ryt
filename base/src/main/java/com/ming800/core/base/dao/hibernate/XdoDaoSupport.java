@@ -114,6 +114,18 @@ public class XdoDaoSupport implements XdoDao {
     }
 
     @Override
+    public Object executeHql(String type, String queryStr, LinkedHashMap<String, Object> queryParamMap) {
+        Query listQuery = this.getSession().createQuery(queryStr);
+        listQuery = setQueryParams(listQuery, queryParamMap);
+
+        if ("list".equals(type)) {
+            return listQuery.list();
+        } else {
+            return listQuery.executeUpdate();
+        }
+    }
+
+    @Override
     public List getObjectList(String queryHql, LinkedHashMap<String, Object> queryParamMap) {
 
         Query listQuery = this.getSession().createQuery(queryHql);

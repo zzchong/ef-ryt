@@ -202,12 +202,12 @@ public class MessageController extends BaseController {
                     resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                     return resultMap;
                 }else if("0".equals(type)){
-                    String hql = "from Notification WHERE targetUser.id=" +jsonObj.getString("userId") + " AND status<>'0'  order by createDatetime desc";
+                    String hql = "from Notification WHERE targetUser.id=" +"'"+jsonObj.getString("userId").toString()+"'" + " AND status<>'0'  order by isWatch asc,createDatetime desc";
                     objectList =  (List<Notification>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
 //                    objectList =  (List<Notification>)baseManager.listObject(AppConfig.SQL_NOTICE_GET_APP, map);
                 }else if("1".equals(type)){
                     objectList = new ArrayList();
-                    String hql = "from ArtworkComment WHERE fatherComment.creator.id= "+jsonObj.getString("userId") + " AND status<>'0'  order by createDatetime desc";
+                    String hql = "from ArtworkComment WHERE fatherComment.creator.id= "+"'"+jsonObj.getString("userId").toString()+"'" + " AND status<>'0'  order by isWatch asc, createDatetime desc";
                     List<ArtworkComment> objectTempList = (List<ArtworkComment>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
                     for (ArtworkComment artworkComment : objectTempList){
                         ArtworkCommentBean artworkCommentBean = new ArtworkCommentBean();
@@ -254,17 +254,17 @@ public class MessageController extends BaseController {
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
-                    resultMap.put("objectList ",objectList);
+                    resultMap.put("objectList",objectList);
                 }else{
                     logBean.setResultCode("10008");
                     logBean.setMsg("查无数据,稍后再试");
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "10008");
                     resultMap.put("resultMsg", "查无数据,稍后再试");
-                    resultMap.put("objectList ",null);
+                    resultMap.put("objectList",null);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 logBean.setResultCode("10005");
                 logBean.setMsg("查询数据出现异常");
                 baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
@@ -335,14 +335,14 @@ public class MessageController extends BaseController {
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
-                    resultMap.put("objectList ",objectList);
+                    resultMap.put("objectList",objectList);
                 }else{
                     logBean.setResultCode("10008");
                     logBean.setMsg("查无数据,稍后再试");
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "10008");
                     resultMap.put("resultMsg", "查无数据,稍后再试");
-                    resultMap.put("objectList ",null);
+                    resultMap.put("objectList",null);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -374,8 +374,8 @@ public class MessageController extends BaseController {
 //        map.put("userId","2");
 //        map.put("timestamp",timestamp);
         /**information.do测试加密参数**/
-        map.put("userId","2");
-        map.put("type","2");
+        map.put("userId","iijq9f1r7apprtab");
+        map.put("type","0");
         map.put("pageSize","5");
         map.put("pageNum","1");
         map.put("timestamp", timestamp);
@@ -388,13 +388,13 @@ public class MessageController extends BaseController {
 
 
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/information.do";
+        String url = "http://192.168.1.69:8001/app/information.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
         /**json参数  informationList.do测试 **/
 //         String json = "{\"userId\":\"2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  information.do测试 **/
-        String json = "{\"userId\":\"2\",\"type\":\"2\",\"pageSize\":\"5\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"userId\":\"iijq9f1r7apprtab\",\"type\":\"0\",\"pageSize\":\"5\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  commentDetail.do测试 **/
 //        String json = "{\"userId\":\"2\",\"fromUserId\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);

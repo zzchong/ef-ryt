@@ -8,16 +8,15 @@ import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.message.dao.MessageDao;
-import com.efeiyi.ec.art.model.Artwork;
-import com.efeiyi.ec.art.model.ArtworkInvest;
-import com.efeiyi.ec.art.model.InvestReward;
-import com.efeiyi.ec.art.model.Master;
+import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
+import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
+import com.ming800.core.p.service.AliOssUploadManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -32,6 +31,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -52,6 +54,11 @@ public class ArtworkController extends BaseController {
 
     @Autowired
     ResultMapHandler resultMapHandler;
+
+    @Autowired
+    AliOssUploadManager aliOssUploadManager;
+
+
 
     @RequestMapping(value = "/app/getArtWorkList.do", method = RequestMethod.POST)
     @ResponseBody
@@ -331,6 +338,308 @@ public class ArtworkController extends BaseController {
 
         return resultMap;
     }
+
+
+    /**
+     * 艺术家发起新的项目接口 一
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/initNewArtWork.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map initNewArtWork(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try{
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(request.getParameter("title")+" "+request.getParameter("brief"));//************记录请求报文
+            logBean.setApiName("initNewArtWork");
+            if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
+                    || "".equals(request.getParameter("title")) || "".equals(request.getParameter("brief")) || "".equals(request.getParameter("duration"))
+            || "".equals(request.getParameter("userId")) || "".equals(request.getParameter("investGoalMoney"))) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            //校验数字签名
+            String signmsg = request.getParameter("signmsg");
+            treeMap.put("userId",request.getParameter("userId"));
+            treeMap.put("timestamp",request.getParameter("timestamp"));
+            treeMap.put("title",request.getParameter("title"));
+            treeMap.put("investGoalMoney", request.getParameter("investGoalMoney"));
+            treeMap.put("duration",request.getParameter("duration"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
+
+            User user = (User) baseManager.getObject(User.class.getName(),request.getParameter("userId"));
+            try {
+                if (user!=null && user.getId()!=null) {
+
+                    Artwork artwork = new Artwork();
+                    artwork.setStatus("0");//不可用状态，不能进入融资阶段
+                    artwork.setType("0");
+                    artwork.setStep("100");//编辑阶段，尚未提交 提交后置为 10
+                    artwork.setTitle(request.getParameter("title"));
+                    artwork.setBrief(request.getParameter("brief"));
+                    artwork.setDuration(Integer.parseInt(request.getParameter("duration")));
+                    artwork.setCreateDatetime(new Date());
+                    artwork.setInvestGoalMoney(new  BigDecimal(request.getParameter("investGoalMoney")));
+                    MultipartFile artwork_img = ((MultipartHttpServletRequest) request).getFile("picture_url");
+                    String fileType = "";
+                    if(artwork_img.getContentType().contains("jpg")){
+                        fileType = ".jpg";
+                    }else if(artwork_img.getContentType().contains("jpeg")){
+                        fileType = ".jpeg";
+                    }else if(artwork_img.getContentType().contains("png")||artwork_img.getContentType().contains("PNG")){
+                        fileType = ".png";
+                    }else if(artwork_img.getContentType().contains("gif")){
+                        fileType = ".gif";
+                    }
+                    String url = "artwork/" + new  Date().getTime() + fileType;
+                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
+                    //将图片上传至阿里云
+                    aliOssUploadManager.uploadFile(artwork_img,"ec-efeiyi2",url);
+                    artwork.setPicture_url(pictureUrl);
+                    artwork.setAuthor(user);
+                    baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap.put("artworkId",artwork.getId());
+                    return resultMap;
+                        }else {
+                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+            }
+
+
+        } catch(Exception e){
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
+    }
+
+
+    /**
+     * 艺术家发起新的项目接口 二
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/initNewArtWork2.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map initNewArtWork2(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try{
+
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(request.getParameter("artworkId")+" "+request.getParameter("description")
+                    +" "+request.getParameter("timestamp") +" "+request.getParameter("signmsg"));//************记录请求报文
+            logBean.setApiName("initNewArtWork2");
+            if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
+                    || "".equals(request.getParameter("description"))
+                    || "".equals(request.getParameter("artworkId"))
+                   ) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            //校验数字签名
+            String signmsg = request.getParameter("signmsg");
+            treeMap.put("artworkId",request.getParameter("artworkId"));
+            treeMap.put("timestamp", request.getParameter("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
+
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),request.getParameter("artworkId"));
+            try {
+                if (artwork!=null && artwork.getId()!=null) {
+
+                    Artworkdirection artworkdirection = new  Artworkdirection();
+                    artworkdirection.setFinancing_aq(request.getParameter("financing_aq"));
+                    artworkdirection.setMake_instru(request.getParameter("make_instru"));
+                    artwork.setDescription(request.getParameter("description"));
+                    artwork.setArtworkdirection(artworkdirection);
+                    //List<ArtworkAttachment> artworkAttachments = new ArrayList<ArtworkAttachment>();
+
+                    //创建一个通用的多部分解析器
+                    CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+                    //判断 request 是否有文件上传,即多部分请求
+                    if(multipartResolver.isMultipart(request)){
+                        //转换成多部分request
+                        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest)request;
+                        //取得request中的所有文件名
+                        Iterator<MultipartFile> iter = multiRequest.getFiles("file").iterator();
+                        while(iter.hasNext()) {
+                            //取得上传文件
+                            //MultipartFile file = multiRequest.getFile(iter.next());
+                            MultipartFile file = iter.next();
+                            if (file != null) {
+                                ArtworkAttachment artworkAttachment = new ArtworkAttachment();//项目附件
+                                //取得当前上传文件的文件名称
+                                String myFileName = file.getOriginalFilename();
+                                //如果名称不为“”,说明该文件存在，否则说明该文件不存在
+                                if (myFileName.trim() != "") {
+
+                                    //重命名上传后的文件名
+                                    String url = "artwork/"  +new  Date().getTime()+myFileName;
+                                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
+                                    //将图片上传至阿里云
+                                    aliOssUploadManager.uploadFile(file,"ec-efeiyi2",url);
+                                    artworkAttachment.setArtwork(artwork);
+                                    artworkAttachment.setFileType(myFileName.substring(myFileName.lastIndexOf("."),myFileName.length()));
+                                    artworkAttachment.setFileName(pictureUrl);
+                                    //artworkAttachments.add(artworkAttachment);
+                                    baseManager.saveOrUpdate(ArtworkAttachment.class.getName(),artworkAttachment);
+                                    artwork.getArtworkAttachment().add(artworkAttachment);
+                                }
+                            }
+                          }
+                        }
+                    //artwork.setArtworkAttachment(artworkAttachments);
+                    baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap.put("artworkId",artwork.getId());
+                    return resultMap;
+
+                  }else {
+                    return  resultMapHandler.handlerResult("10008","查无数据，稍后再试",logBean);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+            }
+
+
+        } catch(Exception e){
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
+    }
+
+
+
+
+    /**
+     * 艺术家发布项目动态接口
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/releaseArtworkDynamic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map releaseArtworkDynamic(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try{
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(request.getParameter("artworkId")+" ...");//************记录请求报文
+            logBean.setApiName("releaseArtworkDynamic");
+            if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
+
+                    || "".equals(request.getParameter("artworkId"))  || "".equals(request.getParameter("type"))
+                    ) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            //校验数字签名
+            String signmsg = request.getParameter("signmsg");
+            treeMap.put("artworkId",request.getParameter("artworkId"));
+            treeMap.put("timestamp", request.getParameter("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
+
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),request.getParameter("artworkId"));
+            try {
+                if (artwork!=null && artwork.getId()!=null) {
+
+                    ArtworkMessage artworkMessage = new  ArtworkMessage();
+                    artworkMessage.setContent(!"".equals(request.getParameter("content"))?request.getParameter("content"):"");
+                    artworkMessage.setCreator(artwork.getAuthor());
+                    artworkMessage.setArtwork(artwork);
+                    artworkMessage.setCreateDatetime(new Date());
+                    baseManager.saveOrUpdate(ArtworkMessage.class.getName(),artworkMessage);
+                    //List<ArtworkMessageAttachment> artworkMessageAttachments =  new ArrayList<ArtworkMessageAttachment>();//动态附件有可能是多个文件
+                    //创建一个通用的多部分解析器
+                    CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+                    //判断 request 是否有文件上传,即多部分请求
+                    if(multipartResolver.isMultipart(request)){
+                        //转换成多部分request
+                        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest)request;
+                        //取得request中的所有文件名
+                        Iterator<String> iter = multiRequest.getFileNames();
+                        while(iter.hasNext()) {
+                            //取得上传文件
+                            MultipartFile file = multiRequest.getFile(iter.next());
+                            if (file != null) {
+                                ArtworkMessageAttachment artworkMessageAttachment = new ArtworkMessageAttachment();//动态附件
+                                //取得当前上传文件的文件名称
+                                String myFileName = file.getOriginalFilename();
+                                //如果名称不为“”,说明该文件存在，否则说明该文件不存在
+                                if (myFileName.trim() != "") {
+                                    //重命名上传后的文件名
+                                    StringBuilder url = new StringBuilder("artwork/");
+
+                                    if("0".equals(request.getParameter("type"))){
+                                        url.append("picture/"+new  Date().getTime() +myFileName);
+                                    }else if("1".equals(request.getParameter("type"))){
+                                        url.append("video/"+new  Date().getTime() +myFileName);
+                                    }else {
+                                        url.append(new  Date().getTime() +myFileName);
+                                    }
+
+                                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url.toString();
+                                    //将图片上传至阿里云
+                                    aliOssUploadManager.uploadFile(file,"ec-efeiyi2",url.toString());
+                                    artworkMessageAttachment.setFileUri(pictureUrl);
+                                    artworkMessageAttachment.setArtworkMessage(artworkMessage);
+                                    artworkMessageAttachment.setFileType(request.getParameter("type"));
+                                    //artworkMessageAttachments.add(artworkMessageAttachment);
+                                    baseManager.saveOrUpdate(ArtworkMessageAttachment.class.getName(),artworkMessageAttachment);
+                                    //artworkMessage.getArtworkMessageAttachments().add(artworkMessageAttachment);
+                                }
+                            }
+                        }
+                    }
+                    //artworkMessage.setCreateDatetime(new Date());
+                    //artworkMessage.setArtworkMessageAttachments(artworkMessageAttachments);
+                    //baseManager.saveOrUpdate(ArtworkMessage.class.getName(),artworkMessage);
+                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap.put("artworkId",artwork.getId());
+                    return resultMap;
+
+                }else {
+                    return  resultMapHandler.handlerResult("10008","查无数据，稍后再试",logBean);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+            }
+
+
+        } catch(Exception e){
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
+    }
+
+
+
+
+
+
+
+
     public  static  void  main(String [] arg) throws Exception {
 
 

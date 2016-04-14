@@ -19,6 +19,7 @@
                 <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
                 <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
                 <prop key="hibernate.jdbc.batch_size">50</prop>
+                <prop key="current_session_context_class">thread</prop>
             </props>
         </property>
         <property name="packagesToScan">
@@ -40,5 +41,16 @@
     </bean>
     <bean id="userManager" class="com.efeiyi.ec.art.organization.service.imp.UserManagerImpl">
         <property name="userDao" ref="userDao"/>
+    </bean>
+
+    <bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath*:configuration.properties</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+        <property name="properties" ref="configProperties" />
     </bean>
 </beans>

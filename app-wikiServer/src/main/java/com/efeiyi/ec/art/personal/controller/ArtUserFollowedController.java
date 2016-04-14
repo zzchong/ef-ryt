@@ -94,18 +94,18 @@ public class ArtUserFollowedController extends BaseController {
 //        String pageIndex = "1";
 //        String pageSize = "3";
         TreeMap map = new TreeMap();
-        map.put("userId", "1");
+        map.put("userId", "igxhnwhnmhlwkvnw");
 //        map.put("pageIndex", pageIndex);
 //        map.put("pageSize", pageSize);
         map.put("timestamp", timestamp);
         signmsg = DigitalSignatureUtil.encrypt(map);
         System.out.println(signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.68:8080/app/masterDetails.do";
+        String url = "http://192.168.1.68:8080/app/applyArtMaster.do";
         HttpPost httppost = new HttpPost(url);
 
 //        String changeFollowStatus = "{\"userId\":\"1\",\"pageIndex\":\"1\",\"pageSize\":\"3\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-        String changeFollowStatus = "{\"userId\":\"1\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String changeFollowStatus = "{\"userId\":\"igxhnwhnmhlwkvnw\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
 
         String json = changeFollowStatus;
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);

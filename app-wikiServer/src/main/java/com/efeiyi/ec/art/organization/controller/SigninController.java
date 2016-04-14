@@ -50,8 +50,8 @@ import java.util.regex.Pattern;
 @Controller
 public class SigninController extends BaseController {
     private static Logger logger = Logger.getLogger(SigninController.class);
-    private static final String appKey ="d1573e16403c2482826bbd35";
-    private static final String masterSecret = "0b6ca44da0dfe0b7ea6331f1";
+    private static final String appKey ="539b73fd73c82f1134120a57";
+    private static final String masterSecret = "fea912e000db6a462048f9ef";
     private SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
     @Autowired
     BaseManager baseManager;
@@ -271,13 +271,18 @@ public class SigninController extends BaseController {
                 if (user==null || user.getId()==null) {
                     return resultMapHandler.handlerResult("10007","用户名不存在",logBean);
                 }
-                PushUserBinding pushUserBinding = new PushUserBinding();
+                LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+                param.put("userId", user.getId());
+                PushUserBinding pushUserBinding = (PushUserBinding)baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_BINDING_GET, param);
+                if(pushUserBinding == null || pushUserBinding.getId() == null){
+                    pushUserBinding = new PushUserBinding();
+                    pushUserBinding.setUser(user);
+                }
                 pushUserBinding.setCid(jsonObj.getString("cid"));
-                pushUserBinding.setUser(user);
                 String res = RegisterUsers(jsonObj.getString("username"),jsonObj.getString("password"));//若果绑定失败，人工处理
                 logBean.setExtend1(res);
-                resultMap = resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
                 baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
+                resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             } catch (Exception e) {
                 return resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
                 //e.printStackTrace();
@@ -417,7 +422,7 @@ public class SigninController extends BaseController {
                         fileType = ".gif";
                     }
                     String url = "headPortrait/" + request.getParameter("username").toString() + fileType;
-                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url+"@!ryt_head_portrai";
+                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
                     //将用户头像上传至阿里云
                     aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi2",url);
                     user.setName2(request.getParameter("username").toString());
@@ -428,7 +433,7 @@ public class SigninController extends BaseController {
                     resultMap.put("headPortraitURI",pictureUrl);
                     return resultMap;
                 }else {
-                    return  resultMapHandler.handlerResult("10007","未知错误，请联系管理员",logBean);
+                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
                 }
 
             } catch (Exception e) {
@@ -439,10 +444,8 @@ public class SigninController extends BaseController {
         } catch(Exception e){
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
-
-
-
     }
+
 
     //找回密码
     @RequestMapping(value = "/app/retrievePassword.do", method = RequestMethod.POST)
@@ -519,8 +522,6 @@ public class SigninController extends BaseController {
                     .setUsername(username)
                     .setPassword(password)
                     .build();
-
-
             users.add(user);
 
             RegisterInfo[] regUsers = new RegisterInfo[users.size()];
