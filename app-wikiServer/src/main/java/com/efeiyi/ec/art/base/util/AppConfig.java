@@ -48,4 +48,6 @@ public class AppConfig {
     public static final String GET_ART_WORK_WINNER = "select * from app_art_work_bidding a where a.art_work_id=:artworkId and status='1' ORDER BY a.price desc LIMIT 0,1";
 
     public static final String GET_ART_WORK_BY_ARTIST = "from Artwork where author= :author";
+
+    public static final String SQL_INVEST_MONEY_ARTWORK = "select SUM(price) FROM ArtworkInvest where artwork.id = :artworkId  and status<>'0'";
 }

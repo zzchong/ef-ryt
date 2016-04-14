@@ -26,6 +26,7 @@
     <aop:config>
         <aop:advisor id="managerTx" advice-ref="txAdvice" pointcut="execution(* com.ming800.core.base..*.delete*(..))||execution(* com.ming800.core.base..*.remove*(..))||execution(* com.ming800.core.base..*.saveOrUpdate*(..))"/>
         <!--<aop:advisor id="managerTx" advice-ref="txAdvice" pointcut="execution(* com.efeiyi.ec.website.organization.service.*.*(..))"/>-->
+        <aop:advisor id="managerTx2" advice-ref="txAdvice" pointcut="execution(* com.efeiyi.ec.art.artwork.service.impl.*.*(..))"/>
     </aop:config>
 
     <tx:annotation-driven/>

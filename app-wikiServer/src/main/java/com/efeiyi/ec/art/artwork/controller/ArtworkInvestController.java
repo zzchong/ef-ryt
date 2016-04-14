@@ -1,15 +1,20 @@
 package com.efeiyi.ec.art.artwork.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.efeiyi.ec.art.artwork.service.ArtworkInvestManager;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.model.ArtworkInvest;
 import com.efeiyi.ec.art.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.does.model.XQuery;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +38,11 @@ public class ArtworkInvestController extends BaseController {
     BaseManager baseManager;
     @Autowired
     ResultMapHandler resultMapHandler;
-     private Lock lock = new ReentrantLock();
+
+    @Autowired
+    ArtworkInvestManager artworkInvestManager;
+
+
 
     /**
      * 用户投资接口，此接口不涉及微信、支付宝
@@ -42,7 +51,7 @@ public class ArtworkInvestController extends BaseController {
      */
     @RequestMapping(value = "/app/artworkInvest.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map login(HttpServletRequest request) {
+    public Map artworkInvest(HttpServletRequest request) {
         LogBean logBean = new LogBean();
         logBean.setApiName("artworkInvest");
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -68,36 +77,8 @@ public class ArtworkInvestController extends BaseController {
 
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
+            resultMap = artworkInvestManager.artworkInvest(request,jsonObj,logBean);
 
-
-            lock.lock();//加锁 可能会涉及修改项目状态
-            try {
-                MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(),jsonObj.getString("userId"));
-                if (user == null && user.getId()!= null) {//用户存在
-                    //验证项目
-                    Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artworkId"));
-                    if(artwork!= null && artwork.getId() != null){
-                        //判断项目是否是融资阶段  是否是融资中 状态是否是可用
-
-                       if ("1".equals(artwork.getType()) && "14".equals(artwork.getStep()) && "0".equals(artwork.getStatus())){
-                           BigDecimal price = new BigDecimal(jsonObj.getString("price"));
-                           // 查询当前融资总额
-
-                       }
-                    }
-
-
-
-                }else{
-
-                    resultMap = resultMapHandler.handlerResult("10007","用户名不存在",logBean);
-                }
-            } catch (Exception e) {
-
-                resultMap = resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
-            }finally {
-                lock.unlock();
-            }
         } catch (Exception e) {
 
             return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
