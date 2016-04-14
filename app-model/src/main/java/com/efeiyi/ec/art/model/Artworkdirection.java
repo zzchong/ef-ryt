@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -46,6 +47,8 @@ public class Artworkdirection implements Serializable {
     public void setFinancing_aq(String financing_aq) {
         this.financing_aq = financing_aq;
     }
+
+    @JsonIgnore
     @OneToOne(mappedBy = "artworkdirection")
     public Artwork getArtwork() {
         return artwork;

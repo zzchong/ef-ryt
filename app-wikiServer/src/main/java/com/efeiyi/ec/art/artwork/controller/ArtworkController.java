@@ -13,6 +13,7 @@ import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
@@ -157,7 +158,7 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("investorArtWork");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("artWorkId"))) {
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             //校验数字签名
@@ -169,21 +170,27 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
+            //项目详情
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
-//            ArtWorkBean artWorkBean = new ArtWorkBean();
-//            artWorkBean.setArtwork(artwork);
-         //   artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-
-            XQuery xQuery = new XQuery("listArtworkInvest1_default",request);
-            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
-            List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>)baseManager.listObject(xQuery);
-            List<User> userList = new ArrayList<>();
-            for(ArtworkInvest artworkInvest : artworkInvestList){
-                userList.add(artworkInvest.getCreator());
+            //投资人数
+            Integer investNum = 0;
+            if(artwork.getArtworkInvests()!=null){
+                investNum = artwork.getArtworkInvests().size();
             }
+            //剩余时间
+            String time = TimeUtil.getDistanceTimes2(new Date(),artwork.getInvestStartDatetime(),"",TimeUtil.SECOND).get("time").toString();
+            //投资记录
+//            XQuery xQuery = new XQuery("listArtworkInvest1_default",request);
+//            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
+//            List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>)baseManager.listObject(xQuery);
+//            List<User> userList = new ArrayList<>();
+//            for(ArtworkInvest artworkInvest : artworkInvestList){
+//                userList.add(artworkInvest.getCreator());
+//            }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("object",artwork);
-            resultMap.put("investUserList",userList);
+            resultMap.put("investNum",investNum);
+            resultMap.put("time",time);
         } catch(Exception e){
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -653,31 +660,31 @@ public class ArtworkController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("timestamp", timestamp);
         /**investorArtWork.do测试加密参数**/
-//        map.put("artWorkId","qydeyugqqiugd2");
-//        map.put("timestamp", timestamp);
+        map.put("artWorkId","qydeyugqqiugd2");
+        map.put("timestamp", timestamp);
 
         /**masterView.do测试加密参数**/
-        map.put("pageSize","3");
-        map.put("pageNum","1");
-        map.put("masterId","icjxkedl0000b6i0");
+//        map.put("pageSize","3");
+//        map.put("pageNum","1");
+//        map.put("masterId","icjxkedl0000b6i0");
 //        map.put("timestamp", timestamp);
         /**guestView.do测试加密参数**/
 //        map.put("userId","icjxkedl0000b6i0");
-        map.put("timestamp", timestamp);
+//        map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/masterView.do";
+        String url = "http://192.168.1.80:8001/app/investorArtWork.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
-//        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  investorIndex.do测试 **/
 //        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  guestView.do测试 **/
 //        String json = "{\"userId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  masterView.do测试 **/
-        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+//        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 

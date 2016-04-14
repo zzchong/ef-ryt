@@ -224,7 +224,7 @@ public class Artwork implements Serializable {
         this.step = step;
     }
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
     public List<ArtworkInvest> getArtworkInvests() {
         return artworkInvests;
