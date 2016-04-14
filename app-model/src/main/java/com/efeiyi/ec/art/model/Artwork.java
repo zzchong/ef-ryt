@@ -229,6 +229,7 @@ public class Artwork implements Serializable {
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    @OrderBy(value = "createDatetime desc")
     public List<ArtworkInvest> getArtworkInvests() {
         return artworkInvests;
     }

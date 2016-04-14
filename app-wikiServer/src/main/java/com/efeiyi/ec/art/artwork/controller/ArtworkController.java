@@ -188,6 +188,8 @@ public class ArtworkController extends BaseController {
             List<ArtworkComment> artworkCommentList = null;
             //投资记录列表
             List<ArtworkInvest> artworkInvestList = null;
+            //投资top
+            List<ArtworkInvest> artworkInvestTopList = null;
             if("view".equals(jsonObj.getString("tab"))){
                 artworkdirection = artwork.getArtworkdirection();
                 artworkAttachmentList = artwork.getArtworkAttachment();
@@ -195,6 +197,14 @@ public class ArtworkController extends BaseController {
                 artworkCommentList = artwork.getArtworkComments();
 
             }else if("invest".equals(jsonObj.getString("tab"))){
+                if(artwork.getArtworkInvests().size()>3){
+                    artworkInvestTopList = new ArrayList<>();
+                    for(int i=0;i<3;i++){
+                        artworkInvestTopList.add(artwork.getArtworkInvests().get(i));
+                    }
+                }else {
+                    artworkInvestTopList = artwork.getArtworkInvests();
+                }
                 artworkInvestList = artwork.getArtworkInvests();
             }else {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
@@ -215,6 +225,7 @@ public class ArtworkController extends BaseController {
             resultMap.put("artworkdirection",artworkdirection);
             resultMap.put("artworkCommentList",artworkCommentList);
             resultMap.put("artworkInvestList",artworkInvestList);
+            resultMap.put("artworkInvestTopList",artworkInvestTopList);
         } catch(Exception e){
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
