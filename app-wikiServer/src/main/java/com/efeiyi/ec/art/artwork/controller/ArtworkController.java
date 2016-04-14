@@ -142,7 +142,7 @@ public class ArtworkController extends BaseController {
 
 
     /**
-     * 融资项目 详情页
+     * 融资项目 项目详情页
      * @param request
      * @return
      */
@@ -158,13 +158,14 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("investorArtWork");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("artWorkId"))) {
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("artWorkId")) || "".equals(jsonObj.getString("tab"))) {
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("artWorkId",jsonObj.getString("artWorkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            treeMap.put("tab",jsonObj.getString("tab"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
@@ -179,6 +180,25 @@ public class ArtworkController extends BaseController {
             }
             //剩余时间
             String time = TimeUtil.getDistanceTimes2(new Date(),artwork.getInvestStartDatetime(),"",TimeUtil.SECOND).get("time").toString();
+            //项目文件
+            List<ArtworkAttachment> artworkAttachmentList = null;
+            //项目制作过程说明、融资解惑
+            Artworkdirection artworkdirection = null;
+            //评论列表
+            List<ArtworkComment> artworkCommentList = null;
+            //投资记录列表
+            List<ArtworkInvest> artworkInvestList = null;
+            if("index".equals(jsonObj.getString("tab"))){
+                artworkdirection = artwork.getArtworkdirection();
+                artworkAttachmentList = artwork.getArtworkAttachment();
+            }else if("comment".equals(jsonObj.getString("tab"))){
+                artworkCommentList = artwork.getArtworkComments();
+
+            }else if("invest".equals(jsonObj.getString("tab"))){
+                artworkInvestList = artwork.getArtworkInvests();
+            }else {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
             //投资记录
 //            XQuery xQuery = new XQuery("listArtworkInvest1_default",request);
 //            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
@@ -191,6 +211,10 @@ public class ArtworkController extends BaseController {
             resultMap.put("object",artwork);
             resultMap.put("investNum",investNum);
             resultMap.put("time",time);
+            resultMap.put("artworkAttachmentList",artworkAttachmentList);
+            resultMap.put("artworkdirection",artworkdirection);
+            resultMap.put("artworkCommentList",artworkCommentList);
+            resultMap.put("artworkInvestList",artworkInvestList);
         } catch(Exception e){
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -660,6 +684,7 @@ public class ArtworkController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("timestamp", timestamp);
         /**investorArtWork.do测试加密参数**/
+        map.put("tab","index");
         map.put("artWorkId","qydeyugqqiugd2");
         map.put("timestamp", timestamp);
 
@@ -678,7 +703,7 @@ public class ArtworkController extends BaseController {
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
-        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"tab\":\"index\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  investorIndex.do测试 **/
 //        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  guestView.do测试 **/
