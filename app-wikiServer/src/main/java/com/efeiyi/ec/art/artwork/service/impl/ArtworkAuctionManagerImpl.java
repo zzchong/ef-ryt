@@ -8,6 +8,7 @@ import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkBidding;
+import com.efeiyi.ec.art.model.MarginAccount;
 import com.ming800.core.base.service.BaseManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -74,22 +75,19 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             }
             LinkedHashMap queryMap = new LinkedHashMap();
             queryMap.put("userId", jsonObj.getString("userId"));
-            Account account = (Account)baseManager.getUniqueObjectByConditions("From Account as a WHERE a.user.id = :userId",queryMap);
-            if (account == null || account.getCurrentUsableBalance().compareTo(jsonObj.getBigDecimal("price")) < 0 || account.getCurrentBalance().compareTo(jsonObj.getBigDecimal("price")) < 0) {//余额不足
-                return resultMapHandler.handlerResult("10015", "账户余额不足，请充值", logBean);
+            queryMap.put("artworkId", jsonObj.getString("artworkId"));
+            MarginAccount marginAccount = (MarginAccount)baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId",queryMap);
+            if (marginAccount == null || !"0".equals(marginAccount.getStatus())) {//未冻结拍卖保证金
+                return resultMapHandler.handlerResult("10019", "未冻结拍卖保证金", logBean);
             }
 
             ArtworkBidding artworkBidding = new ArtworkBidding();
             artworkBidding.setArtwork(artwork);
             artworkBidding.setCreateDatetime(new Date());
-            artworkBidding.setCreator(account.getUser());
+            artworkBidding.setCreator(marginAccount.getAccount().getUser());
             artworkBidding.setStatus("1");
             artworkBidding.setPrice(jsonObj.getBigDecimal("price"));
             getCurrentSession().saveOrUpdate(artworkBidding);
-
-            account.setCurrentBalance(account.getCurrentBalance().subtract(jsonObj.getBigDecimal("price")));
-            account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(jsonObj.getBigDecimal("price")));
-            getCurrentSession().saveOrUpdate(account);
 
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {

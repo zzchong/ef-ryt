@@ -235,7 +235,7 @@ public class AuctionController extends BaseController {
             treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            treeMap.put("price", jsonObj.getString("money"));
+            treeMap.put("price", jsonObj.getString("price"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
@@ -251,6 +251,40 @@ public class AuctionController extends BaseController {
         return resultMap;
     }
 
+    @RequestMapping(value = "/app/artworkBidPayDeposit.do")
+    @ResponseBody
+    public Map artWorkBidPayDeposit(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap;
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("artWorkAuctionList");
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("artworkId")) || "".equals(jsonObj.getString("money"))) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            //校验数字签名
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("userId", jsonObj.getString("userId"));
+            treeMap.put("artworkId", jsonObj.getString("artworkId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            treeMap.put("price", jsonObj.getString("money"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            resultMap = artworkAuctionManager.artworkBidOnAuction(request,jsonObj,logBean);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
 
     public static void main(String[] arg) throws Exception {
 
