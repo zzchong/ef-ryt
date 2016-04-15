@@ -16,6 +16,7 @@ import java.util.List;
  * 投资收益表
  *
  */
+@Deprecated
 @Entity
 @Table(name = "app_invest_reward")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
