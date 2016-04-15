@@ -6,11 +6,9 @@ import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ConvertArtWork;
 import com.efeiyi.ec.art.organization.model.AddressProvince;
-import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
-import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
@@ -25,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -301,10 +300,12 @@ public class ProfileController extends BaseController {
             String signmsg = jsonObj.getString("signmsg");
             String timestamp = jsonObj.getString("timestamp");
             String userId = jsonObj.getString("userId");
-            if ("".equals(signmsg) || "".equals(timestamp) || "".equals(userId)) {
+            String paramType = jsonObj.getString("paramType");
+            if ("".equals(signmsg) || "".equals(timestamp) || "".equals(userId) || "".equals(paramType)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             treeMap.put("userId", userId);
+            treeMap.put("paramType",paramType);
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
@@ -317,65 +318,118 @@ public class ProfileController extends BaseController {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             List<MultipartFile> oneList = multipartRequest.getFiles("one");
             List<MultipartFile> twoList = multipartRequest.getFiles("two");
-            if (!oneList.isEmpty()) {
-                uploadFilePath(oneList, master, "1");
-            }
-            if (!twoList.isEmpty()) {
-                uploadFilePath(twoList, master, "2");
+            List<MultipartFile> threeList = multipartRequest.getFiles("three");
+            MultipartFile identityFront = multipartRequest.getFile("identityFront");
+            MultipartFile identityBack = multipartRequest.getFile("identityBack");
+            String filePath;
+            if ("yes".equals(paramType)){
+                if (!oneList.isEmpty()) {
+                    uploadFilePath(oneList, master, "1");
+                }
+                if (!twoList.isEmpty()) {
+                    uploadFilePath(twoList, master, "2");
+                }
+                if (!threeList.isEmpty()){
+                    uploadFilePath(threeList,master,"3");
+                }
+            }else{
+                if (identityFront!=null){
+                    filePath = uploadFile(identityFront);
+                    master.setIdentityFront(filePath);
+                    baseManager.saveOrUpdate(Master.class.getName(),master);
+
+                }
+                if (identityBack!=null){
+                    filePath = uploadFile(identityBack);
+                    master.setIdentityBack(filePath);
+                    baseManager.saveOrUpdate(Master.class.getName(),master);
+                }
             }
             resultMapHandler.handlerResult("0", "成功", logBean);
+
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
         return resultMap;
     }
 
-    public String uploadFilePath(List<MultipartFile> list, Master master, String msg) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        String identify = sdf.format(new Date());
+    /**
+     * 上传单个附件调用的方法
+     * @param mf
+     * @return
+     * @throws IOException
+     */
+    public String uploadFile(MultipartFile mf){
+        String pictureUrl = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            String identify = sdf.format(new Date());
+            String url ;
+            String fileName = mf.getOriginalFilename();//获取原文件名
+            String file = fileName.substring(0, fileName.indexOf("."));
+            String prefix = "";
+            switch (mf.getContentType()) {
+                case "image/jpg":
+                    prefix = ".jpg";
+                    break;
+                case "image/jpeg":
+                    prefix = ".jpeg";
+                    break;
+                case "image/png":
+                    prefix = ".png";
+                    break;
+                case "image/gif":
+                    prefix = ".gif";
+                    break;
+            }
+            url = "master/" + file + identify + prefix;
+            aliOssUploadManager.uploadFile(mf, "ec-efeiyi2", url);
+            pictureUrl = "http://rongyitou2.efeiyi.com/" + url + "@!ryt_head_portrai";
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return pictureUrl;
+    }
+
+    /**
+     * 上传列表附件内部调用单附件上传方法
+     * @param list
+     * @param master
+     * @param msg
+     * @return
+     */
+    public void uploadFilePath(List<MultipartFile> list, Master master, String msg){
         List<ArtMasterAttachment> attachmentList = new ArrayList<>(3);
-        String url;
         String pictureUrl;
         if (!list.isEmpty()) {
             for (MultipartFile mf : list) {
-                try {
-                    String fileName = mf.getOriginalFilename();//获取原文件名
-                    String file = fileName.substring(0, fileName.indexOf("."));
-                    String prefix = "";
-                    switch (mf.getContentType()) {
-                        case "image/jpg":
-                            prefix = ".jpg";
-                            break;
-                        case "image/jpeg":
-                            prefix = ".jpeg";
-                            break;
-                        case "image/png":
-                            prefix = ".png";
-                            break;
-                        case "image/gif":
-                            prefix = ".gif";
-                            break;
-                    }
-                    url = "master/" + file + identify + prefix;
-                    pictureUrl = "http://rongyitou2.efeiyi.com/" + url + "@!ryt_head_portrai";
-                    aliOssUploadManager.uploadFile(mf, "ec-efeiyi2", url);
-                    ArtMasterAttachment attachment = new ArtMasterAttachment();
-                    attachment.setMaster(master);
-                    attachment.setUrl(pictureUrl);
-                    baseManager.saveOrUpdate(ArtMasterAttachment.class.getName(), attachment);
-                    attachmentList.add(attachment);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                pictureUrl = uploadFile(mf);
+                ArtMasterAttachment attachment = new ArtMasterAttachment();
+                attachment.setMaster(master);
+                attachment.setUrl(pictureUrl);
+                baseManager.saveOrUpdate(ArtMasterAttachment.class.getName(), attachment);
+                attachmentList.add(attachment);
             }
-            if ("1".equals(msg)) {
-                master.setWorksPhotos(attachmentList);
-            } else {
-                master.setWorkShopPhotos(attachmentList);
-            }
-            baseManager.saveOrUpdate(Master.class.getName(), master);
+            putAttachment(msg,attachmentList,master);
         }
-        return "ok";
+    }
+
+    /**
+     * master实体put附件列表
+     * @param msg
+     * @param attachments
+     * @param master
+     * @return
+     */
+    public void putAttachment(String msg , List<ArtMasterAttachment> attachments,Master master){
+        if ("1".equals(msg)) {
+            master.setWorksPhotos(attachments);
+        } else if("2".equals(msg)) {
+            master.setWorkShopPhotos(attachments);
+        } else if("3".equals(msg)){
+            master.setCertificatePhotos(attachments);
+        }
+        baseManager.saveOrUpdate(Master.class.getName(), master);
     }
 
 
