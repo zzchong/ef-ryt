@@ -3,7 +3,9 @@ package com.efeiyi.ec.art.artwork.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkInvestManager;
 import com.efeiyi.ec.art.base.model.LogBean;
+import com.efeiyi.ec.art.base.util.JPushConfig;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.jpush.EfeiyiPush;
 import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkInvest;
@@ -106,7 +108,13 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
                             account.setCurrentUsableBalance(account.getCurrentUsableBalance().multiply(price));
                             baseManager.saveOrUpdate(Account.class.getName(),account);//更新用户账户
                         }
-
+                    //发送透传消息，通知客户端更新融资金额  透传消息不需要保存
+                        Map<String,Object> map = new HashMap<String,Object>();
+                        map.put("msg_content",currentInvestMoney.toString());
+                        map.put("content_type","text");
+                        map.put("title","msg");
+                        map.put("json","");
+                        EfeiyiPush.SendPushMessage(JPushConfig.appKey, JPushConfig.masterSecret, map);
                         return resultMapHandler.handlerResult("0","成功",logBean);
                     }else{
 

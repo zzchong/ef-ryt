@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
+import com.efeiyi.ec.art.base.util.JPushConfig;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.jpush.EfeiyiPush;
 import com.efeiyi.ec.art.model.Artwork;
@@ -31,8 +32,7 @@ import java.util.*;
 public class EPushController extends BaseController {
     private static Logger logger = Logger.getLogger(EPushController.class);
 
-    private static final String appKey ="539b73fd73c82f1134120a57";
-    private static final String masterSecret = "fea912e000db6a462048f9ef";
+
 
 
     @Autowired
@@ -106,7 +106,7 @@ public class EPushController extends BaseController {
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
 
-            EfeiyiPush.SendPush(appKey, masterSecret,message);
+            EfeiyiPush.SendPush(JPushConfig.appKey, JPushConfig.masterSecret,message);
 
         } catch (Exception e) {
             logBean.setResultCode("10004");
@@ -193,7 +193,7 @@ public class EPushController extends BaseController {
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "成功");
 
-            EfeiyiPush.SendPushComment(appKey, masterSecret, artworkComment);
+            EfeiyiPush.SendPushComment(JPushConfig.appKey, JPushConfig.masterSecret, artworkComment);
 
         } catch (Exception e) {
             logBean.setResultCode("10004");
@@ -216,7 +216,7 @@ public class EPushController extends BaseController {
         message.setContent("现年快乐");
         message.setCreateDatetime(new Date());
         //message.setFromUser(new User());
-        EfeiyiPush.SendPush(appKey, masterSecret,message);
+        EfeiyiPush.SendPush(JPushConfig.appKey, JPushConfig.masterSecret,message);
 
     }
 }
