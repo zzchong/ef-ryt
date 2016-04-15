@@ -46,6 +46,9 @@ public class Master implements Serializable{
     private List<ArtMasterAttachment> workShopPhotos;//工作室照片
     private List<ArtMasterAttachment> worksPhotos;//作品照片
     private String feedback;//审批意见
+    private String identityFront;//身份证正面
+    private String identityBack;//身份证反面
+    private List<ArtMasterAttachment> certificatePhotos;//证书附件
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -247,5 +250,32 @@ public class Master implements Serializable{
 
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+
+    @Column(name = "identity_front")
+    public String getIdentityFront() {
+        return identityFront;
+    }
+
+    public void setIdentityFront(String identityFront) {
+        this.identityFront = identityFront;
+    }
+    @Column(name = "identity_back")
+    public String getIdentityBack() {
+        return identityBack;
+    }
+
+    public void setIdentityBack(String identityBack) {
+        this.identityBack = identityBack;
+    }
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "master")
+    public List<ArtMasterAttachment> getCertificatePhotos() {
+        return certificatePhotos;
+    }
+
+    public void setCertificatePhotos(List<ArtMasterAttachment> certificatePhotos) {
+        this.certificatePhotos = certificatePhotos;
     }
 }

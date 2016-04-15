@@ -55,6 +55,7 @@ public class Artwork implements Serializable {
     private Integer duration;//创作时长
 
     private Artworkdirection artworkdirection;
+    private BigDecimal startingPrice;
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -375,5 +376,14 @@ public class Artwork implements Serializable {
 
     public void setArtworkdirection(Artworkdirection artworkdirection) {
         this.artworkdirection = artworkdirection;
+    }
+
+    @Column(name = "starting_price")
+    public BigDecimal getStartingPrice() {
+        return startingPrice;
+    }
+
+    public void setStartingPrice(BigDecimal startingPrice) {
+        this.startingPrice = startingPrice;
     }
 }
