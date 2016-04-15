@@ -160,6 +160,7 @@ public class Artwork implements Serializable {
 
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    @JsonIgnore
     public List<ArtworkAttachment> getArtworkAttachment() {
         return artworkAttachment;
     }
@@ -201,6 +202,7 @@ public class Artwork implements Serializable {
     }
 
     @OneToOne(mappedBy = "artwork")
+    @JsonIgnore
     public ArtworkDraw getArtworkDraw() {
         return artworkDraw;
     }
@@ -366,6 +368,7 @@ public class Artwork implements Serializable {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "artwork_direction_id")
+    @JsonIgnore
     public Artworkdirection getArtworkdirection() {
         return artworkdirection;
     }
