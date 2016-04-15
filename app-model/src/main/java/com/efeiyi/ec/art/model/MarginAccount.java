@@ -15,7 +15,7 @@ import java.util.Date;
 @Entity
 @Table(name = "app_art_work_margin_account")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class MarginAccount implements Serializable {
+public class MarginAccount implements Serializable {//保证金表
 
     private String id;
     private BigDecimal currentBalance;//当前余额
