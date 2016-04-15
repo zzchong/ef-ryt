@@ -108,7 +108,29 @@ public class EfeiyiPush {
         }
     }
 
+    public static void SendPushNotification(String appKey ,String masterSecret,com.efeiyi.ec.art.model.Notification notification, String cid) {
 
+        JPushClient jpushClient = new JPushClient(masterSecret, appKey);
+        PushPayload payload=buildPushObject_android_and_ios_notification(notification,cid);
+        try {
+            System.out.println(payload.toString());
+            PushResult result = jpushClient.sendPush(payload);
+            System.out.println(result+"................................");
+
+            logger.info("Got result - " + result);
+
+        } catch (APIConnectionException e) {
+            logger.error("Connection error. Should retry later. ", e);
+
+        } catch (APIRequestException e) {
+            e.printStackTrace();
+            logger.error("Error response from JPush server. Should review and fix it. ", e);
+            logger.info("HTTP Status: " + e.getStatus());
+            logger.info("Error Code: " + e.getErrorCode());
+            logger.info("Error Message: " + e.getErrorMessage());
+            logger.info("Msg ID: " + e.getMsgId());
+        }
+    }
     public static PushPayload buildPushObject_all_all_alert() {
         return PushPayload.alertAll(ALERT);
     }
@@ -220,6 +242,29 @@ public class EfeiyiPush {
                         .setContentType(msg.get("content_type").toString())
                         .setTitle(msg.get("title").toString())
                         .addExtra("extras", msg.get("json").toString())
+                        .build())
+                .build();
+    }
+
+    public static PushPayload buildPushObject_android_and_ios_notification(com.efeiyi.ec.art.model.Notification notification,String cid) {
+        return PushPayload.newBuilder()
+                .setPlatform(Platform.android_ios())
+                        //.setAudience(Audience.all())
+                .setAudience(Audience.registrationId(cid))
+                .setNotification(Notification.newBuilder()
+                        .setAlert(MSG_CONTENT)
+                        .addPlatformNotification(AndroidNotification.newBuilder()
+                                .setTitle(TITLE)
+                                .setAlert(ALERT+notification.getContent())
+                                .addExtra("extra_key", "extra_value")
+                                .build())
+                        .addPlatformNotification(IosNotification.newBuilder()
+                                .setAlert(ALERT+notification.getContent())
+                                .setBadge(5)
+                                .setSound("happy")
+                                .addExtra("from", "JPush")
+                                .incrBadge(1)
+                                .addExtra("extra_key", "extra_value").build())
                         .build())
                 .build();
     }
