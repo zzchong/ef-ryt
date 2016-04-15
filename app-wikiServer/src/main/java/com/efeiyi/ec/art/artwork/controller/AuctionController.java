@@ -226,7 +226,7 @@ public class AuctionController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            logBean.setApiName("artWorkAuctionList");
+            logBean.setApiName("artWorkBidOnAuction");
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("artworkId")) || "".equals(jsonObj.getString("money"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
@@ -251,9 +251,9 @@ public class AuctionController extends BaseController {
         return resultMap;
     }
 
-    @RequestMapping(value = "/app/artworkBidPayDeposit.do")
+    @RequestMapping(value = "/app/artWorkAuctionPayDeposit.do")
     @ResponseBody
-    public Map artWorkBidPayDeposit(HttpServletRequest request) {
+    public Map artWorkAuctionPayDeposit(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap;
         TreeMap treeMap = new TreeMap();
@@ -261,7 +261,7 @@ public class AuctionController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            logBean.setApiName("artWorkAuctionList");
+            logBean.setApiName("artWorkAuctionPayDeposit");
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("artworkId")) || "".equals(jsonObj.getString("money"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
@@ -270,13 +270,13 @@ public class AuctionController extends BaseController {
             treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            treeMap.put("price", jsonObj.getString("money"));
+            treeMap.put("price", jsonObj.getString("price"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            resultMap = artworkAuctionManager.artworkBidOnAuction(request,jsonObj,logBean);
+            resultMap = artworkAuctionManager.artWorkAuctionPayDeposit(request, jsonObj, logBean);
 
         } catch (Exception e) {
             e.printStackTrace();

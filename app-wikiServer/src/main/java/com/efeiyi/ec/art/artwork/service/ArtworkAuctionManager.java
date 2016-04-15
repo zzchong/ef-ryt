@@ -11,5 +11,5 @@ import java.util.Map;
  */
 public interface ArtworkAuctionManager {
     Map artworkBidOnAuction(HttpServletRequest request,JSONObject jsonObj,LogBean logBean);
-
+    Map artWorkAuctionPayDeposit(HttpServletRequest request,JSONObject jsonObj,LogBean logBean);
 }
