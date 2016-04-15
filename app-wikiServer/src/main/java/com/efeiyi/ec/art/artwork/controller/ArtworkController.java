@@ -763,7 +763,7 @@ public class ArtworkController extends BaseController {
 
         /**artworkPraise.do测试加密参数**/
         map.put("artWorkId","qydeyugqqiugd2");
-        map.put("currentUserId","iickhknq3h7yrku2");
+        map.put("currentUserId","iih8wrlm31r449bh");
         map.put("timestamp", timestamp);
 
         String signmsg = DigitalSignatureUtil.encrypt(map);
@@ -782,7 +782,7 @@ public class ArtworkController extends BaseController {
         /**json参数  masterView.do测试 **/
 //        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artworkPraise.do测试 **/
-        String json = "{\"currentUserId\":\"iickhknq3h7yrku2\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"currentUserId\":\"iih8wrlm31r449bh\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 

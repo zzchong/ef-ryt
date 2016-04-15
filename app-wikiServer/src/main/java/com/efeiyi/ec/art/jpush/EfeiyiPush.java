@@ -252,7 +252,7 @@ public class EfeiyiPush {
                         //.setAudience(Audience.all())
                 .setAudience(Audience.registrationId(cid))
                 .setNotification(Notification.newBuilder()
-                        .setAlert(MSG_CONTENT)
+                        .setAlert(notification.getContent())
                         .addPlatformNotification(AndroidNotification.newBuilder()
                                 .setTitle(TITLE)
                                 .setAlert(ALERT+notification.getContent())
