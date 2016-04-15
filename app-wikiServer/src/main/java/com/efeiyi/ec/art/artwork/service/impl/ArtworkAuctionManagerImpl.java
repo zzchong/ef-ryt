@@ -48,10 +48,13 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
     private BaseManager baseManager;
     @Autowired
     ResultMapHandler resultMapHandler;
-    private Map<String, SoftReference<Lock>> auctionLockMap = new HashMap<>();
+//    private Map<String, SoftReference<Lock>> auctionLockMap = new HashMap<>();
+//security come first
+    private Lock lock = new ReentrantLock();
 
     /**
      * 竞拍出价
+     *
      * @param request
      * @param jsonObj
      * @param logBean
@@ -60,19 +63,20 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
     @Override
     @Transactional
     public Map artworkBidOnAuction(HttpServletRequest request, JSONObject jsonObj, LogBean logBean) {
-        SoftReference<Lock> lock = auctionLockMap.get(jsonObj.get("artworkId"));//以防内存吃紧
-        if (lock == null) {
-            synchronized (this.getClass()) {
-                lock = auctionLockMap.get(jsonObj.get("artworkId"));
-                if (lock == null) {
-                    lock = new SoftReference(new ReentrantLock());
-                    auctionLockMap.put(jsonObj.getString("artworkId"), lock);
-                }
-            }
-        }
+//        SoftReference<Lock> lock = auctionLockMap.get(jsonObj.get("artworkId"));//以防内存吃紧
+//        if (lock == null) {
+//            synchronized (this.getClass()) {
+//                lock = auctionLockMap.get(jsonObj.get("artworkId"));
+//                if (lock == null) {
+//                    lock = new SoftReference(new ReentrantLock());
+//                    auctionLockMap.put(jsonObj.getString("artworkId"), lock);
+//                }
+//            }
+//        }
         Map resultMap = new HashMap();
         try {
-            lock.get().lock();
+//            lock.get().lock();
+            lock.lock();
             //项目信息
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artworkId"));
             if (!"31".equals(artwork.getStep())  //校验拍卖中
@@ -102,13 +106,16 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             e.getMessage();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         } finally {
-            lock.get().unlock();
+//            lock.get().unlock();
+            lock.unlock();
+
         }
         return resultMap;
     }
 
     /**
      * 竞拍缴保证金
+     *
      * @param request
      * @param jsonObj
      * @param logBean
