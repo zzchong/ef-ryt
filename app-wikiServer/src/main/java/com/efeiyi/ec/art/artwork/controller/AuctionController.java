@@ -270,7 +270,6 @@ public class AuctionController extends BaseController {
             treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            treeMap.put("price", jsonObj.getString("price"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);

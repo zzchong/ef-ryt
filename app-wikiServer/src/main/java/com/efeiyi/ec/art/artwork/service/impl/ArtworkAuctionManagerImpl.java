@@ -50,6 +50,13 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
     ResultMapHandler resultMapHandler;
     private Map<String, SoftReference<Lock>> auctionLockMap = new HashMap<>();
 
+    /**
+     * 竞拍出价
+     * @param request
+     * @param jsonObj
+     * @param logBean
+     * @return
+     */
     @Override
     @Transactional
     public Map artworkBidOnAuction(HttpServletRequest request, JSONObject jsonObj, LogBean logBean) {
@@ -100,6 +107,13 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
         return resultMap;
     }
 
+    /**
+     * 竞拍缴保证金
+     * @param request
+     * @param jsonObj
+     * @param logBean
+     * @return
+     */
     @Override
     @Transactional
     public Map artWorkAuctionPayDeposit(HttpServletRequest request, JSONObject jsonObj, LogBean logBean) {
@@ -119,12 +133,12 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
         }
         queryMap.remove("artworkId");
         Account account = (Account) baseManager.getUniqueObjectByConditions("From Account a WHERE a.user.id = :userId", queryMap);
-        BigDecimal price = jsonObj.getBigDecimal("price");
-        if (price.compareTo(account.getCurrentUsableBalance()) > 0 //保证金充足?
-                || price.compareTo(account.getCurrentBalance()) > 0) {
+        BigDecimal deposit = artwork.getStartingPrice().movePointLeft(1);
+        if (deposit.compareTo(account.getCurrentUsableBalance()) > 0 //保证金充足?
+                || deposit.compareTo(account.getCurrentBalance()) > 0) {
             return resultMapHandler.handlerResult("100015", "账户余额不足，请充值", logBean);
         }
-        account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(price));
+        account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(deposit));
         getCurrentSession().saveOrUpdate(account);
 
         marginAccount = new MarginAccount();
@@ -158,7 +172,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
         map.put("timestamp", timestamp);
         map.put("userId", "igxhnwhnmhlwkvnw");
         map.put("artworkId", "qydeyugqqiugd7");
-        map.put("price", "500");
+//        map.put("price", "500");
 
         String signmsg = DigitalSignatureUtil.encrypt(map);
         map.put("signmsg", signmsg);
