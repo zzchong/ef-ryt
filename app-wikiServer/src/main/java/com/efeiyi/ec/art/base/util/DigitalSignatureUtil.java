@@ -1,6 +1,8 @@
 package com.efeiyi.ec.art.base.util;
 
+import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.util.AppConfig;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -47,6 +49,35 @@ public class DigitalSignatureUtil {
       }
       return flag;
   }
+
+
+    //校验数字签名的正确性
+    public static Boolean verify2(JSONObject jsonObject)throws  Exception{
+        String signmsg = "";
+        TreeMap map = new TreeMap();
+        for(Map.Entry me : jsonObject.entrySet()){
+            if("signmsg".equals(me.getKey())){
+                signmsg = me.getValue().toString();
+            }else {
+                map.put(me.getKey(), me.getValue());
+            }
+        }
+        boolean flag = false;
+        StringBuffer str = new StringBuffer();
+        for(Iterator it = map.keySet().iterator();it.hasNext();){
+            Object key = it.next();
+            Object Value = map.get(key);
+            str.append(key).append("=").append(Value).append("&");
+        }
+        str.append("key=" + AppConfig.appKey);
+
+        String md5Value = MD5(str.toString());
+        //System.out.println(str.toString()+"======>"+md5Value);
+        if(md5Value.equals(signmsg)){
+            flag = true;
+        }
+        return flag;
+    }
 
     //对所有参数进行自然排序并加密处理
     public static String encrypt(Map map)throws  Exception{

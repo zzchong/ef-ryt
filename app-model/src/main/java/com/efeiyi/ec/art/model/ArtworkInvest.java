@@ -36,6 +36,8 @@ public class ArtworkInvest implements Serializable{
     public void setId(String id) {
         this.id = id;
     }
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "art_work_id")
     public Artwork getArtwork() {

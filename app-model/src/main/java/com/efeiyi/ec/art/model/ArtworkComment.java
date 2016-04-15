@@ -39,7 +39,7 @@ public class ArtworkComment implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.ALL,CascadeType.REFRESH })
     @JoinColumn(name = "art_work_id")
     @JsonIgnore
     public Artwork getArtwork() {

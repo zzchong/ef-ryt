@@ -3,9 +3,11 @@ package com.ming800.core.p.service.impl;
 import com.aliyun.openservices.oss.OSSClient;
 import com.aliyun.openservices.oss.model.*;
 import com.ming800.core.p.service.AliOssUploadManager;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -40,8 +42,8 @@ public class AliOssUploadManagerImpl implements AliOssUploadManager {
 
         // 获取指定文件的输入流
 //        File file = new File(filePath);
-        InputStream content = multipartFile.getInputStream();
-
+        //InputStream content = multipartFile.getInputStream();
+        ByteArrayInputStream content = new ByteArrayInputStream(IOUtils.toByteArray(multipartFile.getInputStream()));
         // 创建上传Object的Metadata
         ObjectMetadata meta = new ObjectMetadata();
 

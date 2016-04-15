@@ -37,7 +37,18 @@
             </jnode>
         </jnode>
     </jnode>
-
+    <jnode id="UserManager" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="用户管理" url="/main.do?jnodeId=UserManager"  state="">
+        <jnode url="" id="userManager" access="admin,operational,o_operational,financial,product_manager,market" state="closed" text_zh_CN="用户管理">
+            <jnode url="/basic/xm.do?qm=plistMaster_default&amp;CheckMaster=CheckMaster" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="艺术家列表">
+                <match url="/basic/xm.do?qm=plistMaster"/>
+                <match url="/basic/xm.do?qm=viewMaster"/>
+            </jnode>
+            <jnode url="/basic/xm.do?qm=plistUser_default&amp;User=User" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="用户列表">
+                <match url="/basic/xm.do?qm=plistUser"/>
+                <match url="/basic/xm.do?qm=viewUser"/>
+            </jnode>
+        </jnode>
+    </jnode>
 
 
 

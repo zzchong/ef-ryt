@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 import com.efeiyi.ec.art.organization.model.User;
@@ -67,6 +68,8 @@ public class ArtworkBidding implements Serializable{//竞价记录
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "art_work_id")
     public Artwork getArtwork() {

@@ -25,7 +25,7 @@ public class ConvertArtWorkUtil {
         if (invests != null && invests.size() > 0) {
             for (int i = 0; i < invests.size(); i++) {
                 Artwork artwork = invests.get(i).getArtwork();
-                ConvertWork work = artWork(artwork,investMoney.get(i));
+                ConvertWork work = artWork(artwork, investMoney.get(i));
                 list.add(work);
             }
         }
@@ -34,17 +34,36 @@ public class ConvertArtWorkUtil {
         return convert;
     }
 
-    public static ConvertWork artWork(Artwork artwork , BigDecimal price){
+    public static ConvertWork artWork(Artwork artwork, BigDecimal price) {
         ConvertWork work = null;
-        if (artwork != null && artwork.getId() != null){
+        if (artwork != null && artwork.getId() != null) {
             work = new ConvertWork();
             work.setId(artwork.getId());
-            work.setBrief(artwork.getBrief()==null?"":artwork.getBrief());
+            work.setBrief(artwork.getBrief() == null ? "" : artwork.getBrief());
             work.setInvestsMoney(price);
-            work.setPicture_url(artwork.getPicture_url()==null?"":artwork.getPicture_url());
+            work.setPicture_url(artwork.getPicture_url() == null ? "" : artwork.getPicture_url());
             work.setStep(artwork.getStep());
-            work.setTitle(artwork.getTitle()==null?"":artwork.getTitle());
+            work.setTitle(artwork.getTitle() == null ? "" : artwork.getTitle());
         }
         return work;
+    }
+
+    public static ConvertArtWork convert2(List<Artwork> artworks, int followedList, int toFollowedList,
+                                          BigDecimal sumInvestsMoney, BigDecimal reward, User user) {
+        ConvertArtWork convert = new ConvertArtWork();
+        convert.setFollowNum(followedList <= 0 ? 0 : followedList);
+        convert.setNum(toFollowedList <= 0 ? 0 : toFollowedList);
+        convert.setYield(reward);
+        convert.setSumInvestment(sumInvestsMoney);
+        List<ConvertWork> list = new ArrayList<ConvertWork>();
+        if (artworks != null && artworks.size() > 0) {
+            for (Artwork artwork : artworks) {
+                ConvertWork work = artWork(artwork, artwork.getInvestsMoney());
+                list.add(work);
+            }
+        }
+        convert.setArtworks(list);
+        convert.setUser(user);
+        return convert;
     }
 }

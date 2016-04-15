@@ -9,14 +9,15 @@ import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
-import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
-import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.CommonUtil;
+import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
+import com.ming800.core.taglib.PageEntity;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -141,7 +142,7 @@ public class ArtworkController extends BaseController {
 
 
     /**
-     * 融资项目 详情页
+     * 融资项目 项目详情页
      * @param request
      * @return
      */
@@ -157,33 +158,89 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("investorArtWork");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
+            if(!CommonUtil.jsonObject(jsonObj)){
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
+//            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("artWorkId")) || "".equals(jsonObj.getString("tab"))) {
+//                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+//            }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artWorkId",jsonObj.getString("artWorkId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+//            String signmsg = jsonObj.getString("signmsg");
+//            treeMap.put("artWorkId",jsonObj.getString("artWorkId"));
+//            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+//            treeMap.put("pageSize", jsonObj.getString("pageSize"));
+//            treeMap.put("pageIndex", jsonObj.getString("pageIndex"));
+//            treeMap.put("tab",jsonObj.getString("tab"));
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
+            //项目详情
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
-//            ArtWorkBean artWorkBean = new ArtWorkBean();
-//            artWorkBean.setArtwork(artwork);
-         //   artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-
-            XQuery xQuery = new XQuery("listArtworkInvest1_default",request);
-            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
-            List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>)baseManager.listObject(xQuery);
-            List<User> userList = new ArrayList<>();
-            for(ArtworkInvest artworkInvest : artworkInvestList){
-                userList.add(artworkInvest.getCreator());
+            //投资人数
+            Integer investNum = 0;
+            if(artwork.getArtworkInvests()!=null){
+                investNum = artwork.getArtworkInvests().size();
             }
+            //剩余时间
+            String time = TimeUtil.getDistanceTimes2(new Date(),artwork.getInvestStartDatetime(),"",TimeUtil.SECOND).get("time").toString();
+            //项目文件
+            List<ArtworkAttachment> artworkAttachmentList = null;
+            //项目制作过程说明、融资解惑
+            Artworkdirection artworkdirection = null;
+            //评论列表
+            List<ArtworkComment> artworkCommentList = null;
+            //投资记录列表
+            List<ArtworkInvest> artworkInvestList = null;
+            //投资top
+            List<ArtworkInvest> artworkInvestTopList = null;
+            if("view".equals(jsonObj.getString("tab"))){
+                artworkdirection = artwork.getArtworkdirection();
+                artworkAttachmentList = artwork.getArtworkAttachment();
+            }else if("comment".equals(jsonObj.getString("tab"))){
+
+                artworkCommentList = artwork.getArtworkComments();
+
+            }else if("invest".equals(jsonObj.getString("tab"))){
+                if(artwork.getArtworkInvests().size()>3){
+                    artworkInvestTopList = new ArrayList<>();
+                    for(int i=0;i<3;i++){
+                        artworkInvestTopList.add(artwork.getArtworkInvests().get(i));
+                    }
+                }else {
+                    artworkInvestTopList = artwork.getArtworkInvests();
+                }
+                XQuery xQuery = new XQuery("plistArtworkInvest_default",request);
+                PageEntity pageEntity = new PageEntity();
+                pageEntity.setSize(jsonObj.getInteger("pageSize"));
+                pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
+                xQuery.setPageEntity(pageEntity);
+//                xQuery.put("pageEntity_size",jsonObj.getString("pageSize"));
+//                xQuery.put("pageEntity_index",jsonObj.getString("pageIndex"));
+                artworkInvestList = baseManager.listPageInfo(xQuery).getList();
+
+//                        artworkInvestList = artwork.getArtworkInvests();
+            }else {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+            //投资记录
+//            XQuery xQuery = new XQuery("listArtworkInvest1_default",request);
+//            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
+//            List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>)baseManager.listObject(xQuery);
+//            List<User> userList = new ArrayList<>();
+//            for(ArtworkInvest artworkInvest : artworkInvestList){
+//                userList.add(artworkInvest.getCreator());
+//            }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("object",artwork);
-            resultMap.put("investUserList",userList);
+            resultMap.put("investNum",investNum);
+            resultMap.put("time",time);
+            resultMap.put("artworkAttachmentList",artworkAttachmentList);
+            resultMap.put("artworkdirection",artworkdirection);
+            resultMap.put("artworkCommentList",artworkCommentList);
+            resultMap.put("artworkInvestList",artworkInvestList);
+            resultMap.put("artworkInvestTopList",artworkInvestTopList);
         } catch(Exception e){
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -365,7 +422,7 @@ public class ArtworkController extends BaseController {
             treeMap.put("userId",request.getParameter("userId"));
             treeMap.put("timestamp",request.getParameter("timestamp"));
             treeMap.put("title",request.getParameter("title"));
-            treeMap.put("brief", request.getParameter("brief"));
+            treeMap.put("investGoalMoney", request.getParameter("investGoalMoney"));
             treeMap.put("duration",request.getParameter("duration"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -378,8 +435,9 @@ public class ArtworkController extends BaseController {
                 if (user!=null && user.getId()!=null) {
 
                     Artwork artwork = new Artwork();
+                    artwork.setStatus("0");//不可用状态，不能进入融资阶段
                     artwork.setType("0");
-                    artwork.setStep("10");
+                    artwork.setStep("100");//编辑阶段，尚未提交 提交后置为 10
                     artwork.setTitle(request.getParameter("title"));
                     artwork.setBrief(request.getParameter("brief"));
                     artwork.setDuration(Integer.parseInt(request.getParameter("duration")));
@@ -435,9 +493,10 @@ public class ArtworkController extends BaseController {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
         try{
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+
             logBean.setCreateDate(new Date());//操作时间
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setRequestMessage(request.getParameter("artworkId")+" "+request.getParameter("description")
+                    +" "+request.getParameter("timestamp") +" "+request.getParameter("signmsg"));//************记录请求报文
             logBean.setApiName("initNewArtWork2");
             if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
                     || "".equals(request.getParameter("description"))
@@ -455,7 +514,7 @@ public class ArtworkController extends BaseController {
             }
 
 
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artworkId"));
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),request.getParameter("artworkId"));
             try {
                 if (artwork!=null && artwork.getId()!=null) {
 
@@ -473,10 +532,11 @@ public class ArtworkController extends BaseController {
                         //转换成多部分request
                         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest)request;
                         //取得request中的所有文件名
-                        Iterator<String> iter = multiRequest.getFileNames();
+                        Iterator<MultipartFile> iter = multiRequest.getFiles("file").iterator();
                         while(iter.hasNext()) {
                             //取得上传文件
-                            MultipartFile file = multiRequest.getFile(iter.next());
+                            //MultipartFile file = multiRequest.getFile(iter.next());
+                            MultipartFile file = iter.next();
                             if (file != null) {
                                 ArtworkAttachment artworkAttachment = new ArtworkAttachment();//项目附件
                                 //取得当前上传文件的文件名称
@@ -493,10 +553,11 @@ public class ArtworkController extends BaseController {
                                     artworkAttachment.setFileType(myFileName.substring(myFileName.lastIndexOf("."),myFileName.length()));
                                     artworkAttachment.setFileName(pictureUrl);
                                     //artworkAttachments.add(artworkAttachment);
+                                    baseManager.saveOrUpdate(ArtworkAttachment.class.getName(),artworkAttachment);
                                     artwork.getArtworkAttachment().add(artworkAttachment);
                                 }
                             }
-                        }
+                          }
                         }
                     //artwork.setArtworkAttachment(artworkAttachments);
                     baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
@@ -535,12 +596,11 @@ public class ArtworkController extends BaseController {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
         try{
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setRequestMessage(request.getParameter("artworkId")+" ...");//************记录请求报文
             logBean.setApiName("releaseArtworkDynamic");
             if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
-                    || "".equals(request.getParameter("content"))
+
                     || "".equals(request.getParameter("artworkId"))  || "".equals(request.getParameter("type"))
                     ) {
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
@@ -555,15 +615,17 @@ public class ArtworkController extends BaseController {
             }
 
 
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artworkId"));
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),request.getParameter("artworkId"));
             try {
                 if (artwork!=null && artwork.getId()!=null) {
 
                     ArtworkMessage artworkMessage = new  ArtworkMessage();
-                    artworkMessage.setContent(request.getParameter("content"));
+                    artworkMessage.setContent(!"".equals(request.getParameter("content"))?request.getParameter("content"):"");
                     artworkMessage.setCreator(artwork.getAuthor());
                     artworkMessage.setArtwork(artwork);
-                    List<ArtworkMessageAttachment> artworkMessageAttachments =  new ArrayList<ArtworkMessageAttachment>();//动态附件有可能是多个文件
+                    artworkMessage.setCreateDatetime(new Date());
+                    baseManager.saveOrUpdate(ArtworkMessage.class.getName(),artworkMessage);
+                    //List<ArtworkMessageAttachment> artworkMessageAttachments =  new ArrayList<ArtworkMessageAttachment>();//动态附件有可能是多个文件
                     //创建一个通用的多部分解析器
                     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                     //判断 request 是否有文件上传,即多部分请求
@@ -581,23 +643,33 @@ public class ArtworkController extends BaseController {
                                 String myFileName = file.getOriginalFilename();
                                 //如果名称不为“”,说明该文件存在，否则说明该文件不存在
                                 if (myFileName.trim() != "") {
-
                                     //重命名上传后的文件名
-                                    String url = "artwork/" +new  Date().getTime() +myFileName;
-                                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
+                                    StringBuilder url = new StringBuilder("artwork/");
+
+                                    if("0".equals(request.getParameter("type"))){
+                                        url.append("picture/"+new  Date().getTime() +myFileName);
+                                    }else if("1".equals(request.getParameter("type"))){
+                                        url.append("video/"+new  Date().getTime() +myFileName);
+                                    }else {
+                                        url.append(new  Date().getTime() +myFileName);
+                                    }
+
+                                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url.toString();
                                     //将图片上传至阿里云
-                                    aliOssUploadManager.uploadFile(file,"ec-efeiyi2",url);
+                                    aliOssUploadManager.uploadFile(file,"ec-efeiyi2",url.toString());
                                     artworkMessageAttachment.setFileUri(pictureUrl);
                                     artworkMessageAttachment.setArtworkMessage(artworkMessage);
                                     artworkMessageAttachment.setFileType(request.getParameter("type"));
-                                    artworkMessageAttachments.add(artworkMessageAttachment);
+                                    //artworkMessageAttachments.add(artworkMessageAttachment);
+                                    baseManager.saveOrUpdate(ArtworkMessageAttachment.class.getName(),artworkMessageAttachment);
+                                    //artworkMessage.getArtworkMessageAttachments().add(artworkMessageAttachment);
                                 }
                             }
                         }
                     }
-                    artworkMessage.setCreateDatetime(new Date());
-                    artworkMessage.setArtworkMessageAttachments(artworkMessageAttachments);
-                    baseManager.saveOrUpdate(ArtworkMessage.class.getName(),artworkMessage);
+                    //artworkMessage.setCreateDatetime(new Date());
+                    //artworkMessage.setArtworkMessageAttachments(artworkMessageAttachments);
+                    //baseManager.saveOrUpdate(ArtworkMessage.class.getName(),artworkMessage);
                     resultMap = resultMapHandler.handlerResult("0","成功",logBean);
                     resultMap.put("artworkId",artwork.getId());
                     return resultMap;
@@ -638,31 +710,34 @@ public class ArtworkController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("timestamp", timestamp);
         /**investorArtWork.do测试加密参数**/
-//        map.put("artWorkId","qydeyugqqiugd2");
-//        map.put("timestamp", timestamp);
+        map.put("tab","invest");
+        map.put("artWorkId","qydeyugqqiugd2");
+        map.put("pageSize","4");
+        map.put("pageIndex","1");
+        map.put("timestamp", timestamp);
 
         /**masterView.do测试加密参数**/
-        map.put("pageSize","3");
-        map.put("pageNum","1");
-        map.put("masterId","icjxkedl0000b6i0");
+//        map.put("pageSize","3");
+//        map.put("pageNum","1");
+//        map.put("masterId","icjxkedl0000b6i0");
 //        map.put("timestamp", timestamp);
         /**guestView.do测试加密参数**/
 //        map.put("userId","icjxkedl0000b6i0");
-        map.put("timestamp", timestamp);
+//        map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/masterView.do";
+        String url = "http://192.168.1.80:8001/app/investorArtWork.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
-//        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"pageIndex\":\"1\",\"pageSize\":\"4\",\"tab\":\"invest\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  investorIndex.do测试 **/
 //        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  guestView.do测试 **/
 //        String json = "{\"userId\":\"icjxkedl0000b6i0\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  masterView.do测试 **/
-        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+//        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 

@@ -295,7 +295,7 @@
         </entity>
         <entity name="User" label="用户"
                 basic="simple" others=""
-                model="com.efeiyi.ec.organization.model.User">
+                model="com.efeiyi.ec.art.organization.model.User">
             <fields>
                 <field name="sex" label="性别" inputType="text">
                     <statusType fieldName="sex">
