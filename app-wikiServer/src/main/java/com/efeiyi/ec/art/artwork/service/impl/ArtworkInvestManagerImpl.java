@@ -64,7 +64,7 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
 
 
                         if (price.doubleValue()<2.0){
-                            return resultMapHandler.handlerResult("100012","投资金额不能小于2元",logBean);
+                            return resultMapHandler.handlerResult("100018","投资金额不能小于2元",logBean);
                         }
                         if (price.doubleValue()>investGoalMoney.doubleValue()){
                             return resultMapHandler.handlerResult("100014","投资金额最多"+investGoalMoney.doubleValue()+"元",logBean);
