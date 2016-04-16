@@ -1,16 +1,19 @@
 package com.efeiyi.ec.art.base.service.impl;
 
 import com.efeiyi.ec.art.base.service.ThreadManager;
+import com.efeiyi.ec.art.base.thread.ThreadLaunch;
 import com.efeiyi.ec.art.base.thread.UpdateArtWorkStatusThread;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.organization.OrganizationConst;
 import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
+import com.ming800.core.p.model.SolrReactor;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,7 +25,7 @@ import java.util.concurrent.Executors;
 public class ThreadManagerImpl implements ThreadManager {
     private static Logger log = Logger.getLogger(ThreadManagerImpl.class);
 
-    public void startWork(List<Artwork> artworks) throws Exception{
+  /*  public void startWork(List<Artwork> artworks) throws Exception{
         ExecutorService pool = Executors.newFixedThreadPool(OrganizationConst.THREAD_POOL_CORE_COUNT);
         log.info("开始创建线程池");
         System.out.println("开始创建线程池...");
@@ -38,5 +41,39 @@ public class ThreadManagerImpl implements ThreadManager {
         pool.shutdown();
         log.info("关闭线程池");
         System.out.println("关闭线程池...");
+    }*/
+
+    public void startWork(List<Artwork> artworks) throws Exception{
+
+        //ThreadLaunch.getInstance().artworkQueue = putQueue(artworks);
+        putQueue(artworks);
+        try{
+            synchronized(ThreadLaunch.getInstance().artworkQueue){
+
+               if(!ThreadLaunch.getInstance().artworkQueue.isEmpty()) {
+                   ThreadLaunch.getInstance().artworkQueue.notifyAll();
+               }
+                ThreadLaunch.getInstance().artworkQueue.wait();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+
+
     }
+
+   //将所有待处理的artwort 放入任务队列中
+    private  void putQueue(List<Artwork> artworks){
+        if (artworks!=null && !artworks.isEmpty()){
+            synchronized(ThreadLaunch.getInstance().artworkQueue){
+                for (Artwork artwork:artworks){
+                    ThreadLaunch.getInstance().artworkQueue.offer(artwork);
+                }
+            }
+
+        }
+
+    }
+
 }

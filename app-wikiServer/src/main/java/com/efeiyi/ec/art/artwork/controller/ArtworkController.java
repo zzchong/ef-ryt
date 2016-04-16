@@ -768,7 +768,7 @@ public class ArtworkController extends BaseController {
 
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/artworkPraise.do";
+        String url = "http://192.168.1.69:8001/app/artworkPraise.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
