@@ -132,7 +132,7 @@ public class UpdateArtWorkStatusThread implements  Runnable {
                  session.saveOrUpdate(Artwork.class.getName(),session.merge(Artwork.class.getName(),artwork));
                  if(flag==true){
                      //解冻用户保证金
-                     List<MarginAccount>  marginAccounts = session.createQuery(AppConfig.SQL_MARGIN_ACCOUNT_LIST).setString(1,artwork.getId()).list();
+                     List<MarginAccount>  marginAccounts = session.createQuery(AppConfig.SQL_MARGIN_ACCOUNT_LIST).setString("artworkId",artwork.getId()).list();
                      if(marginAccounts!= null && !marginAccounts.isEmpty()){
                          for(MarginAccount marginAccount: marginAccounts){
                              Account account = marginAccount.getAccount();
@@ -153,7 +153,7 @@ public class UpdateArtWorkStatusThread implements  Runnable {
                      */
                      //计算比率
                      BigDecimal rate = artworkBidding.getPrice().divide(artwork.getInvestGoalMoney());
-                     List<ArtworkInvest>  artworkInvests = session.createQuery(AppConfig.SQL_INVEST_MONEY_ARTWORK_LIST).setString(1,artwork.getId()).list();
+                     List<ArtworkInvest>  artworkInvests = session.createQuery(AppConfig.SQL_INVEST_MONEY_ARTWORK_LIST).setString("artworkId",artwork.getId()).list();
                    if (artworkInvests!= null && !artworkInvests.isEmpty()){
                        for(ArtworkInvest artworkInvest  :  artworkInvests){
                            Account account = artworkInvest.getAccount();
