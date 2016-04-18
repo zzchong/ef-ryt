@@ -252,5 +252,19 @@
 
             </does>
         </entity>
+        <entity name="MarginAccount" label="MarginAccount"
+                basic="simple" others=""
+                model="com.efeiyi.ec.art.model.MarginAccount">
+            <does>
+                <do name="listMarginAccount" access="" label="MarginAccount列表"
+                    result="json">
+                    <query name="default" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="artwork.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="eq"/>
+                    </query>
+                </do>
+
+            </does>
+        </entity>
     </entities>
 </module>

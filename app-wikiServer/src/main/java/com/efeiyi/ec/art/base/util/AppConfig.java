@@ -50,4 +50,7 @@ public class AppConfig {
     public static final String GET_ART_WORK_BY_ARTIST = "from Artwork where author= :author";
 
     public static final String SQL_INVEST_MONEY_ARTWORK = "select SUM(price) FROM ArtworkInvest where artwork.id = :artworkId  and status<>'0'";
+//获取保证金列表
+    public static final String SQL_MARGIN_ACCOUNT_LIST =" from MarginAccount where artwork.id=:artworkId and status='0'";
+
 }

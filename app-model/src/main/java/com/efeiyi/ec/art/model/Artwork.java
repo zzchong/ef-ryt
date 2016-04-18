@@ -340,8 +340,10 @@ public class Artwork implements Serializable {
         this.newCreationDate = newCreationDate;
     }
 
-    @Transient
-    public User getWinner() {
+   // @Transient
+   @ManyToOne(fetch = FetchType.EAGER)
+   @JoinColumn(name="winner_id")
+   public User getWinner() {
         return winner;
     }
 
