@@ -46,18 +46,41 @@ public class ThreadManagerImpl implements ThreadManager {
     public void startWork(List<Artwork> artworks) throws Exception{
 
         //ThreadLaunch.getInstance().artworkQueue = putQueue(artworks);
-        putQueue(artworks);
+        //putQueue(artworks);
+        ThreadLaunch.getInstance().lock.lock();
         try{
-            synchronized(ThreadLaunch.getInstance().artworkQueue){
-
-               if(!ThreadLaunch.getInstance().artworkQueue.isEmpty()) {
-                   ThreadLaunch.getInstance().artworkQueue.notifyAll();
-               }
-                ThreadLaunch.getInstance().artworkQueue.wait();
+            if (artworks != null && !artworks.isEmpty()) {
+                for (Artwork artwork : artworks) {
+                    ThreadLaunch.getInstance().artworkQueue.offer(artwork);
+                }
+            }else {
+                ThreadLaunch.getInstance().condition.await();
             }
+
+
+
+            if (!ThreadLaunch.getInstance().artworkQueue.isEmpty()) {
+                //ThreadLaunch.getInstance().artworkQueue.notifyAll();
+                ThreadLaunch.getInstance().condition.signalAll();
+            }
+            //ThreadLaunch.getInstance().artworkQueue.wait();
+
+            ThreadLaunch.getInstance().condition.await();
+
+            /*if(!ThreadLaunch.getInstance().artworkQueue.isEmpty()) {
+                synchronized (ThreadLaunch.getInstance().artworkQueue) {
+
+                    if (!ThreadLaunch.getInstance().artworkQueue.isEmpty()) {
+                        ThreadLaunch.getInstance().artworkQueue.notifyAll();
+                    }
+                    ThreadLaunch.getInstance().artworkQueue.wait();
+                }
+            }*/
         }catch (Exception e){
             e.printStackTrace();
 
+        }finally {
+            ThreadLaunch.getInstance().lock.unlock();
         }
 
 
@@ -65,15 +88,30 @@ public class ThreadManagerImpl implements ThreadManager {
 
    //将所有待处理的artwort 放入任务队列中
     private  void putQueue(List<Artwork> artworks){
-        if (artworks!=null && !artworks.isEmpty()){
-            synchronized(ThreadLaunch.getInstance().artworkQueue){
-                for (Artwork artwork:artworks){
-                    ThreadLaunch.getInstance().artworkQueue.offer(artwork);
+       /* if (artworks!=null && !artworks.isEmpty()){
+            synchronized(ThreadLaunch.getInstance().artworkQueue) {
+                if (artworks != null && !artworks.isEmpty()) {
+                    for (Artwork artwork : artworks) {
+                        ThreadLaunch.getInstance().artworkQueue.offer(artwork);
+                    }
                 }
             }
+        }*/
+        ThreadLaunch.getInstance().lock.lock();
+        try{
+            if (artworks != null && !artworks.isEmpty()) {
+                for (Artwork artwork : artworks) {
+                            ThreadLaunch.getInstance().artworkQueue.offer(artwork);
+                }
+            }else {
+                ThreadLaunch.getInstance().condition.await();
+            }
 
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            ThreadLaunch.getInstance().lock.unlock();
         }
-
     }
 
 }

@@ -78,21 +78,32 @@ public class UpdateArtWorkStatusThread implements  Runnable {
     @Override
     public void run() {
         while (true){
+            ThreadLaunch.getInstance().lock.lock();
             try{
-                synchronized(ThreadLaunch.getInstance().artworkQueue){
-                  if (ThreadLaunch.getInstance().artworkQueue.isEmpty()){
-                       ThreadLaunch.getInstance().artworkQueue.wait();
-                      System.out.println("UpdateArtWorkStatusThread "+name+"wait...");
-                   }
+                /*if (ThreadLaunch.getInstance().artworkQueue.isEmpty()) {
+                    synchronized (ThreadLaunch.getInstance().artworkQueue) {
+                        if (ThreadLaunch.getInstance().artworkQueue.isEmpty()) {
+                            ThreadLaunch.getInstance().artworkQueue.wait();
+                            System.out.println("UpdateArtWorkStatusThread " + name + "wait...");
+                        }
 
-                   artwork = ThreadLaunch.getInstance().artworkQueue.poll();
+                    }
+                }*/
+                        if (ThreadLaunch.getInstance().artworkQueue.isEmpty()) {
+                            //ThreadLaunch.getInstance().artworkQueue.wait();
+                            ThreadLaunch.getInstance().condition.await();
+                            System.out.println("UpdateArtWorkStatusThread " + name + "wait...");
+                        }
 
-                }
+
+                artwork = ThreadLaunch.getInstance().artworkQueue.poll();
                 if (artwork!=null)
                     exeBatchUpdate(artwork);
             }catch (InterruptedException e){
                 e.printStackTrace();
 
+            }finally {
+                ThreadLaunch.getInstance().lock.unlock();
             }
         }
     }
