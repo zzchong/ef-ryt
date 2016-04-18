@@ -2,6 +2,7 @@ package com.efeiyi.ec.art.base.thread;
 
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.ContextUtils;
+import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkBidding;
 import com.efeiyi.ec.art.model.MarginAccount;
@@ -132,12 +133,27 @@ public class UpdateArtWorkStatusThread implements  Runnable {
                  session.saveOrUpdate(Artwork.class.getName(),session.merge(Artwork.class.getName(),artwork));
                  if(flag==true){
                      //解冻用户保证金
-                     List<MarginAccount>  marginAccounts = session.createQuery(AppConfig.SQL_MARGIN_ACCOUNT_LIST).setString(0,artwork.getId()).list();
+                     List<MarginAccount>  marginAccounts = session.createQuery(AppConfig.SQL_MARGIN_ACCOUNT_LIST).setString(1,artwork.getId()).list();
                      if(marginAccounts!= null && !marginAccounts.isEmpty()){
                          for(MarginAccount marginAccount: marginAccounts){
-
+                             Account account = marginAccount.getAccount();
+                             if(account.getUser().getId().equals(artwork.getWinner().getId())){//过滤掉竞拍得主
+                                 continue;
+                             }
+                             marginAccount.setEndDatetime(new Date());
+                             marginAccount.setStatus("3");//解冻状态
+                             account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(marginAccount.getCurrentBalance()));
+                             session.saveOrUpdate(Account.class.getName(),session.merge(Account.class.getName(),account));
+                             session.saveOrUpdate(MarginAccount.class.getName(),session.merge(MarginAccount.class.getName(),marginAccount));
                          }
                      }
+                     /*返回投资收益
+                     * 1.查出投资列表
+                     * 2.计算投资回报额
+                     * 3.返回收益到用户账户
+                     */
+
+
                  }
 
 
