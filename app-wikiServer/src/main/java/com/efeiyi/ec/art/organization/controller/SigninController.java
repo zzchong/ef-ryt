@@ -6,6 +6,7 @@ import cn.jpush.api.common.resp.APIConnectionException;
 import cn.jpush.api.common.resp.APIRequestException;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.PushUserBinding;
 import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.MyUser;
@@ -39,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -166,6 +168,14 @@ public class SigninController extends BaseController {
             myUser.setStatus(1);
             myUser.setCreateDatetime(new Date());
             baseManager.saveOrUpdate(MyUser.class.getName(),myUser);
+            //给用户绑定一个账户
+            Account account = new Account();
+            account.setCurrentUsableBalance(new BigDecimal("0.00"));
+            account.setCurrentBalance(new BigDecimal("0.00"));
+            account.setCreateDatetime(new Date());
+            account.setStatus("1");
+            account.setUser((User)baseManager.getObject(User.class.getName(),myUser.getId()));
+            baseManager.saveOrUpdate(Account.class.getName(),account);
             resultMap = resultMapHandler.handlerResult("0","注册成功！",logBean);
             resultMap.put("userInfo",myUser);//响应的用户信息
             return  resultMap;
