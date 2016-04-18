@@ -4,12 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkAuctionManager;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
+import com.efeiyi.ec.art.base.util.JPushConfig;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.jpush.EfeiyiPush;
 import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkBidding;
 import com.efeiyi.ec.art.model.MarginAccount;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.util.JsonUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -101,6 +104,14 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             artworkBidding.setPrice(jsonObj.getBigDecimal("price"));
             getCurrentSession().saveOrUpdate(artworkBidding);
 
+            //透传所有终端新竞价
+            Map<String,Object> map = new HashMap();
+            map.put("msg_content","new bid updated");
+            map.put("content_type","text");
+            map.put("title","newBid");
+            map.put("json", JsonUtil.getJsonString(artworkBidding));
+            EfeiyiPush.buildPushObject_android_and_ios_message(map);
+
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {
             e.getMessage();
@@ -179,13 +190,13 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
         map.put("timestamp", timestamp);
         map.put("userId", "igxhnwhnmhlwkvnw");
         map.put("artworkId", "qydeyugqqiugd7");
-//        map.put("price", "500");
+        map.put("price", "500");
 
         String signmsg = DigitalSignatureUtil.encrypt(map);
         map.put("signmsg", signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-//        String url = "http://192.168.1.41:8080/app/artworkBid.do";
-        String url = "http://192.168.1.41:8080/app/artWorkAuctionPayDeposit.do";
+        String url = "http://192.168.1.41:8080/app/artworkBid.do";
+//        String url = "http://192.168.1.41:8080/app/artWorkAuctionPayDeposit.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
