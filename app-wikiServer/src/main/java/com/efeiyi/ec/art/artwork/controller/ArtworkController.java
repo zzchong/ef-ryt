@@ -448,11 +448,11 @@ public class ArtworkController extends BaseController {
             }
             //投资回报
             BigDecimal reward = new BigDecimal(0);
-            xQuery = new XQuery("listInvestReward_default",request);
-            xQuery.put("investUser_id",jsonObj.getString("userId"));
-            List<InvestReward> investRewards = (List<InvestReward>)baseManager.listObject(xQuery);
-            for (InvestReward investReward : investRewards){
-                reward = reward.add(investReward.getReward());
+            xQuery = new XQuery("listROIRecord_default",request);
+            xQuery.put("user_id",jsonObj.getString("userId"));
+            List<ROIRecord> roiRecordList = (List<ROIRecord>)baseManager.listObject(xQuery);
+            for (ROIRecord roiRecord : roiRecordList){
+                reward = reward.add(roiRecord.getCurrentBalance());
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("user",user);

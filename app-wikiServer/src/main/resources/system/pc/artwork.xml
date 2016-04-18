@@ -164,20 +164,20 @@
             </does>
         </entity>
 
-        <entity name="InvestReward" label="Artwork"
+        <entity name="ROIRecord" label="ROIRecord"
                 basic="simple" others=""
-                model="com.efeiyi.ec.art.model.InvestReward">
+                model="com.efeiyi.ec.art.model.ROIRecord">
             <does>
-                <do name="plistInvestReward" access="" label="InvestReward列表"
+                <do name="plistROIRecord" access="" label="ROIRecord列表"
                     result="json">
                     <query name="default" label="默认" type="auto" orderBy="id:desc">
                         <condition name="id" defaultValue="0" operation="ne"/>
                     </query>
                 </do>
-                <do name="listInvestReward" access="" label="InvestReward列表"
+                <do name="listROIRecord" access="" label="ROIRecord列表"
                     result="json">
                     <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
-                        <condition name="investUser.id" defaultValue="0" operation="eq"/>
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
                         <condition name="status" defaultValue="1" operation="eq"/>
                     </query>
                 </do>
