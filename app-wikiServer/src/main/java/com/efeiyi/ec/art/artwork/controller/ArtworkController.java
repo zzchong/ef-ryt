@@ -2,7 +2,7 @@ package com.efeiyi.ec.art.artwork.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.efeiyi.ec.art.artwork.service.ArtworkPraiseManager;
+import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
@@ -12,7 +12,6 @@ import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.User;
-import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
@@ -20,7 +19,6 @@ import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
-import com.ming800.core.util.MD5Encode;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -63,7 +61,7 @@ public class ArtworkController extends BaseController {
     AliOssUploadManager aliOssUploadManager;
 
     @Autowired
-    private ArtworkPraiseManager artworkPraiseManager;
+    private ArtworkManager artworkManager;
 
 
 
@@ -275,7 +273,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
-            if(artworkPraiseManager.saveArtWorkPraise(jsonObject.getString("artWorkId"),jsonObject.getString("currentUserId"))){
+            if(artworkManager.saveArtWorkPraise(jsonObject.getString("artWorkId"),jsonObject.getString("currentUserId"))){
                 resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             }else {
                 return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
@@ -287,6 +285,44 @@ public class ArtworkController extends BaseController {
         }
         return  resultMap;
     }
+
+
+    /**
+     * 评论
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/artworkComment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public  Map artworkComment(HttpServletRequest request){
+        LogBean logBean = new LogBean();
+        Map<String,Object> resultMap = new HashMap<>();
+        List objectList = null;
+        try {
+            JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObject.toString());
+            logBean.setApiName("artworkComment");
+            if(!CommonUtil.jsonObject(jsonObject)){
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            if(!DigitalSignatureUtil.verify2(jsonObject)){
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
+            if(artworkManager.saveArtWorkComment(jsonObject.getString("artWorkId"),jsonObject.getString("content"),jsonObject.getString("fatherCommentId"),jsonObject.getString("currentUserId"))){
+                resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+            }else {
+                return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+        return  resultMap;
+    }
+
     /**
      * 艺术家页面
      * @param request
@@ -412,11 +448,11 @@ public class ArtworkController extends BaseController {
             }
             //投资回报
             BigDecimal reward = new BigDecimal(0);
-            xQuery = new XQuery("listInvestReward_default",request);
-            xQuery.put("investUser_id",jsonObj.getString("userId"));
-            List<InvestReward> investRewards = (List<InvestReward>)baseManager.listObject(xQuery);
-            for (InvestReward investReward : investRewards){
-                reward = reward.add(investReward.getReward());
+            xQuery = new XQuery("listROIRecord_default",request);
+            xQuery.put("user_id",jsonObj.getString("userId"));
+            List<ROIRecord> roiRecordList = (List<ROIRecord>)baseManager.listObject(xQuery);
+            for (ROIRecord roiRecord : roiRecordList){
+                reward = reward.add(roiRecord.getCurrentBalance());
             }
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("user",user);
@@ -762,13 +798,19 @@ public class ArtworkController extends BaseController {
 //        map.put("timestamp", timestamp);
 
         /**artworkPraise.do测试加密参数**/
+//        map.put("artWorkId","qydeyugqqiugd2");
+//        map.put("currentUserId","iih8wrlm31r449bh");
+//        map.put("timestamp", timestamp);
+
+        /**artworkComment.do测试加密参数**/
         map.put("artWorkId","qydeyugqqiugd2");
         map.put("currentUserId","iih8wrlm31r449bh");
+        map.put("fatherCommentId","3");
+        map.put("content","同意+1");
         map.put("timestamp", timestamp);
-
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.69:8001/app/artworkPraise.do";
+        String url = "http://192.168.1.69:8001/app/artworkComment.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
@@ -782,7 +824,10 @@ public class ArtworkController extends BaseController {
         /**json参数  masterView.do测试 **/
 //        String json = "{\"masterId\":\"icjxkedl0000b6i0\",\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artworkPraise.do测试 **/
-        String json = "{\"currentUserId\":\"iih8wrlm31r449bh\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+//        String json = "{\"currentUserId\":\"iih8wrlm31r449bh\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+
+        /**json参数  artworkPraise.do测试 **/
+        String json = "{\"content\":\"同意+1\",\"fatherCommentId\":\"3\",\"currentUserId\":\"iih8wrlm31r449bh\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 

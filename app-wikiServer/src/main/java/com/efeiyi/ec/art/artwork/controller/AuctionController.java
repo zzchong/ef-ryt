@@ -124,10 +124,13 @@ public class AuctionController extends BaseController {
                 if ("3".equals(artwork.getType()) && "32".equals(artwork.getStep())) {//拍卖已经结束
 
                     //ArtworkBidding artworkBidding = (ArtworkBidding)baseManager.getUniqueObjectByConditions(AppConfig.GET_ART_WORK_WINNER,param);
-                    ArtworkBidding artworkBidding = (ArtworkBidding) xdoDao.getSession().createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
+                  /*  ArtworkBidding artworkBidding = (ArtworkBidding) xdoDao.getSession().createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
                     if (artworkBidding != null && artworkBidding.getId() != null) {
                         artwork.setWinner(artworkBidding.getCreator()); //设置竞拍得主
                     } else {
+                        artwork.setWinner(new User()); //设置竞拍得主为空
+                    }*/
+                    if (artwork.getWinner()== null || artwork.getWinner().getId()==null){
                         artwork.setWinner(new User()); //设置竞拍得主为空
                     }
                 } else {

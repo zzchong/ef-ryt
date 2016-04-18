@@ -4,6 +4,8 @@ import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.ContextUtils;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkBidding;
+import com.efeiyi.ec.art.model.MarginAccount;
+import com.efeiyi.ec.art.organization.model.User;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -11,6 +13,7 @@ import org.hibernate.SessionFactory;
 
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/4/8.
@@ -111,21 +114,38 @@ public class UpdateArtWorkStatusThread implements  Runnable {
     private void exeBatchUpdate(Artwork artwork){
         log.info("begin exeBatchInsert:");
         System.out.println("开始处理任务...");
-
+       boolean flag =false;
         try{
             session = ((SessionFactory)ContextUtils.getBean("sessionFactory")).openSession();
          if ("3".equals(artwork.getType()) && "31".equals(artwork.getStep())){//符合条件
              ArtworkBidding artworkBidding = (ArtworkBidding)session.createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
-             if(artworkBidding.getId()!=null && artworkBidding.getCreator().getId()!= null){//竞拍得主
-                  if(artwork.getAuctionEndDatetime().getTime()<=new Date().getTime()){
+             if(artworkBidding.getId()!=null && artworkBidding.getCreator().getId()!= null){//有竞价记录
+
+                  if(artwork.getAuctionEndDatetime().getTime()<=new Date().getTime()){//结束时间已过
+                      artwork.setWinner(artworkBidding.getCreator()); //设置竞拍得主
                       artwork.setStep("32");
-                  }else {
-                      artwork.setStep("33");
+                      flag = true;
                   }
                  //baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
                  //((BaseManagerImpl)ContextUtils.getBean("bseManagerImpl")).saveOrUpdate(Artwork.class.getName(), artwork);
 
                  session.saveOrUpdate(Artwork.class.getName(),session.merge(Artwork.class.getName(),artwork));
+                 if(flag==true){
+                     //解冻用户保证金
+                     List<MarginAccount>  marginAccounts = session.createQuery(AppConfig.SQL_MARGIN_ACCOUNT_LIST).setString(0,artwork.getId()).list();
+                     if(marginAccounts!= null && !marginAccounts.isEmpty()){
+                         for(MarginAccount marginAccount: marginAccounts){
+
+                         }
+                     }
+                 }
+
+
+             }else {////无竞价记录
+                 if(artwork.getAuctionEndDatetime().getTime()<=new Date().getTime()){
+                     artwork.setWinner(new User()); //设置流拍
+                     artwork.setStep("33");
+                 }
              }
          }
             System.out.println("处理任务结束...");
