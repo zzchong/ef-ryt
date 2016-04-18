@@ -17,6 +17,7 @@ import cn.jpush.api.push.model.notification.Notification;
 import com.efeiyi.ec.art.model.ArtworkComment;
 import org.apache.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -130,6 +131,33 @@ public class EfeiyiPush {
             logger.info("Error Message: " + e.getErrorMessage());
             logger.info("Msg ID: " + e.getMsgId());
         }
+    }
+
+    /**
+     * map:cid content title
+     * @param appKey
+     * @param masterSecret
+     * @param map
+     */
+    public static  void sendPushToSingle(String appKey,String masterSecret,Map map){
+        JPushClient jPushClient = new JPushClient(masterSecret,appKey);
+        PushPayload payload=buildPushObject_android_and_ios_single(map);
+        try {
+            PushResult result = jPushClient.sendPush(payload);
+//            System.out.println(result+"................................");
+            logger.info("Got result - " + result);
+
+        } catch (APIConnectionException e) {
+            logger.error("Connection error. Should retry later. ", e);
+
+        } catch (APIRequestException e) {
+            e.printStackTrace();
+            logger.error("Error response from JPush server. Should review and fix it. ", e);
+            logger.info("HTTP Status: " + e.getStatus());
+            logger.info("Error Code: " + e.getErrorCode());
+            logger.info("Error Message: " + e.getErrorMessage());
+        }
+
     }
     public static PushPayload buildPushObject_all_all_alert() {
         return PushPayload.alertAll(ALERT);
@@ -268,4 +296,32 @@ public class EfeiyiPush {
                         .build())
                 .build();
     }
+
+    /**
+     * 单个通知 或者 多人通知
+     * @param map
+     * @return
+     */
+   public static PushPayload buildPushObject_android_and_ios_single(Map map){
+       return PushPayload.newBuilder()
+               .setPlatform(Platform.android_ios())
+               //.setAudience(Audience.all())
+               .setAudience(Audience.registrationId((List<String>)map.get("cid")))
+               .setNotification(Notification.newBuilder()
+                       .setAlert(map.get("content").toString())
+                       .addPlatformNotification(AndroidNotification.newBuilder()
+                               .setTitle(TITLE)
+                               .setAlert(map.get("content").toString())
+                               .addExtra("extra_key", "extra_value")
+                               .build())
+                       .addPlatformNotification(IosNotification.newBuilder()
+                               .setAlert(map.get("content").toString())
+                               .setBadge(5)
+                               .setSound("happy")
+                               .addExtra("from", "JPush")
+                               .incrBadge(1)
+                               .addExtra("extra_key", "extra_value").build())
+                       .build())
+               .build();
+   }
 }
