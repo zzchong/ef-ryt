@@ -156,6 +156,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
         marginAccount.setAccount(account);
         marginAccount.setCurrentBalance(deposit);
         getCurrentSession().saveOrUpdate(marginAccount);
+        marginAccount.setCreateDatetime(new Date());
 
         Map resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
         return resultMap;
