@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -20,6 +23,8 @@ public class ThreadLaunch {//implements InitializingBean {
 
     public static final Queue<Artwork> artworkQueue = new ConcurrentLinkedQueue<Artwork>();
     private static ThreadLaunch threadLaunch;
+    public static final Lock lock = new ReentrantLock();
+    public static final Condition condition = lock.newCondition();
 
     private ThreadLaunch() {
         super();

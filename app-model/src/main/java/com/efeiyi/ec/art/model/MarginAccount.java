@@ -18,7 +18,7 @@ import java.util.Date;
 public class MarginAccount implements Serializable {//保证金表
 
     private String id;
-    private BigDecimal currentBalance;//当前余额
+    private BigDecimal currentBalance;//保证金额
     private String status;//0 已冻结 1 已使用 3 已解冻
     private Date createDatetime;//创建时间 即冻结时间
     private Date endDatetime;//解冻时间/使用时间
