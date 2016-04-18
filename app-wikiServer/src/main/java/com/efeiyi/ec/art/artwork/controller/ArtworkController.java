@@ -146,15 +146,16 @@ public class ArtworkController extends BaseController {
 
 
     /**
-     * 融资项目 项目详情页
+     * 融资项目 项目详情页(项目详情tab)
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/investorArtWork.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/investorArtWorkView.do", method = RequestMethod.POST)
     @ResponseBody
     public Map investorArtWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
         List objectList = null;
         try{
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
@@ -171,6 +172,9 @@ public class ArtworkController extends BaseController {
 
             //项目详情
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
+            if(artwork==null){
+               return   resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+            }
             //投资人数
             Integer investNum = 0;
             if(artwork.getArtworkInvests()!=null){
@@ -179,22 +183,10 @@ public class ArtworkController extends BaseController {
             //剩余时间
             String time = TimeUtil.getDistanceTimes2(new Date(),artwork.getInvestStartDatetime(),"",TimeUtil.SECOND).get("time").toString();
             //项目文件
-            List<ArtworkAttachment> artworkAttachmentList = null;
+            List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
             //项目制作过程说明、融资解惑
-            Artworkdirection artworkdirection = null;
-            //评论列表
-            List<ArtworkComment> artworkCommentList = null;
-            //投资记录列表
-            List<ArtworkInvest> artworkInvestList = null;
-            //投资top
-            List<ArtworkInvest> artworkInvestTopList = null;
+            Artworkdirection artworkdirection = artwork.getArtworkdirection();
 
-
-
-            resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            if("view".equals(jsonObj.getString("tab"))){
-                artworkdirection = artwork.getArtworkdirection();
-                artworkAttachmentList = artwork.getArtworkAttachment();
                 //是否点赞
                 Boolean isPraise = false;
                 XQuery xQuery = new XQuery("listArtWorkPraise_default",request);
@@ -207,39 +199,63 @@ public class ArtworkController extends BaseController {
                     }
                 }
                 resultMap.put("isPraise",isPraise);
-            }else if("comment".equals(jsonObj.getString("tab"))){
+                data.put("artWork",artwork);
+                data.put("artworkdirection",artworkdirection);
+                data.put("artworkAttachmentList",artworkAttachmentList);
+                data.put("isPraise",isPraise);
 
-                artworkCommentList = artwork.getArtworkComments();
+                resultMap = resultMapHandler.handlerResult("0","成功",logBean);
 
-            }else if("invest".equals(jsonObj.getString("tab"))){
-                if(artwork.getArtworkInvests().size()>3){
-                    artworkInvestTopList = new ArrayList<>();
-                    for(int i=0;i<3;i++){
-                        artworkInvestTopList.add(artwork.getArtworkInvests().get(i));
-                    }
-                }else {
-                    artworkInvestTopList = artwork.getArtworkInvests();
-                }
-               XQuery xQuery = new XQuery("plistArtworkInvest_default",request);
+                resultMap.put("object",data);
+
+        } catch(Exception e){
+            e.printStackTrace();
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
+        return resultMap;
+    }
+
+    /**
+     * 融资项目 项目详情页(评论tab)
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/investorArtWorkComment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map investorArtWorkComment(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
+        List objectList = null;
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("investorArtWorkComment");
+            if(!CommonUtil.jsonObject(jsonObj)){
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
+//            评论列表
+            List<ArtworkComment> artworkCommentList = null;
+
+                XQuery xQuery = new XQuery("plistArtworkComment_default",request);
+                xQuery.put("artwork_id",jsonObj.getString("artworkId"));
                 PageEntity pageEntity = new PageEntity();
                 pageEntity.setSize(jsonObj.getInteger("pageSize"));
                 pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
                 xQuery.setPageEntity(pageEntity);
-                artworkInvestList = baseManager.listPageInfo(xQuery).getList();
+                artworkCommentList = baseManager.listPageInfo(xQuery).getList();
 
-            }else {
-                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-            }
-//            resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("object",artwork);
-            resultMap.put("investNum",investNum);
-            resultMap.put("time",time);
+                data.put("artworkCommentList",artworkCommentList);
 
-            resultMap.put("artworkAttachmentList",artworkAttachmentList);
-            resultMap.put("artworkdirection",artworkdirection);
-            resultMap.put("artworkCommentList",artworkCommentList);
-            resultMap.put("artworkInvestList",artworkInvestList);
-            resultMap.put("artworkInvestTopList",artworkInvestTopList);
+                resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+                resultMap.put("object",data);
         } catch(Exception e){
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -249,6 +265,77 @@ public class ArtworkController extends BaseController {
 
         return resultMap;
     }
+
+    /**
+     * 融资项目 项目详情页(投资tab)
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/investorArtWorkInvest.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map investorArtWorkInvest(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
+        List objectList = null;
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("investorArtWorkInvest");
+            if(!CommonUtil.jsonObject(jsonObj)){
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
+            //投资记录列表
+            List<ArtworkInvest> artworkInvestList = null;
+            //投资top
+            List<ArtworkInvest> artworkInvestTopList = null;
+            //temp
+            List<ArtworkInvest> artworkInvestTopTempList = null;
+
+
+            XQuery xQuery = new XQuery("plistArtworkInvest_default",request);
+            xQuery.put("artwork_id",jsonObj.getString("artworkId"));
+            PageEntity pageEntity = new PageEntity();
+            pageEntity.setSize(jsonObj.getInteger("pageSize"));
+            pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
+            xQuery.setPageEntity(pageEntity);
+            artworkInvestList = baseManager.listPageInfo(xQuery).getList();
+
+            data.put("artworkInvestList",artworkInvestList);
+
+            xQuery = new XQuery("listArtworkInvest1_default",request);
+            xQuery.put("artwork_id",jsonObj.getString("artworkId"));
+            artworkInvestTopTempList = baseManager.listObject(xQuery);
+            if(artworkInvestTopTempList!=null) {
+                if (artworkInvestTopTempList.size() > 3) {
+                    artworkInvestTopList = new ArrayList<>();
+                    for (int i = 0; i < 3; i++) {
+                        artworkInvestTopList.add(artworkInvestTopTempList.get(i));
+                    }
+                } else {
+                    artworkInvestTopList = artworkInvestTopTempList;
+                }
+            }
+            data.put("artworkInvestTopList",artworkInvestTopList);
+
+            resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+            resultMap.put("object",data);
+        } catch(Exception e){
+            e.printStackTrace();
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
+        return resultMap;
+    }
+
 
     /**
      * 点赞
@@ -780,13 +867,12 @@ public class ArtworkController extends BaseController {
 //        map.put("pageSize","3");
 //        map.put("pageNum","1");
 //        map.put("timestamp", timestamp);
-        /**investorArtWork.do测试加密参数**/
-//        map.put("tab","view");
-//        map.put("artWorkId","qydeyugqqiugd2");
-//        map.put("currentUserId","iickhknq3h7yrku2");
-////        map.put("pageSize","4");
-////        map.put("pageIndex","1");
-//        map.put("timestamp", timestamp);
+        /**investorArtWorkView.do测试加密参数**/
+        map.put("artWorkId","qydeyugqqiugd2");
+        map.put("currentUserId","iickhknq3h7yrku2");
+//        map.put("pageSize","4");
+//        map.put("pageIndex","1");
+        map.put("timestamp", timestamp);
 
         /**masterView.do测试加密参数**/
 //        map.put("pageSize","3");
@@ -803,20 +889,20 @@ public class ArtworkController extends BaseController {
 //        map.put("timestamp", timestamp);
 
         /**artworkComment.do测试加密参数**/
-        map.put("artWorkId","qydeyugqqiugd2");
-        map.put("currentUserId","iih8wrlm31r449bh");
-        map.put("fatherCommentId","3");
-        map.put("content","同意+1");
-        map.put("timestamp", timestamp);
+//        map.put("artWorkId","qydeyugqqiugd2");
+//        map.put("currentUserId","iih8wrlm31r449bh");
+//        map.put("fatherCommentId","3");
+//        map.put("content","同意+1");
+//        map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.69:8001/app/artworkComment.do";
+        String url = "http://192.168.1.69:8001/app/investorArtWorkView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
 //        String json = "{\"pageIndex\":\"1\",\"pageSize\":\"4\",\"tab\":\"invest\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
-//        String json = "{\"currentUserId\":\"iickhknq3h7yrku2\",\"tab\":\"view\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"currentUserId\":\"iickhknq3h7yrku2\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  investorIndex.do测试 **/
 //        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  guestView.do测试 **/
@@ -827,7 +913,7 @@ public class ArtworkController extends BaseController {
 //        String json = "{\"currentUserId\":\"iih8wrlm31r449bh\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         /**json参数  artworkPraise.do测试 **/
-        String json = "{\"content\":\"同意+1\",\"fatherCommentId\":\"3\",\"currentUserId\":\"iih8wrlm31r449bh\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+//        String json = "{\"content\":\"同意+1\",\"fatherCommentId\":\"3\",\"currentUserId\":\"iih8wrlm31r449bh\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
