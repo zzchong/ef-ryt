@@ -2,10 +2,7 @@ package com.efeiyi.ec.art.base.thread;
 
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.ContextUtils;
-import com.efeiyi.ec.art.model.Account;
-import com.efeiyi.ec.art.model.Artwork;
-import com.efeiyi.ec.art.model.ArtworkBidding;
-import com.efeiyi.ec.art.model.MarginAccount;
+import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -13,6 +10,8 @@ import org.hibernate.SessionFactory;
 
 
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -152,8 +151,28 @@ public class UpdateArtWorkStatusThread implements  Runnable {
                      * 2.计算投资回报额
                      * 3.返回收益到用户账户
                      */
+                     //计算比率
+                     BigDecimal rate = artworkBidding.getPrice().divide(artwork.getInvestGoalMoney());
+                     List<ArtworkInvest>  artworkInvests = session.createQuery(AppConfig.SQL_INVEST_MONEY_ARTWORK_LIST).setString(1,artwork.getId()).list();
+                   if (artworkInvests!= null && !artworkInvests.isEmpty()){
+                       for(ArtworkInvest artworkInvest  :  artworkInvests){
+                           Account account = artworkInvest.getAccount();
+                           account.setCurrentBalance(account.getCurrentBalance().add(artworkInvest.getPrice().multiply(rate)));
+                           account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(artworkInvest.getPrice().multiply(rate)));
+                           session.saveOrUpdate(Account.class.getName(),session.merge(Account.class.getName(),account));
+                           //生成投资收益记录
+                           ROIRecord roiRecord = new ROIRecord();
+                           roiRecord.setAccount(account);
+                           roiRecord.setStatus("1");
+                           roiRecord.setCurrentBalance(artworkInvest.getPrice().multiply(rate));
+                           roiRecord.setArtwork(artworkInvest.getArtwork());
+                           roiRecord.setCreateDatetime(new Date());
+                           roiRecord.setUser(artworkInvest.getCreator());
+                           roiRecord.setDetails("投资"+artworkInvest.getArtwork().getTitle()+"收益");
+                           session.saveOrUpdate(ROIRecord.class.getName(),roiRecord);
 
-
+                       }
+                   }
                  }
 
 
