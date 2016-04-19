@@ -1,6 +1,6 @@
 package com.efeiyi.ec.virtual.handler;
 
-import com.efeiyi.ec.art.model.VirtualPlan;
+import com.efeiyi.ec.art.virtual.VirtualPlan;
 import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.base.util.XDoUtil;

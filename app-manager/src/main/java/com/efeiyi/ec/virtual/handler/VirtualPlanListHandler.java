@@ -1,7 +1,7 @@
 package com.efeiyi.ec.virtual.handler;
 
-import com.efeiyi.ec.art.model.VirtualPlan;
-import com.efeiyi.ec.art.model.VirtualPlanElement;
+import com.efeiyi.ec.art.virtual.VirtualPlan;
+import com.efeiyi.ec.art.virtual.VirtualPlanElement;
 import com.efeiyi.ec.virtual.service.VirtualPlanManagerService;
 import com.efeiyi.ec.virtual.util.VirtualPlanConstant;
 import com.ming800.core.base.service.BaseManager;

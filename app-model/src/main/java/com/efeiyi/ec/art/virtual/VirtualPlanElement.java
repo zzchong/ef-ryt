@@ -1,4 +1,4 @@
-package com.efeiyi.ec.art.model;
+package com.efeiyi.ec.art.virtual;
 
 /**
  * Created by Administrator on 2015/12/9.

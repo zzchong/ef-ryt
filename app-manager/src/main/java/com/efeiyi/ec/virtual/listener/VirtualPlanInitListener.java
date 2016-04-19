@@ -1,6 +1,6 @@
 package com.efeiyi.ec.virtual.listener;
 
-import com.efeiyi.ec.art.model.VirtualPlan;
+import com.efeiyi.ec.art.virtual.VirtualPlan;
 import com.efeiyi.ec.virtual.model.task.CoreTaskScheduler;
 import com.efeiyi.ec.virtual.model.timer.SuperTimer;
 import com.efeiyi.ec.virtual.util.VirtualPlanConstant;

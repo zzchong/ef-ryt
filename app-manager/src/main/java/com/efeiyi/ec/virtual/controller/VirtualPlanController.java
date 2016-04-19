@@ -1,6 +1,6 @@
 package com.efeiyi.ec.virtual.controller;
 
-import com.efeiyi.ec.art.model.VirtualPlan;
+import com.efeiyi.ec.art.virtual.VirtualPlan;
 import com.efeiyi.ec.virtual.model.task.CoreTaskScheduler;
 import com.efeiyi.ec.virtual.model.timer.SubTimer;
 import com.efeiyi.ec.virtual.model.timer.SuperTimer;
@@ -8,7 +8,6 @@ import com.efeiyi.ec.virtual.service.VirtualPlanManagerService;
 import com.efeiyi.ec.virtual.util.VirtualPlanConstant;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.taglib.PageEntity;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -17,11 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Administrator on 2015/12/9.
