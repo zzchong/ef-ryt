@@ -18,13 +18,14 @@ import java.util.Date;
 @Entity
 @Table(name = "app_art_work_invest")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class ArtworkInvest implements Serializable{
+public class ArtworkInvest implements Serializable{//投资记录
     private String id;
     private Artwork artwork;
     private BigDecimal price;
     private String status;
     private User creator;
     private Date createDatetime;
+    private Account account;//关联账户
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -80,6 +81,15 @@ public class ArtworkInvest implements Serializable{
 
     public void setCreateDatetime(Date createDatetime) {
         this.createDatetime = createDatetime;
+    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }
 

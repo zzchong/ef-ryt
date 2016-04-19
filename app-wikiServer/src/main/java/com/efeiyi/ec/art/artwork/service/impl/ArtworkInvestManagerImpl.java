@@ -85,10 +85,11 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
                             artworkInvest.setCreator(user);
                             artworkInvest.setArtwork(artwork);
                             artworkInvest.setPrice(price);
+                            artworkInvest.setAccount(account);
                             baseManager.saveOrUpdate(ArtworkInvest.class.getName(),artworkInvest);//保存投资记录
                             //修改账户
-                            account.setCurrentBalance(account.getCurrentBalance().multiply(price));
-                            account.setCurrentUsableBalance(account.getCurrentUsableBalance().multiply(price));
+                            account.setCurrentBalance(account.getCurrentBalance().subtract(price));
+                            account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(price));
                             baseManager.saveOrUpdate(Account.class.getName(),account);//更新用户账户
 
                             //修改项目
