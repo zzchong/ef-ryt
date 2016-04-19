@@ -24,7 +24,7 @@ public class ConsumerAddress implements Serializable {
     private String post;
     private String phone;//收货人手机号
     private String email;
-    private User consumer;
+    private User consumer;//关联用户
     private String status;   //1 正常的 2 默认的
     private  String consignee; //收货人姓名
     @Id

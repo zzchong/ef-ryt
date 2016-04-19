@@ -21,10 +21,10 @@ public class AuctionOrder implements Serializable {
     private ConsumerAddress consumerAddress;//收货地址
     private Date createDatetime;//创建时间
     private String payWay;// 0 账户余额 1 微信支付 2 支付宝支付
-    private String status;// 0 可用 1 作废
+    private String status;// 1 可用 0 作废
     private String type;// 0 待付尾款 1 代发货 2交易成功
     private BigDecimal finalPayment;//尾款金额
-    private String payStatus;// 0 支付成功 1 支付失败
+    private String payStatus;// 0 支付成功 1 支付失败 3未支付
     private BigDecimal amount;//拍卖金额
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
