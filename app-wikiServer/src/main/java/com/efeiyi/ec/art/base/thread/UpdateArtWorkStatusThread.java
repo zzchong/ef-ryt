@@ -137,13 +137,20 @@ public class UpdateArtWorkStatusThread implements  Runnable {
                          for(MarginAccount marginAccount: marginAccounts){
                              Account account = marginAccount.getAccount();
                              if(account.getUser().getId().equals(artwork.getWinner().getId())){//过滤掉竞拍得主
-                                 continue;
+                                 //continue;
+                                 marginAccount.setEndDatetime(new Date());
+                                 marginAccount.setStatus("1");//已使用
+                                /* account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(marginAccount.getCurrentBalance()));
+                                 session.saveOrUpdate(Account.class.getName(),session.merge(Account.class.getName(),account));*/
+                                 session.saveOrUpdate(MarginAccount.class.getName(),session.merge(MarginAccount.class.getName(),marginAccount));
+                             }else{
+                                 marginAccount.setEndDatetime(new Date());
+                                 marginAccount.setStatus("2");//解冻状态
+                                 account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(marginAccount.getCurrentBalance()));
+                                 session.saveOrUpdate(Account.class.getName(),session.merge(Account.class.getName(),account));
+                                 session.saveOrUpdate(MarginAccount.class.getName(),session.merge(MarginAccount.class.getName(),marginAccount));
                              }
-                             marginAccount.setEndDatetime(new Date());
-                             marginAccount.setStatus("3");//解冻状态
-                             account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(marginAccount.getCurrentBalance()));
-                             session.saveOrUpdate(Account.class.getName(),session.merge(Account.class.getName(),account));
-                             session.saveOrUpdate(MarginAccount.class.getName(),session.merge(MarginAccount.class.getName(),marginAccount));
+
                          }
                      }
                      /*返回投资收益
