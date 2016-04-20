@@ -18,7 +18,7 @@ public interface ArtworkManager {
      * @param currentUserId
      * @return
      */
-    boolean  saveArtWorkPraise(String id,String currentUserId);
+    boolean  saveArtWorkPraise(String id,String currentUserId,String messageId);
 
     /**
      * 评论

@@ -29,6 +29,8 @@ public class ArtWorkPraise implements Serializable{
 
     private Artwork artwork;//点赞项目
 
+    private ArtworkMessage artworkMessage;//点赞动态
+
     private User user;//点赞用户
 
     private Date createDateTime;//点赞时间
@@ -97,5 +99,15 @@ public class ArtWorkPraise implements Serializable{
 
     public void setWatch(String watch) {
         this.watch = watch;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artwork_message_id")
+    public ArtworkMessage getArtworkMessage() {
+        return artworkMessage;
+    }
+
+    public void setArtworkMessage(ArtworkMessage artworkMessage) {
+        this.artworkMessage = artworkMessage;
     }
 }

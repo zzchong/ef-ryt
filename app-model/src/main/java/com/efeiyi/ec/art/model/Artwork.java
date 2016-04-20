@@ -37,6 +37,7 @@ public class Artwork implements Serializable {
     private List<ArtworkInvest> artworkInvests;//项目投资
     private List<ArtworkMessage> artworkMessages;//项目制作动态 //后台制作动态查询应用
     private List<ArtworkBidding> artworkBiddings;//项目竞价记录 //艺术家个人信息统计应用
+    private List<ArtWorkPraise> artWorkPraiseList;//点赞数
     private ArtworkDraw artworkDraw;
     private String picture_url;
     private String step; //1 : 审核阶段
@@ -56,6 +57,9 @@ public class Artwork implements Serializable {
 
     private Artworkdirection artworkdirection;
     private BigDecimal startingPrice;
+
+    private Integer commentNum = 0;//评论数
+    private Integer praiseNUm = 0;//点赞数
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -241,6 +245,16 @@ public class Artwork implements Serializable {
         this.artworkInvests = artworkInvests;
     }
 
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    public List<ArtWorkPraise> getArtWorkPraiseList() {
+        return artWorkPraiseList;
+    }
+
+    public void setArtWorkPraiseList(List<ArtWorkPraise> artWorkPraiseList) {
+        this.artWorkPraiseList = artWorkPraiseList;
+    }
+
     @Transient
     public BigDecimal getInvestsMoney() {
         Double temp = 0.00;
@@ -387,5 +401,27 @@ public class Artwork implements Serializable {
 
     public void setStartingPrice(BigDecimal startingPrice) {
         this.startingPrice = startingPrice;
+    }
+
+    @Transient
+    public Integer getCommentNum() {
+        if(artworkComments!=null)
+            commentNum = artworkComments.size();
+        return commentNum;
+    }
+
+
+    public void setCommentNum(Integer commentNum) {
+        this.commentNum = commentNum;
+    }
+    @Transient
+    public Integer getPraiseNUm() {
+        if (artWorkPraiseList!=null)
+           praiseNUm = artWorkPraiseList.size();
+        return praiseNUm;
+    }
+
+    public void setPraiseNUm(Integer praiseNUm) {
+        this.praiseNUm = praiseNUm;
     }
 }

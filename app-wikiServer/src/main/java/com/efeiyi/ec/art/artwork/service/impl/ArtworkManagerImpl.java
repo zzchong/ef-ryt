@@ -26,7 +26,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
 
     @Override
-    public  boolean  saveArtWorkPraise(String id,String currentUserId){
+    public  boolean  saveArtWorkPraise(String id,String currentUserId,String messageId){
 
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),id);
 
@@ -44,6 +44,18 @@ public class ArtworkManagerImpl implements ArtworkManager {
             artWorkPraise.setWatch("0");
 
             artWorkPraise.setArtwork(artwork);
+
+            if(!"".equals(messageId) && !StringUtils.isEmpty(messageId)){
+
+                ArtworkMessage artworkMessage = (ArtworkMessage) baseManager.getObject(ArtworkMessage.class.getName(),messageId);
+
+                artWorkPraise.setArtworkMessage(artworkMessage);
+
+//                saveNotification(artwork,"有人回复了!",currentUser,fatherComment.getCreator());
+
+//                cidList.add(fatherComment.getCreator().getId());
+
+            }
 
             Notification notification = saveNotification(artwork,"有人点赞了!",currentUser,artwork.getAuthor());
 

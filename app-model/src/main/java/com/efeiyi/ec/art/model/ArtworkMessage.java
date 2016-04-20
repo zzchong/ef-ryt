@@ -24,6 +24,11 @@ public class ArtworkMessage implements Serializable{//项目动态
     private Artwork artwork;
     private String status;
     private List<ArtworkMessageAttachment> artworkMessageAttachments;
+    private List<ArtWorkPraise> artWorkPraiseList; //点赞
+    private List<ArtworkComment> artworkCommentList;//评论
+
+    private Integer commentNum = 0;//评论数
+    private Integer praiseNum = 0; //点赞数
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -88,6 +93,49 @@ public class ArtworkMessage implements Serializable{//项目动态
 
     public void setArtworkMessageAttachments(List<ArtworkMessageAttachment> artworkMessageAttachments) {
         this.artworkMessageAttachments = artworkMessageAttachments;
+    }
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "artworkMessage")
+    @JsonIgnore
+    public List<ArtWorkPraise> getArtWorkPraiseList() {
+        return artWorkPraiseList;
+    }
+
+    public void setArtWorkPraiseList(List<ArtWorkPraise> artWorkPraiseList) {
+        this.artWorkPraiseList = artWorkPraiseList;
+    }
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "artworkMessage")
+    @OrderBy(value = "createDatetime desc")
+    public List<ArtworkComment> getArtworkCommentList() {
+        return artworkCommentList;
+    }
+
+    public void setArtworkCommentList(List<ArtworkComment> artworkCommentList) {
+        this.artworkCommentList = artworkCommentList;
+    }
+
+    @Transient
+    public Integer getCommentNum() {
+
+        if (artworkCommentList!=null)
+            commentNum = artworkCommentList.size();
+        return commentNum;
+    }
+
+    public void setCommentNum(Integer commentNum) {
+        this.commentNum = commentNum;
+    }
+
+    @Transient
+    public Integer getPraiseNum() {
+        if (artWorkPraiseList!=null)
+            praiseNum = artWorkPraiseList.size();
+        return praiseNum;
+    }
+
+    public void setPraiseNum(Integer praiseNum) {
+        this.praiseNum = praiseNum;
     }
 }
 

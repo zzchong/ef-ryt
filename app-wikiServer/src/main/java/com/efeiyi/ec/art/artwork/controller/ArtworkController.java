@@ -364,7 +364,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            if (artworkManager.saveArtWorkPraise(jsonObject.getString("artWorkId"), jsonObject.getString("currentUserId"))) {
+            if (artworkManager.saveArtWorkPraise(jsonObject.getString("artWorkId"), jsonObject.getString("currentUserId"),jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -888,6 +888,7 @@ public class ArtworkController extends BaseController {
         /**artworkPraise.do测试加密参数**/
 //        map.put("artWorkId","qydeyugqqiugd2");
 //        map.put("currentUserId","iih8wrlm31r449bh");
+//        map.put("messageId","2");
 //        map.put("timestamp", timestamp);
 
         /**artworkComment.do测试加密参数**/

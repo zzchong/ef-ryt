@@ -12,6 +12,7 @@ import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
@@ -124,23 +125,18 @@ public class ArtWorkCreationController extends BaseController {
     public Map ArtWorkCreationView(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
-        TreeMap treeMap = new TreeMap();
+        Map<String, Object> data = new HashMap<String, Object>();
         List<Artwork> artworkList = null;
         try{
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkCreationView");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
-                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            if (!CommonUtil.jsonObject(jsonObj)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artWorkId",jsonObj.getString("artWorkId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
@@ -160,11 +156,12 @@ public class ArtWorkCreationController extends BaseController {
             String createdTime = TimeUtil.getDistanceTimes(str1,str2);
             //剩余时长
             String restTime = TimeUtil.getDistanceTimes(str3,str1);
+            data.put("artworkMessageList",artworkMessageList);
+            data.put("createdTime",createdTime);
+            data.put("restTime",restTime);
+
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("object",artwork);
-            resultMap.put("artworkMessageList",artworkMessageList);
-            resultMap.put("createdTime",createdTime);
-            resultMap.put("restTime",restTime);
+            resultMap.put("object",data);
         } catch(Exception e){
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
