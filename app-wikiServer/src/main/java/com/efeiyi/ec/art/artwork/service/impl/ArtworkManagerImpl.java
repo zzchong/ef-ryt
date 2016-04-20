@@ -67,7 +67,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
 
     @Override
-    public boolean saveArtWorkComment(String id, String content,String fatherCommentId,String currentUserId) {
+    public boolean saveArtWorkComment(String id, String content,String fatherCommentId,String currentUserId,String messageId) {
 
         if(StringUtils.isEmpty(currentUserId) || StringUtils.isEmpty(id)) {
 
@@ -107,6 +107,19 @@ public class ArtworkManagerImpl implements ArtworkManager {
                 saveNotification(artwork,"有人回复了!",currentUser,fatherComment.getCreator());
 
                 cidList.add(fatherComment.getCreator().getId());
+
+            }
+
+
+            if(!"".equals(messageId) && !StringUtils.isEmpty(messageId)){
+
+                ArtworkMessage artworkMessage = (ArtworkMessage) baseManager.getObject(ArtworkMessage.class.getName(),messageId);
+
+                artworkComment.setArtworkMessage(artworkMessage);
+
+//                saveNotification(artwork,"有人回复了!",currentUser,fatherComment.getCreator());
+
+//                cidList.add(fatherComment.getCreator().getId());
 
             }
 

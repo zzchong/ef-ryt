@@ -53,7 +53,6 @@ public class ArtworkComment implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artwork_message_id")
-    @JsonIgnore
     public ArtworkMessage getArtworkMessage() {
         return artworkMessage;
     }

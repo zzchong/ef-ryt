@@ -28,7 +28,7 @@ public interface ArtworkManager {
      * @param currentUserId
      * @return
      */
-    boolean  saveArtWorkComment(String id,String content,String fatherCommentId,String currentUserId);
+    boolean  saveArtWorkComment(String id,String content,String fatherCommentId,String currentUserId,String messageId);
 
 
 }
