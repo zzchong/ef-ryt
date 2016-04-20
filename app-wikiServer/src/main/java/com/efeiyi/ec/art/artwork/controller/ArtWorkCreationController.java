@@ -17,6 +17,7 @@ import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
+import com.ming800.core.taglib.PageEntity;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -64,6 +65,7 @@ public class ArtWorkCreationController extends BaseController {
     public Map ArtWorkCreation(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
         List<Artwork> artworkList = null;
         try{
@@ -71,31 +73,28 @@ public class ArtWorkCreationController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkCreationList");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
-                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            if (!CommonUtil.jsonObject(jsonObj)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("pageNum",jsonObj.getString("pageNum"));
-            treeMap.put("pageSize",jsonObj.getString("pageSize"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-
-            String hql = "from Artwork WHERE 1=1 and status = '1' and type = '2' order by investStartDatetime asc";
-            artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
+            XQuery xQuery = new XQuery("plistArtwork_default2", request);
+            xQuery.put("type", "2");
+            PageEntity pageEntity = new PageEntity();
+            pageEntity.setSize(jsonObj.getInteger("pageSize"));
+            pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
+            xQuery.setPageEntity(pageEntity);
+            artworkList = baseManager.listPageInfo(xQuery).getList();
+//            String hql = "from Artwork WHERE 1=1 and status = '1' and type = '2' order by investStartDatetime asc";
+//            artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
 //            List<ArtWorkBean> objectList = new ArrayList<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             String str1 = sdf.format(new Date());
             for (Artwork artwork : artworkList){
                 //项目动态
-                XQuery xQuery = new XQuery("listArtworkMessage_default",request);
-                xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
-                List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
-                if(artworkMessageList!=null&&artworkMessageList.size()!=0){
-                    artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1,sdf.format(artworkMessageList.get(0).getCreateDatetime())));
+                if(artwork.getArtworkMessages()!=null && artwork.getArtworkMessages().size()>0){
+                        artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1, sdf.format(artwork.getArtworkMessages().get(0).getCreateDatetime())));
                 }else {
                     artwork.setNewCreationDate("暂无更新状态");
                 }
@@ -104,8 +103,9 @@ public class ArtWorkCreationController extends BaseController {
 //                artWorkBean.setArtwork(artwork);
 //                objectList.add(artWorkBean);
             }
+            data.put("artworkList",artworkList);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("objectList",artworkList);
+            resultMap.put("object",data);
         } catch(Exception e){
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
@@ -145,9 +145,9 @@ public class ArtWorkCreationController extends BaseController {
 //            artWorkBean.setArtwork(artwork);
            // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
            //项目动态
-            XQuery xQuery = new XQuery("listArtworkMessage_default",request);
-            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
-            List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
+//            XQuery xQuery = new XQuery("listArtworkMessage_default",request);
+//            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
+//            List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
             //已创作时长
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             String str1 = sdf.format(new Date());
@@ -156,7 +156,7 @@ public class ArtWorkCreationController extends BaseController {
             String createdTime = TimeUtil.getDistanceTimes(str1,str2);
             //剩余时长
             String restTime = TimeUtil.getDistanceTimes(str3,str1);
-            data.put("artworkMessageList",artworkMessageList);
+            data.put("artworkMessageList",artwork.getArtworkMessages());
             data.put("createdTime",createdTime);
             data.put("restTime",restTime);
 
