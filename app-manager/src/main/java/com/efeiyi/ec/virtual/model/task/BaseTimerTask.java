@@ -1,6 +1,6 @@
 package com.efeiyi.ec.virtual.model.task;
 
-import com.efeiyi.ec.art.virtual.VirtualPlan;
+import com.efeiyi.ec.art.virtual.model.VirtualPlan;
 import com.ming800.core.util.ApplicationContextUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
