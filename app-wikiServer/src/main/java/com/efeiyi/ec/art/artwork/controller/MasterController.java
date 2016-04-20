@@ -20,11 +20,17 @@ import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
+import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
@@ -40,6 +46,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.*;
@@ -73,10 +80,11 @@ public class MasterController extends BaseController {
      */
     @RequestMapping(value = "/app/saveMasterWork.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map saveMasterWork(HttpServletRequest request) {
+    public Map saveMasterWork(HttpServletRequest request,MultipartHttpServletRequest multiRequest) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
+        TreeMap map = new TreeMap();
         List objectList = null;
         try{
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
@@ -86,12 +94,16 @@ public class MasterController extends BaseController {
             if(!CommonUtil.jsonObject(jsonObj)){
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
+            map.put("name",request.getParameter("name"));
+            map.put("material",request.getParameter("material"));
+            map.put("currentUserId",request.getParameter("currentUserId"));
+            map.put("type",request.getParameter("type"));
             boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
-            MultipartFile picture = ((MultipartHttpServletRequest) request).getFile("pictureUrl");
+            MultipartFile picture = multiRequest.getFile("pictureUrl");
 
             String hz = picture.getOriginalFilename().substring
                     (picture.getOriginalFilename().lastIndexOf("."));
@@ -129,45 +141,22 @@ public class MasterController extends BaseController {
 
         Map<String, Object> map = new HashMap<String, Object>();
 
-        /**investorIndex.do测试加密参数**/
-//        map.put("pageSize","3");
-//        map.put("pageNum","1");
-//        map.put("timestamp", timestamp);
-        /**investorArtWorkView.do测试加密参数**/
-        map.put("artWorkId","qydeyugqqiugd2");
-//        map.put("currentUserId","iickhknq3h7yrku2");
-        map.put("pageSize","4");
-        map.put("pageIndex","1");
-        map.put("timestamp", timestamp);
+        File file = new File("C:\\Users\\Administrator\\Desktop\\石榴瓶.JPG");
 
-        /**masterView.do测试加密参数**/
-//        map.put("pageSize","3");
-//        map.put("pageNum","1");
-//        map.put("masterId","icjxkedl0000b6i0");
-//        map.put("timestamp", timestamp);
-        /**guestView.do测试加密参数**/
-//        map.put("userId","icjxkedl0000b6i0");
-//        map.put("timestamp", timestamp);
-
-        /**artworkPraise.do测试加密参数**/
-//        map.put("artWorkId","qydeyugqqiugd2");
-//        map.put("currentUserId","iih8wrlm31r449bh");
-//        map.put("timestamp", timestamp);
-
-        /**artworkComment.do测试加密参数**/
-//        map.put("artWorkId","qydeyugqqiugd2");
-//        map.put("currentUserId","iih8wrlm31r449bh");
-//        map.put("fatherCommentId","3");
-//        map.put("content","同意+1");
-//        map.put("timestamp", timestamp);
+        /**saveMasterWork.do测试加密参数**/
+        map.put("name", "清明上河图");
+        map.put("material", "纸质");
+        map.put("currentUserId", "iih8wrlm31r449bh");
+        map.put("type", "0");
+//        map.put("pictureUrl",file);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/investorArtWorkInvest.do";
+        String url = "http://192.168.1.80:8001/app/saveMasterWork.do";
         HttpPost httppost = new HttpPost(url);
-        httppost.setHeader("Content-Type", "application/json;charset=utf-8");
+        httppost.setHeader("Content-Type", "application/octet-stream;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
-        String json = "{\"pageIndex\":\"1\",\"pageSize\":\"4\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+//        String json = "{\"pictureUrl\":file,\"type\":\"0\",\"name\":\"清明上河图\",\"material\":\"纸质\",\"currentUserId\":\"iih8wrlm31r449bh\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 //        String json = "{\"currentUserId\":\"iickhknq3h7yrku2\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  investorIndex.do测试 **/
 //        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
@@ -180,20 +169,31 @@ public class MasterController extends BaseController {
 
         /**json参数  artworkPraise.do测试 **/
 //        String json = "{\"content\":\"同意+1\",\"fatherCommentId\":\"3\",\"currentUserId\":\"iih8wrlm31r449bh\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
-        JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
-        String jsonString = jsonObj.toJSONString();
+//        JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
+//        String jsonString = jsonObj.toJSONString();
 
 
-        StringEntity stringEntity = new StringEntity(jsonString,"utf-8");
-        stringEntity.setContentType("text/json");
-        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-        httppost.setEntity(stringEntity);
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+        multipartEntityBuilder.setLaxMode();
+
+        FileBody fb  = new FileBody(file,ContentType.MULTIPART_FORM_DATA);
+        multipartEntityBuilder.addBinaryBody("pictureUrl",file);
+//        multipartEntityBuilder.seContentType(ContentType.MULTIPART_FORM_DATA);
+//        multipartEntityBuilder.setCharset(Consts.UTF_8);
+        multipartEntityBuilder.addTextBody("name","清明上河图",ContentType.MULTIPART_FORM_DATA);
+        multipartEntityBuilder.addTextBody("currentUserId","iih8wrlm31r449bh",ContentType.MULTIPART_FORM_DATA);
+        multipartEntityBuilder.addTextBody("type","0",ContentType.MULTIPART_FORM_DATA);
+        multipartEntityBuilder.addTextBody("material","纸质",ContentType.MULTIPART_FORM_DATA);
+//        StringEntity stringEntity = new StringEntity(jsonString,"utf-8");
+//        stringEntity.setContentType("text/json");
+//        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        httppost.setEntity(multipartEntityBuilder.build());
         System.out.println("url:  " + url);
         try {
-            byte[] b = new byte[(int) stringEntity.getContentLength()];
-            System.out.println(stringEntity);
-            stringEntity.getContent().read(b);
-            System.out.println("报文:" + new String(b, "utf-8"));
+//            byte[] b = new byte[(int) stringEntity.getContentLength()];
+//            System.out.println(stringEntity);
+//            stringEntity.getContent().read(b);
+//            System.out.println("报文:" + new String(b, "utf-8"));
             HttpResponse response = httpClient.execute(httppost);
             HttpEntity entity = response.getEntity();
             BufferedReader reader = new BufferedReader(new InputStreamReader(

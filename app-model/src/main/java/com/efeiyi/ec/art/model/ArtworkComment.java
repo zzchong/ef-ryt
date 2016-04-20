@@ -21,6 +21,7 @@ public class ArtworkComment implements Serializable {
 
     private String id;
     private Artwork artwork;
+    private ArtworkMessage artworkMessage;//项目动态
     private String content;
     private User creator;
     private Date createDatetime;
@@ -49,6 +50,18 @@ public class ArtworkComment implements Serializable {
     public void setArtwork(Artwork artwork) {
         this.artwork = artwork;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artwork_message_id")
+    @JsonIgnore
+    public ArtworkMessage getArtworkMessage() {
+        return artworkMessage;
+    }
+
+    public void setArtworkMessage(ArtworkMessage artworkMessage) {
+        this.artworkMessage = artworkMessage;
+    }
+
     @Column(name = "content")
     public String getContent() {
         return content;
@@ -95,7 +108,6 @@ public class ArtworkComment implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "father_comment_id")
-    @JsonIgnore
     public ArtworkComment getFatherComment() {
         return fatherComment;
     }

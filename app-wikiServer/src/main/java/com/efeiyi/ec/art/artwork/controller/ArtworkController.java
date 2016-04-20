@@ -897,7 +897,7 @@ public class ArtworkController extends BaseController {
 //        map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/investorArtWorkInvest.do";
+        String url = "http://192.168.1.80:8001/app/investorArtWorkComment.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 

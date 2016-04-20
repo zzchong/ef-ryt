@@ -57,7 +57,7 @@ public class MasterManagerImpl implements MasterManager {
 
             masterWork.setPictureUrl("http://rongyitou2.efeiyi.com/"+url);
 
-            masterWork.setType("0");
+            masterWork.setType(jsonObject.getString("type"));
 
             baseManager.saveOrUpdate(MasterWork.class.getName(),masterWork);
 
