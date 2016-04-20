@@ -20,7 +20,7 @@ public class RechargeRecord implements Serializable {//充值记录表
 
     private String id;
     private BigDecimal currentBalance;//充值金额
-    private String status;//0 成功 1 失败
+    private String status;//0 成功 1 失败 2初始化状态
     private Date createDatetime;//充值时间
     private Account account;//关联的账户
     private User user;//关联用户

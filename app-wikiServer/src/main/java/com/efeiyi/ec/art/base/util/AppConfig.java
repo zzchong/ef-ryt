@@ -56,4 +56,6 @@ public class AppConfig {
     public static final String SQL_INVEST_MONEY_ARTWORK_LIST = " FROM ArtworkInvest where artwork.id = :artworkId  and status<>'0'";
    //查询默认收货地址
    public static final String SQL_CONSUMER_ADDRESS = " FROM ConsumerAddress where user.id = :userId  and status='2'";
+    //获取账户
+    public static final String SQL_GET_USER_ACCOUNT = " FROM Account where user.id = :userId  and status='1'";
 }
