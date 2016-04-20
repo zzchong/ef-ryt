@@ -125,6 +125,24 @@ public class UpdateArtWorkStatusThread implements  Runnable {
                       artwork.setWinner(artworkBidding.getCreator()); //设置竞拍得主
                       artwork.setStep("32");
                       flag = true;
+                      //生成一个拍卖订单
+                      AuctionOrder auctionOrder = new AuctionOrder();
+                      auctionOrder.setArtwork(artwork);
+                      auctionOrder.setUser(artworkBidding.getCreator());//下单用户
+                      auctionOrder.setStatus("1");
+                      auctionOrder.setAmount(artworkBidding.getPrice());//拍卖金额
+                      auctionOrder.setCreateDatetime(new Date());
+                      auctionOrder.setFinalPayment(artworkBidding.getPrice().multiply(new BigDecimal("0.90")));//尾款金额
+                      auctionOrder.setPayStatus("3");//3未支付
+                      auctionOrder.setType("0");//待付尾款
+                      //查询收货地址
+                      List<ConsumerAddress> addressList =  session.createQuery(AppConfig.SQL_CONSUMER_ADDRESS).setString("userId",artworkBidding.getCreator().getId()).list();
+                      if(addressList!= null && !addressList.isEmpty()){
+                          auctionOrder.setConsumerAddress(addressList.get(0));//收货地址
+                      }else {
+                          auctionOrder.setConsumerAddress(new ConsumerAddress());//收货地址
+                      }
+                      session.saveOrUpdate(ConsumerAddress.class.getName(),auctionOrder);
                   }
                  //baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
                  //((BaseManagerImpl)ContextUtils.getBean("bseManagerImpl")).saveOrUpdate(Artwork.class.getName(), artwork);
@@ -137,13 +155,20 @@ public class UpdateArtWorkStatusThread implements  Runnable {
                          for(MarginAccount marginAccount: marginAccounts){
                              Account account = marginAccount.getAccount();
                              if(account.getUser().getId().equals(artwork.getWinner().getId())){//过滤掉竞拍得主
-                                 continue;
+                                 //continue;
+                                 marginAccount.setEndDatetime(new Date());
+                                 marginAccount.setStatus("1");//已使用
+                                /* account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(marginAccount.getCurrentBalance()));
+                                 session.saveOrUpdate(Account.class.getName(),session.merge(Account.class.getName(),account));*/
+                                 session.saveOrUpdate(MarginAccount.class.getName(),session.merge(MarginAccount.class.getName(),marginAccount));
+                             }else{
+                                 marginAccount.setEndDatetime(new Date());
+                                 marginAccount.setStatus("2");//解冻状态
+                                 account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(marginAccount.getCurrentBalance()));
+                                 session.saveOrUpdate(Account.class.getName(),session.merge(Account.class.getName(),account));
+                                 session.saveOrUpdate(MarginAccount.class.getName(),session.merge(MarginAccount.class.getName(),marginAccount));
                              }
-                             marginAccount.setEndDatetime(new Date());
-                             marginAccount.setStatus("3");//解冻状态
-                             account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(marginAccount.getCurrentBalance()));
-                             session.saveOrUpdate(Account.class.getName(),session.merge(Account.class.getName(),account));
-                             session.saveOrUpdate(MarginAccount.class.getName(),session.merge(MarginAccount.class.getName(),marginAccount));
+
                          }
                      }
                      /*返回投资收益

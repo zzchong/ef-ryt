@@ -48,7 +48,7 @@
     <bean id="cronTrigger"  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <!--<property name="jobDetail" ref="firstComplexJobDetail" />-->
         <property name="jobDetail" ref="artworkJob" />
-        <property name="cronExpression" value="0 0/1 * * * ?" />
+        <property name="cronExpression" value="0 0/100 * * * ?" />
 
     </bean>
 

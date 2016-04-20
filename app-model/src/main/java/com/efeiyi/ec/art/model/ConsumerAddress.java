@@ -1,29 +1,30 @@
-package com.efeiyi.ec.art.organization.model;
+package com.efeiyi.ec.art.model;
 
 import com.efeiyi.ec.art.organization.model.AddressCity;
 import com.efeiyi.ec.art.organization.model.AddressDistrict;
 import com.efeiyi.ec.art.organization.model.AddressProvince;
-import com.efeiyi.ec.art.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.User;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 /**
- * Created by Administrator on 2015/5/29.
+ * Created by Administrator on 2016/4/19.
+ *
  */
 @Entity
-@Table(name = "organization_consumer_address")
+@Table(name = "app_consumer_address")
 public class ConsumerAddress implements Serializable {
     private String id;
-    private AddressProvince province;
-    private AddressDistrict district;
-    private AddressCity city;
-    private String details;
+    private AddressProvince province;//省
+    private AddressDistrict district;//地区
+    private AddressCity city;//城市
+    private String details;//详细地址
     private String post;
-    private String phone;
+    private String phone;//收货人手机号
     private String email;
-    private MyUser consumer;
+    private User consumer;//关联用户
     private String status;   //1 正常的 2 默认的
     private  String consignee; //收货人姓名
     @Id
@@ -37,7 +38,7 @@ public class ConsumerAddress implements Serializable {
         this.id = id;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="address_province_id")
     public AddressProvince getProvince() {
         return province;
@@ -47,7 +48,7 @@ public class ConsumerAddress implements Serializable {
         this.province = province;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="address_city_id")
     public AddressCity getCity() {
         return city;
@@ -93,7 +94,7 @@ public class ConsumerAddress implements Serializable {
         this.email = email;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_district_id")
     public AddressDistrict getDistrict() {
         return district;
@@ -103,13 +104,13 @@ public class ConsumerAddress implements Serializable {
         this.district = district;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "consumer_id")
-    public MyUser getConsumer() {
+    public User getConsumer() {
         return consumer;
     }
 
-    public void setConsumer(MyUser consumer) {
+    public void setConsumer(User consumer) {
         this.consumer = consumer;
     }
 

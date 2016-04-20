@@ -1,6 +1,6 @@
 package com.efeiyi.ec.virtual.model.task;
 
-import com.efeiyi.ec.art.model.VirtualPlan;
+import com.efeiyi.ec.art.virtual.model.VirtualPlan;
 import com.efeiyi.ec.virtual.model.timer.SubTimer;
 import com.efeiyi.ec.virtual.model.timer.SuperTimer;
 import com.efeiyi.ec.virtual.util.VirtualPlanConstant;

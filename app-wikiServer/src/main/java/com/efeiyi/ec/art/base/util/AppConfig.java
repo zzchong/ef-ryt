@@ -54,6 +54,6 @@ public class AppConfig {
     public static final String SQL_MARGIN_ACCOUNT_LIST =" from MarginAccount where artwork.id= :artworkId and status='0'";
     //获取项目投资列表
     public static final String SQL_INVEST_MONEY_ARTWORK_LIST = " FROM ArtworkInvest where artwork.id = :artworkId  and status<>'0'";
-
-
+   //查询默认收货地址
+   public static final String SQL_CONSUMER_ADDRESS = " FROM ConsumerAddress where user.id = :userId  and status='2'";
 }
