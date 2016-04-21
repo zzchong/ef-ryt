@@ -58,4 +58,19 @@ public class AppConfig {
    public static final String SQL_CONSUMER_ADDRESS = " FROM ConsumerAddress where user.id = :userId  and status='2'";
     //获取账户
     public static final String SQL_GET_USER_ACCOUNT = " FROM Account where user.id = :userId  and status='1'";
+    //获取关注数量
+    public static final String SQL_GET_USER_FOLLOWED = "select count(1) FROM ArtUserFollowed where user.id = :userId  and status='1'";
+    //获取粉丝数量
+    public static final String SQL_GET_USER_FOLLOW = "select count(1) FROM ArtUserFollowed where follower.id = :userId  and status='1'";
+    //获取用户签名
+    public static final String SQL_GET_USER_SIGNER = " FROM UserBrief where user.id = :userId  and status='1'";
+    //获取用户收益
+    public static final String SQL_GET_USER_ROI = " FROM ROIRecord where user.id = :userId  and status='1'";
+
+    //获取艺术家所有项目
+    public static final String SQL_GET_USER_ARTWORK = " FROM Artwork where user.id = :userId  and status='1'";
+
+    //获取艺术家所有已拍卖项目
+    public static final String SQL_GET_USER_ARTWORK_OVER = " FROM Artwork where user.id = :userId  and status='1'  and type ='3' and step='32'";
+
 }

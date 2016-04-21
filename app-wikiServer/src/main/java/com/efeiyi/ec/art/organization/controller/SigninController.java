@@ -6,8 +6,7 @@ import cn.jpush.api.common.resp.APIConnectionException;
 import cn.jpush.api.common.resp.APIRequestException;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
-import com.efeiyi.ec.art.model.Account;
-import com.efeiyi.ec.art.model.PushUserBinding;
+import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
@@ -18,6 +17,7 @@ import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.service.SmsCheckManager;
 import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
 import com.ming800.core.base.controller.BaseController;
+import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.p.PConst;
 import com.ming800.core.p.service.AliOssUploadManager;
@@ -58,6 +58,8 @@ public class SigninController extends BaseController {
     @Autowired
     BaseManager baseManager;
     @Autowired
+    private XdoDaoSupport xdoDao;
+    @Autowired
     ResultMapHandler resultMapHandler;
     @Autowired
     AliOssUploadManager aliOssUploadManager;
@@ -93,8 +95,80 @@ public class SigninController extends BaseController {
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user.getPassword().equals(jsonObj.getString("password"))) {
-                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+
                     resultMap.put("userInfo",user);
+                    //获取用户的关注数量  粉丝
+                    LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
+                    paramMap.put("userId", user.getId());
+                    Integer count = (Integer)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, map).get(0);
+                    Integer count1 = (Integer)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, map).get(0);
+                    //获取签名 SQL_GET_USER_SIGNER
+                    UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, map).get(0);
+                    resultMap.put("count",count);
+                    resultMap.put("count1",count1);
+                    resultMap.put("userBrief",userBrief.getSigner());
+
+                    User user1 = (User)baseManager.getObject(User.class.getName(),user.getId());
+                    BigDecimal investsMoney = new BigDecimal("0.00");
+                    BigDecimal roiMoney = new BigDecimal("0.00");
+                    BigDecimal rate = new BigDecimal("0.00");
+
+                    BigDecimal investsMoney2 = new BigDecimal("0.00");
+                    BigDecimal roiMoney2 = new BigDecimal("0.00");
+                    BigDecimal rate2 = new BigDecimal("0.00");
+                    if(user1.getMaster()!=null && user1.getMaster().getId()!=null){
+                       // 2 艺术家
+                       //项目总金额
+                        List<Artwork> artworks = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK, map);
+                        for (Artwork artwork:artworks){
+                            investsMoney2 = investsMoney2.add(artwork.getInvestGoalMoney());
+                        }
+
+
+                       //项目总拍卖金额
+                        List<Artwork> artworks2 = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK_OVER, map);
+                        for (Artwork artwork:artworks2){
+                            ArtworkBidding artworkBidding = (ArtworkBidding)xdoDao.getSession().createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
+                            roiMoney2 = roiMoney2.add(artworkBidding.getPrice());
+                        }
+                        //项目拍卖溢价率
+                       if(investsMoney2.doubleValue()!=0.00 && roiMoney2.doubleValue()!=0.00){
+                           rate2 = roiMoney2.divide(investsMoney2);
+                       }
+
+                        resultMap.put("investsMoney2",investsMoney2);
+                        resultMap.put("roiMoney2",roiMoney2);
+                        resultMap.put("rate2",rate2);
+
+
+
+                   }else {
+                       // 1 普通用户
+                       //获取投资金额
+                       List<ArtworkInvest> artworkInvests = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_ARTWORK_APP, map);
+                       for (ArtworkInvest artworkInvest:artworkInvests){
+                           investsMoney =  investsMoney.add(artworkInvest.getPrice());
+                       }
+
+                       //获取投资收益金额 SQL_GET_USER_ROI
+                     List<ROIRecord>  roiRecords = (List<ROIRecord>) baseManager.listObject(AppConfig.SQL_GET_USER_ROI, map);
+                       for (ROIRecord roiRecord : roiRecords){
+                           roiMoney = roiMoney.add(roiRecord.getCurrentBalance().subtract(roiRecord.getArtworkInvest().getPrice()));
+                       }
+
+                       //投资回报率
+                        if(investsMoney.doubleValue()!=0.00&&roiMoney.doubleValue()!=0.00){
+                            rate = roiMoney.divide(investsMoney);
+
+                        }
+                        resultMap.put("investsMoney",investsMoney);
+                        resultMap.put("roiMoney",roiMoney);
+                        resultMap.put("rate",rate);
+
+                   }
+
+
+                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
                 }else{
 
                     resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);

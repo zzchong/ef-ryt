@@ -26,6 +26,7 @@ public class ROIRecord implements Serializable {//投资收益记录表
     private String accountNum;//from 账号
     private String details;//收益详情
     private Artwork artwork;//投资项目
+    private ArtworkInvest artworkInvest;//投资记录
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -103,5 +104,15 @@ public class ROIRecord implements Serializable {//投资收益记录表
 
     public void setArtwork(Artwork artwork) {
         this.artwork = artwork;
+    }
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artworkInvest_id")
+    public ArtworkInvest getArtworkInvest() {
+        return artworkInvest;
+    }
+
+    public void setArtworkInvest(ArtworkInvest artworkInvest) {
+        this.artworkInvest = artworkInvest;
     }
 }
