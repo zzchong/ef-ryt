@@ -44,12 +44,15 @@ public class UserBriefController  extends BaseController {
             if ("".equals(jsonObj.getString("signmsg"))
                     || "".equals(jsonObj.getString("userId"))
                     ||"".equals(jsonObj.getString("timestamp"))
-                    || "".equals(jsonObj.getString("content")) ) {
+                  //  || "".equals(jsonObj.getString("content"))
+                    || "".equals(jsonObj.getString("type"))
+                    ) {
                 return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
 
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("userId",jsonObj.getString("userId"));
+            treeMap.put("type",jsonObj.getString("type"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -64,7 +67,18 @@ public class UserBriefController  extends BaseController {
             }
             userBrief.setUser(user);
             userBrief.setStatus("1");
-            userBrief.setContent(jsonObj.getString("content"));
+            if ("1".equals(jsonObj.getString("type"))){
+                if("".equals(jsonObj.getString("signer"))){
+                    return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+                }
+                userBrief.setContent(jsonObj.getString("signer"));//编辑签名
+            } else{
+                if("".equals(jsonObj.getString("content"))){
+                    return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+                }
+                userBrief.setContent(jsonObj.getString("content"));
+            }
+
             userBrief.setCreateDatetime(new Date());
             baseManager.saveOrUpdate(UserBrief.class.getName(),userBrief);
             return resultMapHandler.handlerResult("0","成功",logBean);
