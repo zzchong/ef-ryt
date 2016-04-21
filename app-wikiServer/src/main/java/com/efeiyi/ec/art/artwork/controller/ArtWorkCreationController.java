@@ -156,6 +156,7 @@ public class ArtWorkCreationController extends BaseController {
             String createdTime = TimeUtil.getDistanceTimes(str1,str2);
             //剩余时长
             String restTime = TimeUtil.getDistanceTimes(str3,str1);
+            data.put("artwork",artwork);
             data.put("artworkMessageList",artwork.getArtworkMessages());
             data.put("createdTime",createdTime);
             data.put("restTime",restTime);
@@ -186,7 +187,7 @@ public class ArtWorkCreationController extends BaseController {
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.80:8001/app/artWorkCreationView.do";
+        String url = "http://192.168.1.75:8001/app/artWorkCreationView.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
