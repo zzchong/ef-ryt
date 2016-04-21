@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by Administrator on 2016/4/21.
@@ -16,11 +17,12 @@ import java.io.Serializable;
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class UserBrief implements Serializable {//用户简介表
     private String id;
-    private String status;//0 正常 1 作废
+    private String status;//0 作废 1 正常
     private String type;// 1 大师 2 普通用户
     private User user;//关联用户
     private String content;//简介内容
     private String signer;//签名
+    private Date createDatetime;
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -71,6 +73,14 @@ public class UserBrief implements Serializable {//用户简介表
 
     public void setSigner(String signer) {
         this.signer = signer;
+    }
+    @Column(name = "createDatetime")
+    public Date getCreateDatetime() {
+        return createDatetime;
+    }
+
+    public void setCreateDatetime(Date createDatetime) {
+        this.createDatetime = createDatetime;
     }
 }
 
