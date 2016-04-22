@@ -842,6 +842,46 @@ public class ProfileController extends BaseController {
         return resultMap;
     }
 
+
+    /**
+     * 获取简介
+     * @param request 接口调用路径 /app/intro.do
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/app/intro.do")
+    public Map intro(HttpServletRequest request){
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        LogBean logBean = new LogBean();
+        TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj;
+        try {
+            jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
+                    "".equals(jsonObj.getString("timestamp"))) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            String signmsg = jsonObj.getString("signmsg");
+            String userId = jsonObj.getString("userId");
+            treeMap.put("userId", userId);
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (!verify) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            LinkedHashMap<String , Object> map = new LinkedHashMap<>();
+            map.put("userId",userId);
+            String userBrief = (String) baseManager.executeHql(null,AppConfig.SQL_GET_USER_BRIEF,map);
+            resultMap.put("userBrief",userBrief);
+            resultMapHandler.handlerResult("0", "请求成功", logBean);
+        } catch (Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+        return resultMap;
+    }
+
     public static void main(String[] arg) throws Exception {
 
 
