@@ -249,6 +249,10 @@ public class ProfileController extends BaseController {
             String timestamp = request.getParameter("timestamp");
             String userId = request.getParameter("userId");
             String paramType = request.getParameter("paramType");
+            String province = request.getParameter("province");
+            String provinceName = request.getParameter("provinceName");
+            String artCategory = request.getParameter("artCategory");
+            String titleCertificate = request.getParameter("titleCertificate");
             if ("".equals(signmsg)
                     || "".equals(timestamp)
                     || "".equals(userId)
@@ -259,20 +263,20 @@ public class ProfileController extends BaseController {
             treeMap.put("userId", userId);
             treeMap.put("paramType", paramType);
             treeMap.put("timestamp", timestamp);
+            treeMap.put("province", province);
+            treeMap.put("provinceName", provinceName);
+            treeMap.put("artCategory", artCategory);
+            treeMap.put("titleCertificate", titleCertificate);
+
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-            String province = request.getParameter("province");
-            String provinceName = request.getParameter("provinceName");
-            String artCategory = request.getParameter("artCategory");
-            String titleCertificate = request.getParameter("titleCertificate");
 
             Master master = new Master();
             master.setTheStatus("1");
-            AddressProvince addressProvince = (AddressProvince) baseManager.getObject(AddressProvince.class.getName(), province);
-            master.setOriginProvince(addressProvince);
-            master.setProvinceName(provinceName);
+            master.setPresentAddress(provinceName);
+            master.setProvinceName(province);
             master.setArtCategory(artCategory);
             master.setTitleCertificate(titleCertificate);
             User user = (User) baseManager.getObject(User.class.getName(), userId);
