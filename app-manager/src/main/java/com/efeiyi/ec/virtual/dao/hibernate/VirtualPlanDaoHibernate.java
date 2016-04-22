@@ -26,7 +26,7 @@ public class VirtualPlanDaoHibernate implements VirtualPlanDao {
     }
 
 //    @Override
-//    public Integer getOrderRelation(VirtualOrderPlan virtualOrderPlan) throws Exception {
+//    public Integer getOrderRelation(VirtualInvestmentPlan virtualOrderPlan) throws Exception {
 //        String hql = "select sum(vpm.randomAmount) from VirtualProductModel vpm where vpm.virtualOrderPlan = :virtualOrderPlan";
 //        Query query = this.getSession().createQuery(hql)
 //                .setParameter("virtualOrderPlan", virtualOrderPlan);
@@ -38,7 +38,7 @@ public class VirtualPlanDaoHibernate implements VirtualPlanDao {
 //    }
 
 //    @Override
-//    public List<PurchaseOrderProduct> getOrderProductList(VirtualOrderPlan virtualOrderPlan, PageEntity pageEntity) throws Exception {
+//    public List<PurchaseOrderProduct> getOrderProductList(VirtualInvestmentPlan virtualOrderPlan, PageEntity pageEntity) throws Exception {
 //        String hql = "select pop from PurchaseOrderProduct pop, VirtualPurchaseOrder vpo where vpo.virtualOrderPlan = :virtualOrderPlan and vpo.id=pop.purchaseOrder.id and pop.purchaseOrder.status <>0";
 //        Query query = this.getSession().createQuery(hql)
 //                .setParameter("virtualOrderPlan", virtualOrderPlan)
@@ -48,7 +48,7 @@ public class VirtualPlanDaoHibernate implements VirtualPlanDao {
 //    }
 
 //    @Override
-//    public List<VirtualUser> getVirtualUserList(VirtualUserPlan virtualUserPlan, PageEntity pageEntity) throws Exception {
+//    public List<VirtualUser> getVirtualUserList(VirtualInvestorPlan virtualUserPlan, PageEntity pageEntity) throws Exception {
 //        String hql = "select vu from VirtualUser vu where vu.virtualUserPlan = :virtualUserPlan";
 //        Query query = this.getSession().createQuery(hql)
 //                .setParameter("virtualUserPlan", virtualUserPlan)

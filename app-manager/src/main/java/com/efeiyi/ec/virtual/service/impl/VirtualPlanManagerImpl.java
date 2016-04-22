@@ -17,17 +17,17 @@ public class VirtualPlanManagerImpl implements VirtualPlanManagerService {
     private VirtualPlanDao virtualPlanDao;
 
 //    @Override
-//    public Integer getOrderRelation(VirtualOrderPlan virtualOrderPlan) throws Exception {
+//    public Integer getOrderRelation(VirtualInvestmentPlan virtualOrderPlan) throws Exception {
 //        return virtualPlanDao.getOrderRelation(virtualOrderPlan);
 //    }
 
 //    @Override
-//    public List<PurchaseOrderProduct> getOrderProductList(VirtualOrderPlan virtualOrderPlan, PageEntity pageEntity) throws Exception {
+//    public List<PurchaseOrderProduct> getOrderProductList(VirtualInvestmentPlan virtualOrderPlan, PageEntity pageEntity) throws Exception {
 //        return virtualPlanDao.getOrderProductList(virtualOrderPlan, pageEntity);
 //    }
 
 //    @Override
-//    public List<VirtualUser> getVirtualUserList(VirtualUserPlan virtualUserPlan, PageEntity pageEntity) throws Exception {
+//    public List<VirtualUser> getVirtualUserList(VirtualInvestorPlan virtualUserPlan, PageEntity pageEntity) throws Exception {
 //        return virtualPlanDao.getVirtualUserList(virtualUserPlan, pageEntity);
 //    }
 

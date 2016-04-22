@@ -12,6 +12,7 @@ public class VirtualPlanConstant {
     public static final String PLAN_TYPE_PRODUCT = "product";//虚拟计划对象--商品
     public static final String PLAN_TYPE_COLLECT = "collect";//虚拟计划对象--收藏
     public static final String PLAN_TYPE_POPULARITY = "popularity";//虚拟计划对象--人气
+    public static final String PLAN_TYPE_INVESTMENT = "investment";//虚拟计划对象--融资
 
     final public static String planStatusDeleted = "0";
     final public static String planStatusNormal = "1";
