@@ -40,7 +40,7 @@ public class VirtualPlanListHandler implements DoHandler {
 
                 //计划对象是--用户
 //                if (vp.getPlanType().equals(VirtualPlanConstant.PLAN_TYPE_USER)){
-//                    VirtualUserPlan virtualUserPlan = (VirtualUserPlan) baseManager.getObject(VirtualUserPlan.class.getName(), vp.getId());
+//                    VirtualInvestorPlan virtualUserPlan = (VirtualInvestorPlan) baseManager.getObject(VirtualInvestorPlan.class.getName(), vp.getId());
 //                    if (virtualUserPlan != null){
 //                        vpe.setRelation(virtualUserPlan.getCount());//关联数量
 //                        vpe.setComplete(virtualUserPlan.getVirtualUserList().size());//完成数量
@@ -50,7 +50,7 @@ public class VirtualPlanListHandler implements DoHandler {
 
                 //计划对象是--订单
 //                if (vp.getPlanType().equals(VirtualPlanConstant.PLAN_TYPE_ORDER)){
-//                    VirtualOrderPlan virtualOrderPlan = (VirtualOrderPlan) baseManager.getObject(VirtualOrderPlan.class.getName(), vp.getId());
+//                    VirtualInvestmentPlan virtualOrderPlan = (VirtualInvestmentPlan) baseManager.getObject(VirtualInvestmentPlan.class.getName(), vp.getId());
 //                    if (virtualOrderPlan != null){
 //                        vpe = getOrderPlanRelation(vpe, virtualOrderPlan);
 //                    }
@@ -84,7 +84,7 @@ public class VirtualPlanListHandler implements DoHandler {
         return vpeList;
     }
 
-//    private VirtualPlanElement getOrderPlanRelation(VirtualPlanElement virtualPlanElement, VirtualOrderPlan virtualOrderPlan) throws Exception {
+//    private VirtualPlanElement getOrderPlanRelation(VirtualPlanElement virtualPlanElement, VirtualInvestmentPlan virtualOrderPlan) throws Exception {
 //
 //        virtualPlanElement.setRelation(vpService.getOrderRelation(virtualOrderPlan));//关联数量
 //        virtualPlanElement.setComplete(virtualOrderPlan.getVirtualPurchaseOrderList().size());//完成数量
