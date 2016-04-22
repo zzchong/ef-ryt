@@ -228,7 +228,6 @@ public class ProfileController extends BaseController {
         return resultMap;
     }
 
-
     /**
      * 普通用户申请成为艺术家接口
      *
@@ -246,31 +245,29 @@ public class ProfileController extends BaseController {
             jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            String signmsg = jsonObj.getString("signmsg");
-            String timestamp = jsonObj.getString("timestamp");
-            String userId = jsonObj.getString("userId");
-            String name = jsonObj.getString("name");
-            String username = jsonObj.getString("username");
-            String province = jsonObj.getString("province");
-            String provinceName = jsonObj.getString("provinceName");
-            String artCategory = jsonObj.getString("artCategory");
-            String titleCertificate = jsonObj.getString("titleCertificate");
-            if ("".equals(signmsg) || "".equals(name) || "".equals(timestamp) || "".equals(username) || "".equals(userId)
-                    || "".equals(province) || "".equals(provinceName) || "".equals(artCategory) || "".equals(titleCertificate)) {
+            String signmsg = request.getParameter("signmsg");
+            String timestamp = request.getParameter("timestamp");
+            String userId = request.getParameter("userId");
+            String paramType = request.getParameter("paramType");
+            if ("".equals(signmsg)
+                    || "".equals(timestamp)
+                    || "".equals(userId)
+                    || "".equals(paramType)
+                    ) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            treeMap.put("name", name);
             treeMap.put("userId", userId);
-            treeMap.put("username", username);
-            treeMap.put("province", province);
-            treeMap.put("provinceName", provinceName);
-            treeMap.put("artCategory", artCategory);
-            treeMap.put("titleCertificate", titleCertificate);
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            treeMap.put("paramType", paramType);
+            treeMap.put("timestamp", timestamp);
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
+            String province = request.getParameter("province");
+            String provinceName = request.getParameter("provinceName");
+            String artCategory = request.getParameter("artCategory");
+            String titleCertificate = request.getParameter("titleCertificate");
+
             Master master = new Master();
             master.setTheStatus("1");
             AddressProvince addressProvince = (AddressProvince) baseManager.getObject(AddressProvince.class.getName(), province);
@@ -284,6 +281,9 @@ public class ProfileController extends BaseController {
             baseManager.saveOrUpdate(Master.class.getName(), master);
             user.setMaster(master);
             baseManager.saveOrUpdate(User.class.getName(), user);
+
+            resultMap = uploadFile(request);
+
             resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -298,33 +298,13 @@ public class ProfileController extends BaseController {
      * @param request
      * @return
      */
-    @ResponseBody
-    @RequestMapping(value = "/app/uploadFile.do", method = RequestMethod.POST)
-    public Map uploadFile(HttpServletRequest request) {
+    private Map uploadFile(HttpServletRequest request) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         LogBean logBean = new LogBean();
-        TreeMap treeMap = new TreeMap();
-        JSONObject jsonObj;
         try {
-            jsonObj = JsonAcceptUtil.receiveJson(request);
-            logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            String signmsg = jsonObj.getString("signmsg");
-            String timestamp = jsonObj.getString("timestamp");
-            String userId = jsonObj.getString("userId");
-            String paramType = jsonObj.getString("paramType");
-            if ("".equals(signmsg) || "".equals(timestamp) || "".equals(userId) || "".equals(paramType)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-            }
-            treeMap.put("userId", userId);
-            treeMap.put("paramType",paramType);
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (!verify) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
             String querySql = "from Master m where m.user.id=:userId and m.theStatus = '1'";
             LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
+            String userId = request.getParameter("userId");
             queryMap.put("userId", userId);
             Master master = (Master) baseManager.getUniqueObjectByConditions(querySql, queryMap);
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
@@ -334,6 +314,7 @@ public class ProfileController extends BaseController {
             MultipartFile identityFront = multipartRequest.getFile("identityFront");
             MultipartFile identityBack = multipartRequest.getFile("identityBack");
             String filePath;
+            String paramType = request.getParameter("paramType");
             if ("yes".equals(paramType)){
                 if (!oneList.isEmpty()) {
                     uploadFilePath(oneList, master, "1");
@@ -349,7 +330,6 @@ public class ProfileController extends BaseController {
                     filePath = uploadFile(identityFront);
                     master.setIdentityFront(filePath);
                     baseManager.saveOrUpdate(Master.class.getName(),master);
-
                 }
                 if (identityBack!=null){
                     filePath = uploadFile(identityBack);
@@ -364,6 +344,142 @@ public class ProfileController extends BaseController {
         }
         return resultMap;
     }
+
+//    /**
+//     * 普通用户申请成为艺术家接口
+//     *
+//     * @param request 接口调用路径 /app/applyArtMaster.do
+//     * @return
+//     */
+//    @ResponseBody
+//    @RequestMapping(value = "/app/applyArtMaster.do", method = RequestMethod.POST)
+//    public Map applyArtMaster(HttpServletRequest request) {
+//        Map<String, Object> resultMap = new HashMap<String, Object>();
+//        LogBean logBean = new LogBean();
+//        TreeMap treeMap = new TreeMap();
+//        JSONObject jsonObj;
+//        try {
+//            jsonObj = JsonAcceptUtil.receiveJson(request);
+//            logBean.setCreateDate(new Date());
+//            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+//            String signmsg = jsonObj.getString("signmsg");
+//            String timestamp = jsonObj.getString("timestamp");
+//            String userId = jsonObj.getString("userId");
+//            String name = jsonObj.getString("name");
+//            String username = jsonObj.getString("username");
+//            String province = jsonObj.getString("province");
+//            String provinceName = jsonObj.getString("provinceName");
+//            String artCategory = jsonObj.getString("artCategory");
+//            String titleCertificate = jsonObj.getString("titleCertificate");
+//            if ("".equals(signmsg) || "".equals(name) || "".equals(timestamp) || "".equals(username) || "".equals(userId)
+//                    || "".equals(province) || "".equals(provinceName) || "".equals(artCategory) || "".equals(titleCertificate)) {
+//                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+//            }
+//            treeMap.put("name", name);
+//            treeMap.put("userId", userId);
+//            treeMap.put("username", username);
+//            treeMap.put("province", province);
+//            treeMap.put("provinceName", provinceName);
+//            treeMap.put("artCategory", artCategory);
+//            treeMap.put("titleCertificate", titleCertificate);
+//            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+//            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+//            if (!verify) {
+//                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+//            }
+//            Master master = new Master();
+//            master.setTheStatus("1");
+//            AddressProvince addressProvince = (AddressProvince) baseManager.getObject(AddressProvince.class.getName(), province);
+//            master.setOriginProvince(addressProvince);
+//            master.setProvinceName(provinceName);
+//            master.setArtCategory(artCategory);
+//            master.setTitleCertificate(titleCertificate);
+//            User user = (User) baseManager.getObject(User.class.getName(), userId);
+//            master.setUser(user);
+//            System.out.print(master.getId());
+//            baseManager.saveOrUpdate(Master.class.getName(), master);
+//            user.setMaster(master);
+//            baseManager.saveOrUpdate(User.class.getName(), user);
+//            resultMapHandler.handlerResult("0", "成功", logBean);
+//        } catch (Exception e) {
+//            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+//        }
+//        return resultMap;
+//    }
+//
+//
+//    /**
+//     * 图片上传
+//     *
+//     * @param request
+//     * @return
+//     */
+//    @ResponseBody
+//    @RequestMapping(value = "/app/uploadFile.do", method = RequestMethod.POST)
+//    public Map uploadFile(HttpServletRequest request) {
+//        Map<String, Object> resultMap = new HashMap<String, Object>();
+//        LogBean logBean = new LogBean();
+//        TreeMap treeMap = new TreeMap();
+//        JSONObject jsonObj;
+//        try {
+//            jsonObj = JsonAcceptUtil.receiveJson(request);
+//            logBean.setCreateDate(new Date());
+//            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+//            String signmsg = jsonObj.getString("signmsg");
+//            String timestamp = jsonObj.getString("timestamp");
+//            String userId = jsonObj.getString("userId");
+//            String paramType = jsonObj.getString("paramType");
+//            if ("".equals(signmsg) || "".equals(timestamp) || "".equals(userId) || "".equals(paramType)) {
+//                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+//            }
+//            treeMap.put("userId", userId);
+//            treeMap.put("paramType",paramType);
+//            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+//            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+//            if (!verify) {
+//                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+//            }
+//            String querySql = "from Master m where m.user.id=:userId and m.theStatus = '1'";
+//            LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
+//            queryMap.put("userId", userId);
+//            Master master = (Master) baseManager.getUniqueObjectByConditions(querySql, queryMap);
+//            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+//            List<MultipartFile> oneList = multipartRequest.getFiles("one");
+//            List<MultipartFile> twoList = multipartRequest.getFiles("two");
+//            List<MultipartFile> threeList = multipartRequest.getFiles("three");
+//            MultipartFile identityFront = multipartRequest.getFile("identityFront");
+//            MultipartFile identityBack = multipartRequest.getFile("identityBack");
+//            String filePath;
+//            if ("yes".equals(paramType)){
+//                if (!oneList.isEmpty()) {
+//                    uploadFilePath(oneList, master, "1");
+//                }
+//                if (!twoList.isEmpty()) {
+//                    uploadFilePath(twoList, master, "2");
+//                }
+//                if (!threeList.isEmpty()){
+//                    uploadFilePath(threeList,master,"3");
+//                }
+//            }else{
+//                if (identityFront!=null){
+//                    filePath = uploadFile(identityFront);
+//                    master.setIdentityFront(filePath);
+//                    baseManager.saveOrUpdate(Master.class.getName(),master);
+//
+//                }
+//                if (identityBack!=null){
+//                    filePath = uploadFile(identityBack);
+//                    master.setIdentityBack(filePath);
+//                    baseManager.saveOrUpdate(Master.class.getName(),master);
+//                }
+//            }
+//            resultMapHandler.handlerResult("0", "成功", logBean);
+//
+//        } catch (Exception e) {
+//            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+//        }
+//        return resultMap;
+//    }
 
     /**
      * 上传单个附件调用的方法
