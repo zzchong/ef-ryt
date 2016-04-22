@@ -136,9 +136,9 @@ public class SigninController extends BaseController {
                            rate2 = roiMoney2.divide(investsMoney2);
                        }
 
-                        resultMap.put("investsMoney2",investsMoney2);
-                        resultMap.put("roiMoney2",roiMoney2);
-                        resultMap.put("rate2",rate2);
+                        resultMap.put("investsMoney",investsMoney2);
+                        resultMap.put("roiMoney",roiMoney2);
+                        resultMap.put("rate",rate2);
 
 
 

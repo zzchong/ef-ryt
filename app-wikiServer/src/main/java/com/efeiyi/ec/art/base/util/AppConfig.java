@@ -73,4 +73,7 @@ public class AppConfig {
     //获取艺术家所有已拍卖项目
     public static final String SQL_GET_USER_ARTWORK_OVER = " FROM Artwork where user.id = :userId  and status='1'  and type ='3' and step='32'";
 
+
+    //获取用户简介
+    public static final String SQL_GET_USER_BRIEF= " FROM UserBrief where user.id = :userId  and status='1'";
 }

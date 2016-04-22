@@ -3,37 +3,43 @@
 
     <entities>
 
-        <entity name="AddressProvince" label="省列表" model="com.efeiyi.ec.organization.model.AddressProvince">
+        <entities>
+        <entity name="PCAddressProvince" label="省"  model="com.efeiyi.ec.art.organization.model.AddressProvince">
             <does>
-                <do name="listAddressProvince" access="" label="订单列表">
-                    <query name="default" label="默认" type="auto" orderBy="id:asc">
-                        <condition name="id" defaultValue="abcde" operation="ne"/>
+                <do name="listAddressProvince" access="" label="省份列表">
+                    <query name="default" label="全部省份" type="auto" orderBy="id:asc">
+                        <condition name="id" defaultValue="0" operation="ne"/>
                     </query>
                 </do>
             </does>
         </entity>
 
-        <entity name="AddressCity" label="城市列表" model="com.efeiyi.ec.organization.model.AddressCity">
+        <entity name="PCAddressCity" label="市"  model="com.efeiyi.ec.art.organization.model.AddressCity">
             <does>
-                <do name="listAddressCity" access="" label="订单列表">
-                    <query name="default" label="默认" type="auto" orderBy="id:desc">
-                        <condition name="id" defaultValue="abcde" operation="ne"/>
-                        <condition name="addressProvince.id" defaultValue="123" operation="eq"/>
+                <do name="listAddressCity" access="" label="市列表">
+                    <query name="default" label="全部市" type="auto" orderBy="id:asc">
+                        <condition name="id" defaultValue="0" operation="ne"/>
+                    </query>
+                    <query name="province" label="省所含市" type="auto" orderBy="id:asc">
+                        <condition name="addressProvince.id" defaultValue="" operation="eq"/>
                     </query>
                 </do>
             </does>
         </entity>
 
-        <entity name="AddressDistrict" label="区列表" model="com.efeiyi.ec.organization.model.AddressDistrict">
+        <entity name="PCAddressDistrict" label="区县"  model="com.efeiyi.ec.art.organization.model.AddressDistrict">
             <does>
-                <do name="listAddressDistrict" access="" label="订单列表">
-                    <query name="default" label="默认" type="auto" orderBy="id:desc">
-                        <condition name="id" defaultValue="abcde" operation="ne"/>
-                        <condition name="addressCity.id" operation="eq"/>
+                <do name="listAddressDistrict" access="" label="区县">
+                    <query name="default" label="全部区县" type="auto" orderBy="id:asc">
+                        <condition name="id" defaultValue="0" operation="ne"/>
+                    </query>
+                    <query name="city" label="市所含区县" type="auto" orderBy="id:asc">
+                        <condition name="addressCity.id" defaultValue="" operation="eq"/>
                     </query>
                 </do>
             </does>
         </entity>
+    </entities>
 
         <entity name="ConsumerAddress" label="收货地址列表"  model="com.efeiyi.ec.organization.model.ConsumerAddress">
             <does>
