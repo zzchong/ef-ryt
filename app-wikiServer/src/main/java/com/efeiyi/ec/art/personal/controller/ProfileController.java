@@ -775,6 +775,56 @@ public class ProfileController extends BaseController {
         return resultMap;
     }
 
+
+    /**
+     * 获取赞过的项目列表
+     * @param request 接口调用路径 /app/followed.do
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/app/followed.do")
+    public Map followed(HttpServletRequest request){
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        LogBean logBean = new LogBean();
+        TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj;
+        try {
+            jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
+                    "".equals(jsonObj.getString("timestamp"))) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            String signmsg = jsonObj.getString("signmsg");
+            String userId = jsonObj.getString("userId");
+            treeMap.put("userId", userId);
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (!verify) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            List<Artwork> artworkList = new ArrayList<Artwork>();
+            XQuery xQuery = new XQuery("listArtWorkPraise_byUserId",request);
+            xQuery.put("user_id",userId);
+            List<ArtWorkPraise> workPraises = baseManager.listObject(xQuery);
+            if (!workPraises.isEmpty()){
+                for (ArtWorkPraise praise : workPraises){
+                    XQuery query = new XQuery("listArtWorkPraise_byArtWorkId",request);
+                    query.put("artwork_id",praise.getArtwork().getId());
+                    List<ArtWorkPraise> praises = baseManager.listObject(query);
+                    praise.getArtwork().setPraiseNUm(praises.size());
+                    artworkList.add(praise.getArtwork());
+                }
+                resultMap.put("pageInfoList", artworkList);
+                resultMapHandler.handlerResult("0", "请求成功", logBean);
+            }
+        } catch (Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+        return resultMap;
+    }
+
     public static void main(String[] arg) throws Exception {
 
 
