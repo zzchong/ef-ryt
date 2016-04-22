@@ -142,6 +142,140 @@ public class MessageController extends BaseController {
         return resultMap;
     }
 
+    /**
+     * 点击消息、通知、评论时，更新对应消息类为已读状态
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(name = " ", method = RequestMethod.POST)
+    @ResponseBody
+    public Map updateMessageWatchedStatus(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
+                logBean.setResultCode("10001");
+                logBean.setMsg("必选参数为空，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                resultMap.put("resultCode", "10001");
+                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                return resultMap;
+            }
+            //校验数字签名
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("userId", jsonObj.getString("userId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            treeMap.put("group", jsonObj.getString("group"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                logBean.setResultCode("10002");
+                logBean.setMsg("参数校验不合格，请仔细检查");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+                return resultMap;
+            }
+            //查询数据参数
+            String userId = jsonObj.getString("userId");
+
+            try {
+                if ("".equals(userId)) {
+                    logBean.setResultCode("10001");
+                    logBean.setMsg("必选参数为空，请仔细检查");
+                    baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                    resultMap.put("resultCode", "10001");
+                    resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                    return resultMap;
+                }
+                String group = (String) treeMap.get("group");
+                String queryKey;
+                switch (group) {
+                    case "message":
+                        group = "listMessage_default";
+                        queryKey = "targetUser_id";
+                        break;
+                    case "notification":
+                        group = "lisNotification_default";
+                        queryKey = "targetUser_id";
+                        break;
+                    case "comment":
+                        group = "listArtworkComment_default";
+                        queryKey = "fatherComment_creator_id";
+                        break;
+                    default:
+                        logBean.setResultCode("10001");
+                        logBean.setMsg("必选参数为空，请仔细检查");
+                        baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                        resultMap.put("resultCode", "10001");
+                        resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                        return resultMap;
+                }
+
+                XQuery xQuery = new XQuery(group, request);
+                xQuery.put(queryKey, userId);
+                List list =null;
+                String clazzName = null;
+                switch (group) {
+                    case "listMessage_default":
+                        group = "listMessage_default";
+                        List<Message> messageList = baseManager.listObject(xQuery);
+                        for(Message message : messageList){
+                            message.setIsWatch("1");
+                        }
+                        clazzName = Message.class.getName();
+                        list = messageList;
+                        break;
+                    case "notificnotificationation":
+                        group = "notification";
+                        List<Notification> notificationList = baseManager.listObject(xQuery);
+                        for(Notification notification : notificationList){
+                            notification.setIsWatch("1");
+                        }
+                        clazzName = Notification.class.getName();
+                        list = notificationList;
+                        break;
+                    case "listArtworkComment_default":
+                        group = "listArtworkComment_default";
+                        List<ArtworkComment> artworkCommentList = baseManager.listObject(xQuery);
+                        for(ArtworkComment artworkComment : artworkCommentList){
+                            artworkComment.setIsWatch("1");
+                        }
+                        clazzName = ArtworkComment.class.getName();
+                        list = artworkCommentList;
+                        break;
+                }
+                baseManager.batchSaveOrUpdate("update",clazzName,list);
+
+                logBean.setResultCode("0");
+                logBean.setMsg("成功");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                logBean.setResultCode("10005");
+                logBean.setMsg("查询数据出现异常");
+                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                resultMap.put("resultCode", "10005");
+                resultMap.put("resultMsg", "查询数据出现异常");
+            }
+        } catch (Exception e) {
+            logBean.setResultCode("10004");
+            logBean.setMsg("未知错误，请联系管理员");
+            baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMap;
+        }
+        return resultMap;
+    }
 
     /**
      * 通知 私信 评论的详情页
