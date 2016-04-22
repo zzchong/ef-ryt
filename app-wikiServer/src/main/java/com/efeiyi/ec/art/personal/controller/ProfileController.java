@@ -12,6 +12,7 @@ import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
+import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
@@ -797,30 +798,42 @@ public class ProfileController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
-                    "".equals(jsonObj.getString("timestamp"))) {
+                    "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("type")) ||
+                    "".equals(jsonObj.getString("pageIndex")) || "".equals(jsonObj.getString("pageSize"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             String userId = jsonObj.getString("userId");
+            String type = jsonObj.getString("type");
+            String index = jsonObj.getString("pageIndex");
+            String size = jsonObj.getString("pageSize");
             treeMap.put("userId", userId);
+            treeMap.put("type", type);
+            treeMap.put("pageIndex", index);
+            treeMap.put("pageSize", size);
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             List<Artwork> artworkList = new ArrayList<Artwork>();
+            PageEntity entity = new PageEntity();
+            entity.setIndex(Integer.parseInt(index));
+            entity.setSize(Integer.parseInt(size));
             XQuery xQuery = new XQuery("listArtWorkPraise_byUserId",request);
             xQuery.put("user_id",userId);
-            List<ArtWorkPraise> workPraises = baseManager.listObject(xQuery);
+            xQuery.setPageEntity(entity);
+            PageInfo info = baseManager.listPageInfo(xQuery);
+            List<ArtWorkPraise> workPraises = info.getList();
             if (!workPraises.isEmpty()){
-                for (ArtWorkPraise praise : workPraises){
-                    XQuery query = new XQuery("listArtWorkPraise_byArtWorkId",request);
-                    query.put("artwork_id",praise.getArtwork().getId());
-                    List<ArtWorkPraise> praises = baseManager.listObject(query);
-                    praise.getArtwork().setPraiseNUm(praises.size());
-                    artworkList.add(praise.getArtwork());
-                }
-                resultMap.put("pageInfoList", artworkList);
+//                for (ArtWorkPraise praise : workPraises){
+//                    XQuery query = new XQuery("listArtWorkPraise_byArtWorkId",request);
+//                    query.put("artwork_id",praise.getArtwork().getId());
+//                    List<ArtWorkPraise> praises = baseManager.listObject(query);
+//                    praise.getArtwork().setPraiseNUm(praises.size());
+//                    artworkList.add(praise.getArtwork());
+//                }
+                resultMap.put("pageInfoList", workPraises);
                 resultMapHandler.handlerResult("0", "请求成功", logBean);
             }
         } catch (Exception e) {
