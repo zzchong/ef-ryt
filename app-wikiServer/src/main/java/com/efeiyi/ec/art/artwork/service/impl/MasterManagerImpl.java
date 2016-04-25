@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -34,30 +35,28 @@ public class MasterManagerImpl implements MasterManager {
 
 
     @Override
-    public boolean saveMasterWork(JSONObject jsonObject, MultipartFile multipartFile,String hz) {
+    public boolean saveMasterWork(HttpServletRequest request, MultipartFile multipartFile) {
 
         try {
             MasterWork masterWork = new MasterWork();
 
             masterWork.setStatus("1");
 
-            masterWork.setCreator((User)baseManager.getObject(User.class.getName(),jsonObject.getString("currentUserId")));
+            masterWork.setCreator((User)baseManager.getObject(User.class.getName(),request.getParameter("currentUserId")));
 
             masterWork.setCreateDatetime(new Date());
 
-            masterWork.setMaterial(jsonObject.getString("material"));
+            masterWork.setMaterial(request.getParameter("material"));
 
-            masterWork.setName(jsonObject.getString("name"));
+            masterWork.setName(request.getParameter("name"));
 
-            masterWork.setPictureUrl(jsonObject.getString("pictureUrl"));
-
-            String url = "masterWork/"+System.currentTimeMillis()+jsonObject.getString("name")+hz;
+            String url = "masterWork/"+System.currentTimeMillis()+multipartFile.getOriginalFilename();
 
             aliOssUploadManager.uploadFile(multipartFile,"ec-efeiyi2",url);
 
             masterWork.setPictureUrl("http://rongyitou2.efeiyi.com/"+url);
 
-            masterWork.setType(jsonObject.getString("type"));
+            masterWork.setType(request.getParameter("type"));
 
             baseManager.saveOrUpdate(MasterWork.class.getName(),masterWork);
 
