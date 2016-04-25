@@ -15,6 +15,17 @@
                         <item label="完成" value="9"/>
                     </statusType>
                 </field>
+                <field name="planType" label="对象" inputType="text">
+                    <statusType fieldName="planType">
+                        <!--<item label="订单" value="order"/>-->
+                        <!--<item label="点赞" value="praise"/>-->
+                        <!--<item label="收藏" value="collect"/>-->
+                        <!--<item label="人气" value="popularity"/>-->
+                        <!--<item label="商品" value="product"/>-->
+                        <!--<item label="用户" value="user"/>-->
+                        <item label="融资" value="investment"/>
+                    </statusType>
+                </field>
             </fields>
             <does>
                 <do name="plistAppVirtualPlan" access="" label="计划列表" result="/virtual/appVirtualPlanPList">
@@ -22,6 +33,10 @@
                         <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
                     </query>
                 </do>
+                <do name="formVirtualPlan" label="虚拟数据" access="" result="/virtual/appVirtualPlanForm"/>
+                <do name="removeVirtualPlan" label="删除虚拟数据" access="" result="redirect:/basic/xm.do?qm=plistAppVirtualPlan_default"/>
+                <do name="saveOrUpdateVirtualPlan" label="新建或更新虚拟计划" access="" result="redirect:/basic/xm.do?qm=plistAppVirtualPlan_default"
+                    execute="com.efeiyi.ec.virtual.handler.VirtualPlanSaveHandler"/>
                 <do name="viewAppVirtualPlan" label="查看计划详情" access="" result="/virtual/appVirtualPlanView"/>
             </does>
         </entity>

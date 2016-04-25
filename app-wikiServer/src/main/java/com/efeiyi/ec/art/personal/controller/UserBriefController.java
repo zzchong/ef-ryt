@@ -2,9 +2,11 @@ package com.efeiyi.ec.art.personal.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
+import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.UserBrief;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -22,6 +25,7 @@ import java.util.*;
  * Created by Administrator on 2016/4/21.
  *
  */
+@RestController
 public class UserBriefController  extends BaseController {
     private static Logger logger = Logger.getLogger(UserBriefController.class);
 
@@ -59,7 +63,14 @@ public class UserBriefController  extends BaseController {
                 return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             User user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
-            UserBrief userBrief = new UserBrief();
+            //
+
+            LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+            param.put("userId", jsonObj.getString("userId"));
+            UserBrief userBrief =  (UserBrief)baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_BRIEF, param);//如果已存在
+            if(userBrief==null || userBrief.getId()==null){
+                userBrief = new UserBrief();
+            }
             if(user.getMaster()!= null && user.getMaster().getId()!=null){
                 userBrief.setType("1");
             }else{

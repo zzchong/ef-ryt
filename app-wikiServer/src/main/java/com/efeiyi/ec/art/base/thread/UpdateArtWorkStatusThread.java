@@ -193,6 +193,7 @@ public class UpdateArtWorkStatusThread implements  Runnable {
                            roiRecord.setArtwork(artworkInvest.getArtwork());
                            roiRecord.setCreateDatetime(new Date());
                            roiRecord.setUser(artworkInvest.getCreator());
+                           roiRecord.setArtworkInvest(artworkInvest);
                            roiRecord.setDetails("投资"+artworkInvest.getArtwork().getTitle()+"收益");
                            session.saveOrUpdate(ROIRecord.class.getName(),roiRecord);
 

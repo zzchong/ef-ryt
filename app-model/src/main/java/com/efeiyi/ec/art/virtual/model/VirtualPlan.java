@@ -1,4 +1,4 @@
-package com.efeiyi.ec.art.virtual;
+package com.efeiyi.ec.art.virtual.model;
 
 import com.google.common.base.Objects;
 import org.hibernate.annotations.GenericGenerator;

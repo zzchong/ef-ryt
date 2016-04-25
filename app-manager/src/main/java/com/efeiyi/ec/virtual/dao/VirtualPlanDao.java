@@ -13,7 +13,7 @@ public interface VirtualPlanDao {
      * @return 虚拟订单计划中订单总数
      * @throws Exception
      */
-//    Integer getOrderRelation(VirtualOrderPlan virtualOrderPlan)throws Exception;
+//    Integer getOrderRelation(VirtualInvestmentPlan virtualOrderPlan)throws Exception;
 
     /**
      * 获取虚拟订单计划已完成的订单列表
@@ -21,7 +21,7 @@ public interface VirtualPlanDao {
      * @param pageEntity 分页信息
      * @return 订单商品列表
      */
-//    List<PurchaseOrderProduct> getOrderProductList(VirtualOrderPlan virtualOrderPlan, PageEntity pageEntity)throws Exception;
+//    List<PurchaseOrderProduct> getOrderProductList(VirtualInvestmentPlan virtualOrderPlan, PageEntity pageEntity)throws Exception;
 
     /**
      * 获取虚拟用户计划已完成的用户列表
@@ -30,7 +30,7 @@ public interface VirtualPlanDao {
      * @return 虚拟用户列表
      * @throws Exception
      */
-//    List<VirtualUser> getVirtualUserList(VirtualUserPlan virtualUserPlan, PageEntity pageEntity)throws Exception;
+//    List<VirtualUser> getVirtualUserList(VirtualInvestorPlan virtualUserPlan, PageEntity pageEntity)throws Exception;
 
     /**
      * 删除虚拟计划-真删(保存对象计划)
