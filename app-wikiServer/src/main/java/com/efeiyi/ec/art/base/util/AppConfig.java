@@ -76,4 +76,10 @@ public class AppConfig {
 
     //获取用户简介
     public static final String SQL_GET_USER_BRIEF= " FROM UserBrief where user.id = :userId  and status='1'";
+
+    //获取艺术家信息
+    public static final String SQL_GET_MASTER_INFO= " FROM Master where user.id = :userId  and status='1'";
+    // 判断用户是否关注用户或者大师
+    public static final String SQL_GET_IS_FOLLOWED= " FROM ArtUserFollowed where user.id = :userId and follower.id= :followerId and status='1'";
+
 }

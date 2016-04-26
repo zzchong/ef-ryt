@@ -95,15 +95,15 @@ public class SigninController extends BaseController {
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user.getPassword().equals(jsonObj.getString("password"))) {
-
+                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
                     resultMap.put("userInfo",user);
                     //获取用户的关注数量  粉丝
                     LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
                     paramMap.put("userId", user.getId());
-                    Integer count = (Integer)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, map).get(0);
-                    Integer count1 = (Integer)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, map).get(0);
+                    Long count = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, paramMap).get(0);
+                    Long count1 = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, paramMap).get(0);
                     //获取签名 SQL_GET_USER_SIGNER
-                    UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, map).get(0);
+                    UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
                     resultMap.put("count",count);
                     resultMap.put("count1",count1);
                     resultMap.put("userBrief",userBrief.getSigner());
@@ -119,14 +119,14 @@ public class SigninController extends BaseController {
                     if(user1.getMaster()!=null && user1.getMaster().getId()!=null){
                        // 2 艺术家
                        //项目总金额
-                        List<Artwork> artworks = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK, map);
+                        List<Artwork> artworks = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK, paramMap);
                         for (Artwork artwork:artworks){
                             investsMoney2 = investsMoney2.add(artwork.getInvestGoalMoney());
                         }
 
 
                        //项目总拍卖金额
-                        List<Artwork> artworks2 = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK_OVER, map);
+                        List<Artwork> artworks2 = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK_OVER, paramMap);
                         for (Artwork artwork:artworks2){
                             ArtworkBidding artworkBidding = (ArtworkBidding)xdoDao.getSession().createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
                             roiMoney2 = roiMoney2.add(artworkBidding.getPrice());
@@ -145,13 +145,13 @@ public class SigninController extends BaseController {
                    }else {
                        // 1 普通用户
                        //获取投资金额
-                       List<ArtworkInvest> artworkInvests = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_ARTWORK_APP, map);
+                       List<ArtworkInvest> artworkInvests = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_ARTWORK_APP, paramMap);
                        for (ArtworkInvest artworkInvest:artworkInvests){
                            investsMoney =  investsMoney.add(artworkInvest.getPrice());
                        }
 
                        //获取投资收益金额 SQL_GET_USER_ROI
-                     List<ROIRecord>  roiRecords = (List<ROIRecord>) baseManager.listObject(AppConfig.SQL_GET_USER_ROI, map);
+                     List<ROIRecord>  roiRecords = (List<ROIRecord>) baseManager.listObject(AppConfig.SQL_GET_USER_ROI, paramMap);
                        for (ROIRecord roiRecord : roiRecords){
                            roiMoney = roiMoney.add(roiRecord.getCurrentBalance().subtract(roiRecord.getArtworkInvest().getPrice()));
                        }
@@ -168,7 +168,7 @@ public class SigninController extends BaseController {
                    }
 
 
-                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+
                 }else{
 
                     resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);

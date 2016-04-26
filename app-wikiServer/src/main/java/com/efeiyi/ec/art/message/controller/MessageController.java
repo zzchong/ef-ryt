@@ -157,6 +157,7 @@ public class MessageController extends BaseController {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
+        System.out.println("/app/updateWatchedStatus.do--------------------" + new Date());
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -510,10 +511,10 @@ public class MessageController extends BaseController {
 //        map.put("userId","2");
 //        map.put("timestamp",timestamp);
         /**information.do测试加密参数**/
-        map.put("userId", "iijq9f1r7apprtab");
-        map.put("type", "0");
-        map.put("pageSize", "5");
-        map.put("pageNum", "1");
+        map.put("userId", "ieatht97wfw30hfd");
+//        map.put("type", "0");
+//        map.put("pageSize", "5");
+        map.put("group", "notification");
         map.put("timestamp", timestamp);
         /**commentDetail.do测试加密参数**/
 //        map.put("userId","2");
@@ -522,18 +523,18 @@ public class MessageController extends BaseController {
 //        String signmsg = "userId=2&timestamp="+timestamp+"&appkey="+appKey ;
         String signmsg = DigitalSignatureUtil.encrypt(map);
 
-
+map.put("signmsg",signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.69:8001/app/information.do";
+        String url = "http://192.168.1.69:8001/app/updateWatchedStatus.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
         /**json参数  informationList.do测试 **/
 //         String json = "{\"userId\":\"2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  information.do测试 **/
-        String json = "{\"userId\":\"iijq9f1r7apprtab\",\"type\":\"0\",\"pageSize\":\"5\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"timestamp\":\"1461578159625\",\"group\":\"notification\",\"signmsg\":\"554371bcb0ef7c41ed54aec5cae63f3f\",\"userId\":\"ieatht97wfw30hfd\"}";
         /**json参数  commentDetail.do测试 **/
 //        String json = "{\"userId\":\"2\",\"fromUserId\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
-        JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
+        JSONObject jsonObj = (JSONObject) JSONObject.toJSON(map);
         String jsonString = jsonObj.toJSONString();
 
 

@@ -2,10 +2,14 @@ package com.efeiyi.ec.art.personal.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
+import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.ArtUserFollowed;
+import com.efeiyi.ec.art.model.FollowUserUtil;
+import com.efeiyi.ec.art.model.Master;
+import com.efeiyi.ec.art.model.UserBrief;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
@@ -52,43 +56,138 @@ public class ArtUserFollowedController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
-                    "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("type")) ||
+                    "".equals(jsonObj.getString("timestamp"))  || "".equals(jsonObj.getString("flag"))
+                    || "".equals(jsonObj.getString("type")) ||
                     "".equals(jsonObj.getString("pageIndex")) || "".equals(jsonObj.getString("pageSize"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            String signmsg = jsonObj.getString("signmsg");
-            String userId = jsonObj.getString("userId");
-            String type = jsonObj.getString("type");
-            String index = jsonObj.getString("pageIndex");
-            String size = jsonObj.getString("pageSize");
-            treeMap.put("userId", userId);
-            treeMap.put("type", type);
-            treeMap.put("pageIndex", index);
-            treeMap.put("pageSize", size);
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (!verify) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
-            XQuery query = new XQuery("listArtUserFollowed_num",request);
-            query.put("user_id", userId);
-            query.put("type", type);
-            List<ArtUserFollowed> userFollowedList = baseManager.listObject(query);
 
-            XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
-            xQuery.put("user_id", userId);
-            xQuery.put("type", type);
-            PageEntity entity = new PageEntity();
-            entity.setSize(Integer.parseInt(size));
-            entity.setIndex(Integer.parseInt(index));
-            xQuery.setPageEntity(entity);
-            PageInfo pageInfo = baseManager.listPageInfo(xQuery);
-            List<ArtUserFollowed> followedList = pageInfo.getList();
-            resultMapHandler.handlerResult("0", "请求成功", logBean);
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "请求成功");
-            resultMap.put("followsNum",userFollowedList.size());
-            resultMap.put("pageInfoList", followedList);
+            String flag = jsonObj.getString("flag");
+
+            if("1".equals(flag)){//自己查看自己
+
+
+                String signmsg = jsonObj.getString("signmsg");
+                String userId = jsonObj.getString("userId");
+                String type = jsonObj.getString("type");
+                String index = jsonObj.getString("pageIndex");
+                String size = jsonObj.getString("pageSize");
+                treeMap.put("userId", userId);
+                treeMap.put("type", type);
+                treeMap.put("pageIndex", index);
+                treeMap.put("pageSize", size);
+                treeMap.put("timestamp", jsonObj.getString("timestamp"));
+                boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+                if (!verify) {
+                    return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+                }
+                XQuery query = new XQuery("listArtUserFollowed_num",request);
+                query.put("user_id", userId);
+                query.put("type", type);
+                List<ArtUserFollowed> userFollowedList = baseManager.listObject(query);
+
+                XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
+                xQuery.put("user_id", userId);
+                xQuery.put("type", type);
+                PageEntity entity = new PageEntity();
+                entity.setSize(Integer.parseInt(size));
+                entity.setIndex(Integer.parseInt(index));
+                xQuery.setPageEntity(entity);
+                PageInfo pageInfo = baseManager.listPageInfo(xQuery);
+                List<ArtUserFollowed> followedList = pageInfo.getList();
+                LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
+                List<FollowUserUtil> followUserUtils = new ArrayList<FollowUserUtil>();
+                for(ArtUserFollowed artUserFollowed : followedList){//去取签名或头衔  BeanUtils.copyProperties
+                    FollowUserUtil followUserUtil = new FollowUserUtil();
+                    paramMap.put("userId", artUserFollowed.getUser().getId());
+                    if(type.equals("1")){
+                        Master master = (Master)baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap).get(0);
+                        followUserUtil.setArtUserFollowed(artUserFollowed);
+                        followUserUtil.setMaster(master);
+                        followUserUtils.add(followUserUtil);
+                    }else  if(type.equals("2")){
+                        UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
+                        followUserUtil.setArtUserFollowed(artUserFollowed);
+                        followUserUtil.setUserBrief(userBrief);
+                        followUserUtils.add(followUserUtil);
+                    }
+
+                }
+                resultMapHandler.handlerResult("0", "请求成功", logBean);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "请求成功");
+                resultMap.put("followsNum",userFollowedList.size());
+                resultMap.put("pageInfoList", followedList);
+            }else if ("2".equals(flag)) {//自己查看别人
+                String signmsg = jsonObj.getString("signmsg");
+                String userId = jsonObj.getString("otherUserId");
+                String myUserId = jsonObj.getString("userId");
+                String type = jsonObj.getString("type");
+                String index = jsonObj.getString("pageIndex");
+                String size = jsonObj.getString("pageSize");
+                treeMap.put("userId", userId);
+                treeMap.put("type", type);
+                treeMap.put("pageIndex", index);
+                treeMap.put("pageSize", size);
+                treeMap.put("timestamp", jsonObj.getString("timestamp"));
+                boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+                if (!verify) {
+                    return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+                }
+                XQuery query = new XQuery("listArtUserFollowed_num",request);
+                query.put("user_id", userId);
+                query.put("type", type);
+                List<ArtUserFollowed> userFollowedList = baseManager.listObject(query);
+
+                XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
+                xQuery.put("user_id", userId);
+                xQuery.put("type", type);
+                PageEntity entity = new PageEntity();
+                entity.setSize(Integer.parseInt(size));
+                entity.setIndex(Integer.parseInt(index));
+                xQuery.setPageEntity(entity);
+                PageInfo pageInfo = baseManager.listPageInfo(xQuery);
+                List<ArtUserFollowed> followedList = pageInfo.getList();
+                LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
+                List<FollowUserUtil> followUserUtils = new ArrayList<FollowUserUtil>();
+                for(ArtUserFollowed artUserFollowed : followedList){//去取签名或头衔  BeanUtils.copyProperties
+                    FollowUserUtil followUserUtil = new FollowUserUtil();
+                    paramMap.put("userId", artUserFollowed.getUser().getId());
+                    LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+                    param.put("followerId", artUserFollowed.getUser().getId());
+                    param.put("userId", myUserId);
+                    String is_followed = "2";
+                    ArtUserFollowed followed = (ArtUserFollowed)baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap).get(0);
+                    if(followed != null && followed.getId()!=null){
+                        is_followed = "1";
+                    }
+                    if(type.equals("1")){//大师
+                        Master master = (Master)baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap).get(0);
+                        followUserUtil.setArtUserFollowed(artUserFollowed);
+                        followUserUtil.setMaster(master);
+                        followUserUtil.setFlag(is_followed);
+                        followUserUtils.add(followUserUtil);
+
+                    }else  if(type.equals("2")){//用户
+                        UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
+                        followUserUtil.setArtUserFollowed(artUserFollowed);
+                        followUserUtil.setUserBrief(userBrief);
+                        followUserUtil.setFlag(is_followed);
+                        followUserUtils.add(followUserUtil);
+                    }
+
+                }
+                resultMapHandler.handlerResult("0", "请求成功", logBean);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "请求成功");
+                resultMap.put("followsNum",userFollowedList.size());
+                resultMap.put("pageInfoList", followedList);
+            }
+
+
+
+
+
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
