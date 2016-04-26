@@ -72,10 +72,8 @@ public class ArtUserFollowedController extends BaseController {
             }
             XQuery query = new XQuery("listArtUserFollowed_num",request);
             query.put("follower_id", userId);
-            query.put("type", "1");
-            List<ArtUserFollowed> userFolloweds = baseManager.listObject(query);
-            query.put("type", "2");
-            List<ArtUserFollowed> userFollowedsList = baseManager.listObject(query);
+            query.put("type", type);
+            List<ArtUserFollowed> userFollowedList = baseManager.listObject(query);
 
             XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
             xQuery.put("follower_id", userId);
@@ -87,8 +85,9 @@ public class ArtUserFollowedController extends BaseController {
             PageInfo pageInfo = baseManager.listPageInfo(xQuery);
             List<ArtUserFollowed> followedList = pageInfo.getList();
             resultMapHandler.handlerResult("0", "请求成功", logBean);
-            resultMap.put("userFollowNum",userFollowedsList.size());
-            resultMap.put("ArtMasterFollowNum",userFolloweds.size());
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "请求成功");
+            resultMap.put("followsNum",userFollowedList.size());
             resultMap.put("pageInfoList", followedList);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
