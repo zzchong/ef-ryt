@@ -18,7 +18,6 @@
                         <condition name="status" defaultValue="0" operation="ne"/>
                         <condition name="type" defaultValue="0" operation="eq"/>
                     </query>
-
                 </do>
             </does>
         </entity>
