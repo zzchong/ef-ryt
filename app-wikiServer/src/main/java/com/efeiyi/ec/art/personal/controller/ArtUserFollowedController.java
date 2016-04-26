@@ -72,9 +72,9 @@ public class ArtUserFollowedController extends BaseController {
             }
             XQuery query = new XQuery("listArtUserFollowed_default",request);
             query.put("follower_id", userId);
-            query.put("type", '1');
+            query.put("type", "1");
             List<ArtUserFollowed> userFolloweds = baseManager.listObject(query);
-            query.put("type", '2');
+            query.put("type", "2");
             List<ArtUserFollowed> userFollowedsList = baseManager.listObject(query);
 
             XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
