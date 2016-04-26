@@ -71,12 +71,12 @@ public class ArtUserFollowedController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             XQuery query = new XQuery("listArtUserFollowed_num",request);
-            query.put("follower_id", userId);
+            query.put("user_id", userId);
             query.put("type", type);
             List<ArtUserFollowed> userFollowedList = baseManager.listObject(query);
 
             XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
-            xQuery.put("follower_id", userId);
+            xQuery.put("user_id", userId);
             xQuery.put("type", type);
             PageEntity entity = new PageEntity();
             entity.setSize(Integer.parseInt(size));
