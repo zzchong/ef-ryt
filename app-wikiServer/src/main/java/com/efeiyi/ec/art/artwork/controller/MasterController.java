@@ -37,6 +37,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -80,7 +81,7 @@ public class MasterController extends BaseController {
      */
     @RequestMapping(value = "/app/saveMasterWork.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map saveMasterWork(HttpServletRequest request,MultipartHttpServletRequest multiRequest) {
+    public Map saveMasterWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
@@ -91,24 +92,25 @@ public class MasterController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("saveMasterWork");
-            if(!CommonUtil.jsonObject(jsonObj)){
+            if(StringUtils.isEmpty(request.getParameter("name")) ||StringUtils.isEmpty(request.getParameter("material"))
+                    || StringUtils.isEmpty("currentUserId") || StringUtils.isEmpty("type")){
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             map.put("name",request.getParameter("name"));
             map.put("material",request.getParameter("material"));
             map.put("currentUserId",request.getParameter("currentUserId"));
             map.put("type",request.getParameter("type"));
-            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            boolean verify = DigitalSignatureUtil.verify(map,request.getParameter("signmsg"));
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
-            MultipartFile picture = multiRequest.getFile("pictureUrl");
+            MultipartFile picture = ((MultipartHttpServletRequest)request).getFile("pictureUrl");
 
-            String hz = picture.getOriginalFilename().substring
-                    (picture.getOriginalFilename().lastIndexOf("."));
+//            String hz = picture.getOriginalFilename().substring
+//                    (picture.getOriginalFilename().lastIndexOf("."));
 
-            if(masterManager.saveMasterWork(jsonObj,picture,hz)){
+            if(masterManager.saveMasterWork(request,picture)){
 
                 return resultMapHandler.handlerResult("0","成功",logBean);
             }else {
