@@ -12,6 +12,14 @@
                         <condition name="type" defaultValue="0" operation="eq"/>
                     </query>
                 </do>
+                <do name="listArtUserFollowed" access="" label="用户详情" result="json">
+                    <query name="default" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="follower.id" defaultValue="1" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="0" operation="eq"/>
+                    </query>
+
+                </do>
             </does>
         </entity>
     </entities>

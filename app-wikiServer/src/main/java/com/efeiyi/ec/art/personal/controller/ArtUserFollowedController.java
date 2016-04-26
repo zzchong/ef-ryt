@@ -70,6 +70,13 @@ public class ArtUserFollowedController extends BaseController {
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
+            XQuery query = new XQuery("listArtUserFollowed_default",request);
+            query.put("follower_id", userId);
+            query.put("type", '1');
+            List<ArtUserFollowed> userFolloweds = baseManager.listObject(query);
+            query.put("type", '2');
+            List<ArtUserFollowed> userFollowedsList = baseManager.listObject(query);
+
             XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
             xQuery.put("follower_id", userId);
             xQuery.put("type", type);
@@ -80,6 +87,8 @@ public class ArtUserFollowedController extends BaseController {
             PageInfo pageInfo = baseManager.listPageInfo(xQuery);
             List<ArtUserFollowed> followedList = pageInfo.getList();
             resultMapHandler.handlerResult("0", "请求成功", logBean);
+            resultMap.put("userFollowNum",userFollowedsList.size());
+            resultMap.put("ArtMasterFollowNum",userFolloweds.size());
             resultMap.put("pageInfoList", followedList);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -87,6 +96,7 @@ public class ArtUserFollowedController extends BaseController {
 
         return resultMap;
     }
+
 
     public static void main(String[] args) throws Exception {
         long timestamp = System.currentTimeMillis();
