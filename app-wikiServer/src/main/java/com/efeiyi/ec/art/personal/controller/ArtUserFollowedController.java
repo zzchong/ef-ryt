@@ -125,7 +125,7 @@ public class ArtUserFollowedController extends BaseController {
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "请求成功");
                 resultMap.put("followsNum",userFollowedList.size());
-                resultMap.put("pageInfoList", followedList);
+                resultMap.put("pageInfoList", followUserUtils);
             }else if ("2".equals(flag)) {//自己查看别人
                 String signmsg = jsonObj.getString("signmsg");
                 String userId = jsonObj.getString("otherUserId");
@@ -202,7 +202,7 @@ public class ArtUserFollowedController extends BaseController {
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "请求成功");
                 resultMap.put("followsNum",userFollowedList.size());
-                resultMap.put("pageInfoList", followedList);
+                resultMap.put("pageInfoList", followUserUtils);
             }
 
 
