@@ -131,6 +131,41 @@ public class UserMainController extends BaseController {
         }
     }
 
+    /**
+     * 艺术家 修改项目
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/editArtWork.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map editArtWork(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("editArtWork");
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if (!CommonUtil.jsonObject(jsonObj)) {
+                return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            if (verify != true) {
+                return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artworkId"));
+            artwork.setDescription(jsonObj.getString("description"));
+            baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+            data.put("artwork",artwork);
+            resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+            resultMap.put("object",data);
+            return  resultMap;
+        } catch(Exception e){
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+    }
+
     public static void main(String[] arg) throws Exception {
 
 
@@ -139,20 +174,18 @@ public class UserMainController extends BaseController {
 
         Map<String, Object> map = new HashMap<String, Object>();
 
-        /**userMain.do测试加密参数**/
-        map.put("userId","imhfp1yr4636pj49");
-        map.put("pageIndex","1");
-        map.put("pageSize","4");
-        map.put("type","1");
+        /**editArtWork.do测试加密参数**/
+        map.put("artworkId","qydeyugqqiugd2");
+        map.put("description","修改后");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.75:8001/app/userMain.do";
+        String url = "http://192.168.1.75:8001/app/editArtWork.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
-        String json = "{\"pageIndex\":\"1\",\"pageSize\":\"4\",\"type\":\"1\",\"userId\":\"imhfp1yr4636pj49\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"artworkId\":\"qydeyugqqiugd2\",\"description\":\"修改后\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
         StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
