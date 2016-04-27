@@ -44,6 +44,11 @@ public class ConvertArtWorkUtil {
             work.setPicture_url(artwork.getPicture_url() == null ? "" : artwork.getPicture_url());
             work.setStep(artwork.getStep());
             work.setTitle(artwork.getTitle() == null ? "" : artwork.getTitle());
+            work.setPraise((long)artwork.getPraiseNUm());
+            work.setFlag("0");
+            work.setGoalMoney(artwork.getInvestGoalMoney());
+            work.setTruename(artwork.getAuthor().getName());
+            work.setUsername(artwork.getAuthor().getUsername());
         }
         return work;
     }
