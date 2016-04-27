@@ -241,11 +241,11 @@ public class ProfileController extends BaseController {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         LogBean logBean = new LogBean();
         TreeMap treeMap = new TreeMap();
-        JSONObject jsonObj;
+//        JSONObject jsonObj;
         try {
-            jsonObj = JsonAcceptUtil.receiveJson(request);
+//            jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+//            logBean.setMsg(jsonObj.toString());//************记录请求报文
             String signmsg = request.getParameter("signmsg");
             String timestamp = request.getParameter("timestamp");
             String userId = request.getParameter("userId");
@@ -342,7 +342,7 @@ public class ProfileController extends BaseController {
                     baseManager.saveOrUpdate(Master.class.getName(),master);
                 }
             }
-            resultMapHandler.handlerResult("0", "成功", logBean);
+            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
 
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
