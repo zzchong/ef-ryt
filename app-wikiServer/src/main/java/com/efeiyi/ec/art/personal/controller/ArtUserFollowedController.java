@@ -101,14 +101,22 @@ public class ArtUserFollowedController extends BaseController {
                     FollowUserUtil followUserUtil = new FollowUserUtil();
                     paramMap.put("userId", artUserFollowed.getUser().getId());
                     if(type.equals("1")){
-                        Master master = (Master)baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap).get(0);
+                        List<Master> master = (List<Master>)baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap);
                         followUserUtil.setArtUserFollowed(artUserFollowed);
-                        followUserUtil.setMaster(master);
+                        if(master!= null && ! master.isEmpty()){
+                            followUserUtil.setMaster(master.get(0));
+                        }else {
+                            followUserUtil.setMaster(new Master());
+                        }
                         followUserUtils.add(followUserUtil);
                     }else  if(type.equals("2")){
-                        UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
+                        List<UserBrief> userBrief = (List<UserBrief>)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
                         followUserUtil.setArtUserFollowed(artUserFollowed);
-                        followUserUtil.setUserBrief(userBrief);
+                        if(userBrief!= null && ! userBrief.isEmpty()){
+                            followUserUtil.setUserBrief(userBrief.get(0));
+                        }else {
+                            followUserUtil.setUserBrief(new UserBrief());
+                        }
                         followUserUtils.add(followUserUtil);
                     }
 
@@ -126,6 +134,7 @@ public class ArtUserFollowedController extends BaseController {
                 String index = jsonObj.getString("pageIndex");
                 String size = jsonObj.getString("pageSize");
                 treeMap.put("userId", userId);
+                treeMap.put("myUserId", jsonObj.getString("userId"));
                 treeMap.put("type", type);
                 treeMap.put("pageIndex", index);
                 treeMap.put("pageSize", size);
@@ -162,16 +171,28 @@ public class ArtUserFollowedController extends BaseController {
                         is_followed = "1";
                     }
                     if(type.equals("1")){//大师
-                        Master master = (Master)baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap).get(0);
+                        List<Master> master = (List<Master>)baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap);
                         followUserUtil.setArtUserFollowed(artUserFollowed);
-                        followUserUtil.setMaster(master);
+                        if(master!= null && ! master.isEmpty()){
+                            followUserUtil.setMaster(master.get(0));
+                        }else {
+                            followUserUtil.setMaster(new Master());
+                        }
+
                         followUserUtil.setFlag(is_followed);
                         followUserUtils.add(followUserUtil);
 
                     }else  if(type.equals("2")){//用户
-                        UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
+                        List<UserBrief> userBrief = (List<UserBrief>)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
                         followUserUtil.setArtUserFollowed(artUserFollowed);
-                        followUserUtil.setUserBrief(userBrief);
+
+                        if(userBrief!= null && ! userBrief.isEmpty()){
+                            followUserUtil.setUserBrief(userBrief.get(0));
+                        }else {
+                            followUserUtil.setUserBrief(new UserBrief());
+                        }
+
+
                         followUserUtil.setFlag(is_followed);
                         followUserUtils.add(followUserUtil);
                     }
@@ -189,6 +210,7 @@ public class ArtUserFollowedController extends BaseController {
 
 
         } catch (Exception e) {
+            e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
