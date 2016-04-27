@@ -91,12 +91,12 @@
                 </do>
             </does>
         </entity>
-        <entity name="masterWork" label="传承人作品"  model="com.efeiyi.ec.master.model.MasterWork">
+        <entity name="masterWork" label="传承人作品"  model="com.efeiyi.ec.art.model.MasterWork">
         <does>
             <do name="plistMasterWork" access="" label="传承人作品">
                 <query name="default" label="默认" type="auto" orderBy="id:desc">
-                    <condition name="master.id" defaultValue="1" operation="eq"/>
-                    <condition name="status" defaultValue="1" operation="eq"/>
+                    <condition name="creator.id" defaultValue="1" operation="eq"/>
+                    <condition name="status" defaultValue="0" operation="ne"/>
                 </query>
                 <query name="part" label="默认" type="auto" orderBy="id:desc">
                     <condition name="master.id" defaultValue="1" operation="eq"/>
