@@ -14,22 +14,25 @@
     <title>虚拟数据批次</title>
 </head>
 <body style="height: auto">
-<div style="text-align: left;margin-left: 10px;">
-    <input onclick="window.history.go(-1);"
-           type="button" class="am-btn am-btn-default am-btn-xs"
-           style="margin-top: 4px;margin-bottom: 6px;margin-left:2px;height: 35px;"
-           value="返回"/>
-</div>
+<%--<div style="text-align: left;margin-left: 10px;">--%>
+    <%--<input onclick="window.location.href='<c:url value="/basic/xm.do?qm=formAppVirtualInvestor&virtual=virtual"/>'"--%>
+           <%--type="button" class="am-btn am-btn-default am-btn-xs"--%>
+           <%--style="margin-top: 4px;margin-bottom: 6px;margin-left:2px;height: 35px;"--%>
+           <%--value="新建虚拟用户组"/>--%>
 <div>
     <table class="am-table am-table-bordered am-table-radius am-table-striped">
         <tr style="text-align:left">
-            <td>用户ID</td>
-            <td>用户名</td>
+            <td>用户组</td>
+            <td>数量</td>
+            <%--<td>出资下限</td>--%>
+            <%--<td>出资上限</td>--%>
         </tr>
-        <c:forEach items="${vUserList}" var="vUser">
+        <c:forEach items="${requestScope.pageInfo.list}" var="investorPlan">
             <tr>
-                <td>${vUser.user.id}</td>
-                <td>${vUser.user.username}</td>
+                <td><a href="<c:url value="/basic/xm.do?qm=viewAppVirtualInvestor&id=${investorPlan.id}"/>">${investorPlan.group}</a></td>
+                <td>${investorPlan.count}</td>
+                <%--<td>${investorPlan.investFloorAmount}</td>--%>
+                <%--<td>${investorPlan.investCeilAmount}</td>--%>
             </tr>
         </c:forEach>
     </table>

@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Created by Administrator on 2015/11/20.
  */
-public class InvestTaskScheduler extends BaseTimerTask {
+public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
 
     private VirtualInvestmentPlan virtualInvestmentPlan;
 //    private List<ProductModel> productModelList;
@@ -58,7 +58,7 @@ public class InvestTaskScheduler extends BaseTimerTask {
 
         //生成随机时间点
         for (VirtualArtwork virtualArtwork : virtualInvestmentPlan.getVirtualArtworkList()) {
-            Long[] randomOrderTimePoint = new Long[virtualInvestmentPlan.getUserCount()];
+            Long[] randomOrderTimePoint = new Long[virtualInvestmentPlan.getVirtualInvestorPlan().getCount()];
             DateFormat dateFormat = new SimpleDateFormat("yyyy,MM,dd,HH,mm,ss");
             Calendar futureCalendar = Calendar.getInstance();
             String[] nowArray = dateFormat.format(futureCalendar.getTime()).split(",");

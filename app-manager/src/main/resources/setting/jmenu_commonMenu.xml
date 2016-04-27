@@ -52,14 +52,16 @@
 
     <jnode id="VirtualManager" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="虚拟管理" url="/main.do?jnodeId=VirtualManager"  state="">
         <jnode url="" id="virtualManager" access="admin,operational,o_operational,financial,product_manager,market" state="closed" text_zh_CN="虚拟管理">
-            <jnode url="/basic/xm.do?qm=plistAppVirtualPlan_appDefault&amp;virtual=virtual" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="计划列表">
+            <jnode url="/basic/xm.do?qm=plistAppVirtualPlan_appDefault&amp;virtual=virtual" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="虚拟计划">
                 <match url="/basic/xm.do?qm=plistAppVirtualPlan_appDefault&amp;virtual=virtual"/>
                 <match url="/basic/xm.do?qm=viewAppVirtualPlan&amp;virtual=virtual"/>
+                <match url="/virtualPlan/getTypeByObject.do"/>
             </jnode>
-            <!--<jnode url="/basic/xm.do?qm=plistUser_default&amp;User=User" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="用户列表">-->
-                <!--<match url="/basic/xm.do?qm=plistUser"/>-->
-                <!--<match url="/basic/xm.do?qm=viewUser"/>-->
-            <!--</jnode>-->
+            <jnode url="/basic/xm.do?qm=plistAppVirtualInvestor_appDefault&amp;User=User"
+                   access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="虚拟用户组">
+                <match url="/basic/xm.do?qm=plistUser"/>
+                <match url="/basic/xm.do?qm=viewUser"/>
+            </jnode>
         </jnode>
     </jnode>
 

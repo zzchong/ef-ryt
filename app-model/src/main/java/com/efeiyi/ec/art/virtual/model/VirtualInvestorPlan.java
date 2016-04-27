@@ -15,10 +15,11 @@ public class VirtualInvestorPlan {
     private String id;
     private String group;
     private Integer count;
-    private int investFloorAmount;
-    private int investCeilAmount;
+//    private int investFloorAmount;
+//    private int investCeilAmount;
+    private String status;
     private List<VirtualUser> virtualUserList;
-    private VirtualInvestmentPlan virtualInvestmentPlan;
+//    private VirtualInvestmentPlan virtualInvestmentPlan;
 
     @Column(name = "count")
     public Integer getCount() {
@@ -57,31 +58,40 @@ public class VirtualInvestorPlan {
     public void setGroup(String group) {
         this.group = group;
     }
-    @Column(name = "invest_floor_amount")
-     public int getInvestFloorAmount() {
-        return investFloorAmount;
+//    @Column(name = "invest_floor_amount")
+//     public int getInvestFloorAmount() {
+//        return investFloorAmount;
+//    }
+//
+//    public void setInvestFloorAmount(int investFloorAmount) {
+//        this.investFloorAmount = investFloorAmount;
+//    }
+//
+//    @Column(name = "invest_ceil_amount")
+//    public int getInvestCeilAmount() {
+//        return investCeilAmount;
+//    }
+//
+//    public void setInvestCeilAmount(int investCeilAmount) {
+//        this.investCeilAmount = investCeilAmount;
+//    }
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "virtual_investment_plan_id")
+//    public VirtualInvestmentPlan getVirtualInvestmentPlan() {
+//        return virtualInvestmentPlan;
+//    }
+//
+//    public void setVirtualInvestmentPlan(VirtualInvestmentPlan virtualInvestmentPlan) {
+//        this.virtualInvestmentPlan = virtualInvestmentPlan;
+//    }
+
+    @Column(name = "status")
+    public String getStatus() {
+        return status;
     }
 
-    public void setInvestFloorAmount(int investFloorAmount) {
-        this.investFloorAmount = investFloorAmount;
-    }
-
-    @Column(name = "invest_ceil_amount")
-    public int getInvestCeilAmount() {
-        return investCeilAmount;
-    }
-
-    public void setInvestCeilAmount(int investCeilAmount) {
-        this.investCeilAmount = investCeilAmount;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "virtual_investment_plan_id")
-    public VirtualInvestmentPlan getVirtualInvestmentPlan() {
-        return virtualInvestmentPlan;
-    }
-
-    public void setVirtualInvestmentPlan(VirtualInvestmentPlan virtualInvestmentPlan) {
-        this.virtualInvestmentPlan = virtualInvestmentPlan;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
