@@ -5,10 +5,7 @@ import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ConvertArtWork;
-import com.efeiyi.ec.art.organization.model.AddressProvince;
-import com.efeiyi.ec.art.organization.model.BigUser;
-import com.efeiyi.ec.art.organization.model.MyUser;
-import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.model.*;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
@@ -25,6 +22,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -241,11 +243,11 @@ public class ProfileController extends BaseController {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         LogBean logBean = new LogBean();
         TreeMap treeMap = new TreeMap();
-        JSONObject jsonObj;
+//        JSONObject jsonObj;
         try {
-            jsonObj = JsonAcceptUtil.receiveJson(request);
+//            jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+//            logBean.setMsg(jsonObj.toString());//************记录请求报文
             String signmsg = request.getParameter("signmsg");
             String timestamp = request.getParameter("timestamp");
             String userId = request.getParameter("userId");
@@ -342,7 +344,7 @@ public class ProfileController extends BaseController {
                     baseManager.saveOrUpdate(Master.class.getName(),master);
                 }
             }
-            resultMapHandler.handlerResult("0", "成功", logBean);
+            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
 
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -882,6 +884,50 @@ public class ProfileController extends BaseController {
         return resultMap;
     }
 
+    //@RequestMapping("/app/test.do")
+    public void test(HttpServletRequest request)throws  Exception{
+        // 创建根节点 并设置它的属性 ;
+        Element root = new Element("root");
+        // 将根节点添加到文档中；
+        Document Doc = new Document(root);
+        //获取全部省
+        XQuery xQuery = new XQuery("listAddressProvince_default", request);
+        List<AddressProvince> addressProvinces =(List<AddressProvince>) baseManager.listObject(xQuery);
+        for (AddressProvince addressProvince :addressProvinces){
+            // 创建节点 book;
+            Element element = new Element("province");
+            element.setAttribute("name",addressProvince.getName());
+            element.setAttribute("id",addressProvince.getId());
+            root.addContent(element);
+            //获取省下所有市
+          /*  XQuery xQuery2 = new XQuery("listAddressCity_province", request);
+            xQuery2.put("addressProvince_id",addressProvince.getId());
+            List<AddressCity> list = (List<AddressCity>)baseManager.listObject(xQuery2);*/
+            List<AddressCity> list = (List<AddressCity>)xdoDao.getSession().createQuery("from AddressCity where addressProvince.id =:addressProvinceId").setString("addressProvinceId",addressProvince.getId()).list();
+            for (AddressCity addressCity:list){
+                Element element2 = new Element("city");
+                element2.setAttribute("name",addressCity.getName());
+                element2.setAttribute("id",addressCity.getId());
+
+                //获取所有地区
+                /*XQuery xQuery3 = new XQuery("listAddressDistrict_city", request);
+                xQuery3.put("addressCity_id",addressCity.getId());
+                List<AddressDistrict> list2 = (List<AddressDistrict>)baseManager.listObject(xQuery3);*/
+                List<AddressDistrict> list2 = (List<AddressDistrict>)xdoDao.getSession().createQuery("from AddressDistrict where addressCity.id=:addressCityId").setString("addressCityId",addressCity.getId()).list();
+
+                for(AddressDistrict addressDistrict:list2){
+                    Element element3 = new Element("district");
+                    element3.setAttribute("name",addressDistrict.getName());
+                    element3.setAttribute("id",addressDistrict.getId());
+                    element2.addContent(element3);
+                }
+                element.addContent(element2);
+            }
+        }
+        Format format = Format.getPrettyFormat();
+        XMLOutputter XMLOut = new XMLOutputter(format);
+        XMLOut.output(Doc, new FileOutputStream("d:/address.xml"));
+    }
     public static void main(String[] arg) throws Exception {
 
 
