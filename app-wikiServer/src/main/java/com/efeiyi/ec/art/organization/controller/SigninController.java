@@ -153,7 +153,7 @@ public class SigninController extends BaseController {
                         resultMap.put("investsMoney",investsMoney2);
                         resultMap.put("roiMoney",roiMoney2);
                         resultMap.put("rate",rate2);
-
+                        resultMap.put("flag","2");
 
 
                    }else {
@@ -178,6 +178,7 @@ public class SigninController extends BaseController {
                         resultMap.put("investsMoney",investsMoney);
                         resultMap.put("roiMoney",roiMoney);
                         resultMap.put("rate",rate);
+                        resultMap.put("flag","1");
 
                    }
 
