@@ -59,7 +59,7 @@ public class ArtworkInvestController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "http://192.168.1.41:8080/app/artworkInvest.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/artworkInvest.do", method = RequestMethod.POST)
     @ResponseBody
     public Map artworkInvest(HttpServletRequest request) {
         LogBean logBean = new LogBean();
