@@ -43,7 +43,7 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             User user = (User) baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
-            if (user == null && user.getId()!= null) {//用户存在
+            if (user != null && user.getId()!= null) {//用户存在
                 //验证项目
                 Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artworkId"));
                 if(artwork!= null && artwork.getId() != null){
