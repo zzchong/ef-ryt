@@ -35,16 +35,16 @@ public class VirtualInvestmentGenerator extends BaseTimerTask {
     }
 
     public void execute(List<VirtualPlan> virtualPlanList) {
-        long timestamp = System.currentTimeMillis();
-
-        jsonMap.put("timestamp", timestamp);
-        String signmsg = null;
-        try {
-            signmsg = DigitalSignatureUtil.encrypt(jsonMap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        jsonMap.put("signmsg",signmsg);
+//        long timestamp = System.currentTimeMillis();
+//
+//        jsonMap.put("timestamp", timestamp);
+//        String signmsg = null;
+//        try {
+//            signmsg = DigitalSignatureUtil.encrypt(jsonMap);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        jsonMap.put("signmsg",signmsg);
         HttpClient httpClient = new DefaultHttpClient();
         String url = virtualInvestmentPlan.getUrl();
         HttpPost httppost = new HttpPost(url);

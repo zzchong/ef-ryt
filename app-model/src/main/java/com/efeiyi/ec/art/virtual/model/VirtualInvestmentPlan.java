@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.virtual.model;
 
+import net.sf.ehcache.search.expression.Not;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -14,21 +15,32 @@ import java.util.List;
 @Table(name = "virtual_investment_plan")
 public class VirtualInvestmentPlan extends VirtualPlan{
 
-    private List<VirtualArtwork> virtualArtworkList;
+    private VirtualArtwork virtualArtwork;
 //    private List<VirtualInvestorPlan> virtualInvestorPlanList;
     private VirtualInvestorPlan virtualInvestorPlan;
 //    private int userCount;
-    private Time peakTime;//均值小时
-    private Integer standardDeviation; //标准差小时
+//    private Time peakTime;//均值小时
+//    private Integer standardDeviation; //标准差小时
     private String url;//模拟请求的服务端地址
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "virtualInvestmentPlan")
-    public List<VirtualArtwork> getVirtualArtworkList() {
-        return virtualArtworkList;
+//    @OneToMany(fetch = FetchType.LAZY,mappedBy = "virtualInvestmentPlan")
+//    public List<VirtualArtwork> getVirtualArtworkList() {
+//        return virtualArtworkList;
+//    }
+//
+//    public void setVirtualArtworkList(List<VirtualArtwork> virtualArtworkList) {
+//        this.virtualArtworkList = virtualArtworkList;
+//    }
+
+    @ManyToOne
+    @JoinColumn(name = "virtual_artwork_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    public VirtualArtwork getVirtualArtwork() {
+        return virtualArtwork;
     }
 
-    public void setVirtualArtworkList(List<VirtualArtwork> virtualArtworkList) {
-        this.virtualArtworkList = virtualArtworkList;
+    public void setVirtualArtwork(VirtualArtwork virtualArtwork) {
+        this.virtualArtwork = virtualArtwork;
     }
 
 
@@ -41,23 +53,23 @@ public class VirtualInvestmentPlan extends VirtualPlan{
 //        this.userCount = userCount;
 //    }
 
-    @Column(name = "peak_time")
-    public Time getPeakTime() {
-        return peakTime;
-    }
-
-    public void setPeakTime(Time peakTime) {
-        this.peakTime = peakTime;
-    }
-
-    @Column(name = "standard_deviation")
-    public Integer getStandardDeviation() {
-        return standardDeviation;
-    }
-
-    public void setStandardDeviation(Integer standardDeviation) {
-        this.standardDeviation = standardDeviation;
-    }
+//    @Column(name = "peak_time")
+//    public Time getPeakTime() {
+//        return peakTime;
+//    }
+//
+//    public void setPeakTime(Time peakTime) {
+//        this.peakTime = peakTime;
+//    }
+//
+//    @Column(name = "standard_deviation")
+//    public Integer getStandardDeviation() {
+//        return standardDeviation;
+//    }
+//
+//    public void setStandardDeviation(Integer standardDeviation) {
+//        this.standardDeviation = standardDeviation;
+//    }
 
     @Column(name = "server_url")
     public String getUrl() {
