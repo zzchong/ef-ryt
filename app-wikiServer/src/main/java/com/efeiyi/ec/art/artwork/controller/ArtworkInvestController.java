@@ -25,6 +25,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,6 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by Administrator on 2016/4/14.
  *
  */
+@Controller
 public class ArtworkInvestController extends BaseController {
     private static Logger logger = Logger.getLogger(ArtworkInvestController.class);
 
