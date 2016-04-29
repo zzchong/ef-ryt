@@ -216,7 +216,7 @@ public class VirtualPlanController {
 //        sessionFactory.getCurrentSession().merge(virtualArtwork);
         baseManager.saveOrUpdate(VirtualArtwork.class.getName(), virtualArtwork);
         virtualInvestmentPlan.setVirtualArtwork(virtualArtwork);
-        virtualInvestmentPlan.setImplementClass("com.efeiyi.ec.system.zero.virtual.model.task.VirtualInvestmentTaskScheduler");
+        virtualInvestmentPlan.setImplementClass("com.efeiyi.ec.virtual.model.task.VirtualInvestmentTaskScheduler");
         virtualInvestmentPlan.setStatus(VirtualPlanConstant.planStatusInit);
         baseManager.saveOrUpdate(VirtualInvestmentPlan.class.getName(), virtualInvestmentPlan);
         virtualArtwork.setVirtualInvestmentPlan(virtualInvestmentPlan);

@@ -3,7 +3,6 @@ package com.efeiyi.ec.virtual.model.task;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.virtual.model.VirtualInvestmentPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualPlan;
-import com.efeiyi.ec.virtual.util.DigitalSignatureUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -26,7 +25,6 @@ public class VirtualInvestmentGenerator extends BaseTimerTask {
 
         private VirtualInvestmentPlan virtualInvestmentPlan;
     private Map jsonMap;
-//    private List<ProductModel> productModelList;
 
 
     public VirtualInvestmentGenerator(Map jsonMap,VirtualInvestmentPlan virtualInvestmentPlan) {
@@ -35,16 +33,6 @@ public class VirtualInvestmentGenerator extends BaseTimerTask {
     }
 
     public void execute(List<VirtualPlan> virtualPlanList) {
-//        long timestamp = System.currentTimeMillis();
-//
-//        jsonMap.put("timestamp", timestamp);
-//        String signmsg = null;
-//        try {
-//            signmsg = DigitalSignatureUtil.encrypt(jsonMap);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        jsonMap.put("signmsg",signmsg);
         HttpClient httpClient = new DefaultHttpClient();
         String url = virtualInvestmentPlan.getUrl();
         HttpPost httppost = new HttpPost(url);
@@ -85,7 +73,7 @@ public class VirtualInvestmentGenerator extends BaseTimerTask {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            session.close();
+//            session.close();
         }
     }
 

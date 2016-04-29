@@ -22,7 +22,8 @@
 <div>
     <table class="am-table am-table-bordered am-table-radius am-table-striped">
         <tr style="text-align:left">
-            <td>用户组</td>
+            <td>用户组序</td>
+            <td>用户组名</td>
             <td>数量</td>
             <%--<td>出资下限</td>--%>
             <%--<td>出资上限</td>--%>
@@ -30,6 +31,7 @@
         <c:forEach items="${requestScope.pageInfo.list}" var="investorPlan">
             <tr>
                 <td><a href="<c:url value="/basic/xm.do?qm=viewAppVirtualInvestor&id=${investorPlan.id}"/>">${investorPlan.group}</a></td>
+                <td>${investorPlan.groupName}</td>
                 <td>${investorPlan.count}</td>
                 <%--<td>${investorPlan.investFloorAmount}</td>--%>
                 <%--<td>${investorPlan.investCeilAmount}</td>--%>

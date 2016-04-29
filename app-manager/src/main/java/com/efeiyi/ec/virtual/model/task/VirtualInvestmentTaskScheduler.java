@@ -2,7 +2,6 @@ package com.efeiyi.ec.virtual.model.task;
 
 
 import com.efeiyi.ec.art.model.Artwork;
-import com.efeiyi.ec.art.virtual.model.VirtualArtwork;
 import com.efeiyi.ec.art.virtual.model.VirtualInvestmentPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualUser;
@@ -59,8 +58,9 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
 
         Double percentageOfAmount = 0.0;
         Integer fixedInvestmentIncrement = 0;
-        setVirtualLevel(percentageOfAmount,fixedInvestmentIncrement);
-
+        Number[] numbers = setVirtualLevel(percentageOfAmount, fixedInvestmentIncrement);
+        percentageOfAmount = (Double) numbers[0];
+        fixedInvestmentIncrement = (Integer) numbers[1];
         Artwork artwork = virtualInvestmentPlan.getVirtualArtwork().getArtwork();
         Double investGoal = artwork.getInvestGoalMoney().doubleValue();
         Double subInvestGoal = investGoal * percentageOfAmount;
@@ -68,148 +68,150 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
         Long[] morningInvests = new Long[investTimes * 2 / 5];
         Long[] afternoonInvests = new Long[investTimes / 5];
         Long[] eveningInvests = new Long[investTimes * 2 / 5];
-        Random random = new Random(2 * 60 * 60 * 1000);
-        for(Long morningInvest : morningInvests){
-            morningInvest = random.nextLong();
+        Random random = new Random();
+        for (int x = 0; x < morningInvests.length;x++) {
+            morningInvests[x] = Integer.toUnsignedLong(random.nextInt(2 * 60 * 60 * 1000));
         }
-        for(Long afternoonInvest : afternoonInvests){
-            afternoonInvest = random.nextLong() / 2 + 7 * 60 * 60 * 1000;
+        for (int x = 0; x < afternoonInvests.length;x++) {
+            afternoonInvests[x] = Integer.toUnsignedLong(random.nextInt(2 * 60 * 60 * 1000)) + 7 * 60 * 60 * 1000;;
+        }for (int x = 0; x < eveningInvests.length;x++) {
+            eveningInvests[x] = Integer.toUnsignedLong(random.nextInt(2 * 60 * 60 * 1000)) + 13 * 60 * 60 * 1000;
         }
-        for(Long eveningInvest : eveningInvests){
-            eveningInvest = random.nextLong() + 13 * 60 * 60 * 1000;
-        }
-        List<Long> investList = new ArrayList<>(morningInvests.length + afternoonInvests.length + eveningInvests.length);
-        Collections.addAll(investList,morningInvests);
-        Collections.addAll(investList,afternoonInvests);
-        Collections.addAll(investList,eveningInvests);
-//        DateFormat dateFormat = new SimpleDateFormat("yyyy,MM,dd,HH,mm,ss");
-//        Calendar futureCalendar = Calendar.getInstance();
-//        String[] nowArray = dateFormat.format(futureCalendar.getTime()).split(",");
-////        String[] peakTimeArray = dateFormat.format(virtualInvestmentPlan.getPeakTime()).split(",");
-////        futureCalendar.set(Integer.parseInt(nowArray[0]), Integer.parseInt(nowArray[1]) - 1, Integer.parseInt(nowArray[2]), Integer.parseInt(peakTimeArray[3]), Integer.parseInt(peakTimeArray[4]), Integer.parseInt(peakTimeArray[5]));
-//        long now = System.currentTimeMillis();
-//        long future = futureCalendar.getTimeInMillis();
-//        long futureFromNow = future - now;
 
-//        for (int x = 0; x < randomOrderTimePoint.length; x++) {
-//            randomOrderTimePoint[x] = (long) (random.nextGaussian() * 60 * 60 * 1000) * virtualInvestmentPlan.getStandardDeviation() + futureFromNow;
-//        }
-//        Arrays.sort(randomOrderTimePoint);
-//        int count = 0;
-//        double investAmount = 0;
+        List<Long> investList = new ArrayList<>(morningInvests.length + afternoonInvests.length + eveningInvests.length);
+        Collections.addAll(investList, morningInvests);
+        Collections.addAll(investList, afternoonInvests);
+        Collections.addAll(investList, eveningInvests);
         Long now = System.currentTimeMillis();
-        for(Long relativeTimePoint : investList){
-            int randomSize = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList().size();
-            Random randomUser = new Random(randomSize);
-            VirtualUser virtualUser = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList().get(randomUser.nextInt());
-Map resultMap = new TreeMap();
-            resultMap.put("price",fixedInvestmentIncrement);
-            resultMap.put("userId",virtualUser.getUserBrief().getUser().getId());
-            resultMap.put("artworkId",artwork.getId());
-            resultMap.put("timestamp",now + relativeTimePoint);
-            try {
-                resultMap.put("signmsg",DigitalSignatureUtil.encrypt(resultMap));
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error("Encrypt Exception");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy,MM,dd,HH,mm,ss");
+        Calendar futureCalendar = Calendar.getInstance();
+        String[] nowArray = dateFormat.format(futureCalendar.getTime()).split(",");
+//        String[] peakTimeArray = dateFormat.format(virtualInvestmentPlan.getPeakTime()).split(",");
+        futureCalendar.set(Integer.parseInt(nowArray[0]),
+                Integer.parseInt(nowArray[1]) - 1,
+                Integer.parseInt(nowArray[2]),
+                8,
+                0,
+                0);
+        long future = futureCalendar.getTimeInMillis();
+        long futureFromNow = future - now;
+        int randomSize = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList().size();
+        for (Long relativeTimePoint : investList) {
+            long timePoint = futureFromNow + relativeTimePoint;
+            if(timePoint > 0) {
+                int randomNumber = random.nextInt(randomSize);
+                VirtualUser virtualUser = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList().get(randomNumber);
+                Map resultMap = new TreeMap();
+                resultMap.put("price", fixedInvestmentIncrement);
+                resultMap.put("userId", virtualUser.getUserBrief().getUser().getId());
+                resultMap.put("artworkId", artwork.getId());
+                resultMap.put("timestamp", timePoint);
+                try {
+                    String msg = DigitalSignatureUtil.encrypt(resultMap);
+                    resultMap.put("signmsg", msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("Encrypt Exception");
+                }
+                    SuperTimer.getInstance().getSubTimerMap()
+                            .get(virtualInvestmentPlan)
+                            .getSubTimer()
+                            .schedule(new VirtualInvestmentGenerator(resultMap, virtualInvestmentPlan),
+                                    timePoint
+//                                    1000
+                            );
+
             }
-            SuperTimer.getInstance().getSubTimerMap()
-                    .get(virtualInvestmentPlan)
-                    .getSubTimer()
-                    .schedule(new VirtualInvestmentGenerator(resultMap, virtualInvestmentPlan), now + relativeTimePoint);
         }
         logger.info("Ready to generate " + investTimes + " virtual investments");
 
     }
 
-    private void setVirtualLevel(Double percentageOfAmount, Integer fixedInvestmentIncrement) {
-        if (virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(5001)) < 0){
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()){
-                case "1":{
+    private Number[] setVirtualLevel(Double percentageOfAmount, Integer fixedInvestmentIncrement) {
+        if (virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(5001)) < 0) {
+            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+                case "1":
                     percentageOfAmount = 0.02;
                     fixedInvestmentIncrement = 20;
-                }
-                case "2":{
+                    break;
+                case "2":
                     percentageOfAmount = 0.3;
                     fixedInvestmentIncrement = 100;
-                }
-                case "3":{
+                    break;
+                case "3":
                     percentageOfAmount = 0.15;
                     fixedInvestmentIncrement = 0;
-                }
-                case "4":{
+                    break;
+                case "4":
                     percentageOfAmount = 0.1;
                     fixedInvestmentIncrement = 10;
-                }
-                case "5":{
+                    break;
+                case "5":
                     percentageOfAmount = 0.2;
                     fixedInvestmentIncrement = 20;
-                }
-                case "6":{
+                    break;
+                case "6":
                     percentageOfAmount = 0.03;
                     fixedInvestmentIncrement = 2;
-                }
-
             }
-        }
-        else if(virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(15001)) < 0){
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()){
-                case "1":{
+        } else if (virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(15001)) < 0) {
+            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+                case "1":
                     percentageOfAmount = 0.04;
                     fixedInvestmentIncrement = 80;
-                }
-                case "2":{
+                    break;
+                case "2":
                     percentageOfAmount = 0.2;
                     fixedInvestmentIncrement = 200;
-                }
-                case "3":{
+                    break;
+                case "3":
                     percentageOfAmount = 0.2;
                     fixedInvestmentIncrement = 100;
-                }
-                case "4":{
+                    break;
+                case "4":
                     percentageOfAmount = 0.05;
                     fixedInvestmentIncrement = 20;
-                }
-                case "5":{
+                    break;
+                case "5":
                     percentageOfAmount = 0.3;
                     fixedInvestmentIncrement = 60;
-                }
-                case "6":{
+                    break;
+                case "6":
                     percentageOfAmount = 0.01;
                     fixedInvestmentIncrement = 2;
-                }
-
             }
-        }
-        else{
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()){
-                case "1":{
+        } else {
+            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+                case "1":
                     percentageOfAmount = 0.04;
                     fixedInvestmentIncrement = 100;
-                }
-                case "2":{
+                    break;
+                case "2":
                     percentageOfAmount = 0.3;
                     fixedInvestmentIncrement = 300;
-                }
-                case "3":{
+                    break;
+                case "3":
                     percentageOfAmount = 0.2;
                     fixedInvestmentIncrement = 100;
-                }
-                case "4":{
+                    break;
+                case "4":
                     percentageOfAmount = 0.05;
                     fixedInvestmentIncrement = 10;
-                }
-                case "5":{
+                    break;
+                case "5":
                     percentageOfAmount = 0.2;
                     fixedInvestmentIncrement = 80;
-                }
-                case "6":{
+                    break;
+                case "6":
                     percentageOfAmount = 0.01;
                     fixedInvestmentIncrement = 2;
-                }
 
             }
         }
+        Number[] numbers = new Number[2];
+        numbers[0] = percentageOfAmount;
+        numbers[1] = fixedInvestmentIncrement;
+        return numbers;
     }
 
     @Override
@@ -242,7 +244,7 @@ Map resultMap = new TreeMap();
     }
 
 
-    private void switchGroup(int percentageValueOfInvestGoal,int fixedInvestAmount){
+    private void switchGroup(int percentageValueOfInvestGoal, int fixedInvestAmount) {
 
     }
 }
