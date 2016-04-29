@@ -18,6 +18,7 @@ public class ConvertWork implements Serializable{
     private String truename;
     private String username;
     private String flag;
+    private String level;
 
     public String getId() {
         return id;
@@ -105,5 +106,13 @@ public class ConvertWork implements Serializable{
 
     public void setFlag(String flag) {
         this.flag = flag;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
     }
 }

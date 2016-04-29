@@ -658,7 +658,7 @@ public class ProfileController extends BaseController {
                 reward = reward.add(roiRecord.getCurrentBalance());
             }
             ConvertArtWork convert = ConvertArtWorkUtil.convert(invests, followedList.size(), toFollowedList.size(), investMoney, sumInvestsMoney, reward, user);
-            resultMapHandler.handlerResult("0", "请求成功", logBean);
+            resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("pageInfo", convert);
             System.out.print(convert);
         } catch (Exception e) {
@@ -827,7 +827,7 @@ public class ProfileController extends BaseController {
             xQuery.setPageEntity(entity);
             PageInfo info = baseManager.listPageInfo(xQuery);
             List<ArtWorkPraise> workPraises = info.getList();
-            if (!workPraises.isEmpty()){
+            if (workPraises != null && !workPraises.isEmpty()){
 //                for (ArtWorkPraise praise : workPraises){
 //                    XQuery query = new XQuery("listArtWorkPraise_byArtWorkId",request);
 //                    query.put("artwork_id",praise.getArtwork().getId());
@@ -835,8 +835,12 @@ public class ProfileController extends BaseController {
 //                    praise.getArtwork().setPraiseNUm(praises.size());
 //                    artworkList.add(praise.getArtwork());
 //                }
+
+                resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                 resultMap.put("pageInfoList", workPraises);
-                resultMapHandler.handlerResult("0", "请求成功", logBean);
+            }else{
+                workPraises = new ArrayList<ArtWorkPraise>();
+                resultMap.put("pageInfoList", workPraises);
             }
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
