@@ -875,7 +875,7 @@ public class ProfileController extends BaseController {
             }
             LinkedHashMap<String , Object> map = new LinkedHashMap<>();
             map.put("userId",userId);
-            String userBrief = (String) baseManager.executeHql(null,AppConfig.SQL_GET_USER_BRIEF,map);
+            UserBrief userBrief = (UserBrief) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_BRIEF, map);
             resultMap.put("userBrief",userBrief);
             resultMapHandler.handlerResult("0", "请求成功", logBean);
         } catch (Exception e) {
@@ -939,18 +939,19 @@ public class ProfileController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("pageSize","5");
         /**artWorkCreationView.do测试加密参数**/
-        map.put("userId", "igxhnwhnmhlwkvnw");
+        map.put("userId", "ina6pqm2d036fya5");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.41:8080/app/myArtwork.do";
+//        String url = "http://192.168.1.41:8080/app/myArtwork.do";
+        String url = "http://192.168.1.41:8080/app/intro.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  artWorkCreationList.do测试 **/
 //        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artWorkCreationView.do测试 **/
-        String json = "{\"userId\":\"igxhnwhnmhlwkvnw\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"userId\":\"ina6pqm2d036fya5\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
