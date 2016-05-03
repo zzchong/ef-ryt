@@ -11,6 +11,7 @@ import com.efeiyi.ec.art.model.FollowUserUtil;
 import com.efeiyi.ec.art.model.Master;
 import com.efeiyi.ec.art.model.UserBrief;
 import com.efeiyi.ec.art.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
@@ -248,8 +249,10 @@ public class ArtUserFollowedController extends BaseController {
                         return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
                     }
                     ArtUserFollowed userFollowed = new ArtUserFollowed();
-                    MyUser myUser = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
-                    MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(), followId);
+//                    MyUser myUser = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
+//                    MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(), followId);
+                    User myUser = (User) baseManager.getObject(User.class.getName(), userId);
+                    User user = (User) baseManager.getObject(User.class.getName(), followId);
                     userFollowed.setUser(myUser);
                     userFollowed.setFollower(user);
                     userFollowed.setCreateDatetime(new Date());
