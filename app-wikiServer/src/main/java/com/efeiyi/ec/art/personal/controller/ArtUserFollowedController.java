@@ -11,6 +11,7 @@ import com.efeiyi.ec.art.model.FollowUserUtil;
 import com.efeiyi.ec.art.model.Master;
 import com.efeiyi.ec.art.model.UserBrief;
 import com.efeiyi.ec.art.organization.model.MyUser;
+import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
@@ -56,7 +57,7 @@ public class ArtUserFollowedController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
-                    "".equals(jsonObj.getString("timestamp"))  || "".equals(jsonObj.getString("flag"))
+                    "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("flag"))
                     || "".equals(jsonObj.getString("type")) ||
                     "".equals(jsonObj.getString("pageIndex")) || "".equals(jsonObj.getString("pageSize"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
@@ -64,7 +65,7 @@ public class ArtUserFollowedController extends BaseController {
 
             String flag = jsonObj.getString("flag");
 
-            if("1".equals(flag)){//自己查看自己
+            if ("1".equals(flag)) {//自己查看自己
 
 
                 String signmsg = jsonObj.getString("signmsg");
@@ -81,7 +82,7 @@ public class ArtUserFollowedController extends BaseController {
                 if (!verify) {
                     return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
                 }
-                XQuery query = new XQuery("listArtUserFollowed_num",request);
+                XQuery query = new XQuery("listArtUserFollowed_num", request);
                 query.put("user_id", userId);
                 query.put("type", type);
                 List<ArtUserFollowed> userFollowedList = baseManager.listObject(query);
@@ -97,36 +98,38 @@ public class ArtUserFollowedController extends BaseController {
                 List<ArtUserFollowed> followedList = pageInfo.getList();
                 LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
                 List<FollowUserUtil> followUserUtils = new ArrayList<FollowUserUtil>();
-                for(ArtUserFollowed artUserFollowed : followedList){//去取签名或头衔  BeanUtils.copyProperties
-                    FollowUserUtil followUserUtil = new FollowUserUtil();
-                    paramMap.put("userId", artUserFollowed.getUser().getId());
-                    if(type.equals("1")){
-                        List<Master> master = (List<Master>)baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap);
-                        followUserUtil.setArtUserFollowed(artUserFollowed);
-                        if(master!= null && ! master.isEmpty()){
-                            followUserUtil.setMaster(master.get(0));
-                        }else {
-                            followUserUtil.setMaster(new Master());
+                if (followedList != null) {
+                    for (ArtUserFollowed artUserFollowed : followedList) {//去取签名或头衔  BeanUtils.copyProperties
+                        FollowUserUtil followUserUtil = new FollowUserUtil();
+                        paramMap.put("userId", artUserFollowed.getUser().getId());
+                        if (type.equals("1")) {
+                            List<Master> master = (List<Master>) baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap);
+                            followUserUtil.setArtUserFollowed(artUserFollowed);
+                            if (master != null && !master.isEmpty()) {
+                                followUserUtil.setMaster(master.get(0));
+                            } else {
+                                followUserUtil.setMaster(new Master());
+                            }
+                            followUserUtils.add(followUserUtil);
+                        } else if (type.equals("2")) {
+                            List<UserBrief> userBrief = (List<UserBrief>) baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
+                            followUserUtil.setArtUserFollowed(artUserFollowed);
+                            if (userBrief != null && !userBrief.isEmpty()) {
+                                followUserUtil.setUserBrief(userBrief.get(0));
+                            } else {
+                                followUserUtil.setUserBrief(new UserBrief());
+                            }
+                            followUserUtils.add(followUserUtil);
                         }
-                        followUserUtils.add(followUserUtil);
-                    }else  if(type.equals("2")){
-                        List<UserBrief> userBrief = (List<UserBrief>)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
-                        followUserUtil.setArtUserFollowed(artUserFollowed);
-                        if(userBrief!= null && ! userBrief.isEmpty()){
-                            followUserUtil.setUserBrief(userBrief.get(0));
-                        }else {
-                            followUserUtil.setUserBrief(new UserBrief());
-                        }
-                        followUserUtils.add(followUserUtil);
-                    }
 
+                    }
                 }
                 resultMapHandler.handlerResult("0", "请求成功", logBean);
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "请求成功");
-                resultMap.put("followsNum",userFollowedList.size());
+                resultMap.put("followsNum", userFollowedList.size());
                 resultMap.put("pageInfoList", followUserUtils);
-            }else if ("2".equals(flag)) {//自己查看别人
+            } else if ("2".equals(flag)) {//自己查看别人
                 String signmsg = jsonObj.getString("signmsg");
                 String userId = jsonObj.getString("otherUserId");
                 String myUserId = jsonObj.getString("userId");
@@ -143,7 +146,7 @@ public class ArtUserFollowedController extends BaseController {
                 if (!verify) {
                     return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
                 }
-                XQuery query = new XQuery("listArtUserFollowed_num",request);
+                XQuery query = new XQuery("listArtUserFollowed_num", request);
                 query.put("user_id", userId);
                 query.put("type", type);
                 List<ArtUserFollowed> userFollowedList = baseManager.listObject(query);
@@ -159,36 +162,36 @@ public class ArtUserFollowedController extends BaseController {
                 List<ArtUserFollowed> followedList = pageInfo.getList();
                 LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
                 List<FollowUserUtil> followUserUtils = new ArrayList<FollowUserUtil>();
-                for(ArtUserFollowed artUserFollowed : followedList){//去取签名或头衔  BeanUtils.copyProperties
+                for (ArtUserFollowed artUserFollowed : followedList) {//去取签名或头衔  BeanUtils.copyProperties
                     FollowUserUtil followUserUtil = new FollowUserUtil();
                     paramMap.put("userId", artUserFollowed.getUser().getId());
                     LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
                     param.put("followerId", artUserFollowed.getUser().getId());
                     param.put("userId", myUserId);
                     String is_followed = "2";
-                    ArtUserFollowed followed = (ArtUserFollowed)baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap).get(0);
-                    if(followed != null && followed.getId()!=null){
+                    ArtUserFollowed followed = (ArtUserFollowed) baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap).get(0);
+                    if (followed != null && followed.getId() != null) {
                         is_followed = "1";
                     }
-                    if(type.equals("1")){//大师
-                        List<Master> master = (List<Master>)baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap);
+                    if (type.equals("1")) {//大师
+                        List<Master> master = (List<Master>) baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap);
                         followUserUtil.setArtUserFollowed(artUserFollowed);
-                        if(master!= null && ! master.isEmpty()){
+                        if (master != null && !master.isEmpty()) {
                             followUserUtil.setMaster(master.get(0));
-                        }else {
+                        } else {
                             followUserUtil.setMaster(new Master());
                         }
 
                         followUserUtil.setFlag(is_followed);
                         followUserUtils.add(followUserUtil);
 
-                    }else  if(type.equals("2")){//用户
-                        List<UserBrief> userBrief = (List<UserBrief>)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
+                    } else if (type.equals("2")) {//用户
+                        List<UserBrief> userBrief = (List<UserBrief>) baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
                         followUserUtil.setArtUserFollowed(artUserFollowed);
 
-                        if(userBrief!= null && ! userBrief.isEmpty()){
+                        if (userBrief != null && !userBrief.isEmpty()) {
                             followUserUtil.setUserBrief(userBrief.get(0));
-                        }else {
+                        } else {
                             followUserUtil.setUserBrief(new UserBrief());
                         }
 
@@ -201,16 +204,87 @@ public class ArtUserFollowedController extends BaseController {
                 resultMapHandler.handlerResult("0", "请求成功", logBean);
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "请求成功");
-                resultMap.put("followsNum",userFollowedList.size());
+                resultMap.put("followsNum", userFollowedList.size());
                 resultMap.put("pageInfoList", followUserUtils);
             }
 
 
-
-
-
         } catch (Exception e) {
             e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/app/changeFollowStatus.do", method = RequestMethod.POST)
+    public Map changeFollowStatus(HttpServletRequest request) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        LogBean logBean = new LogBean();
+        TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj;
+        try {
+            jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if (!"".equals(jsonObj.getString("identifier"))) {
+                if ("0".equals(jsonObj.getString("identifier"))) {
+                    if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("followId")) ||
+                            "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("followType"))) {
+                        return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+                    }
+                    String signmsg = jsonObj.getString("signmsg");
+                    String userId = jsonObj.getString("userId");
+                    String followId = jsonObj.getString("followId");
+                    String identifier = jsonObj.getString("identifier");
+                    String followType = jsonObj.getString("followType");
+                    treeMap.put("userId", userId);
+                    treeMap.put("followId", followId);
+                    treeMap.put("identifier", identifier);
+                    treeMap.put("followType", followType);
+                    treeMap.put("timestamp", jsonObj.getString("timestamp"));
+                    boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+                    if (!verify) {
+                        return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+                    }
+                    ArtUserFollowed userFollowed = new ArtUserFollowed();
+//                    MyUser myUser = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
+//                    MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(), followId);
+                    User myUser = (User) baseManager.getObject(User.class.getName(), userId);
+                    User user = (User) baseManager.getObject(User.class.getName(), followId);
+                    userFollowed.setUser(myUser);
+                    userFollowed.setFollower(user);
+                    userFollowed.setCreateDatetime(new Date());
+                    userFollowed.setStatus("1");
+                    userFollowed.setType(followType);
+                    baseManager.saveOrUpdate(ArtUserFollowed.class.getName(), userFollowed);
+                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap.put("artUserFollowed", userFollowed);
+                } else if ("1".equals(jsonObj.getString("identifier"))) {
+                    if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("artUserFollowId"))) {
+                        return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+                    }
+                    String signmsg = jsonObj.getString("signmsg");
+                    String artUserFollowId = jsonObj.getString("artUserFollowId");
+                    String identifier = jsonObj.getString("identifier");
+                    treeMap.put("artUserFollowId", artUserFollowId);
+                    treeMap.put("identifier", identifier);
+                    treeMap.put("timestamp", jsonObj.getString("timestamp"));
+                    boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+                    if (!verify) {
+                        return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+                    }
+                    ArtUserFollowed userFollowed = (ArtUserFollowed) baseManager.getObject(ArtUserFollowed.class.getName(), artUserFollowId);
+                    userFollowed.setStatus("0");
+                    baseManager.saveOrUpdate(ArtUserFollowed.class.getName(), userFollowed);
+                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap.put("artUserFollowed", userFollowed);
+                }
+            } else {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+        } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
@@ -224,20 +298,26 @@ public class ArtUserFollowedController extends BaseController {
 //        String pageIndex = "1";
 //        String pageSize = "3";
         TreeMap map = new TreeMap();
-        map.put("userId", "igxhnwhnmhlwkvnw");
+        map.put("userId", "ieatht97wfw30hfd");
 //        map.put("pageIndex", pageIndex);
 //        map.put("pageSize", pageSize);
         map.put("timestamp", timestamp);
+        map.put("type", "1");
+        map.put("pageSize", "11");
+        map.put("pageIndex", "1");
         signmsg = DigitalSignatureUtil.encrypt(map);
+        map.put("flag", "1");
+        map.put("signmsg", signmsg);
         System.out.println(signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.68:8080/app/applyArtMaster.do";
+        String url = "http://192.168.1.41:8080/app/userFollowed.do";
         HttpPost httppost = new HttpPost(url);
 
 //        String changeFollowStatus = "{\"userId\":\"1\",\"pageIndex\":\"1\",\"pageSize\":\"3\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-        String changeFollowStatus = "{\"userId\":\"igxhnwhnmhlwkvnw\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+//        String changeFollowStatus = "{\"userId\":\"igxhnwhnmhlwkvnw\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
 
-        String json = changeFollowStatus;
+//        String json = changeFollowStatus;
+        String json = JSONObject.toJSONString(map);
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
@@ -260,77 +340,4 @@ public class ArtUserFollowedController extends BaseController {
         System.out.println(stringBuilder.toString());
 
     }
-
-    @ResponseBody
-    @RequestMapping(value = "/app/changeFollowStatus.do", method = RequestMethod.POST)
-    public Map changeFollowStatus(HttpServletRequest request) {
-        Map<String, Object> resultMap = new HashMap<String, Object>();
-        LogBean logBean = new LogBean();
-        TreeMap treeMap = new TreeMap();
-        JSONObject jsonObj;
-        try {
-            jsonObj = JsonAcceptUtil.receiveJson(request);
-            logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            if (!"".equals(jsonObj.getString("identifier"))){
-                if ("0".equals(jsonObj.getString("identifier"))){
-                    if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("followId")) ||
-                            "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("followType"))) {
-                        return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                    }
-                    String signmsg = jsonObj.getString("signmsg");
-                    String userId = jsonObj.getString("userId");
-                    String followId = jsonObj.getString("followId");
-                    String identifier = jsonObj.getString("identifier");
-                    String followType = jsonObj.getString("followType");
-                    treeMap.put("userId", userId);
-                    treeMap.put("followId", followId);
-                    treeMap.put("identifier", identifier);
-                    treeMap.put("followType",followType);
-                    treeMap.put("timestamp", jsonObj.getString("timestamp"));
-                    boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-                    if (!verify) {
-                        return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                    }
-                    ArtUserFollowed userFollowed = new ArtUserFollowed();
-                    MyUser myUser = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
-                    MyUser user = (MyUser) baseManager.getObject(MyUser.class.getName(), followId);
-                    userFollowed.setUser(myUser);
-                    userFollowed.setFollower(user);
-                    userFollowed.setCreateDatetime(new Date());
-                    userFollowed.setStatus("1");
-                    userFollowed.setType(followType);
-                    baseManager.saveOrUpdate(ArtUserFollowed.class.getName(),userFollowed);
-                    resultMapHandler.handlerResult("0", "请求成功", logBean);
-                    resultMap.put("artUserFollowed", userFollowed);
-                }else if("1".equals(jsonObj.getString("identifier"))){
-                    if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("artUserFollowId"))){
-                        return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-                    }
-                    String signmsg = jsonObj.getString("signmsg");
-                    String artUserFollowId = jsonObj.getString("artUserFollowId");
-                    String identifier = jsonObj.getString("identifier");
-                    treeMap.put("artUserFollowId", artUserFollowId);
-                    treeMap.put("identifier", identifier);
-                    treeMap.put("timestamp", jsonObj.getString("timestamp"));
-                    boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-                    if (!verify) {
-                        return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-                    }
-                    ArtUserFollowed userFollowed = (ArtUserFollowed) baseManager.getObject(ArtUserFollowed.class.getName(),artUserFollowId);
-                    userFollowed.setStatus("0");
-                    baseManager.saveOrUpdate(ArtUserFollowed.class.getName(),userFollowed);
-                    resultMapHandler.handlerResult("0", "请求成功", logBean);
-                    resultMap.put("artUserFollowed", userFollowed);
-                }
-            } else {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-            }
-        } catch (Exception e) {
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-        }
-
-        return resultMap;
-    }
-
 }

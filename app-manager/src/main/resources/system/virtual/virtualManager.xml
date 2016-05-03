@@ -41,35 +41,93 @@
             </does>
         </entity>
 
-        <!--<entity name="Artist" label="CheckMaster" basic="simple" others="" model="com.efeiyi.ec.art.model.Master">-->
-            <!--<fields>-->
-                <!--<field name="status" label="艺术家状态" inputType="text">-->
-                    <!--<statusType fieldName="theStatus">-->
+        <entity name="appVirtualInvestorPlan" label="appVirtualInvestorPlan" basic="simple" others="" model="com.efeiyi.ec.art.virtual.model.VirtualInvestorPlan">
+            <fields>
+                <!--<field name="status" label="计划状态" inputType="text">-->
+                    <!--<statusType fieldName="status">-->
                         <!--<item label="删除" value="0"/>-->
-                        <!--<item label="待审核" value="1"/>-->
-                        <!--<item label="审核中" value="2"/>-->
-                        <!--<item label="审核通过" value="3"/>-->
-                        <!--<item label="审核未通过，已驳回" value="4"/>-->
+                        <!--<item label="已建立" value="1"/>-->
+                        <!--<item label="已初始化" value="2"/>-->
+                        <!--<item label="运行中" value="3"/>-->
+                        <!--<item label="暂停" value="5"/>-->
+                        <!--<item label="停止" value="7"/>-->
+                        <!--<item label="完成" value="9"/>-->
                     <!--</statusType>-->
                 <!--</field>-->
-            <!--</fields>-->
-            <!--<does>-->
-                <!--<do name="plistCheckMaster" access="" label="艺术家列表" result="/checkArtist/checkArtistPList">-->
-                    <!--<query name="default" label="默认" type="auto" orderBy="id:desc">-->
-                        <!--<condition name="theStatus" defaultValue="0" operation="ne" inputType="default"/>-->
-                    <!--</query>-->
-                <!--</do>-->
-                <!--<do name="viewCheckMaster" label="查看艺术家详情" access="" result="/checkArtist/checkArtistView"/>-->
-            <!--</does>-->
-            <!--<does>-->
-                <!--<do name="plistMaster" access="" label="艺术家列表" result="/user/artistPList">-->
-                    <!--<query name="default" label="默认" type="auto" orderBy="id:desc">-->
-                        <!--<condition name="theStatus" defaultValue="0" operation="ne" inputType="default"/>-->
-                    <!--</query>-->
-                <!--</do>-->
-                <!--<do name="viewMaster" label="查看艺术家详情" access="" result="/user/artistView"/>-->
-            <!--</does>-->
-        <!--</entity>-->
+                <field name="planType" label="对象" inputType="text">
+                    <statusType fieldName="planType">
+                        <!--<item label="订单" value="order"/>-->
+                        <!--<item label="点赞" value="praise"/>-->
+                        <!--<item label="收藏" value="collect"/>-->
+                        <!--<item label="人气" value="popularity"/>-->
+                        <!--<item label="商品" value="product"/>-->
+                        <!--<item label="用户" value="user"/>-->
+                        <item label="融资" value="investment"/>
+                    </statusType>
+                </field>
+            </fields>
+            <does>
+                <do name="listAppVirtualInvestor" access="" label="虚拟融资用户组列表" result="">
+                    <query name="appDefault" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
+                    </query>
+                </do>
+                <do name="plistAppVirtualInvestor" access="" label="虚拟融资用户组列表" result="/virtual/appVirtualInvestorList">
+                    <query name="appDefault" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
+                    </query>
+                </do>
+                <do name="formAppVirtualInvestor" access="" label="虚拟融资用户组详情" result="/virtual/appVirtualInvestorForm"  execute="com.efeiyi.ec.virtual.handler.VirtualUserListHandler">
+                </do>
+                <do name="viewAppVirtualInvestor" access="" label="虚拟融资用户组列表" result="/virtual/appVirtualInvestorView" >
+                </do>
+            </does>
+        </entity>
+
+        <entity name="appVirtualUserBrief" label="appVirtualUserBrief" basic="simple" others="" model="com.efeiyi.ec.art.model.UserBrief">
+            <does>
+                <do name="listAppVirtualUserBrief" access="" label="虚拟用户个人详情" result="">
+                    <query name="appDefault" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="user.status" defaultValue="8" operation="eq" inputType="default"/>
+                    </query>
+                </do>
+            </does>
+        </entity>
+
+        <entity name="appArtwork" label="appArtwork" basic="simple" others="" model="com.efeiyi.ec.art.model.Artwork">
+            <fields>
+                <!--<field name="status" label="计划状态" inputType="text">-->
+                <!--<statusType fieldName="status">-->
+                <!--<item label="删除" value="0"/>-->
+                <!--<item label="已建立" value="1"/>-->
+                <!--<item label="已初始化" value="2"/>-->
+                <!--<item label="运行中" value="3"/>-->
+                <!--<item label="暂停" value="5"/>-->
+                <!--<item label="停止" value="7"/>-->
+                <!--<item label="完成" value="9"/>-->
+                <!--</statusType>-->
+                <!--</field>-->
+                <field name="planType" label="对象" inputType="text">
+                    <statusType fieldName="planType">
+                        <!--<item label="订单" value="order"/>-->
+                        <!--<item label="点赞" value="praise"/>-->
+                        <!--<item label="收藏" value="collect"/>-->
+                        <!--<item label="人气" value="popularity"/>-->
+                        <!--<item label="商品" value="product"/>-->
+                        <!--<item label="用户" value="user"/>-->
+                        <item label="融资" value="investment"/>
+                    </statusType>
+                </field>
+            </fields>
+            <does>
+                <do name="listAppArtwork" access="" label="计划列表" result="">
+                    <query name="appDefault" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
+                    </query>
+                </do>
+            </does>
+        </entity>
+
 
     </entities>
 </module>

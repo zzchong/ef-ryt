@@ -100,14 +100,28 @@ public class SigninController extends BaseController {
                     //获取用户的关注数量  粉丝
                     LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
                     paramMap.put("userId", user.getId());
-                    Long count = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, paramMap).get(0);
-                    Long count1 = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, paramMap).get(0);
+                    List<Long> counts = (List<Long>)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, paramMap);
+                    Long count =0l;
+                    if(counts != null && !counts.isEmpty()){
+                        count= counts.get(0);
+                    }
+                    //Long count = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, paramMap).get(0);
+                    List<Long> count1s = (List<Long>)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, paramMap);
+                    //Long count1 = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, paramMap).get(0);
+                    Long count1 =0l;
+                    if(count1s != null && !count1s.isEmpty()){
+                        count1= count1s.get(0);
+                    }
                     //获取签名 SQL_GET_USER_SIGNER
-                    UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
+                    List<UserBrief> userBriefs = (List<UserBrief>)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
+                    UserBrief userBrief = new UserBrief();
+                    if (userBriefs!=null && !userBriefs.isEmpty()){
+                        userBrief = userBriefs.get(0);
+                    }
+                    //UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
                     resultMap.put("count",count);
                     resultMap.put("count1",count1);
                     resultMap.put("userBrief",userBrief.getSigner());
-
                     User user1 = (User)baseManager.getObject(User.class.getName(),user.getId());
                     BigDecimal investsMoney = new BigDecimal("0.00");
                     BigDecimal roiMoney = new BigDecimal("0.00");
@@ -139,7 +153,7 @@ public class SigninController extends BaseController {
                         resultMap.put("investsMoney",investsMoney2);
                         resultMap.put("roiMoney",roiMoney2);
                         resultMap.put("rate",rate2);
-
+                        resultMap.put("flag","2");
 
 
                    }else {
@@ -164,6 +178,7 @@ public class SigninController extends BaseController {
                         resultMap.put("investsMoney",investsMoney);
                         resultMap.put("roiMoney",roiMoney);
                         resultMap.put("rate",rate);
+                        resultMap.put("flag","1");
 
                    }
 

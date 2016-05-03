@@ -68,13 +68,13 @@ public class AppConfig {
     public static final String SQL_GET_USER_ROI = " FROM ROIRecord where user.id = :userId  and status='1'";
 
     //获取艺术家所有项目
-    public static final String SQL_GET_USER_ARTWORK = " FROM Artwork where user.id = :userId  and status !='0'";
+    public static final String SQL_GET_USER_ARTWORK = " FROM Artwork where author.id = :userId  and status !='0'";
 
     //获取艺术家所有作品
     public static final String SQL_GET_USER_WORK = " FROM MasterWork where user.id = :userId  and status !='0'";
 
     //获取艺术家所有已拍卖项目
-    public static final String SQL_GET_USER_ARTWORK_OVER = " FROM Artwork where user.id = :userId  and status='1'  and type ='3' and step='32'";
+    public static final String SQL_GET_USER_ARTWORK_OVER = " FROM Artwork where author.id = :userId  and status='1'  and type ='3' and step='32'";
 
 
     //获取用户简介

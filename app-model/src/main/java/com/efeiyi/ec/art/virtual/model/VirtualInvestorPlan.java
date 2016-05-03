@@ -1,6 +1,8 @@
 package com.efeiyi.ec.art.virtual.model;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,10 +17,10 @@ public class VirtualInvestorPlan {
     private String id;
     private String group;
     private Integer count;
-    private int investFloorAmount;
-    private int investCeilAmount;
+//    private List <VirtualStrategy> virtualStrategyList;
+    private String status;
     private List<VirtualUser> virtualUserList;
-    private VirtualInvestmentPlan virtualInvestmentPlan;
+    private String groupName;
 
     @Column(name = "count")
     public Integer getCount() {
@@ -57,31 +59,32 @@ public class VirtualInvestorPlan {
     public void setGroup(String group) {
         this.group = group;
     }
-    @Column(name = "invest_floor_amount")
-     public int getInvestFloorAmount() {
-        return investFloorAmount;
+
+    @Column(name = "status")
+    public String getStatus() {
+        return status;
     }
 
-    public void setInvestFloorAmount(int investFloorAmount) {
-        this.investFloorAmount = investFloorAmount;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    @Column(name = "invest_ceil_amount")
-    public int getInvestCeilAmount() {
-        return investCeilAmount;
+//    @OneToMany(mappedBy = "virtualInvestorPlan")
+//    @NotFound(action = NotFoundAction.IGNORE)
+//    public List<VirtualStrategy> getVirtualStrategyList() {
+//        return virtualStrategyList;
+//    }
+//
+//    public void setVirtualStrategyList(List<VirtualStrategy> virtualStrategyList) {
+//        this.virtualStrategyList = virtualStrategyList;
+//    }
+
+    @Column(name = "group_name")
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setInvestCeilAmount(int investCeilAmount) {
-        this.investCeilAmount = investCeilAmount;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "virtual_investment_plan_id")
-    public VirtualInvestmentPlan getVirtualInvestmentPlan() {
-        return virtualInvestmentPlan;
-    }
-
-    public void setVirtualInvestmentPlan(VirtualInvestmentPlan virtualInvestmentPlan) {
-        this.virtualInvestmentPlan = virtualInvestmentPlan;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

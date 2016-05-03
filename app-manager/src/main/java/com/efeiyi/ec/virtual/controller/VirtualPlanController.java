@@ -1,5 +1,7 @@
 package com.efeiyi.ec.virtual.controller;
 
+import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.virtual.model.VirtualArtwork;
 import com.efeiyi.ec.art.virtual.model.VirtualInvestmentPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualInvestorPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualPlan;
@@ -13,6 +15,7 @@ import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.taglib.PageEntity;
 import org.apache.commons.beanutils.BeanUtils;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -21,9 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Administrator on 2015/12/9.
@@ -95,14 +100,6 @@ public class VirtualPlanController {
             pageEntity.setSize(Integer.parseInt(pageSize));
         }
         modelMap.put("pageEntity", pageEntity);
-        //虚拟计划对象--用户user
-//        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_USER)){
-//            return virtualUserList(modelMap);
-//        }
-        //虚拟计划对象--订单order
-//        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_ORDER)){
-//            return virtualOrderList(modelMap);
-//        }
         //虚拟计划对象--点赞praise
         if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRAISE)){}
         //虚拟计划对象--商品product
@@ -128,14 +125,6 @@ public class VirtualPlanController {
         String type = request.getParameter("type");
         modelMap.put("objectType", type);
 
-        //虚拟计划对象--用户user
-//        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_USER)){
-//            return virtualUserView(modelMap);
-//        }
-        //虚拟计划对象--订单order
-//        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_ORDER)){
-//            return virtualOrderView(modelMap, request);
-//        }
         //虚拟计划融资--investment
         if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_INVESTMENT)){
             return virtualInvestmentView(modelMap, request);
@@ -152,85 +141,26 @@ public class VirtualPlanController {
         return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_default");
     }
 
-//    @RequestMapping("/saveVirtualUserPlan.do")
-//    public ModelAndView saveVirtualUserPlan(VirtualInvestorPlan virtualUserPlan) throws Exception{
-//        VirtualInvestorPlan userPlan = (VirtualInvestorPlan)baseManager.getObject(VirtualInvestorPlan.class.getName(), virtualUserPlan.getId());
-//        if (userPlan == null){
-//            vpmService.deleteVirtualPlan(virtualUserPlan.getId());
-//            virtualUserPlan.setImplementClass("com.efeiyi.ec.system.zero.virtual.model.task.VirtualUserGenerator");
-//            virtualUserPlan.setId(null);
-//            virtualUserPlan.setStatus(VirtualPlanConstant.planStatusInit);
-//            baseManager.saveOrUpdate(VirtualInvestorPlan.class.getName(), virtualUserPlan);
-//        }else {
-//            userPlan.setCount(virtualUserPlan.getCount());
-//            userPlan.setStatus(VirtualPlanConstant.planStatusInit);
-//            baseManager.saveOrUpdate(VirtualInvestorPlan.class.getName(), userPlan);
-//        }
-//        return new ModelAndView("redirect:/basic/xm.do?qm=plistVirtualPlan_default");
-//    }
 
-//    @RequestMapping("/saveVirtualOrderPlan.do")
-//    public ModelAndView saveVirtualOrderPlan(HttpServletRequest request)throws Exception{
-//        String id = request.getParameter("id");
-//        VirtualInvestmentPlan virtualOrderPlan = (VirtualInvestmentPlan) baseManager.getObject(VirtualInvestmentPlan.class.getName(), id);
-//        if (virtualOrderPlan == null){
-//            //获取父类virtualPlan基本属性值
-//            VirtualPlan virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), id);
-//            virtualOrderPlan = new VirtualInvestmentPlan();
-//            BeanUtils.copyProperties(virtualOrderPlan, virtualPlan);
-//            //删除父类virtualPlan 并制空ID
-//            vpmService.deleteVirtualPlan(id);
-//            virtualOrderPlan.setId(null);
-//        }
-//        //获取除父类外的基本属性值
-//        virtualOrderPlan = getBaseProperty(virtualOrderPlan, request);
-//        //获取关联对象
-//        virtualOrderPlan = getRelationObject(virtualOrderPlan, request);
-//        //保存订单计划
-//        virtualOrderPlan.setStatus(VirtualPlanConstant.planStatusInit);
-//        baseManager.saveOrUpdate(VirtualInvestmentPlan.class.getName(), virtualOrderPlan);
-//        //保存订单计划关联商品
-//        saveVirtualProductModelList(virtualOrderPlan, request);
-//
-//        return new ModelAndView("redirect:/basic/xm.do?qm=plistVirtualPlan_default");
-//    }
+    @RequestMapping("/saveVirtualInvestmentPlan.do")
+    public ModelAndView saveVirtualOrderPlan(HttpServletRequest request)throws Exception{
+        String id = request.getParameter("id");
+        VirtualInvestmentPlan virtualInvestmentPlan = (VirtualInvestmentPlan) baseManager.getObject(VirtualInvestmentPlan.class.getName(), id);
+        if (virtualInvestmentPlan == null){
+            //获取父类virtualPlan基本属性值
+            VirtualPlan virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), id);
+            virtualInvestmentPlan = new VirtualInvestmentPlan();
+            BeanUtils.copyProperties(virtualInvestmentPlan, virtualPlan);
+            //删除父类virtualPlan 并制空ID
+            vpmService.deleteVirtualPlan(id);
+            virtualInvestmentPlan.setId(null);
+        }
+        //获取除父类外的基本属性值
+        getBaseProperty(virtualInvestmentPlan, request);
 
-//    @RequestMapping("/getOrderProduct.do")
-//    public ModelAndView getOrderProduct(ModelMap modelMap, HttpServletRequest request)throws Exception{
-//        String popId = request.getParameter("id");
-//        String planId = request.getParameter("planId");
-//        if (popId == null || popId.trim().equals("")){
-//            throw new Exception("获取订单商品对象失败:id为空");
-//        }
-//        PurchaseOrderProduct pop = (PurchaseOrderProduct) baseManager.getObject(PurchaseOrderProduct.class.getName(), popId);
-//        modelMap.put("object", pop);
-//        modelMap.put("planId", planId);
-//        return new ModelAndView("/zero/virtual/virtualPurchaseOrderForm");
-//    }
+        return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_appDefault&virtual");
+    }
 
-//    @RequestMapping("/saveOrderProductContent.do")
-//    public ModelAndView saveOrderProductContent(HttpServletRequest request)throws Exception{
-//        String popId = request.getParameter("id");
-//        String planId = request.getParameter("planId");
-//        String content = request.getParameter("content");
-//        String stars = request.getParameter("starts");//评价星级
-//        if (popId == null || popId.trim().equals("")){
-//            throw new Exception("获取订单商品对象失败:id为空");
-//        }
-//        PurchaseOrderProduct pop = (PurchaseOrderProduct) baseManager.getObject(PurchaseOrderProduct.class.getName(), popId);
-//        PurchaseOrderComment poc = new PurchaseOrderComment();
-//        poc.setContent(content);
-//        poc.setPurchaseOrderProduct(pop);
-//        poc.setStarts(stars);//评价星级、默认是五星
-//        poc.setStatus("1");
-//        poc.setCreateDatetime(new Date());
-//        baseManager.saveOrUpdate(poc.getClass().getName(), poc);
-//        pop.setPurchaseOrderComment(poc);
-//        pop.setStatus("1");
-//        baseManager.saveOrUpdate(pop.getClass().getName(), pop);
-//
-//        return new ModelAndView("redirect:/virtualPlan/getTypeObjectList.do?virtual=virtual&id="+planId+"&type=order");
-//    }
 
     @RequestMapping("/removeVirtualPlan.do")
     public ModelAndView removeVirtualPlan(HttpServletRequest request)throws Exception{
@@ -242,57 +172,6 @@ public class VirtualPlanController {
         return new ModelAndView("redirect:/basic/xm.do?qm=plistVirtualPlan_default");
     }
 
-//    @RequestMapping("/removeVirtualOrder.do")
-//    public ModelAndView removeVirtualOrder(HttpServletRequest request)throws Exception{
-//        String popId = request.getParameter("id");
-//        String planId = request.getParameter("planId");
-//        if (popId == null || popId.trim().equals("")){
-//            throw new Exception("获取订单商品对象失败:id为空");
-//        }
-//        PurchaseOrderProduct pop = (PurchaseOrderProduct) baseManager.getObject(PurchaseOrderProduct.class.getName(), popId);
-//        PurchaseOrder order = pop.getPurchaseOrder();
-//        order.setStatus("0");
-//        baseManager.saveOrUpdate(PurchaseOrder.class.getName(), order);
-//        return new ModelAndView("redirect:/virtualPlan/getTypeObjectList.do?virtual=virtual&id="+planId+"&type=order");
-//    }
-
-//    private ModelAndView virtualOrderList(ModelMap modelMap) throws Exception {
-//        String planId = (String) modelMap.get("planId");
-//        VirtualInvestmentPlan virtualOrderPlan = (VirtualInvestmentPlan)baseManager.getObject(VirtualInvestmentPlan.class.getName(), planId);
-//        PageEntity pageEntity = (PageEntity) modelMap.get("pageEntity");
-//        List<PurchaseOrderProduct> popList = vpmService.getOrderProductList(virtualOrderPlan, pageEntity);
-//        pageEntity.setCount(virtualOrderPlan.getVirtualPurchaseOrderList().size());
-//        modelMap.put("popList", popList);
-//
-//        return new ModelAndView("/zero/virtual/virtualPurchaseOrderPList");
-//    }
-
-//    private ModelAndView virtualUserList(ModelMap modelMap) throws Exception{
-//        String planId = (String) modelMap.get("planId");
-//        VirtualInvestorPlan virtualUserPlan = (VirtualInvestorPlan)baseManager.getObject(VirtualInvestorPlan.class.getName(), planId);
-//        PageEntity pageEntity = (PageEntity) modelMap.get("pageEntity");
-//        List<VirtualUser> vUserList = vpmService.getVirtualUserList(virtualUserPlan, pageEntity);
-//        pageEntity.setCount(virtualUserPlan.getVirtualUserList().size());
-//        modelMap.put("vUserList", vUserList);
-//
-//        return new ModelAndView("/zero/virtual/virtualUserPList");
-//    }
-
-//    private ModelAndView virtualUserView(ModelMap modelMap) throws Exception{
-//        String planId = (String) modelMap.get("planId");
-//        VirtualInvestorPlan virtualUserPlan = (VirtualInvestorPlan)baseManager.getObject(VirtualInvestorPlan.class.getName(), planId);
-//        if (virtualUserPlan == null){
-//            VirtualPlan virtualPlan = (VirtualPlan)baseManager.getObject(VirtualPlan.class.getName(), planId);
-//            virtualUserPlan = new VirtualInvestorPlan();
-//            BeanUtils.copyProperties(virtualUserPlan, virtualPlan);
-//        }else{
-//            long time = virtualUserPlan.getCreateDatetime().getTime();
-//            virtualUserPlan.setCreateDatetime(new Date(time));
-//        }
-//        modelMap.put("object", virtualUserPlan);
-//
-//        return new ModelAndView("/zero/virtual/user/virtualPlanUserView");
-//    }
 
     private ModelAndView virtualInvestmentView(ModelMap modelMap, HttpServletRequest request) throws Exception{
         String planId = (String) modelMap.get("planId");
@@ -306,121 +185,43 @@ public class VirtualPlanController {
             virtualInvestmentPlan.setCreateDatetime(new Date(time));
         }
         modelMap.put("object", virtualInvestmentPlan);
-        //获取订单计划已经建立关系的商品ID列表和name列表
-//        modelMap = getVirtualProductModelIdAndNameList(modelMap, virtualOrderPlan);
 
         //获取虚拟用户计划列表
-//        XQuery xQuery = new XQuery("listVirtualUserPlan_default",request);
-//        List<VirtualInvestorPlan> userPlanList = baseManager.listObject(xQuery);
-//        modelMap.put("userPlanList", userPlanList);
-//
-//        //获取商品列表
-//        xQuery = new XQuery("listProductModel_virtualOrder",request);
-//        List<ProductModel> productModelList = baseManager.listObject(xQuery);
-//        modelMap.put("productModelList", productModelList);
+        XQuery xQuery = new XQuery("listAppVirtualInvestor_appDefault",request);
+        List<VirtualInvestorPlan> virtualInvestorPlanList = baseManager.listObject(xQuery);
+        modelMap.put("virtualInvestorPlanList", virtualInvestorPlanList);
 
-        return new ModelAndView("/virtual/order/appVirtualInvestmentPlanView");
+//        //获取商品列表
+        xQuery = new XQuery("listAppArtwork_appDefault",request);
+        List<Artwork> artworkList = baseManager.listObject(xQuery);
+        modelMap.put("artworkList", artworkList);
+
+        return new ModelAndView("/virtual/appVirtualInvestmentPlanView");
     }
 
 
-//    private ModelAndView virtualOrderView(ModelMap modelMap, HttpServletRequest request) throws Exception{
-//        String planId = (String) modelMap.get("planId");
-//        VirtualInvestmentPlan virtualOrderPlan = (VirtualInvestmentPlan) baseManager.getObject(VirtualInvestmentPlan.class.getName(), planId);
-//        if (virtualOrderPlan == null){
-//            VirtualPlan virtualPlan = (VirtualPlan)baseManager.getObject(VirtualPlan.class.getName(), planId);
-//            virtualOrderPlan = new VirtualInvestmentPlan();
-//            BeanUtils.copyProperties(virtualOrderPlan, virtualPlan);
-//        }else {
-//            long time = virtualOrderPlan.getCreateDatetime().getTime();
-//            virtualOrderPlan.setCreateDatetime(new Date(time));
-//        }
-//        modelMap.put("object", virtualOrderPlan);
-//        //获取订单计划已经建立关系的商品ID列表和name列表
-//        modelMap = getVirtualProductModelIdAndNameList(modelMap, virtualOrderPlan);
-//
-//        //获取虚拟用户计划列表
-//        XQuery xQuery = new XQuery("listVirtualUserPlan_default",request);
-//        List<VirtualInvestorPlan> userPlanList = baseManager.listObject(xQuery);
-//        modelMap.put("userPlanList", userPlanList);
-//
-//        //获取商品列表
-//        xQuery = new XQuery("listProductModel_virtualOrder",request);
-//        List<ProductModel> productModelList = baseManager.listObject(xQuery);
-//        modelMap.put("productModelList", productModelList);
-//
-//        return new ModelAndView("/zero/virtual/order/virtualPlanOrderView");
-//    }
 
-//    private ModelMap getVirtualProductModelIdAndNameList(ModelMap modelMap, VirtualInvestmentPlan virtualOrderPlan)throws Exception{
-//        String pmIdList = "";
-//        String pmNameList = "";
-//        if (virtualOrderPlan.getVirtualProductModelList() != null){
-//            for (VirtualProductModel vpm:virtualOrderPlan.getVirtualProductModelList()){
-//                if (pmIdList.equals("")){
-//                    pmIdList = vpm.getProductModel().getId();
-//                }else {
-//                    pmIdList += "," + vpm.getProductModel().getId();
-//                }
-//                if (pmNameList.equals("")){
-//                    pmNameList = vpm.getProductModel().getProduct().getName() + "[" + vpm.getProductModel().getName() + "]";
-//                }else {
-//                    pmNameList += "," + vpm.getProductModel().getProduct().getName() + "[" + vpm.getProductModel().getName() + "]";
-//                }
-//            }
-//        }
-//        modelMap.put("pmIdList", pmIdList);
-//        modelMap.put("pmNameList", pmNameList);
-//        return modelMap;
-//    }
+    private VirtualInvestmentPlan getBaseProperty(VirtualInvestmentPlan virtualInvestmentPlan, HttpServletRequest request)throws Exception{
+        String serverUrl = request.getParameter("serverUrl");
+        virtualInvestmentPlan.setUrl(serverUrl);
 
-//    private VirtualInvestmentPlan getBaseProperty(VirtualInvestmentPlan virtualOrderPlan, HttpServletRequest request)throws Exception{
-//        String peakTime = request.getParameter("peakTime");
-//        String orderAmountCeil = request.getParameter("orderAmountCeil");
-//        String orderAmountFloor = request.getParameter("orderAmountFloor");
-//        String standardDeviation = request.getParameter("standardDeviation");
-//
-//        virtualOrderPlan.setPeakTime(Time.valueOf(peakTime));
-//        virtualOrderPlan.setOrderAmountCeil(Integer.parseInt(orderAmountCeil));
-//        virtualOrderPlan.setOrderAmountFloor(Integer.parseInt(orderAmountFloor));
-//        virtualOrderPlan.setStandardDeviation(Integer.parseInt(standardDeviation));
-//        virtualOrderPlan.setImplementClass("com.efeiyi.ec.system.zero.virtual.model.task.PurchaseOrderTaskScheduler");
-//        return virtualOrderPlan;
-//    }
+        String virtualInvestorPlanId = request.getParameter("virtualInvestorPlanId");
+        VirtualInvestorPlan virtualInvestorPlan = (VirtualInvestorPlan)baseManager.getObject(VirtualInvestorPlan.class.getName(), virtualInvestorPlanId);
+        virtualInvestmentPlan.setVirtualInvestorPlan(virtualInvestorPlan);
 
-//    private VirtualInvestmentPlan getRelationObject(VirtualInvestmentPlan virtualOrderPlan, HttpServletRequest request)throws Exception{
-//        String userPlanId = request.getParameter("virtualUserPlan.id");
-//        VirtualInvestorPlan virtualUserPlan = (VirtualInvestorPlan) baseManager.getObject(VirtualInvestorPlan.class.getName(), userPlanId);
-//        virtualOrderPlan.setVirtualInvestorPlan(virtualUserPlan);
-//        return virtualOrderPlan;
-//    }
-
-//    private void saveVirtualProductModelList(VirtualInvestmentPlan virtualOrderPlan, HttpServletRequest request)throws Exception{
-//        //获取随机订单数的区间
-//        Random random = new Random();
-//        Integer start = virtualOrderPlan.getOrderAmountFloor();
-//        Integer end = virtualOrderPlan.getOrderAmountCeil();
-//        //获取选择的商品id字符串，以","分隔
-//        String productModelIdList = request.getParameter("productModelIdList");
-//        String[] productModelIds = productModelIdList.split(",");
-//        //解除订单计划修改之前关联的商品
-//        if (virtualOrderPlan.getVirtualProductModelList() != null && !virtualOrderPlan.getVirtualProductModelList().isEmpty()){
-//            for (VirtualProductModel vpm: virtualOrderPlan.getVirtualProductModelList()){
-//                baseManager.delete(VirtualProductModel.class.getName(), vpm.getId());
-//            }
-//        }
-//        //建立订单与选择的商品之间的关联关系
-//        for (String id: productModelIds){
-//            VirtualProductModel virtualProductModel = new VirtualProductModel();
-//            //获取productModel
-//            ProductModel productModel = (ProductModel) baseManager.getObject(ProductModel.class.getName(), id);
-//            virtualProductModel.setProductModel(productModel);
-//            //获取随机数量
-//            Integer randomAmount = random.nextInt(end - start + 1) + start;
-//            virtualProductModel.setRandomAmount(randomAmount);
-//
-//            virtualProductModel.setVirtualOrderPlan(virtualOrderPlan);
-//            baseManager.saveOrUpdate(VirtualProductModel.class.getName(), virtualProductModel);
-//        }
-//    }
-
+        String artworkId = request.getParameter("artworkId");
+        Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(), artworkId);
+        VirtualArtwork virtualArtwork = new VirtualArtwork();
+        virtualArtwork.setArtwork(artwork);
+//        sessionFactory.getCurrentSession().merge(virtualArtwork);
+        baseManager.saveOrUpdate(VirtualArtwork.class.getName(), virtualArtwork);
+        virtualInvestmentPlan.setVirtualArtwork(virtualArtwork);
+        virtualInvestmentPlan.setImplementClass("com.efeiyi.ec.virtual.model.task.VirtualInvestmentTaskScheduler");
+        virtualInvestmentPlan.setStatus(VirtualPlanConstant.planStatusInit);
+        baseManager.saveOrUpdate(VirtualInvestmentPlan.class.getName(), virtualInvestmentPlan);
+        virtualArtwork.setVirtualInvestmentPlan(virtualInvestmentPlan);
+        baseManager.saveOrUpdate(VirtualArtwork.class.getName(), virtualArtwork);
+//        sessionFactory.getCurrentSession().merge(virtualInvestmentPlan);
+        return virtualInvestmentPlan;
+    }
 }

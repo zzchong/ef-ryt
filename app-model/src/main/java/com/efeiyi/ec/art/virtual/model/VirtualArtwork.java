@@ -14,7 +14,7 @@ public class VirtualArtwork {
     private String id;
     private Artwork artwork;
     private VirtualInvestmentPlan virtualInvestmentPlan;
-    private String investGoal;//0 融资充足 1 不保证融资充足
+//    private String investGoal;//0 融资充足 1 不保证融资充足
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -47,12 +47,12 @@ public class VirtualArtwork {
         this.virtualInvestmentPlan = virtualInvestmentPlan;
     }
 
-    @Column(name = "invest_goal")
-    public String getInvestGoal() {
-        return investGoal;
-    }
-
-    public void setInvestGoal(String investGoal) {
-        this.investGoal = investGoal;
-    }
+//    @Column(name = "invest_goal")
+//    public String getInvestGoal() {
+//        return investGoal;
+//    }
+//
+//    public void setInvestGoal(String investGoal) {
+//        this.investGoal = investGoal;
+//    }
 }

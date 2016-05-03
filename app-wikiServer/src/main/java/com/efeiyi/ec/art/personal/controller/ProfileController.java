@@ -658,7 +658,7 @@ public class ProfileController extends BaseController {
                 reward = reward.add(roiRecord.getCurrentBalance());
             }
             ConvertArtWork convert = ConvertArtWorkUtil.convert(invests, followedList.size(), toFollowedList.size(), investMoney, sumInvestsMoney, reward, user);
-            resultMapHandler.handlerResult("0", "请求成功", logBean);
+            resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("pageInfo", convert);
             System.out.print(convert);
         } catch (Exception e) {
@@ -827,7 +827,7 @@ public class ProfileController extends BaseController {
             xQuery.setPageEntity(entity);
             PageInfo info = baseManager.listPageInfo(xQuery);
             List<ArtWorkPraise> workPraises = info.getList();
-            if (!workPraises.isEmpty()){
+            if (workPraises != null && !workPraises.isEmpty()){
 //                for (ArtWorkPraise praise : workPraises){
 //                    XQuery query = new XQuery("listArtWorkPraise_byArtWorkId",request);
 //                    query.put("artwork_id",praise.getArtwork().getId());
@@ -835,8 +835,12 @@ public class ProfileController extends BaseController {
 //                    praise.getArtwork().setPraiseNUm(praises.size());
 //                    artworkList.add(praise.getArtwork());
 //                }
+
+                resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                 resultMap.put("pageInfoList", workPraises);
-                resultMapHandler.handlerResult("0", "请求成功", logBean);
+            }else{
+                workPraises = new ArrayList<ArtWorkPraise>();
+                resultMap.put("pageInfoList", workPraises);
             }
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -875,7 +879,7 @@ public class ProfileController extends BaseController {
             }
             LinkedHashMap<String , Object> map = new LinkedHashMap<>();
             map.put("userId",userId);
-            String userBrief = (String) baseManager.executeHql(null,AppConfig.SQL_GET_USER_BRIEF,map);
+            UserBrief userBrief = (UserBrief) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_BRIEF, map);
             resultMap.put("userBrief",userBrief);
             resultMapHandler.handlerResult("0", "请求成功", logBean);
         } catch (Exception e) {
@@ -939,18 +943,19 @@ public class ProfileController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("pageSize","5");
         /**artWorkCreationView.do测试加密参数**/
-        map.put("userId", "igxhnwhnmhlwkvnw");
+        map.put("userId", "ina6pqm2d036fya5");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.41:8080/app/myArtwork.do";
+//        String url = "http://192.168.1.41:8080/app/myArtwork.do";
+        String url = "http://192.168.1.41:8080/app/intro.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  artWorkCreationList.do测试 **/
 //        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artWorkCreationView.do测试 **/
-        String json = "{\"userId\":\"igxhnwhnmhlwkvnw\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"userId\":\"ina6pqm2d036fya5\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 

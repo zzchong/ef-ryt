@@ -76,6 +76,8 @@ public class EPushController extends BaseController {
             Message message = new Message();
             message.setContent(jsonObj.getString("content"));
             message.setCreateDatetime(new Date());
+            message.setIsWatch("0");
+            message.setStatus("1");
             User fromUser,targetUser;
             PushUserBinding pushUserBinding;
             try {
