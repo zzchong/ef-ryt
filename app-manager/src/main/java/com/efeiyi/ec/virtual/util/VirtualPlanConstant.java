@@ -1,5 +1,8 @@
 package com.efeiyi.ec.virtual.util;
 
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
+
 /**
  * Created by Administrator on 2015/12/10.
  * 虚拟计划常量
@@ -21,4 +24,6 @@ public class VirtualPlanConstant {
     final public static String planStatusStopped = "5";
     final public static String planStatusFinished = "9";
     final public static String virtualUserIdentifier = "2";
+
+//    final public static ExecutorService threadPool = Executors.newCachedThreadPool();
 }

@@ -21,12 +21,9 @@ import java.util.*;
 public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
 
     private VirtualInvestmentPlan virtualInvestmentPlan;
-//    private List<ProductModel> productModelList;
 
     @Override
     public boolean cancel() {
-        //暂停时保存进度，先放弃了，太啰嗦
-//        SuperTimer.getInstance().getSubTaskTempStoreMap().put(virtualOrderPlan, productModelList);
         try {
             if (session == null || !session.isOpen()) {
                 session = sessionFactory.openSession();
@@ -244,9 +241,6 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
     }
 
 
-    private void switchGroup(int percentageValueOfInvestGoal, int fixedInvestAmount) {
-
-    }
 }
 
 

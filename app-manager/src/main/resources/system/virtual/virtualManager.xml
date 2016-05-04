@@ -17,12 +17,6 @@
                 </field>
                 <field name="planType" label="对象" inputType="text">
                     <statusType fieldName="planType">
-                        <!--<item label="订单" value="order"/>-->
-                        <!--<item label="点赞" value="praise"/>-->
-                        <!--<item label="收藏" value="collect"/>-->
-                        <!--<item label="人气" value="popularity"/>-->
-                        <!--<item label="商品" value="product"/>-->
-                        <!--<item label="用户" value="user"/>-->
                         <item label="融资" value="investment"/>
                     </statusType>
                 </field>
@@ -31,6 +25,11 @@
                 <do name="plistAppVirtualPlan" access="" label="计划列表" result="/virtual/appVirtualPlanPList">
                     <query name="appDefault" label="默认" type="auto" orderBy="id:desc">
                         <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
+                    </query>
+                </do>
+                <do name="listAppVirtualFinisherPlan" access="" label="计划列表" result="/virtual/appVirtualPlanPList">
+                    <query name="appDefault" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="planType" defaultValue="finisher" operation="eq" inputType="default"/>
                     </query>
                 </do>
                 <do name="formVirtualPlan" label="虚拟数据" access="" result="/virtual/appVirtualPlanForm"/>
@@ -43,25 +42,8 @@
 
         <entity name="appVirtualInvestorPlan" label="appVirtualInvestorPlan" basic="simple" others="" model="com.efeiyi.ec.art.virtual.model.VirtualInvestorPlan">
             <fields>
-                <!--<field name="status" label="计划状态" inputType="text">-->
-                    <!--<statusType fieldName="status">-->
-                        <!--<item label="删除" value="0"/>-->
-                        <!--<item label="已建立" value="1"/>-->
-                        <!--<item label="已初始化" value="2"/>-->
-                        <!--<item label="运行中" value="3"/>-->
-                        <!--<item label="暂停" value="5"/>-->
-                        <!--<item label="停止" value="7"/>-->
-                        <!--<item label="完成" value="9"/>-->
-                    <!--</statusType>-->
-                <!--</field>-->
                 <field name="planType" label="对象" inputType="text">
                     <statusType fieldName="planType">
-                        <!--<item label="订单" value="order"/>-->
-                        <!--<item label="点赞" value="praise"/>-->
-                        <!--<item label="收藏" value="collect"/>-->
-                        <!--<item label="人气" value="popularity"/>-->
-                        <!--<item label="商品" value="product"/>-->
-                        <!--<item label="用户" value="user"/>-->
                         <item label="融资" value="investment"/>
                     </statusType>
                 </field>
@@ -96,25 +78,8 @@
 
         <entity name="appArtwork" label="appArtwork" basic="simple" others="" model="com.efeiyi.ec.art.model.Artwork">
             <fields>
-                <!--<field name="status" label="计划状态" inputType="text">-->
-                <!--<statusType fieldName="status">-->
-                <!--<item label="删除" value="0"/>-->
-                <!--<item label="已建立" value="1"/>-->
-                <!--<item label="已初始化" value="2"/>-->
-                <!--<item label="运行中" value="3"/>-->
-                <!--<item label="暂停" value="5"/>-->
-                <!--<item label="停止" value="7"/>-->
-                <!--<item label="完成" value="9"/>-->
-                <!--</statusType>-->
-                <!--</field>-->
                 <field name="planType" label="对象" inputType="text">
                     <statusType fieldName="planType">
-                        <!--<item label="订单" value="order"/>-->
-                        <!--<item label="点赞" value="praise"/>-->
-                        <!--<item label="收藏" value="collect"/>-->
-                        <!--<item label="人气" value="popularity"/>-->
-                        <!--<item label="商品" value="product"/>-->
-                        <!--<item label="用户" value="user"/>-->
                         <item label="融资" value="investment"/>
                     </statusType>
                 </field>
@@ -122,7 +87,7 @@
             <does>
                 <do name="listAppArtwork" access="" label="计划列表" result="">
                     <query name="appDefault" label="默认" type="auto" orderBy="id:desc">
-                        <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
+                        <condition name="status" defaultValue="1" operation="ne" inputType="default"/>
                     </query>
                 </do>
             </does>

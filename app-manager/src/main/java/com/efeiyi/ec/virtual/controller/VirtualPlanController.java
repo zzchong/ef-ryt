@@ -5,8 +5,7 @@ import com.efeiyi.ec.art.virtual.model.VirtualArtwork;
 import com.efeiyi.ec.art.virtual.model.VirtualInvestmentPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualInvestorPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualPlan;
-import com.efeiyi.ec.virtual.model.task.CoreTaskScheduler;
-import com.efeiyi.ec.virtual.model.task.VirtualUserGenerator;
+import com.efeiyi.ec.virtual.model.task.*;
 import com.efeiyi.ec.virtual.model.timer.SubTimer;
 import com.efeiyi.ec.virtual.model.timer.SuperTimer;
 import com.efeiyi.ec.virtual.service.VirtualPlanManagerService;
@@ -15,20 +14,19 @@ import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.taglib.PageEntity;
 import org.apache.commons.beanutils.BeanUtils;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.Timer;
 
 /**
  * Created by Administrator on 2015/12/9.
@@ -47,7 +45,7 @@ public class VirtualPlanController {
     private VirtualPlanManagerService vpmService;
 
     @RequestMapping("/generateFans")
-    public void tranFans(){
+    public void tranFans() {
         VirtualUserGenerator virtualUserGenerator = new VirtualUserGenerator(null);
         virtualUserGenerator.execute(null);
 
@@ -55,11 +53,11 @@ public class VirtualPlanController {
 
 
     @RequestMapping("/startPlan.do")
-    public ModelAndView startPlan(VirtualPlan virtualPlan, ModelMap modelMap,HttpServletRequest request) {
+    public ModelAndView startPlan(VirtualPlan virtualPlan, ModelMap modelMap, HttpServletRequest request) {
 
         List<VirtualPlan> virtualPlanList = new ArrayList<>();
-        virtualPlan = (VirtualPlan)baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
-        if(VirtualPlanConstant.planStatusInit.equals(virtualPlan.getStatus())) {
+        virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
+        if (VirtualPlanConstant.planStatusInit.equals(virtualPlan.getStatus())) {
             virtualPlanList.add(virtualPlan);
             CoreTaskScheduler.getInstance().execute(virtualPlanList);
         }
@@ -67,16 +65,35 @@ public class VirtualPlanController {
         return new ModelAndView("redirect:" + request.getParameter("resultPage"), modelMap);
     }
 
-    @RequestMapping("/pausePlan.do")
-    public ModelAndView pausePlan(VirtualPlan virtualPlan, ModelMap modelMap,HttpServletRequest request) {
+    @RequestMapping("/finishPlan.do")
+    @ResponseBody
+    public boolean finishPlan(VirtualPlan virtualPlan, ModelMap modelMap, HttpServletRequest request) throws Exception {
 
-        virtualPlan = (VirtualPlan)baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
+        List<VirtualPlan> virtualPlanList = new ArrayList<>();
+        virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
+        virtualPlanList.add(virtualPlan);
+        if(!SuperTimer.getInstance().getSubTimerMap().containsKey(virtualPlan)) {
+            BaseTimerTask timerTask = new VirtualInvestmentTaskFinisher();
+            timerTask.setVirtualPlan(virtualPlan);
+            SubTimer subTimer = new SubTimer(new Timer(), timerTask, new Timer(), new SubTaskStopper(virtualPlan));
+            SuperTimer.getInstance().getSubTimerMap().put(virtualPlan, subTimer);
+            subTimer.getSubTimer().schedule(timerTask, 0);
+            subTimer.getStopperTimer().schedule(subTimer.getStopTimerTask(), 0);
+            return true;
+        }
+        return  false;
+    }
+
+    @RequestMapping("/pausePlan.do")
+    public ModelAndView pausePlan(VirtualPlan virtualPlan, ModelMap modelMap, HttpServletRequest request) {
+
+        virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
         SubTimer subTimer = SuperTimer.getInstance().getSubTimerMap().get(virtualPlan);
-        if(subTimer != null){
+        if (subTimer != null) {
             subTimer.cancel();
         }
         modelMap.addAttribute(virtualPlan);
-        return new ModelAndView("redirect:" + request.getParameter("resultPage"),modelMap);
+        return new ModelAndView("redirect:" + request.getParameter("resultPage"), modelMap);
     }
 
     @RequestMapping("/getTypeObjectList.do")
@@ -84,7 +101,7 @@ public class VirtualPlanController {
 
         //虚拟计划Id
         String planId = request.getParameter("id");
-        if (planId.isEmpty() || planId.trim().equals("")){
+        if (planId.isEmpty() || planId.trim().equals("")) {
             throw new Exception("获取计划完成列表失败:VirtualPlanId为空!");
         }
         modelMap.put("planId", planId);
@@ -101,13 +118,17 @@ public class VirtualPlanController {
         }
         modelMap.put("pageEntity", pageEntity);
         //虚拟计划对象--点赞praise
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRAISE)){}
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRAISE)) {
+        }
         //虚拟计划对象--商品product
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRODUCT)){}
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRODUCT)) {
+        }
         //虚拟计划对象--收藏
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_COLLECT)){}
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_COLLECT)) {
+        }
         //虚拟计划对象--人气popularity
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_POPULARITY)){}
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_POPULARITY)) {
+        }
 
         return new ModelAndView("redirect:/basic/xm.do?qm=plistVirtualPlan_default");
     }
@@ -117,7 +138,7 @@ public class VirtualPlanController {
 
         //虚拟计划Id
         String planId = request.getParameter("id");
-        if (planId.isEmpty() || planId.trim().equals("")){
+        if (planId.isEmpty() || planId.trim().equals("")) {
             throw new Exception("获取计划完成列表失败:VirtualPlanId为空!");
         }
         modelMap.put("planId", planId);
@@ -126,27 +147,31 @@ public class VirtualPlanController {
         modelMap.put("objectType", type);
 
         //虚拟计划融资--investment
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_INVESTMENT)){
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_INVESTMENT)) {
             return virtualInvestmentView(modelMap, request);
         }
         //虚拟计划对象--点赞praise
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRAISE)){}
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRAISE)) {
+        }
         //虚拟计划对象--商品product
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRODUCT)){}
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRODUCT)) {
+        }
         //虚拟计划对象--收藏
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_COLLECT)){}
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_COLLECT)) {
+        }
         //虚拟计划对象--人气popularity
-        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_POPULARITY)){}
+        if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_POPULARITY)) {
+        }
 
         return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_default");
     }
 
 
     @RequestMapping("/saveVirtualInvestmentPlan.do")
-    public ModelAndView saveVirtualOrderPlan(HttpServletRequest request)throws Exception{
+    public ModelAndView saveVirtualOrderPlan(HttpServletRequest request) throws Exception {
         String id = request.getParameter("id");
         VirtualInvestmentPlan virtualInvestmentPlan = (VirtualInvestmentPlan) baseManager.getObject(VirtualInvestmentPlan.class.getName(), id);
-        if (virtualInvestmentPlan == null){
+        if (virtualInvestmentPlan == null) {
             //获取父类virtualPlan基本属性值
             VirtualPlan virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), id);
             virtualInvestmentPlan = new VirtualInvestmentPlan();
@@ -163,36 +188,36 @@ public class VirtualPlanController {
 
 
     @RequestMapping("/removeVirtualPlan.do")
-    public ModelAndView removeVirtualPlan(HttpServletRequest request)throws Exception{
+    public ModelAndView removeVirtualPlan(HttpServletRequest request) throws Exception {
         String id = request.getParameter("id");
-        if (id == null || id.trim().equals("")){
+        if (id == null || id.trim().equals("")) {
             throw new Exception("删除计划失败:计划ID为空");
         }
         vpmService.removeVirtualPlan(id);
-        return new ModelAndView("redirect:/basic/xm.do?qm=plistVirtualPlan_default");
+         return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_appDefault");
     }
 
 
-    private ModelAndView virtualInvestmentView(ModelMap modelMap, HttpServletRequest request) throws Exception{
+    private ModelAndView virtualInvestmentView(ModelMap modelMap, HttpServletRequest request) throws Exception {
         String planId = (String) modelMap.get("planId");
         VirtualInvestmentPlan virtualInvestmentPlan = (VirtualInvestmentPlan) baseManager.getObject(VirtualInvestmentPlan.class.getName(), planId);
-        if (virtualInvestmentPlan == null){
-            VirtualPlan virtualPlan = (VirtualPlan)baseManager.getObject(VirtualPlan.class.getName(), planId);
+        if (virtualInvestmentPlan == null) {
+            VirtualPlan virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), planId);
             virtualInvestmentPlan = new VirtualInvestmentPlan();
             BeanUtils.copyProperties(virtualInvestmentPlan, virtualPlan);
-        }else {
+        } else {
             long time = virtualInvestmentPlan.getCreateDatetime().getTime();
             virtualInvestmentPlan.setCreateDatetime(new Date(time));
         }
         modelMap.put("object", virtualInvestmentPlan);
 
         //获取虚拟用户计划列表
-        XQuery xQuery = new XQuery("listAppVirtualInvestor_appDefault",request);
+        XQuery xQuery = new XQuery("listAppVirtualInvestor_appDefault", request);
         List<VirtualInvestorPlan> virtualInvestorPlanList = baseManager.listObject(xQuery);
         modelMap.put("virtualInvestorPlanList", virtualInvestorPlanList);
 
 //        //获取商品列表
-        xQuery = new XQuery("listAppArtwork_appDefault",request);
+        xQuery = new XQuery("listAppArtwork_appDefault", request);
         List<Artwork> artworkList = baseManager.listObject(xQuery);
         modelMap.put("artworkList", artworkList);
 
@@ -200,17 +225,16 @@ public class VirtualPlanController {
     }
 
 
-
-    private VirtualInvestmentPlan getBaseProperty(VirtualInvestmentPlan virtualInvestmentPlan, HttpServletRequest request)throws Exception{
+    private VirtualInvestmentPlan getBaseProperty(VirtualInvestmentPlan virtualInvestmentPlan, HttpServletRequest request) throws Exception {
         String serverUrl = request.getParameter("serverUrl");
         virtualInvestmentPlan.setUrl(serverUrl);
 
         String virtualInvestorPlanId = request.getParameter("virtualInvestorPlanId");
-        VirtualInvestorPlan virtualInvestorPlan = (VirtualInvestorPlan)baseManager.getObject(VirtualInvestorPlan.class.getName(), virtualInvestorPlanId);
+        VirtualInvestorPlan virtualInvestorPlan = (VirtualInvestorPlan) baseManager.getObject(VirtualInvestorPlan.class.getName(), virtualInvestorPlanId);
         virtualInvestmentPlan.setVirtualInvestorPlan(virtualInvestorPlan);
 
         String artworkId = request.getParameter("artworkId");
-        Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(), artworkId);
+        Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
         VirtualArtwork virtualArtwork = new VirtualArtwork();
         virtualArtwork.setArtwork(artwork);
 //        sessionFactory.getCurrentSession().merge(virtualArtwork);

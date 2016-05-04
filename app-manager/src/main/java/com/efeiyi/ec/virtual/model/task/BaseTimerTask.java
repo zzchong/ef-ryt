@@ -27,5 +27,4 @@ public abstract class BaseTimerTask extends TimerTask {
         sessionFactory = ((SessionFactory) ApplicationContextUtil.getApplicationContext().getBean("scheduleSessionFactory"));
         session = sessionFactory.openSession();
     }
-
 }
