@@ -96,11 +96,11 @@ public class UserMainController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/useWork.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/userWork.do", method = RequestMethod.POST)
     @ResponseBody
     public Map useWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();
-        logBean.setApiName("useWork");
+        logBean.setApiName("userWork");
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
         try {
@@ -122,7 +122,7 @@ public class UserMainController extends BaseController {
             PageInfo pageInfo = baseManager.listPageInfo(xQuery);
             List<MasterWork> masterWorkList = (List<MasterWork>) pageInfo.getList();
             data.put("masterWorkList",masterWorkList);
-            data.put("type",jsonObj.getString("type"));
+//            data.put("type",jsonObj.getString("type"));
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("object",data);
             return  resultMap;
@@ -175,8 +175,11 @@ public class UserMainController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**editArtWork.do测试加密参数**/
-        map.put("artworkId","qydeyugqqiugd2");
+//        map.put("userId","imhfp1yr4636pj49");
+//        map.put("pageSize","4");
+//        map.put("pageIndex","1");
         map.put("description","修改后");
+        map.put("artworkId","qydeyugqqiugd2");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
@@ -185,7 +188,8 @@ public class UserMainController extends BaseController {
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
-        String json = "{\"artworkId\":\"qydeyugqqiugd2\",\"description\":\"修改后\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+//        String json = "{\"userId\":\"imhfp1yr4636pj49\",\"pageSize\":\"4\",\"pageIndex\":\"1\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"description\":\"修改后\",\"artworkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
         StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
