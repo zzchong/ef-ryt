@@ -1,5 +1,7 @@
 package com.efeiyi.ec.art.modelConvert;
 
+import com.efeiyi.ec.art.organization.model.User;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -15,10 +17,11 @@ public class ConvertWork implements Serializable{
     private BigDecimal investsMoney;//用户投资金额
     private BigDecimal goalMoney;//目标融资金额
     private Long praise;
-    private String truename;
-    private String username;
+//    private String truename;
+//    private String username;
     private String flag;
     private String level;
+    private User user;
 
     public String getId() {
         return id;
@@ -84,21 +87,21 @@ public class ConvertWork implements Serializable{
         this.praise = praise;
     }
 
-    public String getTruename() {
-        return truename;
-    }
-
-    public void setTruename(String truename) {
-        this.truename = truename;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
+//    public String getTruename() {
+//        return truename;
+//    }
+//
+//    public void setTruename(String truename) {
+//        this.truename = truename;
+//    }
+//
+//    public String getUsername() {
+//        return username;
+//    }
+//
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
 
     public String getFlag() {
         return flag;
@@ -114,5 +117,13 @@ public class ConvertWork implements Serializable{
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

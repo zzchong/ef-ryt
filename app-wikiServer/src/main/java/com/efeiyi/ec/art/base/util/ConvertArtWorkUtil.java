@@ -47,8 +47,9 @@ public class ConvertArtWorkUtil {
             work.setPraise((long)artwork.getPraiseNUm());
             work.setFlag("0");
             work.setGoalMoney(artwork.getInvestGoalMoney());
-            work.setTruename(artwork.getAuthor().getName());
-            work.setUsername(artwork.getAuthor().getUsername());
+//            work.setTruename(artwork.getAuthor().getName());
+//            work.setUsername(artwork.getAuthor().getUsername());
+            work.setUser(artwork.getAuthor());
             work.setLevel(artwork.getAuthor().getMaster()!=null?artwork.getAuthor().getMaster().getTitle():"");
         }
         return work;
