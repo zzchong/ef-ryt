@@ -102,4 +102,37 @@ public class AliOssUploadManagerImpl implements AliOssUploadManager {
 
         return listing.getCommonPrefixes();
     }
+
+    @Override
+    public Boolean uploadFile(InputStream inputStream, String bucketName, String uploadName, long length) throws IOException {
+        OSSClient client = new OSSClient("http://oss-cn-beijing.aliyuncs.com", accessKeyId, accessKeySecret);
+
+        // 获取Bucket的存在信息
+        boolean exists = client.doesBucketExist(bucketName);
+        if (!exists) {
+            // 新建一个Bucket
+            client.createBucket(bucketName);
+            //CannedAccessControlList是枚举类型，包含三个值： Private 、 PublicRead 、 PublicReadWrite
+            client.setBucketAcl(bucketName, CannedAccessControlList.PublicReadWrite);
+        }
+
+        // 获取指定文件的输入流
+//        File file = new File(filePath);
+        //InputStream content = multipartFile.getInputStream();
+        ByteArrayInputStream content = new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
+        // 创建上传Object的Metadata
+        ObjectMetadata meta = new ObjectMetadata();
+
+        // 必须设置ContentLength
+        meta.setContentLength(length);
+
+        // 上传Object.
+        PutObjectResult result = client.putObject(bucketName, uploadName, content, meta);
+
+        // 打印ETag
+        System.out.println(result.getETag());
+
+        return true;
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

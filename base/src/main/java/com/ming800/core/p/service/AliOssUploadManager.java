@@ -23,4 +23,5 @@ public interface AliOssUploadManager {
 
     List listObjectByPath(String bucket,String path);
 
+    Boolean uploadFile(InputStream inputStream, String bucket, String uploadName,long length) throws IOException;
 }
