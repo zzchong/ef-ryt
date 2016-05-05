@@ -52,7 +52,7 @@ public class ArtWorkPraise implements Serializable{
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "artwork_id")
     public Artwork getArtwork() {
         return artwork;
@@ -64,7 +64,7 @@ public class ArtWorkPraise implements Serializable{
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "user_id")
     public User getUser() {
         return user;
