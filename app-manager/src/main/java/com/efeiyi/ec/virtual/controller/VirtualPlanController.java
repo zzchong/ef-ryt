@@ -23,10 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
+import java.util.*;
 
 /**
  * Created by Administrator on 2015/12/9.
@@ -72,28 +69,29 @@ public class VirtualPlanController {
         List<VirtualPlan> virtualPlanList = new ArrayList<>();
         virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
         virtualPlanList.add(virtualPlan);
-        if(!SuperTimer.getInstance().getSubTimerMap().containsKey(virtualPlan)) {
+        Map map = SuperTimer.getInstance().getSubTimerMap();
+        if(!map.containsKey(virtualPlan)) {
             BaseTimerTask timerTask = new VirtualInvestmentTaskFinisher();
             timerTask.setVirtualPlan(virtualPlan);
             SubTimer subTimer = new SubTimer(new Timer(), timerTask, new Timer(), new SubTaskStopper(virtualPlan));
-            SuperTimer.getInstance().getSubTimerMap().put(virtualPlan, subTimer);
+            map.put(virtualPlan, subTimer);
             subTimer.getSubTimer().schedule(timerTask, 0);
-            subTimer.getStopperTimer().schedule(subTimer.getStopTimerTask(), 0);
+//            subTimer.getStopperTimer().schedule(subTimer.getStopTimerTask(), 0);
             return true;
         }
         return  false;
     }
 
     @RequestMapping("/pausePlan.do")
-    public ModelAndView pausePlan(VirtualPlan virtualPlan, ModelMap modelMap, HttpServletRequest request) {
+    @ResponseBody
+    public boolean pausePlan(VirtualPlan virtualPlan, ModelMap modelMap, HttpServletRequest request) {
 
         virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
         SubTimer subTimer = SuperTimer.getInstance().getSubTimerMap().get(virtualPlan);
         if (subTimer != null) {
-            subTimer.cancel();
+            return subTimer.cancel();
         }
-        modelMap.addAttribute(virtualPlan);
-        return new ModelAndView("redirect:" + request.getParameter("resultPage"), modelMap);
+        return false;
     }
 
     @RequestMapping("/getTypeObjectList.do")

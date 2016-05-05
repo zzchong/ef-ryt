@@ -34,7 +34,7 @@ public class VirtualInvestmentTaskFinisher extends BaseTimerTask {
     private VirtualInvestmentPlan virtualInvestmentPlan;
     private SessionFactory sessionFactory = ((SessionFactory) ApplicationContextUtil.getApplicationContext().getBean("scheduleSessionFactory"));
     private Session session;
-
+private boolean running = true;
     @Override
     public void setVirtualPlan(VirtualPlan virtualPlan) {
         this.virtualInvestmentPlan = (VirtualInvestmentPlan) virtualPlan;
@@ -43,16 +43,16 @@ public class VirtualInvestmentTaskFinisher extends BaseTimerTask {
     @Override
     public boolean cancel() {
         logger.info("VirtualInvestmentTaskFinisher cancelled.");
+        running = false;
         return super.cancel();
     }
 
     @Override
     public void execute(List<VirtualPlan> virtualPlanList) {
-        virtualInvestmentPlan = (VirtualInvestmentPlan) session.get(VirtualInvestmentPlan.class.getName(), virtualInvestmentPlan.getId());
-        List<VirtualUser> virtualUserList = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList();
-
         Random random = new Random();
-        while (true) {
+        while (running) {
+            virtualInvestmentPlan = (VirtualInvestmentPlan) session.get(VirtualInvestmentPlan.class.getName(), virtualInvestmentPlan.getId());
+            List<VirtualUser> virtualUserList = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList();
             HttpClient httpClient = new DefaultHttpClient();
             String url = virtualInvestmentPlan.getUrl();
             HttpPost httppost = new HttpPost(url);
@@ -107,6 +107,7 @@ public class VirtualInvestmentTaskFinisher extends BaseTimerTask {
                     this.cancel();
                     break;
                 }
+                session.clear();
             } catch (Exception e) {
                 e.printStackTrace();
                 this.cancel();

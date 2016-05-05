@@ -71,6 +71,12 @@
                                         class="am-icon-edit"></span> 补刀
                                 </button>
                             </span>
+                            <span id="cancelLastHit">
+                                <button onclick="javascript:cancelLastHit('${plan.id}')"
+                                        class="am-btn am-btn-default am-btn-xs am-hide-sm-only"><span
+                                        class="am-icon-edit"></span> 终止补刀
+                                </button>
+                            </span>
                         </div>
                     </div>
                 </td>
@@ -100,7 +106,7 @@
                         <c:forEach var="invest" items="${plan.virtualArtwork.artwork.artworkInvests}">
                             <c:set var="currentMoney" value="${currentMoney + invest.price}"/>
                         </c:forEach>
-                        ${currentMoney / plan.virtualArtwork.artwork.investGoalMoney * 100}%
+                        ${currentMoney * 100 / plan.virtualArtwork.artwork.investGoalMoney }%
                     </c:if>
                 </td>
                 <td><fmt:formatDate value="${plan.createDatetime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
@@ -124,13 +130,28 @@
             url: '<c:url value="/virtualPlan/finishPlan.do?id="/>' + id,
             success: function (data) {
                 if (data == "true") {
-//                    $("#lastHit").unbind("click");
-//                    $("#lastHit").bind("click",function(){
-//                        cancelLastHit('" + id + "');
-//                    })
-//                    $("#lastHit").html("");
+                    alert("success");
+                }else{
+                    alert("falied");
                 }
-                alert("success");
+            },
+            error: function (a, b, c) {
+                alert(a + b + c);
+            }
+        });
+    }
+
+    function cancelLastHit(id) {
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '<c:url value="/virtualPlan//pausePlan.do?id="/>' + id,
+            success: function (data) {
+                if (data == "true") {
+                    alert("success");
+                }else{
+                    alert("falied");
+                }
             },
             error: function (a, b, c) {
                 alert(a + b + c);
