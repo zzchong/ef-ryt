@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/11/26.
  */
+@Deprecated
 public class VirtualUserGenerator extends BaseTimerTask {
 
     public VirtualUserGenerator(VirtualInvestorPlan virtualInvestorPlan) {

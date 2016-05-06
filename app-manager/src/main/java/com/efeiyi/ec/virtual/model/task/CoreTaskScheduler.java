@@ -81,6 +81,30 @@ public class CoreTaskScheduler extends BaseTimerTask {
                 subTimer.cancel();
             }
 
+            //不填时间的不做判断,立即启动
+            if(virtualPlan.getStartDate() == null
+                    || virtualPlan.getEndDate() == null
+                    || virtualPlan.getStartTime() == null
+                    || virtualPlan.getEndTime() == null){
+                BaseTimerTask subTimerTask;
+                try {
+                    subTimerTask = (BaseTimerTask) Class.forName(virtualPlan.getImplementClass()).newInstance();
+                    subTimerTask.setVirtualPlan(virtualPlan);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    logger.error("ClassNotFound!!serial :" + virtualPlan.getSerial() + " description:" + virtualPlan.getDescription());
+                    continue;
+                }
+                subTimer = new SubTimer(new Timer(), subTimerTask, new Timer(), new SubTaskStopper(virtualPlan));
+                SuperTimer.getInstance().getSubTimerMap().put(virtualPlan, subTimer);
+
+                subTimer.getSubTimer().schedule(subTimerTask, 0);
+//                subTimer.getStopperTimer().schedule(subTimer.getStopTimerTask(), 0);
+                logger.info(virtualPlan.getSerial() + " timer launch after 0 millis seconds");
+                logger.info(virtualPlan.getSerial() + " timer off after 0 millis seconds");
+                return;
+            }
+
             //转一下日期类型
             Date startDate = null;
             Date endDate = null;

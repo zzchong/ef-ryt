@@ -47,39 +47,39 @@
             </div>
         </div>
 
-        <div class="am-form-group">
-            <label class="am-u-sm-3 am-form-label">任务截止日期<small>*</small></label>
-            <div class="am-u-sm-9">
-                <input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
-                       type="text" style="width: auto; float: left; height: 35px"
-                       name="startDate" id="startDate" title="开始日期" placeholder="开始日期"
-                       value="${object.startDate}" required="true" readonly>
+        <%--<div class="am-form-group">--%>
+            <%--<label class="am-u-sm-3 am-form-label">任务截止日期<small>*</small></label>--%>
+            <%--<div class="am-u-sm-9">--%>
+                <%--<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"--%>
+                       <%--type="text" style="width: auto; float: left; height: 35px"--%>
+                       <%--name="startDate" id="startDate" title="开始日期" placeholder="开始日期"--%>
+                       <%--value="${object.startDate}" required="true" readonly>--%>
 
-                <span style="width: auto; float: left; font-family:'应用字体 Regular', '应用字体'; margin-left: 10px; margin-top: 4px">至</span>
+                <%--<span style="width: auto; float: left; font-family:'应用字体 Regular', '应用字体'; margin-left: 10px; margin-top: 4px">至</span>--%>
 
-                <input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
-                       type="text" style="width: auto; float: left; margin-left: 10px; height: 35px"
-                       name="endDate" id="endDate" title="结束日期" placeholder="结束日期"
-                       value="${object.endDate}" required="true" readonly>
-            </div>
-        </div>
+                <%--<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"--%>
+                       <%--type="text" style="width: auto; float: left; margin-left: 10px; height: 35px"--%>
+                       <%--name="endDate" id="endDate" title="结束日期" placeholder="结束日期"--%>
+                       <%--value="${object.endDate}" required="true" readonly>--%>
+            <%--</div>--%>
+        <%--</div>--%>
 
-        <div class="am-form-group">
-            <label class="am-u-sm-3 am-form-label">任务运行时间<small>*</small></label>
-            <div class="am-u-sm-9">
-                <input class="Wdate" onClick="WdatePicker({dateFmt:'HH:mm:ss'})"
-                       type="text" style="width: auto; float: left; height: 35px"
-                       name="startTime" id="startTime" title="开始时间" placeholder="开始时间"
-                       value="${object.startTime}" required="true" readonly>
+        <%--<div class="am-form-group">--%>
+            <%--<label class="am-u-sm-3 am-form-label">任务运行时间<small>*</small></label>--%>
+            <%--<div class="am-u-sm-9">--%>
+                <%--<input class="Wdate" onClick="WdatePicker({dateFmt:'HH:mm:ss'})"--%>
+                       <%--type="text" style="width: auto; float: left; height: 35px"--%>
+                       <%--name="startTime" id="startTime" title="开始时间" placeholder="开始时间"--%>
+                       <%--value="${object.startTime}" required="true" readonly>--%>
 
-                <span style="width: auto; float: left; font-family:'应用字体 Regular', '应用字体'; margin-left: 10px; margin-top: 4px">至</span>
+                <%--<span style="width: auto; float: left; font-family:'应用字体 Regular', '应用字体'; margin-left: 10px; margin-top: 4px">至</span>--%>
 
-                <input class="Wdate" onClick="WdatePicker({dateFmt:'HH:mm:ss'})"
-                       type="text" style="width: auto; float: left; margin-left: 10px; height: 35px"
-                       name="endTime" id="endTime" title="结束时间" placeholder="结束时间"
-                       value="${object.endTime}" required="true" readonly>
-            </div>
-        </div>
+                <%--<input class="Wdate" onClick="WdatePicker({dateFmt:'HH:mm:ss'})"--%>
+                       <%--type="text" style="width: auto; float: left; margin-left: 10px; height: 35px"--%>
+                       <%--name="endTime" id="endTime" title="结束时间" placeholder="结束时间"--%>
+                       <%--value="${object.endTime}" required="true" readonly>--%>
+            <%--</div>--%>
+        <%--</div>--%>
 
         <div class="am-form-group">
             <div class="am-u-sm-9 am-u-sm-push-3">

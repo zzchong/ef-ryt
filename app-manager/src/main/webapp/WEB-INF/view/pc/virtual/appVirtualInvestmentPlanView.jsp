@@ -67,42 +67,42 @@
             </div>
         </div>
 
-        <div class="am-form-group">
-            <label class="am-u-sm-3 am-form-label">任务截止日期
-                <small>*</small>
-            </label>
+        <%--<div class="am-form-group">--%>
+            <%--<label class="am-u-sm-3 am-form-label">任务截止日期--%>
+                <%--<small>*</small>--%>
+            <%--</label>--%>
 
-            <div class="am-u-sm-9">
+            <%--<div class="am-u-sm-9">--%>
 
-                <input type="text" style="width: auto; float: left; height: 35px"
-                       name="startDate" id="startDate" title="开始日期"
-                       value="${object.startDate}" required="true" readonly>
+                <%--<input type="text" style="width: auto; float: left; height: 35px"--%>
+                       <%--name="startDate" id="startDate" title="开始日期"--%>
+                       <%--value="${object.startDate}" required="true" readonly>--%>
 
-                <span style="width: auto; float: left; font-family:'应用字体 Regular', '应用字体'; margin-left: 10px; margin-top: 4px">至</span>
+                <%--<span style="width: auto; float: left; font-family:'应用字体 Regular', '应用字体'; margin-left: 10px; margin-top: 4px">至</span>--%>
 
-                <input type="text" style="width: auto; float: left; margin-left: 10px; height: 35px"
-                       name="endDate" id="endDate" title="结束日期"
-                       value="${object.endDate}" required="true" readonly>
-            </div>
-        </div>
+                <%--<input type="text" style="width: auto; float: left; margin-left: 10px; height: 35px"--%>
+                       <%--name="endDate" id="endDate" title="结束日期"--%>
+                       <%--value="${object.endDate}" required="true" readonly>--%>
+            <%--</div>--%>
+        <%--</div>--%>
 
-        <div class="am-form-group">
-            <label class="am-u-sm-3 am-form-label">任务运行时间
-                <small>*</small>
-            </label>
+        <%--<div class="am-form-group">--%>
+            <%--<label class="am-u-sm-3 am-form-label">任务运行时间--%>
+                <%--<small>*</small>--%>
+            <%--</label>--%>
 
-            <div class="am-u-sm-9">
-                <input type="text" style="width: auto; float: left; height: 35px"
-                       name="startTime" id="startTime" title="开始时间"
-                       value="${object.startTime}" required="true" readonly>
+            <%--<div class="am-u-sm-9">--%>
+                <%--<input type="text" style="width: auto; float: left; height: 35px"--%>
+                       <%--name="startTime" id="startTime" title="开始时间"--%>
+                       <%--value="${object.startTime}" required="true" readonly>--%>
 
-                <span style="width: auto; float: left; font-family:'应用字体 Regular', '应用字体'; margin-left: 10px; margin-top: 4px">至</span>
+                <%--<span style="width: auto; float: left; font-family:'应用字体 Regular', '应用字体'; margin-left: 10px; margin-top: 4px">至</span>--%>
 
-                <input type="text" style="width: auto; float: left; margin-left: 10px; height: 35px"
-                       name="endTime" id="endTime" title="结束时间"
-                       value="${object.endTime}" required="true" readonly>
-            </div>
-        </div>
+                <%--<input type="text" style="width: auto; float: left; margin-left: 10px; height: 35px"--%>
+                       <%--name="endTime" id="endTime" title="结束时间"--%>
+                       <%--value="${object.endTime}" required="true" readonly>--%>
+            <%--</div>--%>
+        <%--</div>--%>
         <hr/>
         <div class="am-form-group">
             <label for="serverUrl" class="am-u-sm-3 am-form-label">融资请求地址
@@ -115,19 +115,19 @@
                        value="${object.url}" required="true" >
             </div>
         </div>
-        <div class="am-form-group">
-            <label class="am-u-sm-3 am-form-label">选择融资用户组
-                <small>*</small>
-            </label>
+        <%--<div class="am-form-group">--%>
+            <%--<label class="am-u-sm-3 am-form-label">选择融资用户组--%>
+                <%--<small>*</small>--%>
+            <%--</label>--%>
 
-            <div class="am-u-sm-9">
-                <input type="hidden" name="virtualInvestorPlanId" id="virtualInvestorPlanId"
-                       placeholder="融资用户组" value="${object.virtualInvestorPlan.id}" required="true">
-                <input type="text" name="virtualInvestorPlan.description" id="virtualInvestorPlanName"
-                       placeholder="融资用户组" data-am-modal="{target: '#virtualInvestorPlanModal'}"
-                       value="${object.virtualInvestorPlan.group}">
-            </div>
-        </div>
+            <%--<div class="am-u-sm-9">--%>
+                <%--<input type="hidden" name="virtualInvestorPlanId" id="virtualInvestorPlanId"--%>
+                       <%--placeholder="融资用户组" value="${object.virtualInvestorPlan.id}" required="true">--%>
+                <%--<input type="text" name="virtualInvestorPlan.description" id="virtualInvestorPlanName"--%>
+                       <%--placeholder="融资用户组" data-am-modal="{target: '#virtualInvestorPlanModal'}"--%>
+                       <%--value="${object.virtualInvestorPlan.group}">--%>
+            <%--</div>--%>
+        <%--</div>--%>
         <div class="am-form-group">
             <label class="am-u-sm-3 am-form-label">选择作品
                 <small>*</small>

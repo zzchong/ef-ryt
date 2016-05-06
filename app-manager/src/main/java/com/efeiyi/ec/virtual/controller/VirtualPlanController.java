@@ -59,7 +59,7 @@ public class VirtualPlanController {
             CoreTaskScheduler.getInstance().execute(virtualPlanList);
         }
         modelMap.addAttribute(virtualPlan);
-        return new ModelAndView("redirect:" + request.getParameter("resultPage"), modelMap);
+        return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_appDefault", modelMap);
     }
 
     @RequestMapping("/finishPlan.do")
@@ -84,7 +84,7 @@ public class VirtualPlanController {
 
     @RequestMapping("/pausePlan.do")
     @ResponseBody
-    public boolean pausePlan(VirtualPlan virtualPlan, ModelMap modelMap, HttpServletRequest request) {
+    public boolean pausePlan(VirtualPlan virtualPlan) {
 
         virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
         SubTimer subTimer = SuperTimer.getInstance().getSubTimerMap().get(virtualPlan);
@@ -92,6 +92,16 @@ public class VirtualPlanController {
             return subTimer.cancel();
         }
         return false;
+    }
+    @RequestMapping("/pausePlan2.do")
+    public ModelAndView pausePlan2(VirtualPlan virtualPlan) {
+
+        virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
+        SubTimer subTimer = SuperTimer.getInstance().getSubTimerMap().remove(virtualPlan);
+        if (subTimer != null) {
+            subTimer.cancel();
+        }
+        return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_appDefault");
     }
 
     @RequestMapping("/getTypeObjectList.do")
@@ -227,9 +237,9 @@ public class VirtualPlanController {
         String serverUrl = request.getParameter("serverUrl");
         virtualInvestmentPlan.setUrl(serverUrl);
 
-        String virtualInvestorPlanId = request.getParameter("virtualInvestorPlanId");
-        VirtualInvestorPlan virtualInvestorPlan = (VirtualInvestorPlan) baseManager.getObject(VirtualInvestorPlan.class.getName(), virtualInvestorPlanId);
-        virtualInvestmentPlan.setVirtualInvestorPlan(virtualInvestorPlan);
+//        String virtualInvestorPlanId = request.getParameter("virtualInvestorPlanId");
+//        VirtualInvestorPlan virtualInvestorPlan = (VirtualInvestorPlan) baseManager.getObject(VirtualInvestorPlan.class.getName(), virtualInvestorPlanId);
+//        virtualInvestmentPlan.setVirtualInvestorPlan(virtualInvestorPlan);
 
         String artworkId = request.getParameter("artworkId");
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);

@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class VirtualInvestmentPlan extends VirtualPlan{
 
     private VirtualArtwork virtualArtwork;
-    private VirtualInvestorPlan virtualInvestorPlan;
+//    private VirtualInvestorPlan virtualInvestorPlan;
     private String url;//模拟请求的服务端地址
 
     @ManyToOne
@@ -36,14 +36,14 @@ public class VirtualInvestmentPlan extends VirtualPlan{
         this.url = url;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "virtual_investor_plan_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    public VirtualInvestorPlan getVirtualInvestorPlan() {
-        return virtualInvestorPlan;
-    }
-
-    public void setVirtualInvestorPlan(VirtualInvestorPlan virtualInvestorPlan) {
-        this.virtualInvestorPlan = virtualInvestorPlan;
-    }
+//    @ManyToOne
+//    @JoinColumn(name = "virtual_investor_plan_id")
+//    @NotFound(action = NotFoundAction.IGNORE)
+//    public VirtualInvestorPlan getVirtualInvestorPlan() {
+//        return virtualInvestorPlan;
+//    }
+//
+//    public void setVirtualInvestorPlan(VirtualInvestorPlan virtualInvestorPlan) {
+//        this.virtualInvestorPlan = virtualInvestorPlan;
+//    }
 }

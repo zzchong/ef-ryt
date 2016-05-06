@@ -55,12 +55,12 @@
             <jnode url="/basic/xm.do?qm=plistAppVirtualPlan_appDefault&amp;virtual=virtual" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="虚拟计划">
                 <match url="/basic/xm.do?qm=plistAppVirtualPlan_appDefault&amp;virtual=virtual"/>
                 <match url="/basic/xm.do?qm=viewAppVirtualPlan&amp;virtual=virtual"/>
-                <match url="/virtualPlan/getTypeByObject.do"/>
+                <match url="/virtualPlan/getTypeObjectView.do"/>
+                <match url="/basic/xm.do?qm=formVirtualPlan" />
             </jnode>
             <jnode url="/basic/xm.do?qm=plistAppVirtualInvestor_appDefault&amp;User=User"
                    access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="虚拟用户组">
-                <match url="/basic/xm.do?qm=plistUser"/>
-                <match url="/basic/xm.do?qm=viewUser"/>
+                <match url="/basic/xm.do?qm=viewAppVirtualInvestor"/>
             </jnode>
         </jnode>
     </jnode>

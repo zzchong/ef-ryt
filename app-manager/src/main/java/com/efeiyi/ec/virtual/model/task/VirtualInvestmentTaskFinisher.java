@@ -3,6 +3,7 @@ package com.efeiyi.ec.virtual.model.task;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.model.ArtworkInvest;
 import com.efeiyi.ec.art.virtual.model.VirtualInvestmentPlan;
+import com.efeiyi.ec.art.virtual.model.VirtualInvestorPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualUser;
 import com.efeiyi.ec.virtual.util.DigitalSignatureUtil;
@@ -21,10 +22,7 @@ import org.hibernate.SessionFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by Administrator on 2016/5/3.
@@ -50,17 +48,23 @@ private boolean running = true;
     @Override
     public void execute(List<VirtualPlan> virtualPlanList) {
         Random random = new Random();
+        List<VirtualInvestorPlan> virtualInvestorPlanList = session.createQuery("from VirtualInvestorPlan").list();
+        List<VirtualUser> virtualUserList = new ArrayList<>();
+        for(VirtualInvestorPlan virtualInvestorPlan : virtualInvestorPlanList){
+            virtualUserList.addAll(virtualInvestorPlan.getVirtualUserList());
+        }
         while (running) {
             virtualInvestmentPlan = (VirtualInvestmentPlan) session.get(VirtualInvestmentPlan.class.getName(), virtualInvestmentPlan.getId());
-            List<VirtualUser> virtualUserList = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList();
+//            List<VirtualUser> virtualUserList = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList();
             HttpClient httpClient = new DefaultHttpClient();
             String url = virtualInvestmentPlan.getUrl();
             HttpPost httppost = new HttpPost(url);
             httppost.setHeader("Content-Type", "application/json;charset=utf-8");
-            Integer fixedInvestmentIncrement = (Integer) setVirtualLevel();
             Map jsonMap = new TreeMap();
+            VirtualUser virtualUser = virtualUserList.get(random.nextInt(virtualUserList.size()));
+            Integer fixedInvestmentIncrement = (Integer) setVirtualLevel(virtualUser);
             jsonMap.put("price", fixedInvestmentIncrement);
-            jsonMap.put("userId", virtualUserList.get(random.nextInt(virtualUserList.size())).getUserBrief().getUser().getId());
+            jsonMap.put("userId", virtualUser.getUserBrief().getUser().getId());
             jsonMap.put("artworkId", virtualInvestmentPlan.getVirtualArtwork().getArtwork().getId());
             jsonMap.put("timestamp", System.currentTimeMillis());
             String msg = null;
@@ -130,10 +134,10 @@ private boolean running = true;
     }
 
 
-    private Number setVirtualLevel() {
+    private Number setVirtualLevel(VirtualUser virtualUser) {
         Integer fixedInvestmentIncrement = 0;
         if (virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(5001)) < 0) {
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+            switch (virtualUser.getVirtualInvestorPlan().getGroup()) {
                 case "1":
                     fixedInvestmentIncrement = 20;
                     break;
@@ -153,7 +157,7 @@ private boolean running = true;
                     fixedInvestmentIncrement = 2;
             }
         } else if (virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(15001)) < 0) {
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+            switch (virtualUser.getVirtualInvestorPlan().getGroup()) {
                 case "1":
                     fixedInvestmentIncrement = 80;
                     break;
@@ -173,7 +177,7 @@ private boolean running = true;
                     fixedInvestmentIncrement = 2;
             }
         } else {
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+            switch (virtualUser.getVirtualInvestorPlan().getGroup()) {
                 case "1":
                     fixedInvestmentIncrement = 100;
                     break;

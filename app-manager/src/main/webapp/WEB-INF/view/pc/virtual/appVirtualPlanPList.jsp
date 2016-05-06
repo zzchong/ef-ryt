@@ -26,10 +26,10 @@
             <td>操作</td>
             <td>批次编号</td>
             <td>批次名称</td>
-            <td>起始日期</td>
-            <td>终止日期</td>
-            <td>起始时间</td>
-            <td>终止时间</td>
+            <%--<td>起始日期</td>--%>
+            <%--<td>终止日期</td>--%>
+            <%--<td>起始时间</td>--%>
+            <%--<td>终止时间</td>--%>
             <td>任务状态</td>
             <td>任务进度</td>
             <td>创建时间</td>
@@ -53,7 +53,7 @@
                             </c:if>
                             <c:if test="${plan.status == '3' && plan.planType != 'user'}">
                                 <button onclick="window.location.href='<c:url
-                                        value="/virtualPlan/pausePlan.do?id=${plan.id}&resultPage=/basic/xm.do?qm=plistVirtualPlan_default"/>'"
+                                        value="/virtualPlan/pausePlan2.do?id=${plan.id}&resultPage=/basic/xm.do?qm=plistVirtualPlan_default"/>'"
                                         class="am-btn am-btn-default am-btn-xs am-hide-sm-only"><span
                                         class="am-icon-edit"></span> 暂停任务
                                 </button>
@@ -84,18 +84,18 @@
                     <a href="<c:url value="/virtualPlan/getTypeObjectView.do?virtual=virtual&id=${plan.id}&type=${plan.planType}"/>">${plan.serial}</a>
                 </td>
                 <td><%--名称--%>${plan.description}</td>
-                <td><%--起始日期--%>${plan.startDate}
-                        <%--<fmt:formatDate value="${plan.startDate}" pattern="yyyy-MM-dd"/>--%>
-                </td>
-                <td><%--终止日期--%>${plan.endDate}
-                        <%--<fmt:formatDate value="${plan.endDate}" pattern="yyyy-MM-dd"/>--%>
-                </td>
-                <td><%--起始时间--%>${plan.startTime}
-                        <%--<fmt:formatDate value="${plan.startTime}" pattern="HH:mm:ss"/>--%>
-                </td>
-                <td><%--终止时间--%>${plan.endTime}
-                        <%--<fmt:formatDate value="${plan.endTime}" pattern="HH:mm:ss"/>--%>
-                </td>
+                <%--<td>&lt;%&ndash;起始日期&ndash;%&gt;${plan.startDate}--%>
+                        <%--&lt;%&ndash;<fmt:formatDate value="${plan.startDate}" pattern="yyyy-MM-dd"/>&ndash;%&gt;--%>
+                <%--</td>--%>
+                <%--<td>&lt;%&ndash;终止日期&ndash;%&gt;${plan.endDate}--%>
+                        <%--&lt;%&ndash;<fmt:formatDate value="${plan.endDate}" pattern="yyyy-MM-dd"/>&ndash;%&gt;--%>
+                <%--</td>--%>
+                <%--<td>&lt;%&ndash;起始时间&ndash;%&gt;${plan.startTime}--%>
+                        <%--&lt;%&ndash;<fmt:formatDate value="${plan.startTime}" pattern="HH:mm:ss"/>&ndash;%&gt;--%>
+                <%--</td>--%>
+                <%--<td>&lt;%&ndash;终止时间&ndash;%&gt;${plan.endTime}--%>
+                        <%--&lt;%&ndash;<fmt:formatDate value="${plan.endTime}" pattern="HH:mm:ss"/>&ndash;%&gt;--%>
+                <%--</td>--%>
                 <td>
                     <ming800:status name="status" dataType="appVirtualPlan.status" checkedValue="${plan.status}"
                                     type="normal"/>
@@ -145,7 +145,7 @@
         $.ajax({
             type: 'post',
             async: false,
-            url: '<c:url value="/virtualPlan//pausePlan.do?id="/>' + id,
+            url: '<c:url value="/virtualPlan/pausePlan.do?id="/>' + id,
             success: function (data) {
                 if (data == "true") {
                     alert("success");

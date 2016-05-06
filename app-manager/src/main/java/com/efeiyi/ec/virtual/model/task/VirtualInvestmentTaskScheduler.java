@@ -3,6 +3,7 @@ package com.efeiyi.ec.virtual.model.task;
 
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.virtual.model.VirtualInvestmentPlan;
+import com.efeiyi.ec.art.virtual.model.VirtualInvestorPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualPlan;
 import com.efeiyi.ec.art.virtual.model.VirtualUser;
 import com.efeiyi.ec.virtual.model.timer.SuperTimer;
@@ -51,13 +52,24 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
         virtualInvestmentPlan.setStatus(VirtualPlanConstant.planStatusStarted);
         session.saveOrUpdate(virtualInvestmentPlan);
         session.flush();
+        List<VirtualInvestorPlan> virtualInvestorPlanList = session.createQuery("from VirtualInvestorPlan").list();
 
+        //按模板比例选出参与融资的用户
+        randomScreeVirtualUser(virtualInvestorPlanList);
 
-        Double percentageOfAmount = 0.0;
-        Integer fixedInvestmentIncrement = 0;
-        Number[] numbers = setVirtualLevel(percentageOfAmount, fixedInvestmentIncrement);
-        percentageOfAmount = (Double) numbers[0];
-        fixedInvestmentIncrement = (Integer) numbers[1];
+        //遍历所有融资者启动随机时间融资行为
+        for(VirtualInvestorPlan virtualInvestorPlan : virtualInvestorPlanList){
+            launchInvestAction(virtualInvestorPlan);
+        }
+
+        logger.info("Ready to generate virtual investments");
+
+    }
+
+    private void launchInvestAction(VirtualInvestorPlan virtualInvestorPlan) {
+        Number[] numbers = setVirtualLevel(virtualInvestorPlan);
+        Double percentageOfAmount = (Double) numbers[0];
+        Integer fixedInvestmentIncrement = (Integer) numbers[1];
         Artwork artwork = virtualInvestmentPlan.getVirtualArtwork().getArtwork();
         Double investGoal = artwork.getInvestGoalMoney().doubleValue();
         Double subInvestGoal = investGoal * percentageOfAmount;
@@ -83,7 +95,6 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
         DateFormat dateFormat = new SimpleDateFormat("yyyy,MM,dd,HH,mm,ss");
         Calendar futureCalendar = Calendar.getInstance();
         String[] nowArray = dateFormat.format(futureCalendar.getTime()).split(",");
-//        String[] peakTimeArray = dateFormat.format(virtualInvestmentPlan.getPeakTime()).split(",");
         futureCalendar.set(Integer.parseInt(nowArray[0]),
                 Integer.parseInt(nowArray[1]) - 1,
                 Integer.parseInt(nowArray[2]),
@@ -92,12 +103,11 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                 0);
         long future = futureCalendar.getTimeInMillis();
         long futureFromNow = future - now;
-        int randomSize = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList().size();
+        int randomSize = virtualInvestorPlan.getVirtualUserList().size();
         for (Long relativeTimePoint : investList) {
             long timePoint = futureFromNow + relativeTimePoint;
-            if(timePoint > 0) {
                 int randomNumber = random.nextInt(randomSize);
-                VirtualUser virtualUser = virtualInvestmentPlan.getVirtualInvestorPlan().getVirtualUserList().get(randomNumber);
+                VirtualUser virtualUser = virtualInvestorPlan.getVirtualUserList().get(randomNumber);
                 Map resultMap = new TreeMap();
                 resultMap.put("price", fixedInvestmentIncrement);
                 resultMap.put("userId", virtualUser.getUserBrief().getUser().getId());
@@ -110,23 +120,117 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                     e.printStackTrace();
                     logger.error("Encrypt Exception");
                 }
-                    SuperTimer.getInstance().getSubTimerMap()
-                            .get(virtualInvestmentPlan)
-                            .getSubTimer()
-                            .schedule(new VirtualInvestmentGenerator(resultMap, virtualInvestmentPlan),
-                                    timePoint
+                SuperTimer.getInstance().getSubTimerMap()
+                        .get(virtualInvestmentPlan)
+                        .getSubTimer()
+                        .schedule(new VirtualInvestmentGenerator(resultMap, virtualInvestmentPlan),
+                                timePoint < 0 ? 0 : timePoint
 //                                    1000
-                            );
+                        );
 
-            }
         }
-        logger.info("Ready to generate " + investTimes + " virtual investments");
-
     }
 
-    private Number[] setVirtualLevel(Double percentageOfAmount, Integer fixedInvestmentIncrement) {
+    private void randomScreeVirtualUser(List<VirtualInvestorPlan> virtualInvestorPlanList) {
+        BigDecimal goalMoney = virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney();
+        Random random = new Random();
+        for(int y = 0; y <virtualInvestorPlanList.size(); y++) {
+            double percentageOfAmount = 0.0;
+            int fixedInvestmentIncrement = 0;
+            if (goalMoney.compareTo(new BigDecimal(5001)) < 0) {
+                switch (virtualInvestorPlanList.get(y).getGroup()) {
+                    case "1":
+                        percentageOfAmount = 0.02;
+                        fixedInvestmentIncrement = 20;
+                        break;
+                    case "2":
+                        percentageOfAmount = 0.3;
+                        fixedInvestmentIncrement = 100;
+                        break;
+                    case "3":
+                        percentageOfAmount = 0.15;
+                        fixedInvestmentIncrement = 0;
+                        break;
+                    case "4":
+                        percentageOfAmount = 0.1;
+                        fixedInvestmentIncrement = 10;
+                        break;
+                    case "5":
+                        percentageOfAmount = 0.2;
+                        fixedInvestmentIncrement = 20;
+                        break;
+                    case "6":
+                        percentageOfAmount = 0.03;
+                        fixedInvestmentIncrement = 2;
+                }
+            } else if (virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(15001)) < 0) {
+                switch (virtualInvestorPlanList.get(y).getGroup()) {
+                    case "1":
+                        percentageOfAmount = 0.04;
+                        fixedInvestmentIncrement = 80;
+                        break;
+                    case "2":
+                        percentageOfAmount = 0.2;
+                        fixedInvestmentIncrement = 200;
+                        break;
+                    case "3":
+                        percentageOfAmount = 0.2;
+                        fixedInvestmentIncrement = 100;
+                        break;
+                    case "4":
+                        percentageOfAmount = 0.05;
+                        fixedInvestmentIncrement = 20;
+                        break;
+                    case "5":
+                        percentageOfAmount = 0.3;
+                        fixedInvestmentIncrement = 60;
+                        break;
+                    case "6":
+                        percentageOfAmount = 0.01;
+                        fixedInvestmentIncrement = 2;
+                }
+            } else {
+                switch (virtualInvestorPlanList.get(y).getGroup()) {
+                    case "1":
+                        percentageOfAmount = 0.04;
+                        fixedInvestmentIncrement = 100;
+                        break;
+                    case "2":
+                        percentageOfAmount = 0.3;
+                        fixedInvestmentIncrement = 300;
+                        break;
+                    case "3":
+                        percentageOfAmount = 0.2;
+                        fixedInvestmentIncrement = 100;
+                        break;
+                    case "4":
+                        percentageOfAmount = 0.05;
+                        fixedInvestmentIncrement = 10;
+                        break;
+                    case "5":
+                        percentageOfAmount = 0.2;
+                        fixedInvestmentIncrement = 80;
+                        break;
+                    case "6":
+                        percentageOfAmount = 0.01;
+                        fixedInvestmentIncrement = 2;
+
+                }
+            }
+            List<VirtualUser> virtualUserList = new ArrayList<>();
+            int range = goalMoney.multiply(new BigDecimal(percentageOfAmount)).divide(new BigDecimal(fixedInvestmentIncrement),2,BigDecimal.ROUND_HALF_DOWN).intValue();
+            for(int x = 0; x < range; x++){
+                virtualUserList.add(virtualInvestorPlanList.get(y).getVirtualUserList().get(random.nextInt(virtualInvestorPlanList.get(y).getVirtualUserList().size())));
+            }
+            virtualInvestorPlanList.get(y).setVirtualUserList(virtualUserList);
+        }
+    }
+
+    private Number[] setVirtualLevel(VirtualInvestorPlan virtualInvestorPlan) {
+        Double percentageOfAmount = 0.0;
+        Integer fixedInvestmentIncrement = 0;
         if (virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(5001)) < 0) {
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+            switch (virtualInvestorPlan.getGroup()) {
                 case "1":
                     percentageOfAmount = 0.02;
                     fixedInvestmentIncrement = 20;
@@ -152,7 +256,7 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                     fixedInvestmentIncrement = 2;
             }
         } else if (virtualInvestmentPlan.getVirtualArtwork().getArtwork().getInvestGoalMoney().compareTo(new BigDecimal(15001)) < 0) {
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+            switch (virtualInvestorPlan.getGroup()) {
                 case "1":
                     percentageOfAmount = 0.04;
                     fixedInvestmentIncrement = 80;
@@ -178,7 +282,7 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                     fixedInvestmentIncrement = 2;
             }
         } else {
-            switch (virtualInvestmentPlan.getVirtualInvestorPlan().getGroup()) {
+            switch (virtualInvestorPlan.getGroup()) {
                 case "1":
                     percentageOfAmount = 0.04;
                     fixedInvestmentIncrement = 100;
@@ -202,7 +306,6 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                 case "6":
                     percentageOfAmount = 0.01;
                     fixedInvestmentIncrement = 2;
-
             }
         }
         Number[] numbers = new Number[2];
@@ -213,7 +316,7 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
 
     @Override
     public void run() {
-        logger.info(" Purchase order arranging.");
+        logger.info(" investment arranging.");
         if (session == null || !session.isOpen()) {
             session = sessionFactory.openSession();
         }
@@ -229,7 +332,7 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                 session.close();
             }
         }
-        logger.info("Purchase arranged.");
+        logger.info("investment arranged.");
     }
 
     @Override
