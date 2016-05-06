@@ -18,6 +18,7 @@
                 <field name="planType" label="对象" inputType="text">
                     <statusType fieldName="planType">
                         <item label="融资" value="investment"/>
+                        <item label="点赞" value="praise"/>
                     </statusType>
                 </field>
             </fields>

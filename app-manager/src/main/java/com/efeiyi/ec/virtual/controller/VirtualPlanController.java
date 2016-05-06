@@ -97,7 +97,7 @@ public class VirtualPlanController {
     public ModelAndView pausePlan2(VirtualPlan virtualPlan) {
 
         virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), virtualPlan.getId());
-        SubTimer subTimer = SuperTimer.getInstance().getSubTimerMap().remove(virtualPlan);
+        SubTimer subTimer = SuperTimer.getInstance().getSubTimerMap().get(virtualPlan);
         if (subTimer != null) {
             subTimer.cancel();
         }

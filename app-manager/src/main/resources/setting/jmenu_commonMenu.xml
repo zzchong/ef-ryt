@@ -4,13 +4,8 @@
     <jnode id="ProjectManager" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="项目管理" url="/main.do?jnodeId=ProjectManager"  state="">
         <jnode url="" id="projectManager" access="admin,operational,o_operational,financial,product_manager,market" state="closed" text_zh_CN="项目管理">
             <jnode url="/basic/xm.do?qm=plistArtwork_default&amp;viewIdentify=projectManager&amp;viewArtWork=project" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="项目列表">
-
-
             </jnode>
-
-
         </jnode>
-
     </jnode>
     <jnode id="OrderManager" access="admin,operational,o_operational,financial,product_manager,market" text_zh_CN="订单管理" url="/main.do?jnodeId=OrderManager"  state="">
         <jnode url="" id="orderManager" access="admin,operational,o_operational,financial,product_manager,market" state="closed" text_zh_CN="订单管理">
@@ -64,10 +59,6 @@
             </jnode>
         </jnode>
     </jnode>
-
-
-
-
 </jmenu>
 
 

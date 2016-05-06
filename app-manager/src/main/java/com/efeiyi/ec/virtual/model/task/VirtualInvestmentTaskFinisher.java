@@ -145,7 +145,7 @@ private boolean running = true;
                     fixedInvestmentIncrement = 100;
                     break;
                 case "3":
-                    fixedInvestmentIncrement = 0;
+                    fixedInvestmentIncrement = 30;
                     break;
                 case "4":
                     fixedInvestmentIncrement = 10;

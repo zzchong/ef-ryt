@@ -26,6 +26,7 @@
             <td>操作</td>
             <td>批次编号</td>
             <td>批次名称</td>
+            <td>作品</td>
             <%--<td>起始日期</td>--%>
             <%--<td>终止日期</td>--%>
             <%--<td>起始时间</td>--%>
@@ -84,6 +85,7 @@
                     <a href="<c:url value="/virtualPlan/getTypeObjectView.do?virtual=virtual&id=${plan.id}&type=${plan.planType}"/>">${plan.serial}</a>
                 </td>
                 <td><%--名称--%>${plan.description}</td>
+                <td><%--名称--%>${plan.virtualArtwork.artwork.title}</td>
                 <%--<td>&lt;%&ndash;起始日期&ndash;%&gt;${plan.startDate}--%>
                         <%--&lt;%&ndash;<fmt:formatDate value="${plan.startDate}" pattern="yyyy-MM-dd"/>&ndash;%&gt;--%>
                 <%--</td>--%>

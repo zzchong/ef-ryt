@@ -34,7 +34,7 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
             retrieveSessionFactory();
             resetPlanStatus();
         }
-        logger.info("PurchaseOrderTaskScheduler cancelled.");
+        logger.info("VirtualInvestmentTaskScheduler cancelled.");
         return super.cancel();
     }
 
@@ -149,7 +149,7 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                         break;
                     case "3":
                         percentageOfAmount = 0.15;
-                        fixedInvestmentIncrement = 0;
+                        fixedInvestmentIncrement = 30;
                         break;
                     case "4":
                         percentageOfAmount = 0.1;
@@ -241,7 +241,7 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                     break;
                 case "3":
                     percentageOfAmount = 0.15;
-                    fixedInvestmentIncrement = 0;
+                    fixedInvestmentIncrement = 30;
                     break;
                 case "4":
                     percentageOfAmount = 0.1;
