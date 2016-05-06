@@ -880,8 +880,8 @@ public class ProfileController extends BaseController {
             LinkedHashMap<String , Object> map = new LinkedHashMap<>();
             map.put("userId",userId);
             UserBrief userBrief = (UserBrief) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_BRIEF, map);
+            resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("userBrief",userBrief);
-            resultMapHandler.handlerResult("0", "请求成功", logBean);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
