@@ -1,10 +1,7 @@
 package com.efeiyi.ec.virtual.controller;
 
 import com.efeiyi.ec.art.model.Artwork;
-import com.efeiyi.ec.art.virtual.model.VirtualArtwork;
-import com.efeiyi.ec.art.virtual.model.VirtualInvestmentPlan;
-import com.efeiyi.ec.art.virtual.model.VirtualInvestorPlan;
-import com.efeiyi.ec.art.virtual.model.VirtualPlan;
+import com.efeiyi.ec.art.virtual.model.*;
 import com.efeiyi.ec.virtual.model.task.*;
 import com.efeiyi.ec.virtual.model.timer.SubTimer;
 import com.efeiyi.ec.virtual.model.timer.SuperTimer;
@@ -76,7 +73,6 @@ public class VirtualPlanController {
             SubTimer subTimer = new SubTimer(new Timer(), timerTask, new Timer(), new SubTaskStopper(virtualPlan));
             map.put(virtualPlan, subTimer);
             subTimer.getSubTimer().schedule(timerTask, 0);
-//            subTimer.getStopperTimer().schedule(subTimer.getStopTimerTask(), 0);
             return true;
         }
         return  false;
@@ -160,6 +156,7 @@ public class VirtualPlanController {
         }
         //虚拟计划对象--点赞praise
         if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRAISE)) {
+            return virtualPraiseView(modelMap, request);
         }
         //虚拟计划对象--商品product
         if (!type.isEmpty() && type.trim().equals(VirtualPlanConstant.PLAN_TYPE_PRODUCT)) {
@@ -176,7 +173,7 @@ public class VirtualPlanController {
 
 
     @RequestMapping("/saveVirtualInvestmentPlan.do")
-    public ModelAndView saveVirtualOrderPlan(HttpServletRequest request) throws Exception {
+     public ModelAndView saveVirtualInvestmentPlan(HttpServletRequest request) throws Exception {
         String id = request.getParameter("id");
         VirtualInvestmentPlan virtualInvestmentPlan = (VirtualInvestmentPlan) baseManager.getObject(VirtualInvestmentPlan.class.getName(), id);
         if (virtualInvestmentPlan == null) {
@@ -194,6 +191,25 @@ public class VirtualPlanController {
         return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_appDefault&virtual");
     }
 
+    @RequestMapping("/saveVirtualPraisePlan.do")
+    public ModelAndView saveVirtualPraisePlan(HttpServletRequest request) throws Exception {
+        String id = request.getParameter("id");
+        VirtualPraisePlan virtualPraisePlan = (VirtualPraisePlan) baseManager.getObject(VirtualInvestmentPlan.class.getName(), id);
+        if (virtualPraisePlan == null) {
+            //获取父类virtualPlan基本属性值
+            VirtualPlan virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), id);
+            virtualPraisePlan = new VirtualPraisePlan();
+            BeanUtils.copyProperties(virtualPraisePlan, virtualPlan);
+            //删除父类virtualPlan 并制空ID
+            vpmService.deleteVirtualPlan(id);
+            virtualPraisePlan.setId(null);
+        }
+        //获取除父类外的基本属性值
+        getBaseProperty(virtualPraisePlan, request);
+
+        return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_appDefault&virtual");
+    }
+
 
     @RequestMapping("/removeVirtualPlan.do")
     public ModelAndView removeVirtualPlan(HttpServletRequest request) throws Exception {
@@ -203,6 +219,14 @@ public class VirtualPlanController {
         }
         vpmService.removeVirtualPlan(id);
          return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_appDefault");
+    }
+
+    @RequestMapping("/testVirtualPlan.do")
+    public ModelAndView testVirtualPlan(HttpServletRequest request) throws Exception {
+        String id = request.getParameter("id");
+        Artwork artwork =  (Artwork)baseManager.getObject(Artwork.class.getName(),id);
+        List list = artwork.getArtWorkPraiseList();
+        return new ModelAndView("redirect:/basic/xm.do?qm=plistAppVirtualPlan_appDefault");
     }
 
 
@@ -220,18 +244,17 @@ public class VirtualPlanController {
         modelMap.put("object", virtualInvestmentPlan);
 
         //获取虚拟用户计划列表
-        XQuery xQuery = new XQuery("listAppVirtualInvestor_appDefault", request);
-        List<VirtualInvestorPlan> virtualInvestorPlanList = baseManager.listObject(xQuery);
-        modelMap.put("virtualInvestorPlanList", virtualInvestorPlanList);
+//        XQuery xQuery = new XQuery("listAppVirtualInvestor_appDefault", request);
+//        List<VirtualInvestorPlan> virtualInvestorPlanList = baseManager.listObject(xQuery);
+//        modelMap.put("virtualInvestorPlanList", virtualInvestorPlanList);
 
 //        //获取商品列表
-        xQuery = new XQuery("listAppArtwork_appDefault", request);
+        XQuery xQuery = new XQuery("listAppArtwork_appDefault", request);
         List<Artwork> artworkList = baseManager.listObject(xQuery);
         modelMap.put("artworkList", artworkList);
 
         return new ModelAndView("/virtual/appVirtualInvestmentPlanView");
     }
-
 
     private VirtualInvestmentPlan getBaseProperty(VirtualInvestmentPlan virtualInvestmentPlan, HttpServletRequest request) throws Exception {
         String serverUrl = request.getParameter("serverUrl");
@@ -255,5 +278,52 @@ public class VirtualPlanController {
         baseManager.saveOrUpdate(VirtualArtwork.class.getName(), virtualArtwork);
 //        sessionFactory.getCurrentSession().merge(virtualInvestmentPlan);
         return virtualInvestmentPlan;
+    }
+
+    private VirtualPraisePlan getBaseProperty(VirtualPraisePlan virtualPraisePlan, HttpServletRequest request) throws Exception {
+        String serverUrl = request.getParameter("serverUrl");
+        virtualPraisePlan.setUrl(serverUrl);
+
+        String artworkId = request.getParameter("artworkId");
+        Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
+        VirtualArtwork virtualArtwork = new VirtualArtwork();
+        virtualArtwork.setArtwork(artwork);
+//        sessionFactory.getCurrentSession().merge(virtualArtwork);
+        baseManager.saveOrUpdate(VirtualArtwork.class.getName(), virtualArtwork);
+        virtualPraisePlan.setVirtualArtwork(virtualArtwork);
+        virtualPraisePlan.setImplementClass("com.efeiyi.ec.virtual.model.task.VirtualPraiseTaskScheduler");
+        virtualPraisePlan.setStatus(VirtualPlanConstant.planStatusInit);
+        baseManager.saveOrUpdate(VirtualInvestmentPlan.class.getName(), virtualPraisePlan);
+        virtualArtwork.setVirtualPraisePlan(virtualPraisePlan);
+        baseManager.saveOrUpdate(VirtualArtwork.class.getName(), virtualArtwork);
+//        sessionFactory.getCurrentSession().merge(virtualInvestmentPlan);
+        return virtualPraisePlan;
+    }
+
+
+    private ModelAndView virtualPraiseView(ModelMap modelMap, HttpServletRequest request) throws Exception {
+        String planId = (String) modelMap.get("planId");
+        VirtualPraisePlan virtualPraisePlan = (VirtualPraisePlan) baseManager.getObject(VirtualPraisePlan.class.getName(), planId);
+        if (virtualPraisePlan == null) {
+            VirtualPlan virtualPlan = (VirtualPlan) baseManager.getObject(VirtualPlan.class.getName(), planId);
+            virtualPraisePlan = new VirtualPraisePlan();
+            BeanUtils.copyProperties(virtualPraisePlan, virtualPlan);
+        } else {
+            long time = virtualPraisePlan.getCreateDatetime().getTime();
+            virtualPraisePlan.setCreateDatetime(new Date(time));
+        }
+        modelMap.put("object", virtualPraisePlan);
+
+        //获取虚拟用户计划列表
+//        XQuery xQuery = new XQuery("listAppVirtualInvestor_appDefault", request);
+//        List<VirtualInvestorPlan> virtualInvestorPlanList = baseManager.listObject(xQuery);
+//        modelMap.put("virtualInvestorPlanList", virtualInvestorPlanList);
+
+//        //获取商品列表
+        XQuery xQuery = new XQuery("listAppArtwork_appDefault", request);
+        List<Artwork> artworkList = baseManager.listObject(xQuery);
+        modelMap.put("artworkList", artworkList);
+
+        return new ModelAndView("/virtual/appVirtualPraisePlanView");
     }
 }

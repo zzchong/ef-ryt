@@ -26,6 +26,7 @@
             <td>操作</td>
             <td>批次编号</td>
             <td>批次名称</td>
+            <td>类型</td>
             <td>作品</td>
             <%--<td>起始日期</td>--%>
             <%--<td>终止日期</td>--%>
@@ -65,7 +66,7 @@
                                         class="am-btn am-btn-default am-btn-xs am-hide-sm-only"><span
                                         class="am-icon-trash-o"></span> 开始任务
                                 </button>
-                            </c:if>
+                                <c:if test="${plan.planType == 'investment'}">
                             <span id="lastHit">
                                 <button onclick="javascript:lastHit('${plan.id}')"
                                         class="am-btn am-btn-default am-btn-xs am-hide-sm-only"><span
@@ -78,6 +79,8 @@
                                         class="am-icon-edit"></span> 终止补刀
                                 </button>
                             </span>
+                                </c:if>
+                            </c:if>
                         </div>
                     </div>
                 </td>
@@ -85,30 +88,45 @@
                     <a href="<c:url value="/virtualPlan/getTypeObjectView.do?virtual=virtual&id=${plan.id}&type=${plan.planType}"/>">${plan.serial}</a>
                 </td>
                 <td><%--名称--%>${plan.description}</td>
-                <td><%--名称--%>${plan.virtualArtwork.artwork.title}</td>
-                <%--<td>&lt;%&ndash;起始日期&ndash;%&gt;${plan.startDate}--%>
-                        <%--&lt;%&ndash;<fmt:formatDate value="${plan.startDate}" pattern="yyyy-MM-dd"/>&ndash;%&gt;--%>
-                <%--</td>--%>
-                <%--<td>&lt;%&ndash;终止日期&ndash;%&gt;${plan.endDate}--%>
-                        <%--&lt;%&ndash;<fmt:formatDate value="${plan.endDate}" pattern="yyyy-MM-dd"/>&ndash;%&gt;--%>
-                <%--</td>--%>
-                <%--<td>&lt;%&ndash;起始时间&ndash;%&gt;${plan.startTime}--%>
-                        <%--&lt;%&ndash;<fmt:formatDate value="${plan.startTime}" pattern="HH:mm:ss"/>&ndash;%&gt;--%>
-                <%--</td>--%>
-                <%--<td>&lt;%&ndash;终止时间&ndash;%&gt;${plan.endTime}--%>
-                        <%--&lt;%&ndash;<fmt:formatDate value="${plan.endTime}" pattern="HH:mm:ss"/>&ndash;%&gt;--%>
-                <%--</td>--%>
+                <td><%--类型--%>
+                    <ming800:status name="planTypeSelect" dataType="appVirtualPlan.planType"
+                                    checkedValue="${plan.planType}" onclick="javascript:objectChange(this)"
+                                    required="required" type="normal"/>
+                </td>
+                <td><%--作品--%>
+                    <c:if test="${not empty plan.implementClass}">${plan.virtualArtwork.artwork.title}</c:if></td>
+                    <%--<td>&lt;%&ndash;起始日期&ndash;%&gt;${plan.startDate}--%>
+                    <%--&lt;%&ndash;<fmt:formatDate value="${plan.startDate}" pattern="yyyy-MM-dd"/>&ndash;%&gt;--%>
+                    <%--</td>--%>
+                    <%--<td>&lt;%&ndash;终止日期&ndash;%&gt;${plan.endDate}--%>
+                    <%--&lt;%&ndash;<fmt:formatDate value="${plan.endDate}" pattern="yyyy-MM-dd"/>&ndash;%&gt;--%>
+                    <%--</td>--%>
+                    <%--<td>&lt;%&ndash;起始时间&ndash;%&gt;${plan.startTime}--%>
+                    <%--&lt;%&ndash;<fmt:formatDate value="${plan.startTime}" pattern="HH:mm:ss"/>&ndash;%&gt;--%>
+                    <%--</td>--%>
+                    <%--<td>&lt;%&ndash;终止时间&ndash;%&gt;${plan.endTime}--%>
+                    <%--&lt;%&ndash;<fmt:formatDate value="${plan.endTime}" pattern="HH:mm:ss"/>&ndash;%&gt;--%>
+                    <%--</td>--%>
                 <td>
                     <ming800:status name="status" dataType="appVirtualPlan.status" checkedValue="${plan.status}"
                                     type="normal"/>
                 </td>
                 <td>
                     <c:if test="${not empty plan.implementClass}">
-                        <c:set value="${0}" var="currentMoney"/>
-                        <c:forEach var="invest" items="${plan.virtualArtwork.artwork.artworkInvests}">
-                            <c:set var="currentMoney" value="${currentMoney + invest.price}"/>
-                        </c:forEach>
-                        ${currentMoney * 100 / plan.virtualArtwork.artwork.investGoalMoney }%
+                        <c:if test="${plan.planType == 'investment'}">
+                            <c:set value="${0}" var="currentMoney"/>
+                            <c:forEach var="invest" items="${plan.virtualArtwork.artwork.artworkInvests}">
+                                <c:set var="currentMoney" value="${currentMoney + invest.price}"/>
+                            </c:forEach>
+                            ${currentMoney * 100 / plan.virtualArtwork.artwork.investGoalMoney }%
+                        </c:if>
+                        <c:if test="${plan.planType == 'praise'}">
+                            <c:set value="${0}" var="currentPraise"/>
+                            <c:forEach var="praise" items="${plan.virtualArtwork.artwork.artWorkPraiseList}">
+                                <c:set var="currentPraise" value="${currentPraise + 1}"/>
+                            </c:forEach>
+                            ${currentPraise}次
+                        </c:if>
                     </c:if>
                 </td>
                 <td><fmt:formatDate value="${plan.createDatetime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
@@ -133,7 +151,7 @@
             success: function (data) {
                 if (data == "true") {
                     alert("success");
-                }else{
+                } else {
                     alert("falied");
                 }
             },
@@ -151,7 +169,7 @@
             success: function (data) {
                 if (data == "true") {
                     alert("success");
-                }else{
+                } else {
                     alert("falied");
                 }
             },

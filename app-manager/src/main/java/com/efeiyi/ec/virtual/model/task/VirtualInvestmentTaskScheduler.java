@@ -112,7 +112,7 @@ public class VirtualInvestmentTaskScheduler extends BaseTimerTask {
                 resultMap.put("price", fixedInvestmentIncrement);
                 resultMap.put("userId", virtualUser.getUserBrief().getUser().getId());
                 resultMap.put("artworkId", artwork.getId());
-                resultMap.put("timestamp", timePoint);
+                resultMap.put("timestamp", timePoint > 0 ? timePoint : 0);
                 try {
                     String msg = DigitalSignatureUtil.encrypt(resultMap);
                     resultMap.put("signmsg", msg);

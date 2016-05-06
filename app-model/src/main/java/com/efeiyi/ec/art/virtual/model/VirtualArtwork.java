@@ -14,6 +14,7 @@ public class VirtualArtwork {
     private String id;
     private Artwork artwork;
     private VirtualInvestmentPlan virtualInvestmentPlan;
+    private VirtualPraisePlan virtualPraisePlan;
 //    private String investGoal;//0 融资充足 1 不保证融资充足
 
     @Id
@@ -47,6 +48,15 @@ public class VirtualArtwork {
         this.virtualInvestmentPlan = virtualInvestmentPlan;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "virtual_praise_plan_id")
+    public VirtualPraisePlan getVirtualPraisePlan() {
+        return virtualPraisePlan;
+    }
+
+    public void setVirtualPraisePlan(VirtualPraisePlan virtualPraisePlan) {
+        this.virtualPraisePlan = virtualPraisePlan;
+    }
 //    @Column(name = "invest_goal")
 //    public String getInvestGoal() {
 //        return investGoal;

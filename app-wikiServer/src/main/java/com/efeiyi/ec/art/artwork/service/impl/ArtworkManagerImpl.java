@@ -65,6 +65,8 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
             PushUserBinding pushUserBinding = (PushUserBinding)baseManager.getUniqueObjectByConditions(AppConfig.SQL_USER_BINDING_GET,param);
 
+            baseManager.saveOrUpdate(ArtWorkPraise.class.getName(),artWorkPraise);//
+
             EfeiyiPush.SendPushNotification(JPushConfig.appKey,JPushConfig.masterSecret,notification,pushUserBinding.getCid());
 
         }catch (Exception e){
