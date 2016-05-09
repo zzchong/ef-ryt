@@ -4,6 +4,8 @@ import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -35,6 +37,7 @@ public class Artwork implements Serializable {
     private List<ArtworkAttachment> artworkAttachment;
     private List<ArtworkComment> artworkComments;//项目评论
     private List<ArtworkInvest> artworkInvests;//项目投资
+    private List<ArtworkInvest> artworkInvestCount;//投资笔数
     private List<ArtworkMessage> artworkMessages;//项目制作动态 //后台制作动态查询应用
     private List<ArtworkBidding> artworkBiddings;//项目竞价记录 //艺术家个人信息统计应用
     private List<ArtWorkPraise> artWorkPraiseList;//点赞数
@@ -244,6 +247,18 @@ public class Artwork implements Serializable {
 
     public void setArtworkInvests(List<ArtworkInvest> artworkInvests) {
         this.artworkInvests = artworkInvests;
+    }
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    @JsonIgnore
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    public List<ArtworkInvest> getArtworkInvestCount() {
+        return artworkInvestCount;
+    }
+
+    public void setArtworkInvestCount(List<ArtworkInvest> artworkInvestCount) {
+        this.artworkInvestCount = artworkInvestCount;
     }
 
     @JsonIgnore

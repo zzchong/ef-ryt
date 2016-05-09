@@ -21,11 +21,15 @@ import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +45,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.*;
-
+import org.junit.*;
 /**
  * Created by Administrator on 2016/1/29.
  */
@@ -364,7 +369,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            if (artworkManager.saveArtWorkPraise(jsonObject.getString("artWorkId"), jsonObject.getString("currentUserId"),jsonObject.getString("messageId"))) {
+            if (artworkManager.saveArtWorkPraise(jsonObject.getString("artWorkId"), jsonObject.getString("currentUserId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -402,7 +407,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            if (artworkManager.saveArtWorkComment(jsonObject.getString("artWorkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("currentUserId"),jsonObject.getString("messageId"))) {
+            if (artworkManager.saveArtWorkComment(jsonObject.getString("artWorkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("currentUserId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -857,6 +862,52 @@ public class ArtworkController extends BaseController {
     }
 
 
+    /**
+     * 项目进展动态查询接口
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/artworkProgress.do", method = RequestMethod.GET)
+    @ResponseBody
+    public Map artworkProgress(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            String artworkId = request.getParameter("artworkId");
+            String timestamp = request.getParameter("timestamp");
+            String signmsg = request.getParameter("signmsg");
+
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(artworkId + " ...");//************记录请求报文
+            logBean.setApiName("artworkProgress");
+            if ("".equals(signmsg)
+                    || "".equals(timestamp)
+                    || "".equals(signmsg)
+                    ) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            //校验数字签名
+            treeMap.put("artworkId", artworkId);
+            treeMap.put("timestamp", request.getParameter("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artworkId);
+            resultMap.put("artwork",artwork);
+            resultMap.put("investTimes",artwork.getArtworkInvestCount().size());
+            resultMap.put("artworkMessages",artwork.getArtworkMessages());
+            resultMap.put("artworkBidding",artwork.getArtworkBiddings());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+        return resultMap;
+    }
+
     public static void main(String[] arg) throws Exception {
 
 
@@ -947,5 +998,44 @@ public class ArtworkController extends BaseController {
         }
     }
 
+    /**
+     * 项目进展动态查询接口测试
+     * @throws Exception
+     */
+    @Test
+    public void testArtworkProgress() throws Exception {
+        long timestamp = System.currentTimeMillis();
+
+        Map<String, Object> map = new TreeMap<>();
+
+        /**investorArtWorkView.do测试加密参数**/
+        map.put("artworkId", "qydeyugqqiugd2");
+        map.put("timestamp", timestamp);
+        String signmsg = DigitalSignatureUtil.encrypt(map);
+        HttpClient httpClient = new DefaultHttpClient();
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("artworkId","qydeyugqqiugd2"));
+        params.add(new BasicNameValuePair("timestamp",Long.toString(timestamp)));
+        params.add(new BasicNameValuePair("signmsg",signmsg));
+        String url = "http://192.168.1.41:8085/app/artworkProgress.do?" + URLEncodedUtils.format(params,HTTP.UTF_8);
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("Content-Type", "application/json;charset=utf-8");
+        System.out.println("url:  " + url);
+        try {
+            HttpResponse response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    entity.getContent(), "UTF-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            System.out.println(stringBuilder);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }
