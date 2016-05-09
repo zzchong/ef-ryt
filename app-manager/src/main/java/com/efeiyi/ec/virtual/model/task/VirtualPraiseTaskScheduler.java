@@ -65,13 +65,7 @@ public class VirtualPraiseTaskScheduler extends BaseTimerTask {
     }
 
     private void launchPraiseAction(VirtualInvestorPlan virtualInvestorPlan) {
-//        Number[] numbers = setVirtualLevel(virtualInvestorPlan);
-//        Double percentageOfAmount = (Double) numbers[0];
-//        Integer fixedInvestmentIncrement = (Integer) numbers[1];
         Artwork artwork = virtualPraisePlan.getVirtualArtwork().getArtwork();
-//        Double investGoal = artwork.getInvestGoalMoney().doubleValue();
-//        Double subInvestGoal = investGoal * percentageOfAmount;
-//        int investTimes = subInvestGoal.intValue() / fixedInvestmentIncrement;
         int size = virtualInvestorPlan.getVirtualUserList().size();
         Long[] morningPraise = new Long[size / 5];
         Long[] afternoonPraise = new Long[size * 2/ 5];
@@ -109,7 +103,6 @@ public class VirtualPraiseTaskScheduler extends BaseTimerTask {
             int randomNumber = random.nextInt(randomSize);
             VirtualUser virtualUser = virtualInvestorPlan.getVirtualUserList().get(randomNumber);
             Map resultMap = new TreeMap();
-//            resultMap.put("price", fixedInvestmentIncrement);
             resultMap.put("currentUserId", virtualUser.getUserBrief().getUser().getId());
             resultMap.put("artWorkId", artwork.getId());
             resultMap.put("timestamp", timePoint > 0 ? timePoint : 0);
@@ -127,7 +120,6 @@ public class VirtualPraiseTaskScheduler extends BaseTimerTask {
                             timePoint < 0 ? 0 : timePoint
 //                                    1000
                     );
-
         }
     }
 
