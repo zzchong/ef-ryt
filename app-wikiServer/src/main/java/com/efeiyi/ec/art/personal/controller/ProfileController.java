@@ -26,6 +26,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -848,6 +849,60 @@ public class ProfileController extends BaseController {
         return resultMap;
     }
 
+    /**
+     * 点赞查询测试
+     * @throws Exception
+     */
+    @Test
+    public void testFollowed() throws Exception {
+
+        long timestamp = System.currentTimeMillis();
+        Map<String, Object> map = new TreeMap<>();
+
+        /**artWorkCreationView.do测试加密参数**/
+        map.put("userId", "ieatht97wfw30hfd");
+        map.put("timestamp", timestamp);
+        map.put("type", "1");
+        map.put("pageIndex", 1);
+        map.put("pageSize", 10);
+        String signmsg = DigitalSignatureUtil.encrypt(map);
+        map.put("signmsg", signmsg);
+        HttpClient httpClient = new DefaultHttpClient();
+        String url = "http://192.168.1.41:8080/app/followed.do";
+        HttpPost httppost = new HttpPost(url);
+        httppost.setHeader("Content-Type", "application/json;charset=utf-8");
+
+        /**json参数  artWorkCreationList.do测试 **/
+//        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        /**json参数  artWorkCreationView.do测试 **/
+//        String json = "{\"userId\":\"ina6pqm2d036fya5\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+//        JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
+//        String jsonString = jsonObj.toJSONString();
+        String jsonString= JSONObject.toJSONString(map);
+        StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
+        stringEntity.setContentType("text/json");
+        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        httppost.setEntity(stringEntity);
+        System.out.println("url:  " + url);
+        try {
+            byte[] b = new byte[(int) stringEntity.getContentLength()];
+            System.out.println(stringEntity);
+            stringEntity.getContent().read(b);
+            System.out.println("报文:" + new String(b, "utf-8"));
+            HttpResponse response = httpClient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    entity.getContent(), "UTF-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            System.out.println(stringBuilder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 获取简介

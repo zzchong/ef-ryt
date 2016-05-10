@@ -369,7 +369,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            if (artworkManager.saveArtWorkPraise(jsonObject.getString("artWorkId"), jsonObject.getString("currentUserId"), jsonObject.getString("messageId"))) {
+            if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("currentUserId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -382,6 +382,51 @@ public class ArtworkController extends BaseController {
         return resultMap;
     }
 
+
+    @Test
+    public void testArtworkPraise() throws Exception {
+        long timestamp = System.currentTimeMillis();
+
+        Map<String, Object> map = new TreeMap<>();
+
+        /**investorArtWorkView.do测试加密参数**/
+        map.put("artworkId", "qydeyugqqiugd2");
+        map.put("timestamp", timestamp);
+        map.put("currentUserId","ieatht97wfw30hfd");
+        String signmsg = DigitalSignatureUtil.encrypt(map);
+        HttpClient httpClient = new DefaultHttpClient();
+        map.put("signmsg",signmsg);
+        String url = "http://192.168.1.41:8085/app/artworkPraise.do";
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Content-Type", "application/json;charset=utf-8");
+        System.out.println("url:  " + url);
+
+        String jsonString = JSONObject.toJSONString(map);
+        StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
+        stringEntity.setContentType("text/json");
+        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        httpPost.setEntity(stringEntity);
+        System.out.println("url:  " + url);
+        try {
+            byte[] b = new byte[(int) stringEntity.getContentLength()];
+            System.out.println(stringEntity);
+            stringEntity.getContent().read(b);
+            System.out.println("报文:" + new String(b, "utf-8"));
+            HttpResponse response = httpClient.execute(httpPost);
+            HttpEntity entity = response.getEntity();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    entity.getContent(), "UTF-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            System.out.println(stringBuilder);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 评论
