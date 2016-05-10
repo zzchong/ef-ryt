@@ -872,7 +872,7 @@ public class ArtworkController extends BaseController {
     @ResponseBody
     public Map artworkProgress(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> resultMap ;
         TreeMap treeMap = new TreeMap();
         try {
             String artworkId = request.getParameter("artworkId");
@@ -897,6 +897,7 @@ public class ArtworkController extends BaseController {
             }
 
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artworkId);
+            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             resultMap.put("artwork",artwork);
             resultMap.put("investTimes",artwork.getArtworkInvestCount().size());
             resultMap.put("artworkMessages",artwork.getArtworkMessages());
