@@ -899,7 +899,7 @@ public class ArtworkController extends BaseController {
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artworkId);
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             resultMap.put("artwork",artwork);
-            resultMap.put("investTimes",artwork.getArtworkInvestCount().size());
+            resultMap.put("investTimes",artwork.getArtworkInvests().size());
             resultMap.put("artworkMessages",artwork.getArtworkMessages());
             resultMap.put("artworkBidding",artwork.getArtworkBiddings());
         } catch (Exception e) {
