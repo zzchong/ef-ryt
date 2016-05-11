@@ -83,7 +83,7 @@ public class ArtWorkCreationController extends BaseController {
             xQuery.put("type", "2");
             PageEntity pageEntity = new PageEntity();
             pageEntity.setSize(jsonObj.getInteger("pageSize"));
-            pageEntity.setIndex(jsonObj.getInteger("pageNum"));
+            pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
             xQuery.setPageEntity(pageEntity);
             artworkList = baseManager.listPageInfo(xQuery).getList();
 //            String hql = "from Artwork WHERE 1=1 and status = '1' and type = '2' order by investStartDatetime asc";
