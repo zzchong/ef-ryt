@@ -29,10 +29,9 @@ import java.util.*;
 
 /**
  * Created by Administrator on 2016/4/12.
- *
  */
 @Controller
-public class PaymentController  extends BaseController {
+public class PaymentController extends BaseController {
     private static Logger logger = Logger.getLogger(PaymentController.class);
     @Autowired
     ResultMapHandler resultMapHandler;
@@ -49,9 +48,9 @@ public class PaymentController  extends BaseController {
 
         LogBean logBean = new LogBean();
         logBean.setApiName("checkOrderPay");
-        Map<String, String> resultMap = new HashMap<String, String>();
+//        Map<String, String> resultMap = new HashMap<String, String>();
         StringBuffer json = new StringBuffer();
-        String line = null;
+        String line;
 
         try {
             BufferedReader reader = request.getReader();
@@ -69,15 +68,18 @@ public class PaymentController  extends BaseController {
 
         boolean status = paymentManager.verifySign(sign, timestamp);
 
-        PrintWriter out=null;
-        try{
-             out = response.getWriter();//给客户端返回数据
-            if (status) { //验证成功
-        //  获取订单Id
-        //1 校验金额
-        //2 校验账户
-        //3 校验关键字
-        //4 校验详情
+        PrintWriter out = null;
+        try {
+            out = response.getWriter();//给客户端返回数据
+            if (!status) {
+                out.println("fail");
+                return;
+            }//验证成功
+            //  获取订单Id
+            //1 校验金额
+            //2 校验账户
+            //3 校验关键字
+            //4 校验详情
 
         /*   此处需要验证购买的产品与订单金额是否匹配:
          验证购买的产品与订单金额是否匹配的目的在于防止黑客反编译了iOS或者Android app的代码，
@@ -89,13 +91,32 @@ public class PaymentController  extends BaseController {
          只要按照前述要求做了购买的产品与订单金额的匹配性验证，在你的后端服务器不被入侵的前提下，你就不会有任何经济损失。
          处理业务逻辑*/
 
-             out.println("success"); //请不要修改或删除
-
-            } else { //验证失败
+            //先生成充值记录，status=2，再等待Beecloud的webhook回调，
+            // 待测
+            String rechargeId = (String) jsonObj.get("optional");
+            RechargeRecord rechargeRecord = (RechargeRecord) baseManager.getObject(RechargeRecord.class.getName(), rechargeId);
+            if (rechargeRecord == null) {
                 out.println("fail");
+                return;
             }
+            if ("0".equals(rechargeRecord.getStatus())) {
+                out.println("fail");
+                return;
+            }
+            BigDecimal transactionFee = new BigDecimal((double) jsonObj.get("transaction_fee") / 100);
+            if (!rechargeRecord.getCurrentBalance().equals(transactionFee)) {
+                out.println("fail");
+                return;
+            }
+            rechargeRecord.setStatus("0");
+            BigDecimal balance = rechargeRecord.getAccount().getCurrentBalance();
+            BigDecimal usableBalance = rechargeRecord.getAccount().getCurrentUsableBalance();
+            rechargeRecord.getAccount().setCurrentBalance(balance.add(transactionFee));
+            rechargeRecord.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
+            baseManager.saveOrUpdate(RechargeRecord.class.getName(),rechargeRecord);
 
-         }catch (Exception e){
+            out.println("success"); //请不要修改或删除
+        } catch (Exception e) {
             out.println("fail");
         }
 
