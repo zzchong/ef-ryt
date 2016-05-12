@@ -92,15 +92,19 @@ public class MasterController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("saveMasterWork");
-            if(StringUtils.isEmpty(request.getParameter("name")) ||StringUtils.isEmpty(request.getParameter("material"))
-                    || StringUtils.isEmpty("currentUserId") || StringUtils.isEmpty("type")){
+            if(StringUtils.isEmpty(request.getParameter("name"))
+                    ||StringUtils.isEmpty(request.getParameter("material"))
+                    || StringUtils.isEmpty("currentUserId")
+                    || StringUtils.isEmpty("type")
+                    || StringUtils.isEmpty("createYear")){
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
-            map.put("name",request.getParameter("name"));
-            map.put("material",request.getParameter("material"));
-            map.put("currentUserId",request.getParameter("currentUserId"));
-            map.put("type",request.getParameter("type"));
-            boolean verify = DigitalSignatureUtil.verify(map,request.getParameter("signmsg"));
+            map.put("name",jsonObj.getString("name"));
+            map.put("material",jsonObj.getString("material"));
+            map.put("currentUserId",jsonObj.getString("currentUserId"));
+            map.put("type",jsonObj.getString("type"));
+            map.put("createYear",jsonObj.getString("createYear"));
+            boolean verify = DigitalSignatureUtil.verify(map,jsonObj.getString("signmsg"));
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
