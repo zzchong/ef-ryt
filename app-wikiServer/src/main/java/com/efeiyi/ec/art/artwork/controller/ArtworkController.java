@@ -803,6 +803,52 @@ public class ArtworkController extends BaseController {
 
 
     /**
+     * 艺术家变更项目状态
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/updateArtWork.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map updateArtWork(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        TreeMap treeMap = new TreeMap();
+        try {
+            logBean.setCreateDate(new Date());//操作时间
+//            logBean.setRequestMessage(request.getParameter("title") + " " + request.getParameter("brief"));//************记录请求报文
+            logBean.setApiName("updateArtWork");
+            if ("".equals(request.getParameter("signmsg"))
+                    || "".equals(request.getParameter("timestamp"))
+                    || "".equals(request.getParameter("userId"))
+                    || "".equals(request.getParameter("artworkId"))
+                    || "".equals(request.getParameter("step"))) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            //校验数字签名
+            String signmsg = request.getParameter("signmsg");
+            treeMap.put("userId", request.getParameter("userId"));
+            treeMap.put("timestamp", request.getParameter("timestamp"));
+            treeMap.put("artworkId", request.getParameter("artworkId"));
+            treeMap.put("step", request.getParameter("step"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), request.getParameter("artworkId"));
+            if (!request.getParameter("userId").equals(artwork.getAuthor().getId())) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            artwork.setStep(request.getParameter("step"));
+            baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+            return resultMapHandler.handlerResult("0", "成功", logBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+    }
+
+    /**
      * 艺术家发布项目动态接口
      *
      * @param request
@@ -920,7 +966,7 @@ public class ArtworkController extends BaseController {
     @ResponseBody
     public Map artworkProgress(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap ;
+        Map<String, Object> resultMap;
         TreeMap treeMap = new TreeMap();
         try {
             String artworkId = request.getParameter("artworkId");
