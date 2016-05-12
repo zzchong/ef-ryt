@@ -14,7 +14,16 @@ import com.efeiyi.ec.art.model.PushUserBinding;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -188,7 +199,7 @@ public class EPushController extends BaseController {
             artworkComment.setFatherComment(fatherArtworkComment);
 
 
-            baseManager.saveOrUpdate(Message.class.getName(),artworkComment);
+            baseManager.saveOrUpdate(ArtworkComment.class.getName(), artworkComment);
             logBean.setResultCode("0");
             logBean.setMsg("成功");
             baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
@@ -208,9 +219,46 @@ public class EPushController extends BaseController {
         return resultMap;
     }
 
+    @Test
+    public void testSaveComment() throws Exception {
+        long timestamp = System.currentTimeMillis();
 
+        Map<String, Object> map = new TreeMap<>();
 
+        /**investorArtWorkView.do测试加密参数**/
+        map.put("content", "Hgh");
+        map.put("father_comment_id", "");
+        map.put("username","imhipoyk18s4k52u");
+        map.put("timestamp", timestamp);
+        map.put("artwork_id","in5z7r5f2w2f73so");
+        String signmsg = DigitalSignatureUtil.encrypt(map);
+        map.put("signmsg",signmsg);
+        HttpClient httpClient = new DefaultHttpClient();
+        String url = "http://192.168.1.41:8085/app/saveComment.do";
+        HttpPost httppost = new HttpPost(url);
+        httppost.setHeader("Content-Type", "application/json;charset=utf-8");
+        String jsonString = JSONObject.toJSONString(map);
+        StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
+        stringEntity.setContentType("text/json");
+        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        httppost.setEntity(stringEntity);
+        System.out.println("url:  " + url);
+        try {
+            HttpResponse response = httpClient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    entity.getContent(), "UTF-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            System.out.println(stringBuilder);
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public  static void main(String[] args){
