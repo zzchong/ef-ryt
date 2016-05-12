@@ -962,7 +962,7 @@ public class ArtworkController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/artworkProgress.do", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/artworkProgress.do", method = RequestMethod.POST)
     @ResponseBody
     public Map artworkProgress(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
@@ -1134,16 +1134,16 @@ public class ArtworkController extends BaseController {
         }
     }
 
-    @RequestMapping(name = "/app/artworkRemove.do", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/app/removeArtwork.do", method = RequestMethod.POST)
     @ResponseBody
     public Map removeArtwork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson2(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            logBean.setApiName("artworkRemove");
+            logBean.setApiName("removeArtwork");
             if ("".equals(jsonObj.getString("signmsg"))
                     || "".equals(jsonObj.getString("timestamp"))
                     || "".equals(jsonObj.getString("userId"))
@@ -1164,44 +1164,6 @@ public class ArtworkController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-        }
-    }
-
-    @Test
-    public void testArtworkRemove() throws Exception {
-        long timestamp = System.currentTimeMillis();
-
-        Map<String, Object> map = new TreeMap<>();
-
-        /**investorArtWorkView.do测试加密参数**/
-        map.put("artworkId", "aaaaaaaaaaaaaa");
-        map.put("userId", "ieatht97wfw30hfd");
-        map.put("timestamp", timestamp);
-        String signmsg = DigitalSignatureUtil.encrypt(map);
-        HttpClient httpClient = new DefaultHttpClient();
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("artworkId", "aaaaaaaaaaaaaa"));
-        params.add(new BasicNameValuePair("userId", "ieatht97wfw30hfd"));
-        params.add(new BasicNameValuePair("timestamp", Long.toString(timestamp)));
-        params.add(new BasicNameValuePair("signmsg", signmsg));
-        String url = "http://192.168.1.41:8080/app/artworkRemove.do?" + URLEncodedUtils.format(params, HTTP.UTF_8);
-        HttpDelete httpDelete = new HttpDelete(url);
-        httpDelete.setHeader("Content-Type", "application/json;charset=utf-8");
-        System.out.println("url:  " + url);
-        try {
-            HttpResponse response = httpClient.execute(httpDelete);
-            HttpEntity entity = response.getEntity();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    entity.getContent(), "UTF-8"));
-            String line;
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            System.out.println(stringBuilder);
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
