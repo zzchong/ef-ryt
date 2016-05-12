@@ -1134,32 +1134,32 @@ public class ArtworkController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/app/removeArtwork.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/removeMasterWork.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map removeArtwork(HttpServletRequest request) {
+    public Map removeMasterWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         TreeMap treeMap = new TreeMap();
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            logBean.setApiName("removeArtwork");
+            logBean.setApiName("removeMasterWork");
             if ("".equals(jsonObj.getString("signmsg"))
                     || "".equals(jsonObj.getString("timestamp"))
                     || "".equals(jsonObj.getString("userId"))
-                    || "".equals(jsonObj.getString("artworkId"))) {
+                    || "".equals(jsonObj.getString("masterWorkId"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("userId", jsonObj.getString("userId"));
-            treeMap.put("artworkId", jsonObj.getString("artworkId"));
+            treeMap.put("masterWorkId", jsonObj.getString("masterWorkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-            baseManager.remove(Artwork.class.getName(), jsonObj.getString("artworkId"));
+            baseManager.remove(MasterWork.class.getName(), jsonObj.getString("masterWorkId"));
             return resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {
             e.printStackTrace();
