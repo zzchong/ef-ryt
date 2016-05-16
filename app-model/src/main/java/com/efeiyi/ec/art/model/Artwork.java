@@ -63,6 +63,7 @@ public class Artwork implements Serializable {
 
     private Integer commentNum = 0;//评论数
     private Integer praiseNUm = 0;//点赞数
+    private Integer investNum =0;//投资人数
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -270,6 +271,19 @@ public class Artwork implements Serializable {
 
     public void setArtWorkPraiseList(List<ArtWorkPraise> artWorkPraiseList) {
         this.artWorkPraiseList = artWorkPraiseList;
+    }
+
+    @Transient
+    public Integer getInvestNum() {
+        investNum = 0;
+        if (artworkInvests != null) {
+           this.investNum = artworkInvests.size();
+        }
+        return investNum;
+    }
+
+    public void setInvestNum(Integer investNum) {
+        this.investNum = investNum;
     }
 
     @Transient

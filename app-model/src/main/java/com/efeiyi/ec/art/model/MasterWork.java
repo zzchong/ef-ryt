@@ -19,7 +19,7 @@ import java.util.Date;
 public class MasterWork implements Serializable{
     private String id;
     private String name;//作品名称
-    private String type;//是否出售 0 否 1 是
+    private String type;//是否出售 0 非卖品 1 可售 2 已售
     private String status;//状态
     private String material;//材质
     private Date createDatetime;//创建时间
