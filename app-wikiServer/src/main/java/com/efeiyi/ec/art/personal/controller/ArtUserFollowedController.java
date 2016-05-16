@@ -218,6 +218,11 @@ public class ArtUserFollowedController extends BaseController {
         return resultMap;
     }
 
+    /**
+     * 关注/取消关注
+     * @param request
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/app/changeFollowStatus.do", method = RequestMethod.POST)
     public Map changeFollowStatus(HttpServletRequest request) {

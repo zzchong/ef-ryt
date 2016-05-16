@@ -23,6 +23,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -47,7 +48,9 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.*;
+
 import org.junit.*;
+
 /**
  * Created by Administrator on 2016/1/29.
  */
@@ -392,10 +395,10 @@ public class ArtworkController extends BaseController {
         /**investorArtWorkView.do测试加密参数**/
         map.put("artworkId", "qydeyugqqiugd2");
         map.put("timestamp", timestamp);
-        map.put("currentUserId","ieatht97wfw30hfd");
+        map.put("currentUserId", "ieatht97wfw30hfd");
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        map.put("signmsg",signmsg);
+        map.put("signmsg", signmsg);
         String url = "http://192.168.1.41:8085/app/artworkPraise.do";
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader("Content-Type", "application/json;charset=utf-8");
@@ -452,7 +455,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            if (artworkManager.saveArtWorkComment(jsonObject.getString("artWorkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("currentUserId"), jsonObject.getString("messageId"))) {
+            if (artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("currentUserId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -800,6 +803,53 @@ public class ArtworkController extends BaseController {
 
 
     /**
+     * 艺术家变更项目状态
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/updateArtWork.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map updateArtWork(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        TreeMap treeMap = new TreeMap();
+        try {
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setApiName("updateArtWork");
+            JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
+//            logBean.setRequestMessage(request.getParameter("title") + " " + request.getParameter("brief"));//************记录请求报文
+            if ("".equals(jsonObject.getString("signmsg"))
+                    || "".equals(jsonObject.getString("timestamp"))
+                    || "".equals(jsonObject.getString("userId"))
+                    || "".equals(jsonObject.getString("artworkId"))
+                    || "".equals(jsonObject.getString("step"))) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            //校验数字签名
+            String signmsg = jsonObject.getString("signmsg");
+            treeMap.put("userId", jsonObject.getString("userId"));
+            treeMap.put("timestamp", jsonObject.getString("timestamp"));
+            treeMap.put("artworkId", jsonObject.getString("artworkId"));
+            treeMap.put("step", jsonObject.getString("step"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+             if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObject.getString("artworkId"));
+            if (!jsonObject.getString("userId").equals(artwork.getAuthor().getId())) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            artwork.setStep(jsonObject.getString("step"));
+            baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+            return resultMapHandler.handlerResult("0", "成功", logBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+    }
+
+    /**
      * 艺术家发布项目动态接口
      *
      * @param request
@@ -913,11 +963,11 @@ public class ArtworkController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/artworkProgress.do", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/artworkProgress.do", method = RequestMethod.POST)
     @ResponseBody
     public Map artworkProgress(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap ;
+        Map<String, Object> resultMap;
         TreeMap treeMap = new TreeMap();
         try {
             String artworkId = request.getParameter("artworkId");
@@ -1046,6 +1096,7 @@ public class ArtworkController extends BaseController {
 
     /**
      * 项目进展动态查询接口测试
+     *
      * @throws Exception
      */
     @Test
@@ -1084,4 +1135,36 @@ public class ArtworkController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/app/removeMasterWork.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map removeMasterWork(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("removeMasterWork");
+            if ("".equals(jsonObj.getString("signmsg"))
+                    || "".equals(jsonObj.getString("timestamp"))
+                    || "".equals(jsonObj.getString("userId"))
+                    || "".equals(jsonObj.getString("masterWorkId"))) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            //校验数字签名
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("userId", jsonObj.getString("userId"));
+            treeMap.put("masterWorkId", jsonObj.getString("masterWorkId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            baseManager.remove(MasterWork.class.getName(), jsonObj.getString("masterWorkId"));
+            return resultMapHandler.handlerResult("0", "成功", logBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+    }
 }

@@ -837,12 +837,12 @@ public class ProfileController extends BaseController {
 //                    artworkList.add(praise.getArtwork());
 //                }
 
-                resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
-                resultMap.put("pageInfoList", workPraises);
+//                resultMap.put("pageInfoList", workPraises);
             }else{
                 workPraises = new ArrayList<ArtWorkPraise>();
-                resultMap.put("pageInfoList", workPraises);
             }
+            resultMap.put("pageInfoList", workPraises);
+            resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }

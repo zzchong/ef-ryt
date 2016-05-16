@@ -25,6 +25,7 @@ public class MasterWork implements Serializable{
     private Date createDatetime;//创建时间
     private User creator;//大师
     private String pictureUrl;//作品图片
+    private String createYear;//作品年代
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -100,6 +101,15 @@ public class MasterWork implements Serializable{
 
     public void setPictureUrl(String pictureUrl) {
         this.pictureUrl = pictureUrl;
+    }
+
+    @Column(name = "create_year")
+    public String getCreateYear() {
+        return createYear;
+    }
+
+    public void setCreateYear(String createYear) {
+        this.createYear = createYear;
     }
 }
 

@@ -19,7 +19,8 @@
 <div>
     <table class="am-table am-table-bordered am-table-radius am-table-striped">
         <tr style="text-align:left">
-            <td>用户名</td>
+            <td>昵称</td>
+            <td>头像</td>
             <td>签名</td>
             <td>所属组</td>
             <%--<td>出资上限</td>--%>
@@ -27,6 +28,7 @@
         <c:forEach items="${object.virtualUserList}" var="virtualUser">
             <tr>
                 <td>${virtualUser.userBrief.user.name}</td>
+                <td><img src="http://rongyitou2.efeiyi.com/${virtualUser.userBrief.user.pictureUrl}@!ryt_head_portrait"></td>
                 <td>${virtualUser.userBrief.signer}</td>
                     <td>${object.group}</td>
                     <%--<td>${investorPlan.investCeilAmount}</td>--%>
