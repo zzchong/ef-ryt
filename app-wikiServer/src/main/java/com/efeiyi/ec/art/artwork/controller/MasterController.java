@@ -88,31 +88,31 @@ public class MasterController extends BaseController {
         TreeMap map = new TreeMap();
         List objectList = null;
         try{
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+//            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+//            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("saveMasterWork");
             if(StringUtils.isEmpty(request.getParameter("name"))
                     ||StringUtils.isEmpty(request.getParameter("material"))
-                    || StringUtils.isEmpty("currentUserId")
-                    || StringUtils.isEmpty("type")
-                    || StringUtils.isEmpty("createYear")){
+                    || StringUtils.isEmpty(request.getParameter("currentUserId"))
+                    || StringUtils.isEmpty(request.getParameter("type"))
+                    || StringUtils.isEmpty(request.getParameter("timestamp"))
+                    || StringUtils.isEmpty(request.getParameter("createYear"))){
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
-            map.put("name",jsonObj.getString("name"));
-            map.put("material",jsonObj.getString("material"));
-            map.put("currentUserId",jsonObj.getString("currentUserId"));
-            map.put("type",jsonObj.getString("type"));
-            map.put("createYear",jsonObj.getString("createYear"));
-            boolean verify = DigitalSignatureUtil.verify(map,jsonObj.getString("signmsg"));
+            map.put("name",request.getParameter("name"));
+            map.put("material",request.getParameter("material"));
+            map.put("currentUserId",request.getParameter("currentUserId"));
+            map.put("type",request.getParameter("type"));
+            map.put("createYear",request.getParameter("createYear"));
+            map.put("timestamp",request.getParameter("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(map,request.getParameter("signmsg"));
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
             MultipartFile picture = ((MultipartHttpServletRequest)request).getFile("pictureUrl");
 
-//            String hz = picture.getOriginalFilename().substring
-//                    (picture.getOriginalFilename().lastIndexOf("."));
 
             if(masterManager.saveMasterWork(request,picture)){
 
