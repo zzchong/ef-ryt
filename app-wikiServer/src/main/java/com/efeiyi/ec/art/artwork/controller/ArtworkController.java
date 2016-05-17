@@ -35,6 +35,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -639,6 +640,7 @@ public class ArtworkController extends BaseController {
             //校验数字签名
             String signmsg = request.getParameter("signmsg");
             treeMap.put("userId", request.getParameter("userId"));
+            treeMap.put("artWorkId", request.getParameter("artWorkId"));
             treeMap.put("timestamp", request.getParameter("timestamp"));
             treeMap.put("title", request.getParameter("title"));
             treeMap.put("investGoalMoney", request.getParameter("investGoalMoney"));
@@ -648,12 +650,16 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-
+            Artwork artwork = null;
             User user = (User) baseManager.getObject(User.class.getName(), request.getParameter("userId"));
             try {
                 if (user != null && user.getId() != null) {
 
-                    Artwork artwork = new Artwork();
+                    if(!StringUtils.isEmpty(request.getParameter("artWorkId"))){
+                        artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),request.getParameter("artWorkId"));
+                    }else {
+                        artwork = new Artwork();
+                    }
                     artwork.setStatus("0");//不可用状态，不能进入融资阶段
                     artwork.setType("0");
                     artwork.setStep("100");//编辑阶段，尚未提交 提交后置为 10
