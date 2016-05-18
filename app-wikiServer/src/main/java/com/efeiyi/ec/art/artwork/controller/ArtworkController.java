@@ -184,11 +184,19 @@ public class ArtworkController extends BaseController {
             if (artwork == null) {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
             }
+            //投资人
+            List<User> investPeople = null;
             //投资人数
             Integer investNum = 0;
             if (artwork.getArtworkInvests() != null) {
                 investNum = artwork.getArtworkInvests().size();
+                investPeople = new ArrayList<>();
+                for (ArtworkInvest artworkInvest : artwork.getArtworkInvests()){
+                    investPeople.add(artworkInvest.getCreator());
+                }
             }
+
+
             //剩余时间
             String time = TimeUtil.getDistanceTimes2(new Date(), artwork.getInvestStartDatetime(), "", TimeUtil.SECOND).get("time").toString();
             //项目文件
@@ -207,6 +215,7 @@ public class ArtworkController extends BaseController {
                     isPraise = true;
                 }
             }
+            data.put("investPeople",investPeople);
             data.put("artWork", artwork);
             data.put("investNum", investNum);
             data.put("time", time);
@@ -640,7 +649,7 @@ public class ArtworkController extends BaseController {
             //校验数字签名
             String signmsg = request.getParameter("signmsg");
             treeMap.put("userId", request.getParameter("userId"));
-            treeMap.put("artWorkId", request.getParameter("artWorkId"));
+//            treeMap.put("artWorkId", request.getParameter("artWorkId"));
             treeMap.put("timestamp", request.getParameter("timestamp"));
             treeMap.put("title", request.getParameter("title"));
             treeMap.put("investGoalMoney", request.getParameter("investGoalMoney"));

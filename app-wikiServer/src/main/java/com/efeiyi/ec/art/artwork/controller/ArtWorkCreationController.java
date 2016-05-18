@@ -128,7 +128,10 @@ public class ArtWorkCreationController extends BaseController {
         Map<String, Object> data = new HashMap<String, Object>();
         List<Artwork> artworkList = null;
         try{
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            System.out.println(request.getParameter("artWorkId"));
+
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkCreationView");
