@@ -32,6 +32,21 @@ public class CommonUtil {
 
     }
 
+    //验证json是否为空
+    public static  boolean jsonObject(JSONObject jsonObject,String exclude) {
+
+        for(Map.Entry me : jsonObject.entrySet()){
+            if(exclude.indexOf(me.getValue().toString())==-1) {
+                if ("".equals(me.getValue().toString()) || StringUtils.isEmpty(me.getValue().toString())) {
+                    return false;
+                }
+            }
+        }
+
+        return  true;
+
+    }
+
 
     //验证签名
 

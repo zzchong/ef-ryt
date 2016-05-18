@@ -283,7 +283,7 @@ public class EfeiyiPush {
                 .setNotification(Notification.newBuilder()
                         .setAlert(notification.getContent())
                         .addPlatformNotification(AndroidNotification.newBuilder()
-                                .setTitle(TITLE)
+//                                .setTitle(TITLE)
                                 .setAlert(notification.getContent())
                                 .addExtra("extra_key", "extra_value")
                                 .build())

@@ -171,7 +171,7 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("investorArtWorkView");
-            if (!CommonUtil.jsonObject(jsonObj)) {
+            if (!CommonUtil.jsonObject(jsonObj,"currentUserId")) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             boolean verify = DigitalSignatureUtil.verify2(jsonObj);
@@ -206,13 +206,15 @@ public class ArtworkController extends BaseController {
 
             //是否点赞
             Boolean isPraise = false;
-            XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
-            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-            xQuery.put("user_id", jsonObj.getString("currentUserId"));
-            List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
-            if (artWorkPraiseList != null) {
-                if (artWorkPraiseList.size() > 0) {
-                    isPraise = true;
+            if(!StringUtils.isEmpty(jsonObj.getString("currentUserId"))) {
+                XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
+                xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
+                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
+                if (artWorkPraiseList != null) {
+                    if (artWorkPraiseList.size() > 0) {
+                        isPraise = true;
+                    }
                 }
             }
             data.put("investPeople",investPeople);
