@@ -21,7 +21,7 @@ import java.util.*;
 @Entity
 @Table(name = "organization_user")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class MyUser implements Serializable, UserDetails ,BaseUser{
+public class MyUser implements Serializable, UserDetails{
 
     private String id;
     private String username;

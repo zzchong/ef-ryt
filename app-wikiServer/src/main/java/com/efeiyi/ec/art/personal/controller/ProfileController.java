@@ -841,8 +841,8 @@ public class ProfileController extends BaseController {
             }else{
                 workPraises = new ArrayList<ArtWorkPraise>();
             }
-            resultMap.put("pageInfoList", workPraises);
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
+            resultMap.put("pageInfoList", workPraises);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }

@@ -107,7 +107,7 @@ public class EPushController extends BaseController {
                 return resultMap;
             }
             message.setFromUser(fromUser);
-            if(pushUserBinding.getId()!= null){
+            if(pushUserBinding!=null){
                 message.setTargetUser(pushUserBinding.getUser());
                 message.setCid(pushUserBinding.getCid());
             }

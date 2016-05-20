@@ -471,6 +471,7 @@ public class SigninController extends BaseController {
    }
 
 
+
     @RequestMapping(value = "/app/completeUserInfo.do", method = RequestMethod.POST)
     @ResponseBody
     public  Map completeUserInfo(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile headPortrait

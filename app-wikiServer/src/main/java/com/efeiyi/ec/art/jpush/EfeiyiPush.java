@@ -188,11 +188,11 @@ public class EfeiyiPush {
                         .setAlert(MSG_CONTENT)
                         .addPlatformNotification(AndroidNotification.newBuilder()
                                 .setTitle(TITLE)
-                                .setAlert(ALERT+message.getContent())
+                                .setAlert(message.getFromUser().getName()+":"+message.getContent())
                                 .addExtra("extra_key", "extra_value")
                                 .build())
                         .addPlatformNotification(IosNotification.newBuilder()
-                                .setAlert(ALERT)
+                                .setAlert(message.getFromUser().getName()+":"+message.getContent())
                                 .setBadge(5)
                                 .setSound("happy")
                                 .addExtra("from", "JPush")
@@ -280,15 +280,12 @@ public class EfeiyiPush {
                 .setPlatform(Platform.android_ios())
                         //.setAudience(Audience.all())
                 .setAudience(Audience.registrationId(cid))
-                .setNotification(Notification.newBuilder()
-                        .setAlert(notification.getContent())
+                .setNotification(Notification.newBuilder().setAlert(notification.getContent())
                         .addPlatformNotification(AndroidNotification.newBuilder()
-//                                .setTitle(TITLE)
-                                .setAlert(notification.getContent())
+                                .setTitle(TITLE).setAlert(notification.getContent())
                                 .addExtra("extra_key", "extra_value")
                                 .build())
-                        .addPlatformNotification(IosNotification.newBuilder()
-                                .setAlert(notification.getContent())
+                        .addPlatformNotification(IosNotification.newBuilder().setAlert(notification.getContent())
                                 .setBadge(5)
                                 .setSound("happy")
                                 .addExtra("from", "JPush")
@@ -325,4 +322,6 @@ public class EfeiyiPush {
                        .build())
                .build();
    }
+
+
 }

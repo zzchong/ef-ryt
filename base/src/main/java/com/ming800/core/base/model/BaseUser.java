@@ -17,7 +17,6 @@ public interface BaseUser{
 
     String getId();
 
-//    BaseTenant getBigTenant();
 
 
 }

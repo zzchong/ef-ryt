@@ -1,7 +1,10 @@
 package com.efeiyi.ec.art.artwork.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.efeiyi.ec.art.Bean.JsonFile;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.AppConfig;
@@ -44,6 +47,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -72,10 +76,14 @@ public class ArtworkController extends BaseController {
     private ArtworkManager artworkManager;
 
 
-    @RequestMapping(value = "/app/getArtWorkList.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/getArtWorkList.do",method = RequestMethod.POST)
     @ResponseBody
-    public Map getArtWorkList(HttpServletRequest request) {
+    public Map getArtWorkList(HttpServletRequest request,HttpServletResponse response) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Methods","POST");
+        response.setHeader("Access-Control-Allow-Headers","x-requested-with,content-type");
         try {
             XQuery query = new XQuery("plistArtwork_default", request);
             PageInfo pageInfo = baseManager.listPageInfo(query);
@@ -750,18 +758,24 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-
+            String [] actions = request.getParameterValues("picAction");
+            String [] attachmentIds = request.getParameterValues("attachmentIds");
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), request.getParameter("artworkId"));
             try {
+                Artworkdirection artworkdirection = null;
                 if (artwork != null && artwork.getId() != null) {
+                     if(artwork.getArtworkdirection()!=null )
+                         artworkdirection = artwork.getArtworkdirection();
+                     else
+                         artworkdirection = new Artworkdirection();
 
-                    Artworkdirection artworkdirection = new Artworkdirection();
                     artworkdirection.setFinancing_aq(request.getParameter("financing_aq"));
                     artworkdirection.setMake_instru(request.getParameter("make_instru"));
                     artwork.setDescription(request.getParameter("description"));
                     artwork.setArtworkdirection(artworkdirection);
                     //List<ArtworkAttachment> artworkAttachments = new ArrayList<ArtworkAttachment>();
 
+                    baseManager.saveOrUpdate(Artworkdirection.class.getName(),artworkdirection);
                     //创建一个通用的多部分解析器
                     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                     //判断 request 是否有文件上传,即多部分请求
@@ -770,29 +784,43 @@ public class ArtworkController extends BaseController {
                         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
                         //取得request中的所有文件名
                         Iterator<MultipartFile> iter = multiRequest.getFiles("file").iterator();
+                        int i = 0;
                         while (iter.hasNext()) {
                             //取得上传文件
                             //MultipartFile file = multiRequest.getFile(iter.next());
+
                             MultipartFile file = iter.next();
                             if (file != null) {
-                                ArtworkAttachment artworkAttachment = new ArtworkAttachment();//项目附件
                                 //取得当前上传文件的文件名称
                                 String myFileName = file.getOriginalFilename();
                                 //如果名称不为“”,说明该文件存在，否则说明该文件不存在
                                 if (myFileName.trim() != "") {
-
                                     //重命名上传后的文件名
                                     String url = "artwork/" + new Date().getTime() + myFileName;
                                     String pictureUrl = "http://rongyitou2.efeiyi.com/" + url;
-                                    //将图片上传至阿里云
-                                    aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
-                                    artworkAttachment.setArtwork(artwork);
-                                    artworkAttachment.setFileType(myFileName.substring(myFileName.lastIndexOf("."), myFileName.length()));
-                                    artworkAttachment.setFileName(pictureUrl);
-                                    //artworkAttachments.add(artworkAttachment);
-                                    baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
-                                    artwork.getArtworkAttachment().add(artworkAttachment);
+                                    ArtworkAttachment artworkAttachment = null;
+                                    if ("eq".equals(actions[i])) {
+
+                                    }
+                                    if ("add".equals(actions[i])) {
+                                        artworkAttachment = new ArtworkAttachment();//项目附件
+                                        artworkAttachment.setArtwork(artwork);
+                                        artworkAttachment.setFileType(myFileName.substring(myFileName.lastIndexOf("."), myFileName.length()));
+                                        artworkAttachment.setFileName(pictureUrl);
+                                        //将图片上传至阿里云
+                                        aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
+                                        baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+                                        //artworkAttachments.add(artworkAttachment);
+//                                        artwork.getArtworkAttachment().add(artworkAttachment);
+                                    }
+                                    if ("del".equals(actions[i])) {
+                                        artworkAttachment = (ArtworkAttachment) baseManager.getObject(ArtworkAttachment.class.getName(),attachmentIds[i]);
+                                        aliOssUploadManager.deleteFile("ec-efeiyi2",url);
+                                        //将图片从阿里云删除
+                                        baseManager.delete(ArtworkAttachment.class.getName(),attachmentIds[i]);
+                                    }
                                 }
+                                i++;
                             }
                         }
                     }
@@ -817,6 +845,9 @@ public class ArtworkController extends BaseController {
         }
 
     }
+
+
+
 
 
     /**

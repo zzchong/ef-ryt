@@ -177,7 +177,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
             notification.setStatus("1");
 
-            notification.setContent("项目有新评论了!");
+            notification.setContent(content);
 
             notification.setCreateDatetime(new Date());
 
