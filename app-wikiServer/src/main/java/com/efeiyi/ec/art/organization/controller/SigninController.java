@@ -37,6 +37,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -396,7 +397,7 @@ public class SigninController extends BaseController {
     //注册验证码
     @RequestMapping(value = "/app/sendCode.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map registerSendCode(HttpServletRequest request) {//添加同步
+    public Map registerSendCode(HttpServletRequest request, HttpServletResponse response) {//添加同步
         LogBean logBean = new LogBean();
         logBean.setApiName("sendCode");
         Map<String, String> resultMap = new HashMap<String, String>();
@@ -417,6 +418,7 @@ public class SigninController extends BaseController {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             String verificationCode = VerificationCodeGenerator.createVerificationCode();
+            request.getSession().setAttribute(jsonObj.getString("username"), verificationCode);
             String message = this.smsCheckManager.send(jsonObj.getString("username"), verificationCode, "1104699", PConst.TIANYI);
             CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 120);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
@@ -451,8 +453,10 @@ public class SigninController extends BaseController {
            if (verify != true) {
                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
            }
-           Cookie cookie = CookieTool.getCookieByName(request, jsonObj.getString("username").toString());
-           String code =  cookie.getValue();
+//           Cookie cookie = CookieTool.getCookieByName(request, jsonObj.getString("username").toString());
+//           String code =  cookie.getValue();
+           String code = (String) request.getSession().getAttribute(jsonObj.getString("username"));
+
            if(code==null){
                return  resultMapHandler.handlerResult("100011","验证码失效，请重新发送",logBean);
            }
@@ -640,6 +644,53 @@ public class SigninController extends BaseController {
         }catch(Exception e){
             logger.info("Error Message: " + e.getMessage());
             return null;
+        }
+    }
+
+    //找回密码
+    @RequestMapping(value = "/app/WxLogin.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map WxLogin(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("WxLogin");
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("unionid")) ||
+                    "".equals(jsonObj.getString("timestamp"))) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("unionid", jsonObj.getString("unionid"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("username", jsonObj.getString("username"));
+            MyUser user;
+            try {
+                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
+                if (user!=null && user.getId()!=null) {
+                    user.setPassword(jsonObj.getString("password"));
+                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    return  resultMapHandler.handlerResult("0","成功",logBean);
+                }else {
+
+                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
+                }
+            } catch (Exception e) {
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+            }
+
+
+        } catch(Exception e){
+            resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+            return resultMap;
         }
     }
 
