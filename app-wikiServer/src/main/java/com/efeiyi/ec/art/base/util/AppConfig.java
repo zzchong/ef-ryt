@@ -11,8 +11,8 @@ public class AppConfig {
     public static final String SQL_ACCOUNT_BY_USER_ID = "from Account a where a.user.id = :userId and status <> '0'";
     public static final String SQL_APP_VERSION_INFO = "from AppVersionUpGrade WHERE platform= :platform AND status<>'0'";
     public static final String SQL_USER_GET_APP = "from User WHERE username= :username AND status<>'0'";
-    public static final String SQL_MESSAGE_GET_APP = "select m FROM Message m where targetUser.id = :userId and status = '1' and isWatch='0' GROUP BY fromUser.id ORDER BY isWatch asc, createDatetime DESC";
-    public static final String SQL_MESSAGE_GET_NUM_APP = "select COUNT(targetUser.id)  FROM Message m where targetUser.id = :userId and status = '1' and isWatch='0' GROUP BY fromUser.id ORDER BY isWatch asc,createDatetime DESC";
+    public static final String SQL_MESSAGE_GET_APP = "select m FROM Message m where targetUser.id = :userId and status = '1'  GROUP BY fromUser.id ORDER BY isWatch asc, createDatetime DESC";
+    public static final String SQL_MESSAGE_GET_NUM_APP = "select new map(fromUser.id as fromUserId,COUNT(targetUser.id) as isRead)FROM Message m where targetUser.id = :userId and status = '1' and isWatch='0' GROUP BY fromUser.id ORDER BY isWatch asc,createDatetime DESC";
     public static final String SQL_MESSAGE_DETAIL_GET_APP = "from Message where (targetUser.id = :userId and fromUser.id = :fromUserId) or (targetUser.id = :fromUserId and targetUser.id = :fromUserId)  ORDER BY createDatetime ASC";
     public static final String SQL_INVEST_MONEY_APP = "select SUM(price) FROM ArtworkInvest where creator.id = :userId GROUP BY artwork.id ORDER BY createDatetime DESC";
     public static final String SQL_INVEST_ARTWORK_APP = "FROM ArtworkInvest where creator.id = :userId GROUP BY artwork.id ORDER BY createDatetime DESC";
@@ -85,4 +85,7 @@ public class AppConfig {
     // 判断用户是否关注用户或者大师
     public static final String SQL_GET_IS_FOLLOWED= " FROM ArtUserFollowed where user.id = :userId and follower.id= :followerId and status='1'";
 
+
+    //微信登录
+    public static final String SQL_WX_LOGIN = "FROM organization_user where status != '0' and unionid= ? ";
 }

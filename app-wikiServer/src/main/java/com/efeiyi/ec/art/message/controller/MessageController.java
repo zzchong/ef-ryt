@@ -5,6 +5,7 @@ import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
+import com.efeiyi.ec.art.message.bean.MessageRead;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkComment;
@@ -13,6 +14,7 @@ import com.efeiyi.ec.art.model.Notification;
 import com.efeiyi.ec.art.modelConvert.ArtworkCommentBean;
 import com.efeiyi.ec.art.modelConvert.FatherArtworkCommentBean;
 import com.ming800.core.base.controller.BaseController;
+import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
 import org.apache.commons.beanutils.BeanUtils;
@@ -47,6 +49,9 @@ public class MessageController extends BaseController {
     private static Logger logger = Logger.getLogger(MessageController.class);
     @Autowired
     BaseManager baseManager;
+
+    @Autowired
+    XdoDao xdoDao;
 
     @Autowired
     private MessageDao messageDao;
@@ -368,10 +373,21 @@ public class MessageController extends BaseController {
                 } else if ("2".equals(type)) {
                     objectList = new ArrayList();
                     List<Message> objectTempList = (List<Message>) baseManager.listObject(AppConfig.SQL_MESSAGE_GET_APP, map);
-                    List<Long> numberList = (List<Long>) baseManager.listObject(AppConfig.SQL_MESSAGE_GET_NUM_APP, map);
+                    List numberList = (List) baseManager.listObject(AppConfig.SQL_MESSAGE_GET_NUM_APP, map);
+                    Map<String,Long> map1 = new HashMap<>();
+                    Map map2= null;
+                    Long l = new Long(0);
+                    for(int i = 0; i < numberList.size(); i++){
+                        map2 = (Map) numberList.get(i);
+                        System.out.println(map2.get("fromUserId"));
+                        map1.put(map2.get("fromUserId").toString(),Long.parseLong(map2.get("isRead").toString()));
+                    }
                     for (int i = 0; i < objectTempList.size(); i++) {
                         Message message = objectTempList.get(i);
-                        message.setIsRead(numberList.get(i));
+                        if(map1.containsKey(message.getFromUser().getId()))
+                            message.setIsRead(map1.get(message.getFromUser().getId()));
+                        else
+                            message.setIsRead(l);
                         objectList.add(message);
                     }
                 } else {
@@ -511,10 +527,10 @@ public class MessageController extends BaseController {
 //        map.put("userId","2");
 //        map.put("timestamp",timestamp);
         /**information.do测试加密参数**/
-        map.put("userId", "ieatht97wfw30hfd");
-//        map.put("type", "0");
-//        map.put("pageSize", "5");
-        map.put("group", "notification");
+        map.put("userId", "iijq9f1r7apprtab");
+        map.put("type", "2");
+        map.put("pageSize", "5");
+        map.put("pageNum", "1");
         map.put("timestamp", timestamp);
         /**commentDetail.do测试加密参数**/
 //        map.put("userId","2");
@@ -525,13 +541,13 @@ public class MessageController extends BaseController {
 
 map.put("signmsg",signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.69:8001/app/updateWatchedStatus.do";
+        String url = "http://192.168.1.75:8080/app/information.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
         /**json参数  informationList.do测试 **/
 //         String json = "{\"userId\":\"2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  information.do测试 **/
-        String json = "{\"timestamp\":\"1461578159625\",\"group\":\"notification\",\"signmsg\":\"554371bcb0ef7c41ed54aec5cae63f3f\",\"userId\":\"ieatht97wfw30hfd\"}";
+        String json = "{\"timestamp\":\""+timestamp+"\",\"pageNum\":\"1\",\"pageSize\":\"5\",\"type\":\"2\",\"userId\":\"iijq9f1r7apprtab\",\"signmsg\":\""+signmsg+"\"}";
         /**json参数  commentDetail.do测试 **/
 //        String json = "{\"userId\":\"2\",\"fromUserId\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         JSONObject jsonObj = (JSONObject) JSONObject.toJSON(map);
