@@ -26,6 +26,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -111,7 +112,7 @@ public class ArtworkController extends BaseController {
      * @return
      */
 
-    @RequestMapping(value = "/app/investorIndex.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/investorIndex.do")
     @ResponseBody
     public Map investorIndex(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
@@ -750,15 +751,15 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = request.getParameter("signmsg");
-            treeMap.put("artworkId", request.getParameter("artworkId"));
-            treeMap.put("timestamp", request.getParameter("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+//            String signmsg = request.getParameter("signmsg");
+//            treeMap.put("artworkId", request.getParameter("artworkId"));
+//            treeMap.put("timestamp", request.getParameter("timestamp"));
+//            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+//            if (verify != true) {
+//                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+//            }
 
-            String [] actions = request.getParameterValues("picAction");
+            String [] actions = request.getParameterValues("actions");
             String [] attachmentIds = request.getParameterValues("attachmentIds");
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), request.getParameter("artworkId"));
             try {
@@ -828,7 +829,7 @@ public class ArtworkController extends BaseController {
                     baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
                     resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                     resultMap.put("artworkId", artwork.getId());
-                    return resultMap;
+                     return resultMap;
 
                 } else {
                     return resultMapHandler.handlerResult("10008", "查无数据，稍后再试", logBean);
@@ -1213,6 +1214,54 @@ public class ArtworkController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+    }
+
+    @Test
+    public void testArtworkView() throws Exception {
+        long timestamp = System.currentTimeMillis();
+
+        Map<String, Object> map = new TreeMap<>();
+
+        /**investorArtWorkView.do测试加密参数**/
+        map.put("artWorkId", "qydeyugqqiugd2");
+        map.put("currentUserId","iickhknq3h7yrku2");
+        map.put("timestamp", timestamp);
+        String signmsg = DigitalSignatureUtil.encrypt(map);
+        HttpClient httpClient = new DefaultHttpClient();
+        String url = "http://192.168.1.75:8080/app/investorArtWorkView.do";
+        HttpPost httppost = new HttpPost(url);
+        httppost.setHeader("Content-Type", "application/json;charset=utf-8");
+
+        /**json参数  artWorkCreationList.do测试 **/
+//        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        /**json参数  artWorkCreationView.do测试 **/
+        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"currentUserId\":\"iickhknq3h7yrku2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
+        String jsonString = jsonObj.toJSONString();
+
+        StringEntity stringEntity = new StringEntity(jsonString,"utf-8");
+        stringEntity.setContentType("text/json");
+        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        httppost.setEntity(stringEntity);
+        System.out.println("url:  " + url);
+        try {
+            byte[] b = new byte[(int) stringEntity.getContentLength()];
+            System.out.println(stringEntity);
+            stringEntity.getContent().read(b);
+            System.out.println("报文:" + new String(b, "utf-8"));
+            HttpResponse response = httpClient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    entity.getContent(), "UTF-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+        }catch (Exception e){
+
         }
     }
 }
