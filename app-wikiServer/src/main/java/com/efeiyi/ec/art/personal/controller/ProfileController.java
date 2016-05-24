@@ -120,7 +120,7 @@ public class ProfileController extends BaseController {
         LogBean logBean = new LogBean();
         TreeMap treeMap = new TreeMap();
         JSONObject jsonObj;
-        MyUser user;
+        User user;
         try {
             jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
@@ -142,11 +142,11 @@ public class ProfileController extends BaseController {
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-            user = (MyUser) baseManager.getObject(MyUser.class.getName(), userId);
+            user = (User) baseManager.getObject(User.class.getName(), userId);
             if (user != null && user.getId() != null) {
                 if ("11".equals(type)) {
-                    user.setName2(content);
-                    baseManager.saveOrUpdate(MyUser.class.getName(), user);
+                    user.setName(content);
+                    baseManager.saveOrUpdate(User.class.getName(), user);
                     resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("userInfo", user);
                 } else if ("12".equals(type)) {
@@ -160,7 +160,7 @@ public class ProfileController extends BaseController {
                     boolean flag = matcher.find();
                     if (flag) {
                         user.setUsername(content);
-                        baseManager.saveOrUpdate(MyUser.class.getName(), user);
+                        baseManager.saveOrUpdate(User.class.getName(), user);
                         resultMapHandler.handlerResult("0", "请求成功", logBean);
                         resultMap.put("userInfo", user);
                     } else {
@@ -171,6 +171,20 @@ public class ProfileController extends BaseController {
                      * 此处为编辑签名的操作
                      * 修改model后添加业务逻辑
                      */
+                    user.setSignMessage(content);
+                    baseManager.saveOrUpdate(User.class.getName(), user);
+                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap.put("userInfo", user);
+                }else if("10".equals(type)){
+                    MultipartFile headPortrait = ((MultipartHttpServletRequest) request).getFile("headPortrait");
+                    String url = "headPortrait/" + user.getUsername() + headPortrait.getOriginalFilename();
+                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
+                    //将用户头像上传至阿里云
+                    aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi2",url);
+                    user.setPictureUrl(pictureUrl);
+                    baseManager.saveOrUpdate(User.class.getName(),user);
+                    resultMap = resultMapHandler.handlerResult("0","请求成功",logBean);
+                    resultMap.put("userInfo", user);
                 }
             } else {
                 return resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);

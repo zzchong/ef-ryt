@@ -91,13 +91,15 @@ public class ArtWorkCreationController extends BaseController {
 //            List<ArtWorkBean> objectList = new ArrayList<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             String str1 = sdf.format(new Date());
-            for (Artwork artwork : artworkList){
+            if(artworkList!=null){
+            for (Artwork artwork : artworkList) {
                 //项目动态
-                if(artwork.getArtworkMessages()!=null && artwork.getArtworkMessages().size()>0){
-                        artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1, sdf.format(artwork.getArtworkMessages().get(0).getCreateDatetime())));
-                }else {
+                if (artwork.getArtworkMessages() != null && artwork.getArtworkMessages().size() > 0) {
+                    artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1, sdf.format(artwork.getArtworkMessages().get(0).getCreateDatetime())));
+                } else {
                     artwork.setNewCreationDate("暂无更新状态");
                 }
+            }
 //                ArtWorkBean artWorkBean = new ArtWorkBean();
 //             //   artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
 //                artWorkBean.setArtwork(artwork);
