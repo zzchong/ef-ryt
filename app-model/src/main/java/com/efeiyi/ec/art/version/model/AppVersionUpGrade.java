@@ -19,7 +19,7 @@ public class AppVersionUpGrade implements Serializable {
     //private AppDevice appDevice;
     private String name;//工艺投资
     private String platform;//终端标示
-    private String version_id;
+    private Integer version_id;
     private String sub_version_id;
     private String version_code;
     private String updateType;
@@ -38,23 +38,16 @@ public class AppVersionUpGrade implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
-   /* @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "app_id")
-    public AppDevice getAppDevice() {
-        return appDevice;
-    }
 
-    public void setAppDevice(AppDevice appDevice) {
-        this.appDevice = appDevice;
-    }*/
     @Column(name = "version_id")
-    public String getVersion_id() {
+    public Integer getVersion_id() {
         return version_id;
     }
-    public void setVersion_id(String version_id) {
+
+    public void setVersion_id(Integer version_id) {
         this.version_id = version_id;
     }
+
     @Column(name = "version_mini")
     public String getSub_version_id() {
         return sub_version_id;
@@ -63,6 +56,21 @@ public class AppVersionUpGrade implements Serializable {
     public void setSub_version_id(String sub_version_id) {
         this.sub_version_id = sub_version_id;
     }
+
+
+
+/* @JsonIgnore
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "app_id")
+        public AppDevice getAppDevice() {
+            return appDevice;
+        }
+
+        public void setAppDevice(AppDevice appDevice) {
+            this.appDevice = appDevice;
+        }*/
+
+
     @Column(name = "version_code")
     public String getVersion_code() {
         return version_code;
