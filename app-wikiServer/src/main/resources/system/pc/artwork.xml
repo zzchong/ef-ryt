@@ -111,7 +111,7 @@
                 basic="simple" others=""
                 model="com.efeiyi.ec.art.model.Notification">
             <does>
-                <do name="lisNotification" access="" label="通知列表">
+                <do name="listNotification" access="" label="通知列表">
                     <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
                         <condition name="targetUser.id" defaultValue="0" operation="eq"/>
                         <condition name="isWatch" defaultValue="0" operation="eq"/>
@@ -133,7 +133,14 @@
                         <condition name="status" defaultValue="1" operation="eq"/>
                     </query>
                 </do>
-
+                <do name="listMessage1" access="" label="私信列表">
+                    <query name="default" label="默认" type="auto" orderBy="createDatetime:desc">
+                        <condition name="targetUser.id" defaultValue="0" operation="eq"/>
+                        <condition name="fromUser.id" defaultValue="0" operation="eq"/>
+                        <condition name="isWatch" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="1" operation="eq"/>
+                    </query>
+                </do>
             </does>
         </entity>
 

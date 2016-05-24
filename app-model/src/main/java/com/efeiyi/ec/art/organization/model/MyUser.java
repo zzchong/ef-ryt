@@ -64,7 +64,18 @@ public class MyUser implements Serializable, UserDetails{
     private Date lastLogoutDatetime;//最后一次登陆时间
     protected Date createDatetime;
 
-   /* @Transient
+    private String unionid;
+
+    @Column(name = "unionid")
+    public String getUnionid() {
+        return unionid;
+    }
+
+    public void setUnionid(String unionid) {
+        this.unionid = unionid;
+    }
+
+    /* @Transient
     public BigUser getBigUser() {
         return bigUser;
     }

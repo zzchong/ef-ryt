@@ -114,7 +114,7 @@ public class MessageController extends BaseController {
                 resultMap.put("messageNum", baseManager.listObject(xQuery).size());
 
                 //通知 未读数
-                xQuery = new XQuery("lisNotification_default", request);
+                xQuery = new XQuery("listNotification_default", request);
                 xQuery.put("targetUser_id", userId);
                 resultMap.put("noticeNum", baseManager.listObject(xQuery).size());
 
@@ -227,6 +227,8 @@ public class MessageController extends BaseController {
 
                 XQuery xQuery = new XQuery(group, request);
                 xQuery.put(queryKey, userId);
+                if("listMessage_default".equals(group))
+                    xQuery.put("fromUser_id",jsonObj.getString("fromUserId"));
                 List list =null;
                 String clazzName = null;
                 switch (group) {
@@ -238,7 +240,7 @@ public class MessageController extends BaseController {
                         clazzName = Message.class.getName();
                         list = messageList;
                         break;
-                    case "lisNotification_default":
+                    case "listNotification_default":
                         List<Notification> notificationList = baseManager.listObject(xQuery);
                         for(Notification notification : notificationList){
                             notification.setIsWatch("1");
@@ -283,6 +285,45 @@ public class MessageController extends BaseController {
         return resultMap;
     }
 
+   public Boolean updateWatch(HttpServletRequest request,String group,String targetUser_id,String fromUser_id) throws  Exception{
+
+       XQuery xQuery = xQuery = new XQuery(group,request);
+
+       List list = null;
+       String clazzName = null;
+       if("listMessage1_default".equals(group)){
+              xQuery.put("targetUser_id",targetUser_id);
+              xQuery.put("fromUser_id",fromUser_id);
+              List<Message> messageList = baseManager.listObject(xQuery);
+             for(Message message : messageList){
+                 message.setIsWatch("1");
+             }
+            clazzName = Message.class.getName();
+            list = messageList;
+       }else if("listNotification_default".equals(group)){
+           xQuery.put("targetUser_id",targetUser_id);
+           List<Notification> notificationList = baseManager.listObject(xQuery);
+           for(Notification notification : notificationList){
+               notification.setIsWatch("1");
+           }
+           clazzName = Notification.class.getName();
+           list = notificationList;
+
+       }else if("listArtworkComment_default".equals(group)){
+           xQuery.put("fatherComment_creator_id",targetUser_id);
+           List<ArtworkComment> artworkCommentList = baseManager.listObject(xQuery);
+           for(ArtworkComment artworkComment : artworkCommentList){
+               artworkComment.setIsWatch("1");
+           }
+           clazzName = ArtworkComment.class.getName();
+           list = artworkCommentList;
+       }else {
+           return  false;
+       }
+       baseManager.batchSaveOrUpdate("update",clazzName, list);
+      return  true;
+   }
+
     /**
      * 通知 私信 评论的详情页
      *
@@ -326,9 +367,6 @@ public class MessageController extends BaseController {
             //查询数据参数
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
             map.put("userId", jsonObj.getString("userId"));
-            //pageNum从1开始
-//            map.put("pageNum", (jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")));
-//            map.put("pageSize", jsonObj.getInteger("pageSize"));
 
             //0 通知 1 评价 2 私信
             String type = jsonObj.getString("type");
@@ -345,6 +383,7 @@ public class MessageController extends BaseController {
                 } else if ("0".equals(type)) {
                     String hql = "from Notification WHERE targetUser.id=" + "'" + jsonObj.getString("userId").toString() + "'" + " AND status<>'0'  order by isWatch asc,createDatetime desc";
                     objectList = (List<Notification>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
+                    updateWatch(request,"listNotification_default",jsonObj.getString("userId"),"");
 //                    objectList =  (List<Notification>)baseManager.listObject(AppConfig.SQL_NOTICE_GET_APP, map);
                 } else if ("1".equals(type)) {
                     objectList = new ArrayList();
@@ -365,11 +404,8 @@ public class MessageController extends BaseController {
                         BeanUtils.copyProperties(artworkCommentBean, artworkComment);
                         artworkCommentBean.setFatherArtworkCommentBean(fatherArtworkCommentBean);
                         objectList.add(artworkCommentBean);
+                        updateWatch(request,"listArtworkComment_default",jsonObj.getString("userId"),"");
                     }
-//                    objectList.add("d");
-//                    objectList.add("dd");
-//                    objectList =  (List<ArtworkComment>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
-//                    objectList =  (List<ArtworkComment>)baseManager.listObject(AppConfig.SQL_REPLY_GET_APP, map);
                 } else if ("2".equals(type)) {
                     objectList = new ArrayList();
                     List<Message> objectTempList = (List<Message>) baseManager.listObject(AppConfig.SQL_MESSAGE_GET_APP, map);
@@ -435,7 +471,7 @@ public class MessageController extends BaseController {
     }
 
     /**
-     * 点击评论的详情页
+     * 点击私信二级的详情页
      *
      * @param request
      * @return
@@ -486,6 +522,7 @@ public class MessageController extends BaseController {
                     logBean.setResultCode("0");
                     logBean.setMsg("成功");
                     baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+                    updateWatch(request,"listMessage1_default",jsonObj.getString("userId"),jsonObj.getString("fromUserId"));
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
                     resultMap.put("objectList", objectList);
@@ -524,24 +561,24 @@ public class MessageController extends BaseController {
 
         Map<String, Object> map = new HashMap<String, Object>();
         /**informationList.do测试加密参数**/
-//        map.put("userId","2");
+//        map.put("userId","iijq9f1r7apprtab");
 //        map.put("timestamp",timestamp);
         /**information.do测试加密参数**/
-        map.put("userId", "iijq9f1r7apprtab");
-        map.put("type", "2");
-        map.put("pageSize", "5");
-        map.put("pageNum", "1");
-        map.put("timestamp", timestamp);
-        /**commentDetail.do测试加密参数**/
-//        map.put("userId","2");
-//        map.put("fromUserId","1");
+//        map.put("userId", "iijq9f1r7apprtab");
+//        map.put("type", "2");
+//        map.put("pageSize", "5");
+//        map.put("pageNum", "1");
 //        map.put("timestamp", timestamp);
+        /**commentDetail.do测试加密参数**/
+        map.put("userId","iijq9f1r7apprtab");
+        map.put("fromUserId","iigqjdmk2x1deql4");
+        map.put("timestamp", timestamp);
 //        String signmsg = "userId=2&timestamp="+timestamp+"&appkey="+appKey ;
         String signmsg = DigitalSignatureUtil.encrypt(map);
 
 map.put("signmsg",signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.75:8080/app/information.do";
+        String url = "http://192.168.1.75:8080/app/commentDetail.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
         /**json参数  informationList.do测试 **/

@@ -87,5 +87,5 @@ public class AppConfig {
 
 
     //微信登录
-    public static final String SQL_WX_LOGIN = "FROM organization_user where status != '0' and unionid= ? ";
+    public static final String SQL_WX_LOGIN = "FROM organization_user where status != '0' and unionid= :unionid ";
 }

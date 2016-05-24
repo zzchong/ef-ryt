@@ -647,7 +647,7 @@ public class SigninController extends BaseController {
         }
     }
 
-    //找回密码
+    //微信登录
     @RequestMapping(value = "/app/WxLogin.do", method = RequestMethod.POST)
     @ResponseBody
     public Map WxLogin(HttpServletRequest request) {
@@ -672,16 +672,19 @@ public class SigninController extends BaseController {
             }
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
             map.put("username", jsonObj.getString("username"));
-            MyUser user;
+            MyUser user = null;
             try {
-                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
+                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_WX_LOGIN, map);
                 if (user!=null && user.getId()!=null) {
-                    user.setPassword(jsonObj.getString("password"));
-                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+//                    user.setPassword(jsonObj.getString("password"));
+//                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
                     return  resultMapHandler.handlerResult("0","成功",logBean);
                 }else {
-
-                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
+                    user = new MyUser();
+                    user.setName(jsonObj.getString("nickname"));
+                    user.setUnionid(jsonObj.getString("unionid"));
+                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    return  resultMapHandler.handlerResult("0","成功",logBean);
                 }
             } catch (Exception e) {
                 return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
