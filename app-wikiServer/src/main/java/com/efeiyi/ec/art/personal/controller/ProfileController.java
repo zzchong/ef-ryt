@@ -122,22 +122,22 @@ public class ProfileController extends BaseController {
         JSONObject jsonObj;
         User user;
         try {
-            jsonObj = JsonAcceptUtil.receiveJson(request);
+//            jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId"))
-                    || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("type"))
+            logBean.setRequestMessage(request.getParameter("userId"));//************记录请求报文
+            if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("userId"))
+                    || "".equals(request.getParameter("timestamp")) || "".equals(request.getParameter("type"))
                    ) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            String signmsg = jsonObj.getString("signmsg");
-            String userId = jsonObj.getString("userId");
-            String type = jsonObj.getString("type");
-            String content = jsonObj.getString("content");
+            String signmsg = request.getParameter("signmsg");
+            String userId = request.getParameter("userId");
+            String type = request.getParameter("type");
+            String content = request.getParameter("content");
             treeMap.put("userId", userId);
             treeMap.put("type", type);
 //            treeMap.put("content", content);
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            treeMap.put("timestamp", request.getParameter("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
