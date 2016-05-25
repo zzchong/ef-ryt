@@ -680,7 +680,9 @@ public class SigninController extends BaseController {
                 if (user!=null && user.getId()!=null) {
 //                    user.setPassword(jsonObj.getString("password"));
 //                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
-                    return  resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap =  resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap.put("userId",user.getId());
+                    return  resultMap;
                 }else {
                     user = new MyUser();
                     user.setName(jsonObj.getString("nickname"));
@@ -701,7 +703,9 @@ public class SigninController extends BaseController {
                     account.setStatus("1");
                     account.setUser((User)baseManager.getObject(User.class.getName(),user.getId()));
                     baseManager.saveOrUpdate(Account.class.getName(),account);
-                    return  resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap =  resultMapHandler.handlerResult("0","成功",logBean);
+                    resultMap.put("userId",user.getId());
+                    return  resultMap;
                 }
             } catch (Exception e) {
                 return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
