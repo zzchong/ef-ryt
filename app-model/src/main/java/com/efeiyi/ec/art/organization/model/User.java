@@ -30,6 +30,7 @@ public class User {
     private String type; //00000 普通用户 10000 艺术家
     private Master master; //用户关联的大师
     private String signMessage;//签名
+    private Integer sex;
 
 
     @OneToOne(mappedBy="user",fetch=FetchType.LAZY)
@@ -186,5 +187,14 @@ public class User {
 
     public void setSignMessage(String signMessage) {
         this.signMessage = signMessage;
+    }
+
+    @Column(name = "sex")
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
     }
 }

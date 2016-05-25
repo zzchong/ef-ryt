@@ -185,6 +185,11 @@ public class ProfileController extends BaseController {
                     baseManager.saveOrUpdate(User.class.getName(),user);
                     resultMap = resultMapHandler.handlerResult("0","请求成功",logBean);
                     resultMap.put("userInfo", user);
+                }else if("14".equals(type)){
+                    user.setSex(Integer.parseInt(content));
+                    baseManager.saveOrUpdate(User.class.getName(), user);
+                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap.put("userInfo", user);
                 }
             } else {
                 return resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
