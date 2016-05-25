@@ -19,6 +19,7 @@ import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.PConst;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.util.CookieTool;
@@ -394,6 +395,64 @@ public class SigninController extends BaseController {
     }
 
 
+    /**
+     * 微信登录绑定消息
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/wxBinding.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map wxBinding(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("wxBinding");
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("id")) ||
+                    "".equals(jsonObj.getString("cid")) || "".equals(jsonObj.getString("timestamp"))
+                    ) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("id", jsonObj.getString("id"));
+            treeMap.put("cid", jsonObj.getString("cid"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+            User user =null;
+            try {
+                XQuery xQuery = new XQuery("listPushUserBinding_default",request);
+                xQuery.put("user_id",jsonObj.getString("id"));
+                List<PushUserBinding> pushUserBindingList = (List<PushUserBinding>)baseManager.listObject(xQuery);
+                if(pushUserBindingList!=null && pushUserBindingList.size()!=0){
+                   return   resultMapHandler.handlerResult("0","成功",logBean);
+                }
+                user = (User) baseManager.getObject(User.class.getName(), jsonObj.getString("id"));
+                if (user==null || user.getId()==null) {
+                    return resultMapHandler.handlerResult("10007","用户名不存在",logBean);
+                }
+                PushUserBinding pushUserBinding = new PushUserBinding();
+                pushUserBinding.setCid(jsonObj.getString("cid"));
+                pushUserBinding.setUser(user);
+                baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
+                return   resultMapHandler.handlerResult("0","成功",logBean);
+
+            } catch (Exception e) {
+                return resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+                //e.printStackTrace();
+            }
+        } catch(Exception e){
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+    }
+
+
+
     //注册验证码
     @RequestMapping(value = "/app/sendCode.do", method = RequestMethod.POST)
     @ResponseBody
@@ -653,7 +712,7 @@ public class SigninController extends BaseController {
     public Map WxLogin(HttpServletRequest request) {
         LogBean logBean = new LogBean();
         logBean.setApiName("WxLogin");
-        Map<String, String> resultMap = new HashMap<String, String>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
@@ -677,11 +736,12 @@ public class SigninController extends BaseController {
             MyUser user = null;
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_WX_LOGIN, map);
+
                 if (user!=null && user.getId()!=null) {
 //                    user.setPassword(jsonObj.getString("password"));
 //                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
                     resultMap =  resultMapHandler.handlerResult("0","成功",logBean);
-                    resultMap.put("userId",user.getId());
+                    resultMap.put("userInfo",(User) baseManager.getObject(User.class.getName(), user.getId()));
                     return  resultMap;
                 }else {
                     user = new MyUser();
@@ -704,7 +764,7 @@ public class SigninController extends BaseController {
                     account.setUser((User)baseManager.getObject(User.class.getName(),user.getId()));
                     baseManager.saveOrUpdate(Account.class.getName(),account);
                     resultMap =  resultMapHandler.handlerResult("0","成功",logBean);
-                    resultMap.put("userId",user.getId());
+                    resultMap.put("userInfo",(User) baseManager.getObject(User.class.getName(), user.getId()));
                     return  resultMap;
                 }
             } catch (Exception e) {
