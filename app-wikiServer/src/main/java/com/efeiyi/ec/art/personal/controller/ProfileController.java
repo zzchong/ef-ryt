@@ -13,6 +13,7 @@ import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -122,22 +123,22 @@ public class ProfileController extends BaseController {
         JSONObject jsonObj;
         User user;
         try {
-//            jsonObj = JsonAcceptUtil.receiveJson(request);
+            jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(request.getParameter("userId"));//************记录请求报文
-            if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("userId"))
-                    || "".equals(request.getParameter("timestamp")) || "".equals(request.getParameter("type"))
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId"))
+                    || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("type"))
                    ) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            String signmsg = request.getParameter("signmsg");
-            String userId = request.getParameter("userId");
-            String type = request.getParameter("type");
-            String content = request.getParameter("content");
+            String signmsg = jsonObj.getString("signmsg");
+            String userId = jsonObj.getString("userId");
+            String type = jsonObj.getString("type");
+            String content = jsonObj.getString("content");
             treeMap.put("userId", userId);
             treeMap.put("type", type);
-//            treeMap.put("content", content);
-            treeMap.put("timestamp", request.getParameter("timestamp"));
+            treeMap.put("content", content);
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
@@ -191,6 +192,61 @@ public class ProfileController extends BaseController {
                     resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("userInfo", user);
                 }
+            } else {
+                return resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
+            }
+        } catch (Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
+
+
+    /**
+     * 编辑用户资料接口
+     * 接口调用路径 /app/editPicUrl.do
+     *
+     * @param request 参数type决定编辑哪项资料   type 11/昵称  type 12/手机号码  type 13/签名
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/app/editPicUrl.do", method = RequestMethod.POST)
+    public Map editPicUrl(HttpServletRequest request) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        LogBean logBean = new LogBean();
+        TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj;
+        User user;
+        try {
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(request.getParameter("userId"));//************记录请求报文
+            if ("".equals(request.getParameter("userId"))
+                    || "".equals(request.getParameter("timestamp")) )
+                    {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            String signmsg = request.getParameter("signmsg");
+            String userId = request.getParameter("userId");
+            treeMap.put("userId", userId);
+//            treeMap.put("content", content);
+            treeMap.put("timestamp", request.getParameter("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (!verify) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            user = (User) baseManager.getObject(User.class.getName(), userId);
+            if (user != null && user.getId() != null) {
+                    MultipartFile headPortrait = ((MultipartHttpServletRequest) request).getFile("headPortrait");
+                    String url = "headPortrait/" + System.currentTimeMillis()+ user.getUsername() + headPortrait.getOriginalFilename();
+                    String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
+                    //将用户头像上传至阿里云
+                    aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi2",url);
+                    user.setPictureUrl(pictureUrl);
+                    baseManager.saveOrUpdate(User.class.getName(),user);
+                    resultMap = resultMapHandler.handlerResult("0","请求成功",logBean);
+                    resultMap.put("userInfo", user);
+
             } else {
                 return resultMapHandler.handlerResult("10008", "查无数据,稍后再试", logBean);
             }
