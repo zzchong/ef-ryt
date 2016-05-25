@@ -682,8 +682,23 @@ public class SigninController extends BaseController {
                 }else {
                     user = new MyUser();
                     user.setName(jsonObj.getString("nickname"));
+
                     user.setUnionid(jsonObj.getString("unionid"));
+                    user.setAccountExpired(false);
+                    user.setAccountLocked(false);
+                    user.setCredentialsExpired(false);
+                    user.setEnabled(true);
+                    user.setStatus(1);
+                    user.setCreateDatetime(new Date());
                     baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    //给用户绑定一个账户
+                    Account account = new Account();
+                    account.setCurrentUsableBalance(new BigDecimal("0.00"));
+                    account.setCurrentBalance(new BigDecimal("0.00"));
+                    account.setCreateDatetime(new Date());
+                    account.setStatus("1");
+                    account.setUser((User)baseManager.getObject(User.class.getName(),user.getId()));
+                    baseManager.saveOrUpdate(Account.class.getName(),account);
                     return  resultMapHandler.handlerResult("0","成功",logBean);
                 }
             } catch (Exception e) {
