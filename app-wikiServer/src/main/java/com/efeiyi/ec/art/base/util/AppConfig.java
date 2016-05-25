@@ -91,5 +91,5 @@ public class AppConfig {
 
 
     //私信最后一条记录
-    public static final String SQL_LSAT_MESSAGE = "FROM Message where (fromUser.id=:fromUserId and user.id=:userId) or (fromUser.id=:userId and user.id=:fromUserId) and status<>'0' order by createDatetime DESC " ;
+    public static final String SQL_LSAT_MESSAGE = "FROM Message where (fromUser.id=:fromUserId and targetUser.id=:userId) or (fromUser.id=:userId and targetUser.id=:fromUserId) and status<>'0' order by createDatetime DESC " ;
 }
