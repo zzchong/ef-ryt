@@ -665,13 +665,15 @@ public class SigninController extends BaseController {
             }
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("unionid", jsonObj.getString("unionid"));
+            treeMap.put("nickname", jsonObj.getString("nickname"));
+            treeMap.put("headimgurl", jsonObj.getString("headimgurl"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("username", jsonObj.getString("username"));
+            map.put("unionid", jsonObj.getString("unionid"));
             MyUser user = null;
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_WX_LOGIN, map);
@@ -682,8 +684,8 @@ public class SigninController extends BaseController {
                 }else {
                     user = new MyUser();
                     user.setName(jsonObj.getString("nickname"));
-
                     user.setUnionid(jsonObj.getString("unionid"));
+                    user.setPictureUrl(jsonObj.getString("headimgurl"));
                     user.setAccountExpired(false);
                     user.setAccountLocked(false);
                     user.setCredentialsExpired(false);

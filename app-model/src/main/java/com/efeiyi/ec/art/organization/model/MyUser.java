@@ -66,6 +66,8 @@ public class MyUser implements Serializable, UserDetails{
 
     private String unionid;
 
+    public String pictureUrl;
+
     @Column(name = "unionid")
     public String getUnionid() {
         return unionid;
@@ -73,6 +75,17 @@ public class MyUser implements Serializable, UserDetails{
 
     public void setUnionid(String unionid) {
         this.unionid = unionid;
+    }
+
+
+
+    @Column(name = "picture")
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
+
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
     }
 
     /* @Transient
