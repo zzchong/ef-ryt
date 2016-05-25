@@ -88,4 +88,8 @@ public class AppConfig {
 
     //微信登录
     public static final String SQL_WX_LOGIN = "FROM organization_user where status != '0' and unionid= :unionid ";
+
+
+    //私信最后一条记录
+    public static final String SQL_LSAT_MESSAGE = "FROM Message where (fromUser.id=:fromUserId and user.id=:userId) or (fromUser.id=:userId and user.id=:fromUserId) and status<>'0' order by createDatetime DESC " ;
 }

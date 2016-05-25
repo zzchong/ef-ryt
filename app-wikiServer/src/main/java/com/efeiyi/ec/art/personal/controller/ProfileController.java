@@ -127,7 +127,7 @@ public class ProfileController extends BaseController {
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId"))
                     || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("type"))
-                    || "".equals(jsonObj.getString("content"))) {
+                   ) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
@@ -136,7 +136,7 @@ public class ProfileController extends BaseController {
             String content = jsonObj.getString("content");
             treeMap.put("userId", userId);
             treeMap.put("type", type);
-            treeMap.put("content", content);
+//            treeMap.put("content", content);
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {

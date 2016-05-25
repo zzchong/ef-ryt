@@ -418,8 +418,14 @@ public class MessageController extends BaseController {
                         System.out.println(map2.get("fromUserId"));
                         map1.put(map2.get("fromUserId").toString(),Long.parseLong(map2.get("isRead").toString()));
                     }
+                    LinkedHashMap<String, Object> maptemp = new LinkedHashMap<String, Object>();
                     for (int i = 0; i < objectTempList.size(); i++) {
                         Message message = objectTempList.get(i);
+                        maptemp.put("fromUserId",message.getFromUser().getId());
+                        maptemp.put("userId",jsonObj.getString("userId"));
+                        List<Message> objectMessageList = (List<Message>) baseManager.listObject(AppConfig.SQL_LSAT_MESSAGE, maptemp);
+                        if(objectMessageList!=null)
+                            message.setContent(objectMessageList.get(0).getContent());
                         if(map1.containsKey(message.getFromUser().getId()))
                             message.setIsRead(map1.get(message.getFromUser().getId()));
                         else
