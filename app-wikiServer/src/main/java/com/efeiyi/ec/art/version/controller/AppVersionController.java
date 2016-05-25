@@ -97,6 +97,7 @@ public class AppVersionController extends BaseController{
                     resultMap.put("resultCode", "100013");
                     resultMap.put("version_info", appVersionUpGrade);
                     resultMap.put("resultMsg", "检测到有新版本了，可以升级");
+                    resultMap.put("aplkUrl",appVersionUpGrade.getApk_url());
                 }else {
                     logBean.setResultCode("100012");
                     logBean.setMsg("您的版本很旧了，可以升级");
@@ -104,6 +105,7 @@ public class AppVersionController extends BaseController{
                     resultMap.put("resultCode", "100012");
                     resultMap.put("version_info", appVersionUpGrade);
                     resultMap.put("resultMsg", "您的版本很旧了，请尽快升级，以免影响使用!");
+                    resultMap.put("aplkUrl",appVersionUpGrade.getApk_url());
                     return resultMap;
                 }
 
