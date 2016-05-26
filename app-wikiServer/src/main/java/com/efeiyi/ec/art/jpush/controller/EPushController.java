@@ -118,6 +118,7 @@ public class EPushController extends BaseController {
                     baseManager.saveOrUpdate(LogBean.class.getName(),logBean);
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
+                    resultMap.put("userInfo",(User)baseManager.getObject(User.class.getName(),jsonObj.getString("fromUserId")));
 
             EfeiyiPush.SendPush(JPushConfig.appKey, JPushConfig.masterSecret,message);
 
