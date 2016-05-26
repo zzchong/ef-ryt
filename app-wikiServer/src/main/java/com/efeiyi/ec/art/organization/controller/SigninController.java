@@ -98,7 +98,7 @@ public class SigninController extends BaseController {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user.getPassword().equals(jsonObj.getString("password"))) {
                     resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-                    resultMap.put("userInfo",user);
+                    resultMap.put("userInfo",(User)baseManager.getObject(User.class.getName(),user.getId()));
                     //获取用户的关注数量  粉丝
                     LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
                     paramMap.put("userId", user.getId());
