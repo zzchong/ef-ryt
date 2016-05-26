@@ -544,7 +544,7 @@ public class SigninController extends BaseController {
 
         LogBean logBean = new LogBean();
         logBean.setApiName("completeUserInfo");
-        Map<String, String> resultMap = new HashMap<String, String>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
         try {
 
@@ -594,6 +594,7 @@ public class SigninController extends BaseController {
                     baseManager.saveOrUpdate(BigUser.class.getName(),user);
                     resultMap = resultMapHandler.handlerResult("0","成功",logBean);
                     resultMap.put("headPortraitURI",pictureUrl);
+                    resultMap.put("userInfo",(User)baseManager.getObject(User.class.getName(),user.getId()));
                     return resultMap;
                 }else {
                     return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
