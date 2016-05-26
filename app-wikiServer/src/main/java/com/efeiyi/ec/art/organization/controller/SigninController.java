@@ -425,18 +425,25 @@ public class SigninController extends BaseController {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             User user =null;
+            PushUserBinding pushUserBinding;
             try {
                 XQuery xQuery = new XQuery("listPushUserBinding_default",request);
                 xQuery.put("user_id",jsonObj.getString("id"));
                 List<PushUserBinding> pushUserBindingList = (List<PushUserBinding>)baseManager.listObject(xQuery);
                 if(pushUserBindingList!=null && pushUserBindingList.size()!=0){
+                    if(!pushUserBindingList.get(0).getCid().equals(jsonObj.getString("cid"))){
+                       pushUserBinding = pushUserBindingList.get(0);
+                        pushUserBinding.setCid(jsonObj.getString("cid"));
+                        baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
+                    }
+
                    return   resultMapHandler.handlerResult("0","成功",logBean);
                 }
                 user = (User) baseManager.getObject(User.class.getName(), jsonObj.getString("id"));
                 if (user==null || user.getId()==null) {
                     return resultMapHandler.handlerResult("10007","用户名不存在",logBean);
                 }
-                PushUserBinding pushUserBinding = new PushUserBinding();
+                pushUserBinding = new PushUserBinding();
                 pushUserBinding.setCid(jsonObj.getString("cid"));
                 pushUserBinding.setUser(user);
                 baseManager.saveOrUpdate(PushUserBinding.class.getName(),pushUserBinding);
