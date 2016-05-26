@@ -14,6 +14,8 @@ import cn.jpush.api.push.model.audience.AudienceTarget;
 import cn.jpush.api.push.model.notification.AndroidNotification;
 import cn.jpush.api.push.model.notification.IosNotification;
 import cn.jpush.api.push.model.notification.Notification;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.model.ArtworkComment;
 import org.apache.log4j.Logger;
 
@@ -189,13 +191,14 @@ public class EfeiyiPush {
                         .addPlatformNotification(AndroidNotification.newBuilder()
                                 .setTitle(TITLE)
                                 .setAlert(message.getFromUser().getName()+":"+message.getContent())
-                                .addExtra("extra_key", "extra_value")
+                                .addExtra("userId",message.getFromUser().getId())
                                 .build())
                         .addPlatformNotification(IosNotification.newBuilder()
                                 .setAlert(message.getFromUser().getName()+":"+message.getContent())
                                 .setBadge(5)
                                 .setSound("happy")
                                 .addExtra("from", "JPush")
+                                .addExtra("userId",message.getFromUser().getId())
                                 .incrBadge(1)
                                 .addExtra("extra_key", "extra_value").build())
                         .build())
