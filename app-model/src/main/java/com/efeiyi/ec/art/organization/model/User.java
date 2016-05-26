@@ -4,6 +4,7 @@ package com.efeiyi.ec.art.organization.model;
 
 //import com.efeiyi.ec.zero.promotion.model.PromotionPlan;
 import com.efeiyi.ec.art.model.Master;
+import com.efeiyi.ec.art.model.UserBrief;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
@@ -31,6 +32,7 @@ public class User {
     private Master master; //用户关联的大师
     private String signMessage;//签名
     private Integer sex;
+    private UserBrief userBrief;//简介和 签名
 
 
     @OneToOne(mappedBy="user",fetch=FetchType.LAZY)
@@ -196,5 +198,14 @@ public class User {
 
     public void setSex(Integer sex) {
         this.sex = sex;
+    }
+
+    @OneToOne(mappedBy = "user")
+    public UserBrief getUserBrief() {
+        return userBrief;
+    }
+
+    public void setUserBrief(UserBrief userBrief) {
+        this.userBrief = userBrief;
     }
 }

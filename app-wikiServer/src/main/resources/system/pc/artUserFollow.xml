@@ -26,6 +26,11 @@
                         <condition name="user.id" defaultValue="0" operation="eq"/>
                         <condition name="status" defaultValue="1" operation="eq"/>
                     </query>
+                    <query name="isFollowed" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="follower.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="1" operation="eq"/>
+                    </query>
                 </do>
 
                 <!--<do name="listArtUserFollowed" access="" label="ArtUserFollowed列表"-->

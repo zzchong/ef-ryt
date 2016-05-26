@@ -172,8 +172,24 @@ public class ProfileController extends BaseController {
                      * 此处为编辑签名的操作
                      * 修改model后添加业务逻辑
                      */
-                    user.setSignMessage(content);
-                    baseManager.saveOrUpdate(User.class.getName(), user);
+                     UserBrief userBrief = null;
+//                   XQuery xQuery = new XQuery("listUserBrief_default",request);
+//                    xQuery.put("user_id",user.getId());
+//                    List<UserBrief> userBriefList = baseManager.listObject(xQuery);
+                    if(user.getUserBrief()!=null)
+                        userBrief = (UserBrief)baseManager.getObject(UserBrief.class.getName(),userBrief.getId());
+                    else
+                       userBrief = new UserBrief();
+                    userBrief.setUser(user);
+                    userBrief.setSigner(content);
+                    userBrief.setStatus("1");
+                    userBrief.setCreateDatetime(new Date());
+                    if(user.getMaster()!=null)
+                        userBrief.setType("1");
+                    else
+                        userBrief.setType("2");
+                    baseManager.saveOrUpdate(UserBrief.class.getName(), userBrief);
+                    user.setUserBrief(userBrief);
                     resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("userInfo", user);
                 }else if("10".equals(type)){
