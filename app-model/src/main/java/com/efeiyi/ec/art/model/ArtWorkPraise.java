@@ -40,6 +40,7 @@ public class ArtWorkPraise implements Serializable{
     private String watch;//0 未读  1 已读
 
 
+
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")

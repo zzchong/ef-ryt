@@ -3,6 +3,7 @@ package com.efeiyi.ec.art.organization.model;
 
 
 //import com.efeiyi.ec.zero.promotion.model.PromotionPlan;
+import com.efeiyi.ec.art.model.ArtWorkPraise;
 import com.efeiyi.ec.art.model.Master;
 import com.efeiyi.ec.art.model.UserBrief;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 //不要把jsonIgnore注释了
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
@@ -33,6 +35,7 @@ public class User {
     private String signMessage;//签名
     private Integer sex;
     private UserBrief userBrief;//简介和 签名
+    private List<ArtWorkPraise> artWorkPraiseList;//点赞项目
 
 
     @OneToOne(mappedBy="user",fetch=FetchType.LAZY)
@@ -207,5 +210,15 @@ public class User {
 
     public void setUserBrief(UserBrief userBrief) {
         this.userBrief = userBrief;
+    }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    public List<ArtWorkPraise> getArtWorkPraiseList() {
+        return artWorkPraiseList;
+    }
+
+    public void setArtWorkPraiseList(List<ArtWorkPraise> artWorkPraiseList) {
+        this.artWorkPraiseList = artWorkPraiseList;
     }
 }

@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class MessageDaoHibernate implements MessageDao{
@@ -36,5 +34,55 @@ public class MessageDaoHibernate implements MessageDao{
         query.setMaxResults(size);
         query.setFirstResult(index);
         return query.list();
+    }
+
+    @Override
+    public List getPageList2(String hql, Integer index, Integer size,LinkedHashMap<String, Object> params) {
+        Session session = this.getSession();
+        Query query = session.createQuery(hql);
+        query = setQueryParams(query,params);
+        query.setMaxResults(size);
+        query.setFirstResult(index);
+        return query.list();
+    }
+
+    @Override
+    public List getPageList2(String hql, Integer index, Integer size,Object... params) {
+        Session session = this.getSession();
+        Query query = session.createQuery(hql);
+        query = setParameters(query,params);
+        query.setMaxResults(size);
+        query.setFirstResult(index);
+        return query.list();
+    }
+
+    protected Query setParameters(Query query, Object[] paramlist) {
+        if (paramlist != null) {
+            for (int i = 0; i < paramlist.length; i++) {
+                if (paramlist[i] instanceof Date) {
+                    //TODO 难道这是bug 使用setParameter不行？？
+                    query.setTimestamp(i, (Date) paramlist[i]);
+                } else {
+                    query.setParameter(i, paramlist[i]);
+                }
+            }
+        }
+        return query;
+    }
+
+    protected Query setQueryParams(Query query, LinkedHashMap<String, Object> queryParamMap) {
+        if (queryParamMap != null && queryParamMap.size() > 0) {
+            for (String paramName : queryParamMap.keySet()) {
+                if (queryParamMap.get(paramName) instanceof Object[]) {
+                    query.setParameterList(paramName, (Object[]) queryParamMap.get(paramName));
+                } else if (queryParamMap.get(paramName) instanceof Collection) {
+                    query.setParameterList(paramName, (Collection) queryParamMap.get(paramName));
+                } else {
+                    query.setParameter(paramName, queryParamMap.get(paramName));
+                }
+            }
+        }
+
+        return query;
     }
 }

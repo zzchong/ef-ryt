@@ -92,4 +92,8 @@ public class AppConfig {
 
     //私信最后一条记录
     public static final String SQL_LSAT_MESSAGE = "FROM Message where (fromUser.id=:fromUserId and targetUser.id=:userId) or (fromUser.id=:userId and targetUser.id=:fromUserId) and status<>'0' order by createDatetime DESC " ;
+
+    public static final String SQL_IS_PRAISE = "SELECT a " +
+//            ",IF((select COUNT(c.artwork.id) from ArtWorkPraise c WHERE c.user.id = :currentUserId)>0,'true','false') AS isPraise " +
+            "from ArtWorkPraise a where user.id = :userId and status !='0'";
 }

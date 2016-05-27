@@ -19,4 +19,8 @@ public interface MessageDao {
 
 
          List getPageList(String hql,Integer index,Integer size);
+
+         List getPageList2(String hql, Integer index, Integer size,LinkedHashMap<String, Object> params);
+
+         List getPageList2(String hql, Integer index, Integer size,Object... params);
 }

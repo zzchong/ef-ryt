@@ -3,6 +3,7 @@ package com.efeiyi.ec.art.personal.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.*;
+import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ConvertArtWork;
 import com.efeiyi.ec.art.organization.model.*;
@@ -23,6 +24,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -60,6 +63,9 @@ public class ProfileController extends BaseController {
     ResultMapHandler resultMapHandler;
     @Autowired
     private XdoDaoSupport xdoDao;
+
+    @Autowired
+    private MessageDao messageDao;
 
     /**
      * 获取用户资料
@@ -679,7 +685,7 @@ public class ProfileController extends BaseController {
             String signmsg = jsonObj.getString("signmsg");
             String userId = jsonObj.getString("userId");
             String timestamp = jsonObj.getString("timestamp");
-            if ("".equals(signmsg)  || "".equals(timestamp)
+            if ("".equals(signmsg)  || "".equals(timestamp) || "".equals(userId)
                     ) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
@@ -1001,15 +1007,21 @@ public class ProfileController extends BaseController {
             String type = jsonObj.getString("type");
             String index = jsonObj.getString("pageIndex");
             String size = jsonObj.getString("pageSize");
+            String currentId = jsonObj.getString("currentId");
             treeMap.put("userId", userId);
             treeMap.put("type", type);
             treeMap.put("pageIndex", index);
             treeMap.put("pageSize", size);
+            treeMap.put("currentId", currentId);
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
+
+
+            Map<String,Object> data = new HashMap<>();
+            User user = (User)baseManager.getObject(User.class.getName(),currentId);
             List<Artwork> artworkList = new ArrayList<Artwork>();
             PageEntity entity = new PageEntity();
             entity.setIndex(Integer.parseInt(index));
@@ -1019,21 +1031,30 @@ public class ProfileController extends BaseController {
             xQuery.setPageEntity(entity);
             PageInfo info = baseManager.listPageInfo(xQuery);
             List<ArtWorkPraise> workPraises = info.getList();
-            if (workPraises != null && !workPraises.isEmpty()){
-//                for (ArtWorkPraise praise : workPraises){
+            if (workPraises != null && !workPraises.isEmpty() && user!=null){
+                Artwork artwork = null;
+                for (ArtWorkPraise praise : workPraises){
 //                    XQuery query = new XQuery("listArtWorkPraise_byArtWorkId",request);
 //                    query.put("artwork_id",praise.getArtwork().getId());
 //                    List<ArtWorkPraise> praises = baseManager.listObject(query);
 //                    praise.getArtwork().setPraiseNUm(praises.size());
 //                    artworkList.add(praise.getArtwork());
-//                }
+                    artwork = praise.getArtwork();
+                    if(user.getArtWorkPraiseList()!=null && user.getArtWorkPraiseList().size()>0 && user.getArtWorkPraiseList().contains(praise))
+                              artwork.setPraise(true);
+                    else
+                              artwork.setPraise(false);
+
+                    artworkList.add(artwork);
+
+                }
 
 //                resultMap.put("pageInfoList", workPraises);
             }else{
                 workPraises = new ArrayList<ArtWorkPraise>();
             }
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
-            resultMap.put("pageInfoList", workPraises);
+            resultMap.put("pageInfoList", artworkList);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
@@ -1052,6 +1073,7 @@ public class ProfileController extends BaseController {
 
         /**artWorkCreationView.do测试加密参数**/
         map.put("userId", "ieatht97wfw30hfd");
+        map.put("currentId", "imhfp1yr4636pj49");
         map.put("timestamp", timestamp);
         map.put("type", "1");
         map.put("pageIndex", 1);
@@ -1059,7 +1081,7 @@ public class ProfileController extends BaseController {
         String signmsg = DigitalSignatureUtil.encrypt(map);
         map.put("signmsg", signmsg);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.41:8080/app/followed.do";
+        String url = "http://192.168.1.75:8080/app/followed.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
