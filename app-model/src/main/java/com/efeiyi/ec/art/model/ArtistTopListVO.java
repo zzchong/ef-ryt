@@ -13,6 +13,7 @@ public class ArtistTopListVO implements Serializable {
     private BigDecimal invest_goal_money;
     private BigDecimal turnover;
     private String username;
+    private String picture;
     public ArtistTopListVO(){
         super();
     }
@@ -55,5 +56,13 @@ public class ArtistTopListVO implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 }

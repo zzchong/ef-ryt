@@ -13,6 +13,7 @@ public class InvestorTopListVO implements Serializable {
     private BigDecimal price;
     private BigDecimal rois;
     private String username;
+    private String picture;
     public InvestorTopListVO(){
         super();
     }
@@ -55,5 +56,13 @@ public class InvestorTopListVO implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 }

@@ -700,17 +700,17 @@ public class ProfileController extends BaseController {
             beQuery.put("user_id", userId);
             List<ArtUserFollowed> followedList = baseManager.listObject(beQuery);
             if(followedList!=null)
-                data.put("follows",followedList.size());
+                data.put("num",followedList.size());
             else
-                data.put("follows",0);
+                data.put("num",0);
             //被关注列表
             XQuery toQuery = new XQuery("listArtUserFollowed_default", request);
             toQuery.put("follower_id", userId);
             List<ArtUserFollowed> toFollowedList = baseManager.listObject(toQuery);
             if(toFollowedList!=null)
-                data.put("fans",toFollowedList.size());
+                data.put("followNum",toFollowedList.size());
             else
-                data.put("fans",0);
+                data.put("followNum",0);
 
 
             //根据用户id获取投资记录
@@ -724,7 +724,7 @@ public class ProfileController extends BaseController {
                 sumInvestsMoney = sumInvestsMoney.add(artworkInvest.getPrice());
             }
 
-            data.put("sumInvestsMoney",sumInvestsMoney);
+            data.put("sumInvestment",sumInvestsMoney);
             //投资回报
             BigDecimal reward = new BigDecimal("0.00");
             XQuery xQuery = new XQuery("listROIRecord_default",request);
@@ -734,7 +734,7 @@ public class ProfileController extends BaseController {
                 reward = reward.add(roiRecord.getCurrentBalance());
             }
 
-            data.put("reward",reward);
+            data.put("yield",reward);
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("data", data);
         } catch (Exception e) {
