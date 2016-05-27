@@ -1,6 +1,7 @@
 package com.efeiyi.ec.art.model;
 
 import com.efeiyi.ec.art.organization.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -51,6 +52,7 @@ public class UserBrief implements Serializable {//用户简介表
     }
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     public User getUser() {
         return user;
     }

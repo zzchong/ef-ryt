@@ -177,7 +177,7 @@ public class ProfileController extends BaseController {
 //                    xQuery.put("user_id",user.getId());
 //                    List<UserBrief> userBriefList = baseManager.listObject(xQuery);
                     if(user.getUserBrief()!=null)
-                        userBrief = (UserBrief)baseManager.getObject(UserBrief.class.getName(),userBrief.getId());
+                        userBrief = (UserBrief)baseManager.getObject(UserBrief.class.getName(),user.getUserBrief().getId());
                     else
                        userBrief = new UserBrief();
                     userBrief.setUser(user);
@@ -678,6 +678,7 @@ public class ProfileController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             String signmsg = jsonObj.getString("signmsg");
+            String currentId = jsonObj.getString("currentId");
             String userId = jsonObj.getString("userId");
             String index = jsonObj.getString("pageIndex");
             String size = jsonObj.getString("pageSize");
@@ -705,6 +706,17 @@ public class ProfileController extends BaseController {
             XQuery toQuery = new XQuery("listArtUserFollowed_default", request);
             toQuery.put("follower_id", userId);
             List<ArtUserFollowed> toFollowedList = baseManager.listObject(toQuery);
+            //是否关注
+            boolean isFollowed = false;
+            if(currentId.equals(userId)){
+                XQuery xQuery1  = new XQuery("listArtUserFollowed_isFollowed",request);
+                xQuery1.put("user_id",currentId);
+                xQuery1.put("follow_id",userId);
+                List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(xQuery1);
+                if(artUserFollowedList!=null && artUserFollowedList.size()!=0){
+                    isFollowed = true;
+                }
+            }
 
             //初始化一个通用的PageEntity
             PageEntity entity = new PageEntity();
@@ -752,6 +764,7 @@ public class ProfileController extends BaseController {
             ConvertArtWork convert = ConvertArtWorkUtil.convert(invests, followedList.size(), toFollowedList.size(), investMoney, sumInvestsMoney, reward, user);
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("pageInfo", convert);
+            resultMap.put("isFollowed",isFollowed);
             System.out.print(convert);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -1088,13 +1101,16 @@ public class ProfileController extends BaseController {
         /**artWorkCreationList.do测试加密参数**/
 //        map.put("pageNum","1");
 //        map.put("pageSize","5");
-        /**artWorkCreationView.do测试加密参数**/
+        /**editProfile.do测试加密参数**/
         map.put("userId", "ina6pqm2d036fya5");
+        map.put("type", "13");
+        map.put("content", "13ss");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
+        map.put("signmsg",signmsg);
         HttpClient httpClient = new DefaultHttpClient();
 //        String url = "http://192.168.1.41:8080/app/myArtwork.do";
-        String url = "http://192.168.1.41:8080/app/intro.do";
+        String url = "http://192.168.1.75:8080/app/editProfile.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
@@ -1102,7 +1118,7 @@ public class ProfileController extends BaseController {
 //        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artWorkCreationView.do测试 **/
         String json = "{\"userId\":\"ina6pqm2d036fya5\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-        JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
+        JSONObject jsonObj = (JSONObject) JSONObject.toJSON(map);
         String jsonString = jsonObj.toJSONString();
 
         StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
