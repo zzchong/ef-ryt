@@ -659,6 +659,92 @@ public class ProfileController extends BaseController {
         baseManager.saveOrUpdate(Master.class.getName(), master);
     }
 
+    /**
+     * 获取用户首页
+     *
+     * @param request 接口调用路径 /app/my.do
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/app/user.do", method = RequestMethod.POST)
+    public Map User(HttpServletRequest request) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        LogBean logBean = new LogBean();
+        TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj;
+        try {
+            jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            String signmsg = jsonObj.getString("signmsg");
+            String userId = jsonObj.getString("userId");
+            String timestamp = jsonObj.getString("timestamp");
+            if ("".equals(signmsg)  || "".equals(timestamp)
+                    ) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            treeMap.put("userId", userId);
+            treeMap.put("timestamp", timestamp);
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (!verify) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            Map<String,Object> data = new HashMap<>();
+
+            User user = (User) baseManager.getObject(User.class.getName(), userId);
+            data.put("user",user);
+
+            //关注列表
+            XQuery beQuery = new XQuery("listArtUserFollowed_followed", request);
+            beQuery.put("user_id", userId);
+            List<ArtUserFollowed> followedList = baseManager.listObject(beQuery);
+            if(followedList!=null)
+                data.put("follows",followedList.size());
+            else
+                data.put("follows",0);
+            //被关注列表
+            XQuery toQuery = new XQuery("listArtUserFollowed_default", request);
+            toQuery.put("follower_id", userId);
+            List<ArtUserFollowed> toFollowedList = baseManager.listObject(toQuery);
+            if(toFollowedList!=null)
+                data.put("fans",toFollowedList.size());
+            else
+                data.put("fans",0);
+
+
+            //根据用户id获取投资记录
+            XQuery xquery = new XQuery("listArtworkInvest_default", request);
+            xquery.put("creator_id", userId);
+            List<ArtworkInvest> artworkInvests = (List<ArtworkInvest>) baseManager.listObject(xquery);
+
+            //同一用户投资所有项目的总投资金额
+            BigDecimal sumInvestsMoney = new BigDecimal("0.00");
+            for (ArtworkInvest artworkInvest : artworkInvests) {
+                sumInvestsMoney = sumInvestsMoney.add(artworkInvest.getPrice());
+            }
+
+            data.put("sumInvestsMoney",sumInvestsMoney);
+            //投资回报
+            BigDecimal reward = new BigDecimal("0.00");
+            XQuery xQuery = new XQuery("listROIRecord_default",request);
+            xQuery.put("user_id",jsonObj.getString("userId"));
+            List<ROIRecord> roiRecordList = (List<ROIRecord>)baseManager.listObject(xQuery);
+            for (ROIRecord roiRecord : roiRecordList){
+                reward = reward.add(roiRecord.getCurrentBalance());
+            }
+
+            data.put("reward",reward);
+            resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
+            resultMap.put("data", data);
+        } catch (Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
+
+
 
     /**
      * 获取用户首页
@@ -688,6 +774,7 @@ public class ProfileController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             treeMap.put("userId", userId);
+            treeMap.put("currentId", currentId);
             treeMap.put("pageIndex", index);
             treeMap.put("pageSize", size);
             treeMap.put("timestamp", timestamp);
@@ -708,10 +795,10 @@ public class ProfileController extends BaseController {
             List<ArtUserFollowed> toFollowedList = baseManager.listObject(toQuery);
             //是否关注
             boolean isFollowed = false;
-            if(currentId.equals(userId)){
+            if(currentId!=null && !"".equals(currentId) && currentId.equals(userId)){
                 XQuery xQuery1  = new XQuery("listArtUserFollowed_isFollowed",request);
                 xQuery1.put("user_id",currentId);
-                xQuery1.put("follow_id",userId);
+                xQuery1.put("follower_id",userId);
                 List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(xQuery1);
                 if(artUserFollowedList!=null && artUserFollowedList.size()!=0){
                     isFollowed = true;

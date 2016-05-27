@@ -667,6 +667,61 @@ public class SigninController extends BaseController {
     }
 
 
+
+
+    //找回密码
+    @RequestMapping(value = "/app/feedBack.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map feedBack(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        logBean.setApiName("feedBack");
+        Map<String, String> resultMap = new HashMap<String, String>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObj.toString());
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
+                    "".equals(jsonObj.getString("timestamp"))|| "".equals(jsonObj.getString("content"))) {
+                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+            }
+            String signmsg = jsonObj.getString("signmsg");
+            treeMap.put("userId", jsonObj.getString("userId"));
+            treeMap.put("content", jsonObj.getString("content"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
+            User user = null;
+            try {
+                user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+                if (user!=null && user.getId()!=null) {
+                    UserFeedBack userFeedBack = new UserFeedBack();
+                    userFeedBack.setCreateDatetime(new Date());
+                    userFeedBack.setStatus("1");
+                    userFeedBack.setContent(jsonObj.getString("content"));
+                    userFeedBack.setUser(user);
+                    userFeedBack.setEmail(jsonObj.getString("email"));
+                    baseManager.saveOrUpdate(UserFeedBack.class.getName(),userFeedBack);
+                    return  resultMapHandler.handlerResult("0","成功",logBean);
+                }else {
+
+                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
+                }
+            } catch (Exception e) {
+                return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+            }
+
+
+        } catch(Exception e){
+            resultMap = resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+            return resultMap;
+        }
+    }
+
+
     @RequestMapping(value = "/app/test.do", method = RequestMethod.POST)//测试方法
     @ResponseBody
     public  Map test(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile photo) {
