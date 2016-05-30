@@ -301,7 +301,7 @@ public class ArtUserFollowedController extends BaseController {
                     ArtUserFollowed userFollowed = (ArtUserFollowed) baseManager.getObject(ArtUserFollowed.class.getName(), artUserFollowId);
                     userFollowed.setStatus("0");
                     baseManager.saveOrUpdate(ArtUserFollowed.class.getName(), userFollowed);
-                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("artUserFollowed", userFollowed);
                 }
             } else {

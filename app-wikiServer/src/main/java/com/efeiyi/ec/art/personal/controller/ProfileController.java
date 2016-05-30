@@ -801,7 +801,7 @@ public class ProfileController extends BaseController {
             List<ArtUserFollowed> toFollowedList = baseManager.listObject(toQuery);
             //是否关注
             boolean isFollowed = false;
-            if(currentId!=null && !"".equals(currentId) && currentId.equals(userId)){
+            if(currentId!=null && !"".equals(currentId) && !currentId.equals(userId)){
                 XQuery xQuery1  = new XQuery("listArtUserFollowed_isFollowed",request);
                 xQuery1.put("user_id",currentId);
                 xQuery1.put("follower_id",userId);
