@@ -801,6 +801,8 @@ public class ProfileController extends BaseController {
             List<ArtUserFollowed> toFollowedList = baseManager.listObject(toQuery);
             //是否关注
             boolean isFollowed = false;
+            //关注Id
+            String artUserFollowId = "";
             if(currentId!=null && !"".equals(currentId) && !currentId.equals(userId)){
                 XQuery xQuery1  = new XQuery("listArtUserFollowed_isFollowed",request);
                 xQuery1.put("user_id",currentId);
@@ -808,6 +810,7 @@ public class ProfileController extends BaseController {
                 List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(xQuery1);
                 if(artUserFollowedList!=null && artUserFollowedList.size()!=0){
                     isFollowed = true;
+                    artUserFollowId = artUserFollowedList.get(0).getId();
                 }
             }
 
@@ -858,6 +861,7 @@ public class ProfileController extends BaseController {
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("pageInfo", convert);
             resultMap.put("isFollowed",isFollowed);
+            resultMap.put("artUserFollowId",artUserFollowId);
             System.out.print(convert);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
