@@ -788,7 +788,6 @@ public class ProfileController extends BaseController {
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-
             User user = (User) baseManager.getObject(User.class.getName(), userId);
 
             //关注列表
@@ -858,10 +857,10 @@ public class ProfileController extends BaseController {
                 reward = reward.add(roiRecord.getCurrentBalance());
             }
             ConvertArtWork convert = ConvertArtWorkUtil.convert(invests, followedList.size(), toFollowedList.size(), investMoney, sumInvestsMoney, reward, user);
+            convert.setFollowed(isFollowed);
+            convert.setArtUserFollowId(artUserFollowId);
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("pageInfo", convert);
-            resultMap.put("isFollowed",isFollowed);
-            resultMap.put("artUserFollowId",artUserFollowId);
             System.out.print(convert);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);

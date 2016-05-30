@@ -16,6 +16,8 @@ public class ConvertArtWork implements Serializable {
     private User user;
     private Integer followNum; // 关注列表
     private Integer num; //被关注列表
+    private Boolean isFollowed;//是否被关注
+    private  String artUserFollowId;//关注Id
 
     public List<ConvertWork> getArtworks() {
         return artworks;
@@ -63,5 +65,21 @@ public class ConvertArtWork implements Serializable {
 
     public void setNum(Integer num) {
         this.num = num;
+    }
+
+    public Boolean getFollowed() {
+        return isFollowed;
+    }
+
+    public void setFollowed(Boolean followed) {
+        isFollowed = followed;
+    }
+
+    public String getArtUserFollowId() {
+        return artUserFollowId;
+    }
+
+    public void setArtUserFollowId(String artUserFollowId) {
+        this.artUserFollowId = artUserFollowId;
     }
 }
