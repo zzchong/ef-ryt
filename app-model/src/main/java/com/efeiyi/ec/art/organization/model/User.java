@@ -32,7 +32,7 @@ public class User {
     protected Date createDatetime;
     private String type; //00000 普通用户 10000 艺术家
     private Master master; //用户关联的大师
-    private String signMessage;//签名
+    private String signMessage;//签名/弃用
     private Integer sex;
     private UserBrief userBrief;//简介和 签名
     private List<ArtWorkPraise> artWorkPraiseList;//点赞项目

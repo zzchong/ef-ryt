@@ -6,15 +6,14 @@ import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
-import com.efeiyi.ec.art.model.Artwork;
-import com.efeiyi.ec.art.model.MasterWork;
-import com.efeiyi.ec.art.model.UserBrief;
+import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -25,6 +24,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -72,16 +73,94 @@ public class UserMainController extends BaseController {
             if (verify != true) {
                 return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
+
+            String currentId = jsonObj.getString("currentId");
+            String userId = jsonObj.getString("userId");
             User user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
 
-            XQuery xQuery = new XQuery("plistArtworkPage_default",request);
+            //粉丝
+            Integer followNum = 0;
+            XQuery xQuery = new XQuery("listArtUserFollowed_default",request);
+            xQuery.put("follower_id",userId);
+            List<ArtUserFollowed> followNumList = baseManager.listObject(xQuery);
+            if(followNumList!=null){
+                followNum = followNumList.size();
+            }
+            //关注
+            Integer num = 0;
+            xQuery = new XQuery("listArtUserFollowed_followed",request);
+            xQuery.put("user_id",userId);
+            List<ArtUserFollowed> numList = baseManager.listObject(xQuery);
+            if(numList!=null){
+                num = numList.size();
+            }
+            //是否关注
+            boolean isFollowed = false;
+            if(!StringUtils.isEmpty(currentId) && currentId.equals(userId)){
+                XQuery xQuery1  = new XQuery("listArtUserFollowed_isFollowed",request);
+                xQuery1.put("follower_id",userId);
+                xQuery1.put("user_id",currentId);
+                List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(xQuery1);
+                if(artUserFollowedList!=null && artUserFollowedList.size()!=0){
+                    isFollowed = true;
+                }
+            }
+            //艺术家
+            User master = (User)baseManager.getObject(User.class.getName(),userId);
+
+            //艺术家投资记录
+            XQuery xquery = new XQuery("listArtworkInvest_default", request);
+            xquery.put("creator_id", userId);
+            List<ArtworkInvest> artworkInvests = (List<ArtworkInvest>) baseManager.listObject(xquery);
+
+            //艺术家投资总金额
+            BigDecimal sumInvestsMoney = new BigDecimal("0.00");
+            for (ArtworkInvest artworkInvest : artworkInvests) {
+                sumInvestsMoney = sumInvestsMoney.add(artworkInvest.getPrice());
+            }
+
+            //项目总金额
+//            BigDecimal money = new BigDecimal("0.00");
+//            //拍卖总金额
+//            BigDecimal auctionMoney = new BigDecimal("0.00");
+//            xQuery = new XQuery("listArtwork_default",request);
+//            xQuery.put("author_id",userId);
+//            List<Artwork> artworkList = baseManager.listObject(xQuery);
+//            if(artworkList!=null){
+//                for (Artwork artwork :artworkList){
+//                    money.add(artwork.getInvestsMoney());
+//                    if(artwork.getNewBidingPrice()!=null)
+//                        auctionMoney.add(artwork.getNewBidingPrice());
+//                }
+//            }
+
+            //投资收益
+            BigDecimal reward = new BigDecimal("0.00");
+            xQuery = new XQuery("listROIRecord_default",request);
+            xQuery.put("user_id",jsonObj.getString("userId"));
+            List<ROIRecord> roiRecordList = (List<ROIRecord>)baseManager.listObject(xQuery);
+            for (ROIRecord roiRecord : roiRecordList){
+                reward = reward.add(roiRecord.getCurrentBalance());
+            }
+
+            //项目
+            xQuery = new XQuery("plistArtworkPage_default",request);
             xQuery.put("author_id",jsonObj.getString("userId"));
             xQuery.getPageEntity().setSize(jsonObj.getInteger("pageSize"));
             xQuery.getPageEntity().setIndex(jsonObj.getInteger("pageIndex"));
             PageInfo pageInfo = baseManager.listPageInfo(xQuery);
             List<Artwork> artworks = (List<Artwork>) pageInfo.getList();
+
+
             data.put("artworkList",artworks);
-            data.put("type",jsonObj.getString("type"));
+            data.put("followNum",followNum);
+            data.put("num",num);
+            data.put("isFollowed",isFollowed);
+            data.put("master",master);
+            data.put("sumInvestsMoney",sumInvestsMoney);
+            data.put("artworkList",artworks);
+            data.put("reward",reward);
+//            data.put("type",jsonObj.getString("type"));
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("object",data);
             return  resultMap;
