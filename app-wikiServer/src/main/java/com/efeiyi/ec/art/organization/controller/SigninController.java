@@ -149,7 +149,7 @@ public class SigninController extends BaseController {
                         }
                         //项目拍卖溢价率
                        if(investsMoney2.doubleValue()!=0.00 && roiMoney2.doubleValue()!=0.00){
-                           rate2 = roiMoney2.divide(investsMoney2);
+                           rate2 = roiMoney2.divide(investsMoney2,2);
                        }
 
                         resultMap.put("investsMoney",investsMoney2);
@@ -174,7 +174,7 @@ public class SigninController extends BaseController {
 
                        //投资回报率
                         if(investsMoney.doubleValue()!=0.00&&roiMoney.doubleValue()!=0.00){
-                            rate = roiMoney.divide(investsMoney);
+                            rate = roiMoney.divide(investsMoney,2);
 
                         }
                         resultMap.put("investsMoney",investsMoney);
