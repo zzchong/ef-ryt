@@ -282,7 +282,8 @@ public class ArtUserFollowedController extends BaseController {
                     userFollowed.setStatus("1");
                     userFollowed.setType(followType);
                     baseManager.saveOrUpdate(ArtUserFollowed.class.getName(), userFollowed);
-                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap.put("status","1");
                     resultMap.put("artUserFollowed", userFollowed);
                 } else if ("1".equals(jsonObj.getString("identifier"))) {
                     if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("artUserFollowId"))) {
@@ -303,6 +304,7 @@ public class ArtUserFollowedController extends BaseController {
                     baseManager.saveOrUpdate(ArtUserFollowed.class.getName(), userFollowed);
                     resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("artUserFollowed", userFollowed);
+                    resultMap.put("status","0");
                 }
             } else {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
