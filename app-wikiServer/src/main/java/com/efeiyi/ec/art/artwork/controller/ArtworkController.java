@@ -77,14 +77,14 @@ public class ArtworkController extends BaseController {
     private ArtworkManager artworkManager;
 
 
-    @RequestMapping(value = "/app/getArtWorkList.do",method = RequestMethod.POST)
+    @RequestMapping(value = "/app/getArtWorkList.do")
     @ResponseBody
     public Map getArtWorkList(HttpServletRequest request,HttpServletResponse response) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
-        response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods","POST");
-        response.setHeader("Access-Control-Allow-Headers","x-requested-with,content-type");
+//        response.setHeader("Access-Control-Allow-Origin","*");
+//        response.setHeader("Access-Control-Allow-Methods","GET");
+//        response.setHeader("Access-Control-Allow-Headers","x-requested-with,content-type");
         try {
             XQuery query = new XQuery("plistArtwork_default", request);
             PageInfo pageInfo = baseManager.listPageInfo(query);

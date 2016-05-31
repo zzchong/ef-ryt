@@ -23,11 +23,13 @@ import java.util.Date;
 public class ArtworkInvest implements Serializable{//投资记录
     private String id;
     private Artwork artwork;
-    private BigDecimal price;
-    private String status;
-    private User creator;
-    private Date createDatetime;
+    private BigDecimal price;//融资金额
+    private String status;//1成功 0 失败
+    private User creator;//关联用户
+    private Date createDatetime;//融资时间
     private Account account;//关联账户
+    private String type;//融资支付类型
+    private String details;//融资详情
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -38,6 +40,24 @@ public class ArtworkInvest implements Serializable{//投资记录
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Column(name = "details")
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
     }
 
     @JsonIgnore

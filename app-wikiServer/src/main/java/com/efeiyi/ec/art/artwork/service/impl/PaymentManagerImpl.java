@@ -3,8 +3,11 @@ package com.efeiyi.ec.art.artwork.service.impl;
 
 import cn.beecloud.BCCache;
 import cn.beecloud.BeeCloud;
+import cn.beecloud.bean.BCException;
+import cn.beecloud.bean.BCOrder;
 import com.efeiyi.ec.art.artwork.service.PaymentManager;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.p.PConst;
 import com.ming800.core.p.service.AutoSerialManager;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,9 @@ import java.io.UnsupportedEncodingException;
 import net.sf.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.util.Map;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import cn.beecloud.*;
 import org.apache.log4j.*;
@@ -29,8 +35,7 @@ public class PaymentManagerImpl implements PaymentManager {
     @Autowired
     private BaseManager baseManager;
 
-    @Autowired
-    private AutoSerialManager autoSerialManager;
+
 
     static {
         BeeCloud.registerApp("bad9ddf8-b5d8-475d-ae5b-1a244b9b9993","dfbedf37-97d9-4d35-aa32-cd8b3d6fed93","4d164cf7-211f-452f-8d85-417556656577","b5b9b602-6e9c-4e5a-8c37-7071974c3720"); //正式环境
@@ -87,10 +92,23 @@ public class PaymentManagerImpl implements PaymentManager {
         }
     }
 
-
-
-
-
-
-
+    /**
+     *
+     * @param billNo 商户订单号
+     * @param title  订单标题
+     * @param money
+     * @return
+     */
+    //支付参数 通过BCOrder对象接收
+    @Override
+   public String payBCOrder(String billNo, String title, BigDecimal money, Map<String,Object> map) throws BCException {
+       BigDecimal price = new BigDecimal(money.floatValue() * 100);
+       BCOrder bcOrder = new BCOrder(BCEumeration.PAY_CHANNEL.ALI_WEB,price.intValue(),billNo,title);
+       bcOrder.setBillTimeout(360);
+       bcOrder.setReturnUrl(PConst.RETURN_URL+"/app/pay/paysuccess.do");
+       bcOrder.setOptional(map);
+       bcOrder = BCPay.startBCPay(bcOrder);
+       System.out.println(bcOrder.getObjectId());
+       return bcOrder.getHtml();
+   }
 }

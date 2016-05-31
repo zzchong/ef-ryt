@@ -87,4 +87,6 @@ public class PConst {
 
     public static final String HOSTNAME = "http://www.efeiyi.com";
 
+    public static final String RETURN_URL = "http://craft.efeiyi.com";
+
 }

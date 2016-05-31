@@ -66,6 +66,7 @@ public class Artwork implements Serializable {
     private Integer investNum =0;//投资人数
 
     private boolean isPraise;//冗余字段 在获取点赞项目接口中使用
+    private Integer viewNum=0;//浏览次数
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -465,5 +466,14 @@ public class Artwork implements Serializable {
 
     public void setPraise(boolean praise) {
         isPraise = praise;
+    }
+
+    @Column(name = "view_num")
+    public Integer getViewNum() {
+        return viewNum;
+    }
+
+    public void setViewNum(Integer viewNum) {
+        this.viewNum = viewNum;
     }
 }

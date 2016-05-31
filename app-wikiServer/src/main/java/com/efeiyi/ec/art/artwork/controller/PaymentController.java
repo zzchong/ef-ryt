@@ -7,14 +7,19 @@ import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
-import com.efeiyi.ec.art.model.Account;
-import com.efeiyi.ec.art.model.RechargeRecord;
+import com.efeiyi.ec.art.model.*;
+import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.p.service.AutoSerialManager;
 import com.ming800.core.util.CookieTool;
+import net.sf.json.JSON;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,14 +45,23 @@ public class PaymentController extends BaseController {
     BaseManager baseManager;
 
     @Autowired
+    private AutoSerialManager autoSerialManager;
+
+    @Autowired
     PaymentManager paymentManager;
 
-    @RequestMapping(value = "/app/checkOrderPay.do", method = RequestMethod.POST)
+    private final static String TITLE_AUCTION = "融易投-竞价";
+
+    private final static String TITLE_ADD = "融易投-充值";
+
+    private final static String TITLE_INVEST = "融易投-融资";
+
+    @RequestMapping(value = "/app/webhoot.do", method = RequestMethod.POST)
     @ResponseBody
     public void checkOrderPay(HttpServletRequest request, HttpServletResponse response) {
 
         LogBean logBean = new LogBean();
-        logBean.setApiName("checkOrderPay");
+        logBean.setApiName("webhoot");
 //        Map<String, String> resultMap = new HashMap<String, String>();
         StringBuffer json = new StringBuffer();
         String line;
@@ -93,27 +107,67 @@ public class PaymentController extends BaseController {
 
             //先生成充值记录，status=2，再等待Beecloud的webhook回调，
             // 待测
-            String rechargeId = (String) jsonObj.get("optional");
-            RechargeRecord rechargeRecord = (RechargeRecord) baseManager.getObject(RechargeRecord.class.getName(), rechargeId);
-            if (rechargeRecord == null) {
-                out.println("fail");
-                return;
-            }
-            if ("0".equals(rechargeRecord.getStatus())) {
-                out.println("fail");
-                return;
-            }
+            //optional参数
+            JSONObject jsonObject = (JSONObject)JSONObject.toJSON(jsonObj.get("optional"));
+            //竞拍 融资 充值
+            String action = jsonObject.getString("action");
+            //订单号 bill_no
+            String id = (String) jsonObj.get("transaction_id");
+            //金额
             BigDecimal transactionFee = new BigDecimal((double) jsonObj.get("transaction_fee") / 100);
-            if (!rechargeRecord.getCurrentBalance().equals(transactionFee)) {
-                out.println("fail");
-                return;
+            if(action.equals("auction")){
+                ArtworkBidding artworkBidding = (ArtworkBidding) baseManager.getObject(ArtworkBidding.class.getName(), id);
+                if (artworkBidding == null) {
+                    out.println("fail");
+                    return;
+                }
+                if(!artworkBidding.getPrice().equals(transactionFee)){
+                    out.println("fail");
+                    return;
+                }
+                artworkBidding.setStatus("1");
+                BigDecimal balance = artworkBidding.getAccount().getCurrentBalance();
+                BigDecimal usableBalance = artworkBidding.getAccount().getCurrentUsableBalance();
+                artworkBidding.getAccount().setCurrentBalance(balance.add(transactionFee));
+                artworkBidding.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
+                artworkBidding.setCreateDatetime(new Date());
+                baseManager.saveOrUpdate(ArtworkBidding.class.getName(), artworkBidding);
+            }else if(action.equals("add")){
+                RechargeRecord rechargeRecord = (RechargeRecord) baseManager.getObject(RechargeRecord.class.getName(), id);
+                if (rechargeRecord == null) {
+                    out.println("fail");
+                    return;
+                }
+                if(!rechargeRecord.getCurrentBalance().equals(transactionFee)){
+                    out.println("fail");
+                    return;
+                }
+                rechargeRecord.setStatus("1");
+                rechargeRecord.setCreateDatetime(new Date());
+                BigDecimal balance = rechargeRecord.getAccount().getCurrentBalance();
+                BigDecimal usableBalance = rechargeRecord.getAccount().getCurrentUsableBalance();
+                rechargeRecord.getAccount().setCurrentBalance(balance.add(transactionFee));
+                rechargeRecord.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
+                baseManager.saveOrUpdate(RechargeRecord.class.getName(), rechargeRecord);
+
+            }else if(action.equals("invest")){
+                ArtworkInvest artworkInvest = (ArtworkInvest) baseManager.getObject(ArtworkInvest.class.getName(), id);
+                if (artworkInvest == null) {
+                    out.println("fail");
+                    return;
+                }
+                if(!artworkInvest.getPrice().equals(transactionFee)){
+                    out.println("fail");
+                    return;
+                }
+                artworkInvest.setStatus("1");
+                artworkInvest.setCreateDatetime(new Date());
+                BigDecimal balance = artworkInvest.getAccount().getCurrentBalance();
+                BigDecimal usableBalance = artworkInvest.getAccount().getCurrentUsableBalance();
+                artworkInvest.getAccount().setCurrentBalance(balance.add(transactionFee));
+                artworkInvest.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
+                baseManager.saveOrUpdate(ArtworkInvest.class.getName(), artworkInvest);
             }
-            rechargeRecord.setStatus("0");
-            BigDecimal balance = rechargeRecord.getAccount().getCurrentBalance();
-            BigDecimal usableBalance = rechargeRecord.getAccount().getCurrentUsableBalance();
-            rechargeRecord.getAccount().setCurrentBalance(balance.add(transactionFee));
-            rechargeRecord.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
-            baseManager.saveOrUpdate(RechargeRecord.class.getName(),rechargeRecord);
 
             out.println("success"); //请不要修改或删除
         } catch (Exception e) {
@@ -141,7 +195,7 @@ public class PaymentController extends BaseController {
                     || "".equals(jsonObj.getString("timestamp"))
                     || "".equals(jsonObj.getString("payWay"))
                     || "".equals(jsonObj.getString("price"))) {
-                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("userId", jsonObj.getString("userId"));
@@ -150,13 +204,13 @@ public class PaymentController extends BaseController {
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
-                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             // 查出账户ID
             // 生成充值记录
             LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
             param.put("userId", jsonObj.getString("userId"));
-            Account account =  (Account)baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
+            Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
             RechargeRecord rechargeRecord = new RechargeRecord();
             rechargeRecord.setUser(account.getUser());
             rechargeRecord.setCreateDatetime(new Date());
@@ -164,14 +218,110 @@ public class PaymentController extends BaseController {
             rechargeRecord.setCurrentBalance(new BigDecimal(jsonObj.getString("price")));
             rechargeRecord.setAccount(account);
             rechargeRecord.setStatus("2");
-            rechargeRecord.setDetails(account.getUser().getUsername()+":"+account.getId()+":"+jsonObj.getString("price"));
-            baseManager.saveOrUpdate(RechargeRecord.class.getName(),rechargeRecord);
-            resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-            resultMap.put("rechargeRecord",rechargeRecord);
-        } catch(Exception e){
-            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+            rechargeRecord.setDetails(account.getUser().getUsername() + ":" + account.getId() + ":" + jsonObj.getString("price"));
+            baseManager.saveOrUpdate(RechargeRecord.class.getName(), rechargeRecord);
+            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+            resultMap.put("rechargeRecord", rechargeRecord);
+        } catch (Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
         return resultMap;
 
     }
+
+
+    //发送支付信息
+
+    /**
+     * type 用来判断是融资 充值 竞价 订单
+     *
+     * @param request
+     * @param modelMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/app/pay/main.do")
+    public String orderInfo(HttpServletRequest request, ModelMap modelMap) throws Exception {
+        String resultHtml;
+        String title = "";
+        String billNo = "";
+        //optional 参数
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", request.getParameter("action"));
+        //金额
+        BigDecimal money = new BigDecimal(request.getParameter("money"));
+        //支付类型
+        String type = request.getParameter("type");
+        //用户Id
+        String userId = request.getParameter("userId");
+        if(StringUtils.isEmpty(userId)){
+           return "";
+        }
+
+        //用户
+        User user = (User) baseManager.getObject(User.class.getName(),userId);
+        LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+        param.put("userId", userId);
+        //账户
+        Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
+
+        if (request.getParameter("action").equals("auction")) {
+
+            //竞拍项目Id
+            String artWorkId = request.getParameter("artWorkId");
+           if(StringUtils.isEmpty(artWorkId))
+               return "";
+
+            ArtworkBidding artworkBidding = new ArtworkBidding();
+            artworkBidding.setStatus("0");
+            artworkBidding.setAccount(account);
+            artworkBidding.setCreator(user);
+            artworkBidding.setType(type);
+            artworkBidding.setArtwork((Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId));
+            artworkBidding.setPrice(money);
+            baseManager.saveOrUpdate(ArtworkBidding.class.getName(),artworkBidding);
+            title = TITLE_AUCTION;
+            billNo = artworkBidding.getId();
+        } else if (request.getParameter("action").equals("invest")) {
+
+            //融资项目Id
+            String artWorkId = request.getParameter("artWorkId");
+            if(StringUtils.isEmpty(artWorkId))
+                return "";
+
+            ArtworkInvest artworkInvest = new ArtworkInvest();
+            artworkInvest.setCreator(user);
+            artworkInvest.setPrice(money);
+            artworkInvest.setStatus("0");
+            artworkInvest.setArtwork((Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId));
+            artworkInvest.setType(type);
+            artworkInvest.setAccount(account);
+            baseManager.saveOrUpdate(ArtworkInvest.class.getName(),artworkInvest);
+            title = TITLE_INVEST;
+            billNo = artworkInvest.getId();
+        } else if (request.getParameter("action").equals("add")) {
+
+            RechargeRecord rechargeRecord = new RechargeRecord();
+            rechargeRecord.setAccount(account);
+            rechargeRecord.setStatus("0");
+            rechargeRecord.setType(type);
+            rechargeRecord.setCurrentBalance(money);
+            rechargeRecord.setUser(user);
+            baseManager.saveOrUpdate(RechargeRecord.class.getName(),rechargeRecord);
+            title = TITLE_ADD;
+            billNo = rechargeRecord.getId();
+        }
+        resultHtml = paymentManager.payBCOrder(billNo, title, money, map);
+        modelMap.put("resultHtml", resultHtml);
+        return "pay";
+    }
+
+    @RequestMapping("/app/pay/paysuccess.do")
+    public String paysuccess(HttpServletRequest request) {
+        return "paySuccess";
+    }
+
 }
+
+
+
