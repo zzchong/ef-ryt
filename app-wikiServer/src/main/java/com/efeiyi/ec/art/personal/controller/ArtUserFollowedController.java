@@ -168,44 +168,45 @@ public class ArtUserFollowedController extends BaseController {
                 List<ArtUserFollowed> followedList = pageInfo.getList();
                 LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
                 List<FollowUserUtil> followUserUtils = new ArrayList<FollowUserUtil>();
-                for (ArtUserFollowed artUserFollowed : followedList) {//去取签名或头衔  BeanUtils.copyProperties
-                    FollowUserUtil followUserUtil = new FollowUserUtil();
-                    paramMap.put("userId", userId);
-                    paramMap.put("followerId",artUserFollowed.getFollower().getId());
+                if(followedList!=null) {
+                    for (ArtUserFollowed artUserFollowed : followedList) {//去取签名或头衔  BeanUtils.copyProperties
+                        FollowUserUtil followUserUtil = new FollowUserUtil();
+                        paramMap.put("userId", userId);
+                        paramMap.put("followerId", artUserFollowed.getFollower().getId());
 //                    LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
 //                    param.put("followerId", artUserFollowed.getUser().getId());
 //                    param.put("userId", userId);
-                    String is_followed = "2";
-                    ArtUserFollowed followed = (ArtUserFollowed) baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap).get(0);
-                    if (followed != null && followed.getId() != null) {
-                        is_followed = "1";
-                    }
-                    User user = (User)baseManager.getObject(User.class.getName(),artUserFollowed.getFollower().getId());
-                    if (type.equals("1")) {//大师
-
-                        Master master = null;
-                        if(user!=null){
-                            master = user.getMaster();
+                        String is_followed = "2";
+                        ArtUserFollowed followed = (ArtUserFollowed) baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap).get(0);
+                        if (followed != null && followed.getId() != null) {
+                            is_followed = "1";
                         }
+                        User user = (User) baseManager.getObject(User.class.getName(), artUserFollowed.getFollower().getId());
+                        if (type.equals("1")) {//大师
+
+                            Master master = null;
+                            if (user != null) {
+                                master = user.getMaster();
+                            }
 
 //                        List<Master> master = (List<Master>) baseManager.listObject(AppConfig.SQL_GET_MASTER_INFO, paramMap);
-                        followUserUtil.setArtUserFollowed(artUserFollowed);
-                        if (master != null) {
-                            followUserUtil.setMaster(master);
-                        } else {
-                            followUserUtil.setMaster(new Master());
-                        }
+                            followUserUtil.setArtUserFollowed(artUserFollowed);
+                            if (master != null) {
+                                followUserUtil.setMaster(master);
+                            } else {
+                                followUserUtil.setMaster(new Master());
+                            }
 //                        followUserUtil.setUserBrief(user.getUserBrief());
-                        followUserUtil.setFlag(is_followed);
-                        followUserUtils.add(followUserUtil);
+                            followUserUtil.setFlag(is_followed);
+                            followUserUtils.add(followUserUtil);
 
-                    } else if (type.equals("2")) {//用户
+                        } else if (type.equals("2")) {//用户
 //                        List<UserBrief> userBrief = (List<UserBrief>) baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
-                        if(user!=null)
-                            followUserUtil.setUserBrief(user.getUserBrief());
-                        else
-                            followUserUtil.setUserBrief(new UserBrief());
-                        followUserUtil.setArtUserFollowed(artUserFollowed);
+                            if (user != null)
+                                followUserUtil.setUserBrief(user.getUserBrief());
+                            else
+                                followUserUtil.setUserBrief(new UserBrief());
+                            followUserUtil.setArtUserFollowed(artUserFollowed);
 
 //                        if (userBrief != null && !userBrief.isEmpty()) {
 //                            followUserUtil.setUserBrief(userBrief.get(0));
@@ -214,10 +215,11 @@ public class ArtUserFollowedController extends BaseController {
 //                        }
 
 
-                        followUserUtil.setFlag(is_followed);
-                        followUserUtils.add(followUserUtil);
-                    }
+                            followUserUtil.setFlag(is_followed);
+                            followUserUtils.add(followUserUtil);
+                        }
 
+                    }
                 }
                 resultMapHandler.handlerResult("0", "请求成功", logBean);
                 resultMap.put("resultCode", "0");
