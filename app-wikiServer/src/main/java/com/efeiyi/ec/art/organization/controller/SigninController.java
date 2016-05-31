@@ -591,7 +591,7 @@ public class SigninController extends BaseController {
                     }else if(headPortrait.getContentType().contains("gif")){
                         fileType = ".gif";
                     }
-                    String url = "headPortrait/" + request.getParameter("username").toString() + fileType;
+                    String url = "headPortrait/" + request.getParameter("username").toString() +System.currentTimeMillis()+ fileType;
                     String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
                     //将用户头像上传至阿里云
                     aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi2",url);
