@@ -560,7 +560,7 @@ public class SigninController extends BaseController {
             +" "+request.getParameter("sex").toString()+" "+request.getParameter("timestamp").toString());
             if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("username")) ||
                     "".equals(request.getParameter("timestamp")) || "".equals(request.getParameter("nickname "))
-                    || "".equals(request.getParameter("sex "))) {
+                    || "".equals(request.getParameter("sex"))) {
 
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
@@ -595,7 +595,7 @@ public class SigninController extends BaseController {
                     String pictureUrl = "http://rongyitou2.efeiyi.com/"+url;
                     //将用户头像上传至阿里云
                     aliOssUploadManager.uploadFile(headPortrait,"ec-efeiyi2",url);
-                    user.setName2(request.getParameter("username").toString());
+                    user.setName(request.getParameter("nickname").toString());
                     user.setSex(Integer.parseInt(request.getParameter("sex").toString()));
                     user.setPictureUrl(pictureUrl);
                     baseManager.saveOrUpdate(BigUser.class.getName(),user);

@@ -50,7 +50,7 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
                     BigDecimal investGoalMoney = artwork.getInvestGoalMoney();//融资目标额度
                     //判断项目是否是融资阶段  是否是融资中 状态是否是可用
 
-                    if ("1".equals(artwork.getType()) && "14".equals(artwork.getStep()) && "0".equals(artwork.getStatus())){
+                    if ("1".equals(artwork.getType()) && "14".equals(artwork.getStep()) && !"0".equals(artwork.getStatus())){
                         BigDecimal price = new BigDecimal(jsonObj.getString("price"));
 
                         //获取用户关联账户
