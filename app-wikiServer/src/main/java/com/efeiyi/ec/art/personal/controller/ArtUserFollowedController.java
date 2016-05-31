@@ -114,7 +114,7 @@ public class ArtUserFollowedController extends BaseController {
                             if (master != null && !master.isEmpty()) {
                                 followUserUtil.setMaster(master.get(0));
                             } else {
-                                followUserUtil.setMaster(new Master());
+                                followUserUtil.setMaster(null);
                             }
                             followUserUtils.add(followUserUtil);
                         } else if (type.equals("2")) {
