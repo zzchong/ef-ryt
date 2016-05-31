@@ -177,7 +177,11 @@ public class ArtUserFollowedController extends BaseController {
 //                    param.put("followerId", artUserFollowed.getUser().getId());
 //                    param.put("userId", userId);
                         String is_followed = "2";
-                        ArtUserFollowed followed = (ArtUserFollowed) baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap).get(0);
+                        ArtUserFollowed followed = null;
+                        List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap);
+                        if (artUserFollowedList!=null)
+                            followed = artUserFollowedList.get(0);
+//                        ArtUserFollowed followed = (ArtUserFollowed) baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap).get(0);
                         if (followed != null && followed.getId() != null) {
                             is_followed = "1";
                         }
