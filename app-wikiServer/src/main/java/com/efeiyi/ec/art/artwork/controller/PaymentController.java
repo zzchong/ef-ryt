@@ -239,10 +239,13 @@ public class PaymentController extends BaseController {
      * @throws Exception
      */
     @RequestMapping("/app/pay/main.do")
-    public String orderInfo(HttpServletRequest request, ModelMap modelMap) throws Exception {
+    @ResponseBody
+    public Map orderInfo(HttpServletRequest request, ModelMap modelMap) throws Exception {
         String resultHtml;
         String title = "";
         String billNo = "";
+
+        Map<String,Object> data = new HashMap<>();
         //optional 参数
         Map<String, Object> map = new HashMap<>();
         map.put("action", request.getParameter("action"));
@@ -253,7 +256,7 @@ public class PaymentController extends BaseController {
         //用户Id
         String userId = request.getParameter("userId");
         if(StringUtils.isEmpty(userId)){
-           return "";
+           return null;
         }
 
         //用户
@@ -268,7 +271,7 @@ public class PaymentController extends BaseController {
             //项目订单Id
             AuctionOrder auctionOrder = (AuctionOrder)baseManager.getObject(AuctionOrder.class.getName(),request.getParameter("orderId"));
            if(auctionOrder==null)
-               return "";
+               return null;
 
             title = TITLE_AUCTION;
             billNo = auctionOrder.getId();
@@ -277,7 +280,7 @@ public class PaymentController extends BaseController {
             //融资项目Id
             String artWorkId = request.getParameter("artWorkId");
             if(StringUtils.isEmpty(artWorkId))
-                return "";
+                return null;
 
             ArtworkInvest artworkInvest = new ArtworkInvest();
             artworkInvest.setCreator(user);
@@ -303,7 +306,8 @@ public class PaymentController extends BaseController {
         }
         resultHtml = paymentManager.payBCOrder(billNo, title, money, map);
         modelMap.put("resultHtml", resultHtml);
-        return "pay";
+        data.put("resultHtml",resultHtml);
+        return data;
     }
 
     @RequestMapping("/app/pay/paysuccess.do")
