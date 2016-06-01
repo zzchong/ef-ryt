@@ -759,8 +759,8 @@ public class ArtworkController extends BaseController {
 //                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
 //            }
 
-            String [] actions = request.getParameterValues("actions");
-            String [] attachmentIds = request.getParameterValues("attachmentIds");
+//            String [] actions = request.getParameterValues("actions");
+//            String [] attachmentIds = request.getParameterValues("attachmentIds");
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), request.getParameter("artworkId"));
             try {
                 Artworkdirection artworkdirection = null;
@@ -777,6 +777,8 @@ public class ArtworkController extends BaseController {
                     //List<ArtworkAttachment> artworkAttachments = new ArrayList<ArtworkAttachment>();
 
                     baseManager.saveOrUpdate(Artworkdirection.class.getName(),artworkdirection);
+                    List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
+
                     //创建一个通用的多部分解析器
                     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                     //判断 request 是否有文件上传,即多部分请求
@@ -797,13 +799,10 @@ public class ArtworkController extends BaseController {
                                 //如果名称不为“”,说明该文件存在，否则说明该文件不存在
                                 if (myFileName.trim() != "") {
                                     //重命名上传后的文件名
-                                    String url = "artwork/" + new Date().getTime() + myFileName;
+                                    String url = "artwork/" + System.currentTimeMillis() + myFileName;
                                     String pictureUrl = "http://rongyitou2.efeiyi.com/" + url;
                                     ArtworkAttachment artworkAttachment = null;
-                                    if ("eq".equals(actions[i])) {
 
-                                    }
-                                    if ("add".equals(actions[i])) {
                                         artworkAttachment = new ArtworkAttachment();//项目附件
                                         artworkAttachment.setArtwork(artwork);
                                         artworkAttachment.setFileType(myFileName.substring(myFileName.lastIndexOf("."), myFileName.length()));
@@ -814,15 +813,13 @@ public class ArtworkController extends BaseController {
                                         //artworkAttachments.add(artworkAttachment);
 //                                        artwork.getArtworkAttachment().add(artworkAttachment);
                                     }
-                                    if ("del".equals(actions[i])) {
-                                        artworkAttachment = (ArtworkAttachment) baseManager.getObject(ArtworkAttachment.class.getName(),attachmentIds[i]);
-                                        aliOssUploadManager.deleteFile("ec-efeiyi2",url);
-                                        //将图片从阿里云删除
-                                        baseManager.delete(ArtworkAttachment.class.getName(),attachmentIds[i]);
-                                    }
+
                                 }
-                                i++;
-                            }
+                        }
+                    }
+                    if(artworkAttachmentList!=null) {
+                        for (ArtworkAttachment artworkAttachment : artworkAttachmentList) {
+                            baseManager.delete(ArtworkAttachment.class.getName(),artworkAttachment.getId());
                         }
                     }
                     //artwork.setArtworkAttachment(artworkAttachments);
