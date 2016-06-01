@@ -24,18 +24,8 @@ public class ArtworkBidding implements Serializable{//竞价记录
     private String status;//1 成功 0失败
     private User creator;//关联用户
     private Date createDatetime;//竞拍时间
-    private Account account;//关联账户
-    private String type;//支付方式 1 支付宝 2 微信
-    private String details;//竞拍详情
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
-    public Account getAccount() {
-        return account;
-    }
 
-    public void setAccount(Account account) {
-        this.account = account;
-    }
+
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -92,21 +82,5 @@ public class ArtworkBidding implements Serializable{//竞价记录
         this.artwork = artwork;
     }
 
-    @Column(name = "type")
-    public String getType() {
-        return type;
-    }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Column(name = "details")
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
-    }
 }
