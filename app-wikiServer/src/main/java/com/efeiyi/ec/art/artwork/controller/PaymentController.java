@@ -116,22 +116,20 @@ public class PaymentController extends BaseController {
             //金额
             BigDecimal transactionFee = new BigDecimal((double) jsonObj.get("transaction_fee") / 100);
             if(action.equals("auction")){
-                ArtworkBidding artworkBidding = (ArtworkBidding) baseManager.getObject(ArtworkBidding.class.getName(), id);
-                if (artworkBidding == null) {
+                AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), id);
+                if (auctionOrder == null) {
                     out.println("fail");
                     return;
                 }
-                if(!artworkBidding.getPrice().equals(transactionFee)){
+                if(!auctionOrder.getFinalPayment().equals(transactionFee)){
                     out.println("fail");
                     return;
                 }
-                artworkBidding.setStatus("1");
-                BigDecimal balance = artworkBidding.getAccount().getCurrentBalance();
-                BigDecimal usableBalance = artworkBidding.getAccount().getCurrentUsableBalance();
-                artworkBidding.getAccount().setCurrentBalance(balance.add(transactionFee));
-                artworkBidding.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
-                artworkBidding.setCreateDatetime(new Date());
-                baseManager.saveOrUpdate(ArtworkBidding.class.getName(), artworkBidding);
+                auctionOrder.setType("1");
+                auctionOrder.setPayWay("2");
+                auctionOrder.setPayStatus("1");
+
+                baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
             }else if(action.equals("add")){
                 RechargeRecord rechargeRecord = (RechargeRecord) baseManager.getObject(RechargeRecord.class.getName(), id);
                 if (rechargeRecord == null) {
@@ -162,10 +160,10 @@ public class PaymentController extends BaseController {
                 }
                 artworkInvest.setStatus("1");
                 artworkInvest.setCreateDatetime(new Date());
-                BigDecimal balance = artworkInvest.getAccount().getCurrentBalance();
-                BigDecimal usableBalance = artworkInvest.getAccount().getCurrentUsableBalance();
-                artworkInvest.getAccount().setCurrentBalance(balance.add(transactionFee));
-                artworkInvest.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
+//                BigDecimal balance = artworkInvest.getAccount().getCurrentBalance();
+//                BigDecimal usableBalance = artworkInvest.getAccount().getCurrentUsableBalance();
+//                artworkInvest.getAccount().setCurrentBalance(balance.add(transactionFee));
+//                artworkInvest.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
                 baseManager.saveOrUpdate(ArtworkInvest.class.getName(), artworkInvest);
             }
 
@@ -267,21 +265,14 @@ public class PaymentController extends BaseController {
 
         if (request.getParameter("action").equals("auction")) {
 
-            //竞拍项目Id
-            String artWorkId = request.getParameter("artWorkId");
-           if(StringUtils.isEmpty(artWorkId))
+            //项目订单Id
+            AuctionOrder auctionOrder = (AuctionOrder)baseManager.getObject(AuctionOrder.class.getName(),request.getParameter("orderId"));
+           String artWorkId = request.getParameter("artWorkId");
+           if(auctionOrder==null)
                return "";
 
-            ArtworkBidding artworkBidding = new ArtworkBidding();
-            artworkBidding.setStatus("0");
-            artworkBidding.setAccount(account);
-            artworkBidding.setCreator(user);
-            artworkBidding.setType(type);
-            artworkBidding.setArtwork((Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId));
-            artworkBidding.setPrice(money);
-            baseManager.saveOrUpdate(ArtworkBidding.class.getName(),artworkBidding);
             title = TITLE_AUCTION;
-            billNo = artworkBidding.getId();
+            billNo = auctionOrder.getId();
         } else if (request.getParameter("action").equals("invest")) {
 
             //融资项目Id
