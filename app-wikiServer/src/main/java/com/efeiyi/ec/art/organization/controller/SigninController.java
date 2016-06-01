@@ -223,7 +223,6 @@ public class SigninController extends BaseController {
             treeMap.put("username", jsonObj.getString("username"));
             treeMap.put("password", jsonObj.getString("password"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            //treeMap.put("truename2", jsonObj.getString("truename2"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
 
