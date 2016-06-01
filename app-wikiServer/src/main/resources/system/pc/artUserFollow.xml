@@ -9,14 +9,25 @@
                     <query name="default" label="默认" type="auto" orderBy="id:desc">
                         <condition name="user.id" defaultValue="1" operation="eq"/>
                         <condition name="status" defaultValue="0" operation="ne"/>
-                        <condition name="type" defaultValue="0" operation="eq"/>
+                        <condition name="follower.type" defaultValue="0" operation="eq"/>
                     </query>
+                    <query name="default1" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="follower.id" defaultValue="1" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="user.type" defaultValue="10000" operation="eq"/>
+                    </query>
+
                 </do>
                 <do name="listArtUserFollowed" access="" label="用户详情" result="json">
                     <query name="num" label="默认" type="auto" orderBy="id:desc">
                         <condition name="user.id" defaultValue="1" operation="eq"/>
                         <condition name="status" defaultValue="0" operation="ne"/>
-                        <condition name="type" defaultValue="0" operation="eq"/>
+                        <condition name="follower.type" defaultValue="0" operation="eq"/>
+                    </query>
+                    <query name="fan" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="follower.id" defaultValue="1" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="user.type" defaultValue="10000" operation="eq"/>
                     </query>
                     <query name="default" label="默认" type="auto" orderBy="id:desc">
                         <condition name="follower.id" defaultValue="0" operation="eq"/>
@@ -30,6 +41,10 @@
                         <condition name="user.id" defaultValue="0" operation="eq"/>
                         <condition name="follower.id" defaultValue="0" operation="eq"/>
                         <condition name="status" defaultValue="1" operation="eq"/>
+                    </query>
+                    <query name="EFollowed" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="follower.id" defaultValue="0" operation="eq"/>
                     </query>
                 </do>
 

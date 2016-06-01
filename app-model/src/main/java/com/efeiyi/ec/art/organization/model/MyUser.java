@@ -68,6 +68,17 @@ public class MyUser implements Serializable, UserDetails{
 
     public String pictureUrl;
 
+    private String type;
+
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Column(name = "unionid")
     public String getUnionid() {
         return unionid;
