@@ -267,7 +267,6 @@ public class PaymentController extends BaseController {
 
             //项目订单Id
             AuctionOrder auctionOrder = (AuctionOrder)baseManager.getObject(AuctionOrder.class.getName(),request.getParameter("orderId"));
-           String artWorkId = request.getParameter("artWorkId");
            if(auctionOrder==null)
                return "";
 

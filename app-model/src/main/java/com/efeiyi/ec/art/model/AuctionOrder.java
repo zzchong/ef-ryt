@@ -20,7 +20,7 @@ public class AuctionOrder implements Serializable {
     private User user;//下单用户
     private ConsumerAddress consumerAddress;//收货地址
     private Date createDatetime;//创建时间
-    private String payWay;// 0 账户余额 1 微信支付 2 支付宝支付
+    private String payWay;// 0 账户余额 1 支付宝 2 微信
     private String status;// 1 可用 0 作废
     private String type;// 0 待付尾款 1 代发货 2交易成功
     private BigDecimal finalPayment;//尾款金额
