@@ -239,13 +239,11 @@ public class PaymentController extends BaseController {
      * @throws Exception
      */
     @RequestMapping("/app/pay/main.do")
-    @ResponseBody
-    public Map orderInfo(HttpServletRequest request, ModelMap modelMap) throws Exception {
+    public String orderInfo(HttpServletRequest request, ModelMap modelMap) throws Exception {
         String resultHtml;
         String title = "";
         String billNo = "";
 
-        Map<String,Object> data = new HashMap<>();
         //optional 参数
         Map<String, Object> map = new HashMap<>();
         map.put("action", request.getParameter("action"));
@@ -306,8 +304,7 @@ public class PaymentController extends BaseController {
         }
         resultHtml = paymentManager.payBCOrder(billNo, title, money, map);
         modelMap.put("resultHtml", resultHtml);
-        data.put("resultHtml",resultHtml);
-        return data;
+        return "pay";
     }
 
     @RequestMapping("/app/pay/paysuccess.do")

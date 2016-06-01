@@ -38,7 +38,7 @@ public class PaymentManagerImpl implements PaymentManager {
 
 
     static {
-        BeeCloud.registerApp("bad9ddf8-b5d8-475d-ae5b-1a244b9b9993","dfbedf37-97d9-4d35-aa32-cd8b3d6fed93","4d164cf7-211f-452f-8d85-417556656577","b5b9b602-6e9c-4e5a-8c37-7071974c3720"); //正式环境
+        BeeCloud.registerApp("bad9ddf8-b5d8-475d-ae5b-1a244b9b9993","4d164cf7-211f-452f-8d85-417556656577","dfbedf37-97d9-4d35-aa32-cd8b3d6fed93","b5b9b602-6e9c-4e5a-8c37-7071974c3720"); //正式环境
     }
 
 
