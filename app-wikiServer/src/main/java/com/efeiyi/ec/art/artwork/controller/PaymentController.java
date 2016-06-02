@@ -341,7 +341,7 @@ public class PaymentController extends BaseController {
     }
 
 
-    /**打款接口
+    /**支付宝打款接口
      * action 用来判断是)  返还保证金(restoreMargin)  返利(reward)
      * 充值(暂不支持)
      * @param request
@@ -359,7 +359,7 @@ public class PaymentController extends BaseController {
 
 
         //完成拍卖/进行返利的项目Id
-        Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artworkId"));
+        Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
         if(artwork==null)
             return null;
 
@@ -373,7 +373,7 @@ public class PaymentController extends BaseController {
             //获取保证金表信息参数
             LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
             param.put("userId", userId);
-            param.put("artworkId",artwork.getId());
+            param.put("artWorkId",artwork.getId());
             //用户
             User user = (User) baseManager.getObject(User.class.getName(),userId);
 
@@ -387,7 +387,7 @@ public class PaymentController extends BaseController {
 
             //获取保证金表信息参数
             LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
-            param.put("artworkId",artwork.getId());
+            param.put("artWorkId",artwork.getId());
             List<ROIRecord> roiRecordList = baseManager.listObject(AppConfig.SQL_Margin_REWARD,param);
             if(roiRecordList==null)
                 return null;

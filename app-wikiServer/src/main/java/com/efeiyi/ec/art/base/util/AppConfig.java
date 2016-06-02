@@ -98,7 +98,7 @@ public class AppConfig {
             "from ArtWorkPraise a where user.id = :userId and status !='0'";
 
     //返还保证金
-    public static final String SQL_Margin_RESTORE = "FROM MarginAccount where user.id!=:userId and artwork.id=:artworkId and status ='1'" ;
+    public static final String SQL_Margin_RESTORE = "FROM MarginAccount where user.id!=:userId and artwork.id=:artWorkId and status ='1'" ;
     //返利
-    public static final String SQL_Margin_REWARD = "FROM ROIRecord where  artwork.id=:artworkId and status ='1'" ;
+    public static final String SQL_Margin_REWARD = "FROM ROIRecord where  artwork.id=:artWorkId and status ='1'" ;
 }

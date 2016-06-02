@@ -8,6 +8,7 @@ import cn.beecloud.bean.BCException;
 import cn.beecloud.bean.BCOrder;
 import cn.beecloud.bean.TransfersParameter;
 import com.efeiyi.ec.art.artwork.service.PaymentManager;
+import com.efeiyi.ec.art.model.Bill;
 import com.efeiyi.ec.art.model.MarginAccount;
 import com.efeiyi.ec.art.model.ROIRecord;
 import com.ming800.core.base.service.BaseManager;
@@ -25,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -132,13 +134,30 @@ public class PaymentManagerImpl implements PaymentManager {
     public  String batchReturnMoney(String batchNo, List transferDataList,String type) throws Exception {
         String url = "";
         List<ALITransferData> list = new ArrayList<>();
+        List<Object> billList = new ArrayList<>();
+
         if(type.equals("restoreMargin")){
             List<MarginAccount> marginAccountList = (List<MarginAccount>)transferDataList;
             for(MarginAccount marginAccount :marginAccountList){
+
                 String  transferNote = "参与《"+marginAccount.getArtwork().getTitle()+"》项目的保证金";
                 Integer transferFee = marginAccount.getCurrentBalance().multiply(new BigDecimal(100)).intValue();
                 String  transferId = autoSerialManager.nextSerial("transferId");
+
+                Bill bill = new Bill();
+                bill.setStatus("1");
+                bill.setTitle("融易投-保证金退还");
+                bill.setMoney(marginAccount.getCurrentBalance());
+                bill.setAuthor(marginAccount.getUser());
+                bill.setPayWay("1");
+                bill.setOutOrIn("1");
+                bill.setCreateDatetime(new Date());
+                bill.setDetail(transferNote);
+                bill.setFlowAccount(transferId);
+                bill.setType("4");
+
                 ALITransferData data = new ALITransferData(transferId,"1055303387@qq.com","青石",transferFee,transferNote);
+                billList.add(bill);
 
             }
         }else if(type.equals("reward")){
@@ -147,7 +166,20 @@ public class PaymentManagerImpl implements PaymentManager {
                 String  transferNote = "参与《"+roiRecord.getArtwork().getTitle()+"》项目投资的本金"+roiRecord.getInvestMoney()+"及收益"+roiRecord.getCurrentBalance();
                 Integer transferFee = roiRecord.getCurrentBalance().add(roiRecord.getInvestMoney()).multiply(new BigDecimal(100)).intValue();
                 String  transferId = autoSerialManager.nextSerial("transferId");
+
+                Bill bill = new Bill();
+                bill.setStatus("1");
+                bill.setTitle("融易投-保证金退还");
+                bill.setMoney(roiRecord.getCurrentBalance().add(roiRecord.getInvestMoney()));
+                bill.setAuthor(roiRecord.getUser());
+                bill.setPayWay("1");
+                bill.setOutOrIn("1");
+                bill.setCreateDatetime(new Date());
+                bill.setDetail(transferNote);
+                bill.setFlowAccount(transferId);
+                bill.setType("5");
                 ALITransferData data = new ALITransferData(transferId,"1055303387@qq.com","青石",transferFee,transferNote);
+                billList.add(bill);
             }
 
         }
@@ -156,8 +188,8 @@ public class PaymentManagerImpl implements PaymentManager {
         para.setAccountName(ACCOUNT_NAME);
         para.setTransferDataList(list);
         para.setChannel(BCEumeration.PAY_CHANNEL.ALI);
-            url = BCPay.startTransfers(para);
-
+        url = BCPay.startTransfers(para);
+        baseManager.batchSaveOrUpdate("save",Bill.class.getName(),billList);
         return url;
     }
 
