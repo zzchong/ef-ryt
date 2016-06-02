@@ -142,7 +142,7 @@ public class PaymentManagerImpl implements PaymentManager {
 
                 String  transferNote = "参与《"+marginAccount.getArtwork().getTitle()+"》项目的保证金";
                 Integer transferFee = marginAccount.getCurrentBalance().multiply(new BigDecimal(100)).intValue();
-                String  transferId = autoSerialManager.nextSerial("transferId");
+                String  transferId = System.currentTimeMillis()+autoSerialManager.nextSerial("transferId");
 
                 Bill bill = new Bill();
                 bill.setStatus("1");
@@ -157,6 +157,7 @@ public class PaymentManagerImpl implements PaymentManager {
                 bill.setType("4");
 
                 ALITransferData data = new ALITransferData(transferId,"1055303387@qq.com","青石",transferFee,transferNote);
+                list.add(data);
                 billList.add(bill);
 
             }
@@ -165,7 +166,7 @@ public class PaymentManagerImpl implements PaymentManager {
             for (ROIRecord roiRecord : roiRecordList){
                 String  transferNote = "参与《"+roiRecord.getArtwork().getTitle()+"》项目投资的本金"+roiRecord.getInvestMoney()+"及收益"+roiRecord.getCurrentBalance();
                 Integer transferFee = roiRecord.getCurrentBalance().add(roiRecord.getInvestMoney()).multiply(new BigDecimal(100)).intValue();
-                String  transferId = autoSerialManager.nextSerial("transferId");
+                String  transferId = System.currentTimeMillis()+autoSerialManager.nextSerial("transferId");
 
                 Bill bill = new Bill();
                 bill.setStatus("1");
@@ -179,6 +180,7 @@ public class PaymentManagerImpl implements PaymentManager {
                 bill.setFlowAccount(transferId);
                 bill.setType("5");
                 ALITransferData data = new ALITransferData(transferId,"1055303387@qq.com","青石",transferFee,transferNote);
+                list.add(data);
                 billList.add(bill);
             }
 

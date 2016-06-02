@@ -137,7 +137,7 @@ public class Bill implements Serializable {
         this.payWay = payWay;
     }
 
-    @Column(name = "flow_accout")
+    @Column(name = "flow_account")
     public String getFlowAccount() {
         return flowAccount;
     }

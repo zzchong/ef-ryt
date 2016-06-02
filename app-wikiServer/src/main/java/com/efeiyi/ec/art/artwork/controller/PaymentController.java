@@ -12,11 +12,21 @@ import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AutoSerialManager;
 import com.ming800.core.util.CookieTool;
 import net.sf.json.JSON;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -29,6 +39,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.*;
@@ -353,7 +364,7 @@ public class PaymentController extends BaseController {
     @ResponseBody
     public Map restoreMain(HttpServletRequest request, ModelMap modelMap) throws Exception {
         String url = "";
-        String batchNo = autoSerialManager.nextSerial("BatchNo");//批量付款批号
+        String batchNo = System.currentTimeMillis()+autoSerialManager.nextSerial("BatchNo");//批量付款批号
         JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
         Map<String,Object> data = new HashMap<>();
 
@@ -378,8 +389,8 @@ public class PaymentController extends BaseController {
             User user = (User) baseManager.getObject(User.class.getName(),userId);
 
             //返还保证金的list
-            List<MarginAccount> marginAccountList = (List<MarginAccount>)baseManager.getUniqueObjectByConditions(AppConfig.SQL_Margin_RESTORE,param);
-            if(marginAccountList!=null)
+            List<MarginAccount> marginAccountList = (List<MarginAccount>)baseManager.listObject(AppConfig.SQL_Margin_RESTORE,param);
+            if(marginAccountList==null)
                 return null;
             url = paymentManager.batchReturnMoney(batchNo,marginAccountList,"restoreMargin");
 
@@ -405,6 +416,48 @@ public class PaymentController extends BaseController {
         return "paySuccess";
     }
 
+
+    @Test
+    public void testArtworkView() throws Exception {
+        long timestamp = System.currentTimeMillis();
+
+        Map<String, Object> map = new TreeMap<>();
+
+        map.put("artWorkId", "in5z7r5f2w2f73so");
+        map.put("userId","iovebhfg2tf3h0mb");
+        map.put("action","restoreMargin");
+//        String signmsg = DigitalSignatureUtil.encrypt(map);
+        HttpClient httpClient = new DefaultHttpClient();
+        String url = "http://192.168.1.75:8080/app/restore/main.do";
+        HttpPost httppost = new HttpPost(url);
+        httppost.setHeader("Content-Type", "application/json;charset=utf-8");
+        JSONObject jsonObj = (JSONObject)JSONObject.toJSON(map);
+        String jsonString = jsonObj.toJSONString();
+
+        StringEntity stringEntity = new StringEntity(jsonString,"utf-8");
+        stringEntity.setContentType("text/json");
+        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        httppost.setEntity(stringEntity);
+        System.out.println("url:  " + url);
+        try {
+            byte[] b = new byte[(int) stringEntity.getContentLength()];
+            System.out.println(stringEntity);
+            stringEntity.getContent().read(b);
+            System.out.println("报文:" + new String(b, "utf-8"));
+            HttpResponse response = httpClient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    entity.getContent(), "UTF-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+        }catch (Exception e){
+
+        }
+    }
 }
 
 
