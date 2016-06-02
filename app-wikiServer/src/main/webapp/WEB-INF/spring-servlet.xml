@@ -20,14 +20,14 @@
     </bean>
 
 
-    <mvc:interceptors>
-        <mvc:interceptor>
-            <mvc:mapping path="/"/>
-            <mvc:mapping path="/**"/>
-            <mvc:mapping path="**"/>
-            <bean class="com.efeiyi.ec.art.interceptor.DriverInterceptor"/>
-        </mvc:interceptor>
-    </mvc:interceptors>
+    <!--<mvc:interceptors>-->
+        <!--<mvc:interceptor>-->
+            <!--<mvc:mapping path="/"/>-->
+            <!--<mvc:mapping path="/**"/>-->
+            <!--<mvc:mapping path="**"/>-->
+            <!--<bean class="com.efeiyi.ec.art.interceptor.DriverInterceptor"/>-->
+        <!--</mvc:interceptor>-->
+    <!--</mvc:interceptors>-->
 
 
     <bean id="multipartResolver"

@@ -801,6 +801,8 @@ public class ProfileController extends BaseController {
             List<ArtUserFollowed> toFollowedList = baseManager.listObject(toQuery);
             //是否关注
             boolean isFollowed = false;
+            //是否点赞
+            boolean isPraise = false;
             //关注Id
             String artUserFollowId = "";
             if(currentId!=null && !"".equals(currentId) && !currentId.equals(userId)){
@@ -813,6 +815,7 @@ public class ProfileController extends BaseController {
                     artUserFollowId = artUserFollowedList.get(0).getId();
                 }
             }
+
 
             //初始化一个通用的PageEntity
             PageEntity entity = new PageEntity();
@@ -860,6 +863,8 @@ public class ProfileController extends BaseController {
             ConvertArtWork convert = ConvertArtWorkUtil.convert(invests, followedList.size(), toFollowedList.size(), investMoney, sumInvestsMoney, reward, user);
             convert.setFollowed(isFollowed);
             convert.setArtUserFollowId(artUserFollowId);
+
+
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("pageInfo", convert);
             System.out.print(convert);

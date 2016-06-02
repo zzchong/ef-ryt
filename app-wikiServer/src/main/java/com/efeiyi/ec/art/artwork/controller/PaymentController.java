@@ -348,6 +348,7 @@ public class PaymentController extends BaseController {
           baseManager.saveOrUpdate(Bill.class.getName(),bill);
           data.put("url", bcOrder.getUrl());
 
+//          modelMap.put("resultHtml",bcOrder.getHtml());
         return data;
     }
 
