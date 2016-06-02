@@ -385,7 +385,7 @@ public class ProfileController extends BaseController {
             System.out.print(master.getId());
             baseManager.saveOrUpdate(Master.class.getName(), master);
             user.setMaster(master);
-            user.setType("1");
+            user.setType("10000");
             baseManager.saveOrUpdate(User.class.getName(), user);
 
             resultMap = uploadFile(request);

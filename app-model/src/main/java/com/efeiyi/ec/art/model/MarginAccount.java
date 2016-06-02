@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.model;
 
+import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -23,6 +24,7 @@ public class MarginAccount implements Serializable {//保证金表
     private Date createDatetime;//创建时间 即冻结时间
     private Date endDatetime;//解冻时间/使用时间
     private Artwork artwork;//关联的项目
+    private User user;//用户
     private Account account;//关联的账户
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -84,5 +86,15 @@ public class MarginAccount implements Serializable {//保证金表
 
     public void setArtwork(Artwork artwork) {
         this.artwork = artwork;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

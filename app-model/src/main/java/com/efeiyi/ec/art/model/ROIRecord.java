@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/4/6.
@@ -26,6 +27,7 @@ public class ROIRecord implements Serializable {//投资收益记录表
     private String accountNum;//from 账号
     private String details;//收益详情
     private Artwork artwork;//投资项目
+    private BigDecimal investMoney;//投资金额
     private ArtworkInvest artworkInvest;//投资记录
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -106,6 +108,15 @@ public class ROIRecord implements Serializable {//投资收益记录表
         this.artwork = artwork;
     }
 
+
+    @Column(name = "invest_money")
+    public BigDecimal getInvestMoney() {
+        return investMoney;
+    }
+
+    public void setInvestMoney(BigDecimal investMoney) {
+        this.investMoney = investMoney;
+    }
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artworkInvest_id")
     public ArtworkInvest getArtworkInvest() {
@@ -115,4 +126,5 @@ public class ROIRecord implements Serializable {//投资收益记录表
     public void setArtworkInvest(ArtworkInvest artworkInvest) {
         this.artworkInvest = artworkInvest;
     }
+
 }

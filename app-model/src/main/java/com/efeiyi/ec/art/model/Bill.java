@@ -27,10 +27,10 @@ public class Bill implements Serializable {
     private BigDecimal money;//账单金额
     private User author;
     private Date createDatetime;
-    private String type;//账单类型  1 融资 2 拍卖  3 收益
+    private String type;//账单类型  1 投资 2 拍卖订单  3 支付保证金 4 返还保证金 5 返利
     private String outOrIn;//1 进账 0 出账
-    private String number;//支付账号
-    private String payWay;//支付方式
+    private String number;//支付订单唯一标示
+    private String payWay;//支付方式 1 支付宝 2 微信
     private String flowAccount;//流水账号
 
     @Id

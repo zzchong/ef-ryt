@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.artwork.controller;
 
+import cn.beecloud.bean.BCOrder;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.PaymentManager;
 import com.efeiyi.ec.art.base.model.LogBean;
@@ -50,11 +51,11 @@ public class PaymentController extends BaseController {
     @Autowired
     PaymentManager paymentManager;
 
-    private final static String TITLE_AUCTION = "融易投-竞价";
+    private final static String TITLE_AUCTION = "融易投-项目尾款";
 
-    private final static String TITLE_ADD = "融易投-充值";
+    private final static String TITLE_ADD = "融易投-保证金";
 
-    private final static String TITLE_INVEST = "融易投-融资";
+    private final static String TITLE_INVEST = "融易投-投资";
 
     @RequestMapping(value = "/app/webhoot.do", method = RequestMethod.POST)
     @ResponseBody
@@ -111,6 +112,11 @@ public class PaymentController extends BaseController {
             JSONObject jsonObject = (JSONObject)JSONObject.toJSON(jsonObj.get("optional"));
             //竞拍 融资 充值
             String action = jsonObject.getString("action");
+            //账单Id
+            String billId = jsonObject.getString("bill_id");
+            Bill bill = (Bill) baseManager.getObject(Bill.class.getName(),billId);
+            bill.setCreateDatetime(new Date());
+            baseManager.saveOrUpdate(Bill.class.getName(),bill);
             //订单号 bill_no
             String id = (String) jsonObj.get("transaction_id");
             //金额
@@ -126,27 +132,27 @@ public class PaymentController extends BaseController {
                     return;
                 }
                 auctionOrder.setType("1");
-                auctionOrder.setPayWay("2");
+                auctionOrder.setPayWay("1");
                 auctionOrder.setPayStatus("1");
 
                 baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
-            }else if(action.equals("add")){
-                RechargeRecord rechargeRecord = (RechargeRecord) baseManager.getObject(RechargeRecord.class.getName(), id);
-                if (rechargeRecord == null) {
+            }else if(action.equals("payMargin")){
+                MarginAccount marginAccount = (MarginAccount) baseManager.getObject(MarginAccount.class.getName(), id);
+                if (marginAccount == null) {
                     out.println("fail");
                     return;
                 }
-                if(!rechargeRecord.getCurrentBalance().equals(transactionFee)){
+                if(!marginAccount.getCurrentBalance().equals(transactionFee)){
                     out.println("fail");
                     return;
                 }
-                rechargeRecord.setStatus("1");
-                rechargeRecord.setCreateDatetime(new Date());
-                BigDecimal balance = rechargeRecord.getAccount().getCurrentBalance();
-                BigDecimal usableBalance = rechargeRecord.getAccount().getCurrentUsableBalance();
-                rechargeRecord.getAccount().setCurrentBalance(balance.add(transactionFee));
-                rechargeRecord.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
-                baseManager.saveOrUpdate(RechargeRecord.class.getName(), rechargeRecord);
+                marginAccount.setStatus("1");
+                marginAccount.setCreateDatetime(new Date());
+//                BigDecimal balance = rechargeRecord.getAccount().getCurrentBalance();
+//                BigDecimal usableBalance = rechargeRecord.getAccount().getCurrentUsableBalance();
+//                rechargeRecord.getAccount().setCurrentBalance(balance.add(transactionFee));
+//                rechargeRecord.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
+                baseManager.saveOrUpdate(MarginAccount.class.getName(), marginAccount);
 
             }else if(action.equals("invest")){
                 ArtworkInvest artworkInvest = (ArtworkInvest) baseManager.getObject(ArtworkInvest.class.getName(), id);
@@ -160,10 +166,6 @@ public class PaymentController extends BaseController {
                 }
                 artworkInvest.setStatus("1");
                 artworkInvest.setCreateDatetime(new Date());
-//                BigDecimal balance = artworkInvest.getAccount().getCurrentBalance();
-//                BigDecimal usableBalance = artworkInvest.getAccount().getCurrentUsableBalance();
-//                artworkInvest.getAccount().setCurrentBalance(balance.add(transactionFee));
-//                artworkInvest.getAccount().setCurrentUsableBalance(usableBalance.add(transactionFee));
                 baseManager.saveOrUpdate(ArtworkInvest.class.getName(), artworkInvest);
             }
 
@@ -231,52 +233,65 @@ public class PaymentController extends BaseController {
     //发送支付信息
 
     /**
-     * type 用来判断是融资 充值 竞价 订单
-     *
+     * action 用来判断是投资支付(invest) 支付保证金(payMargin) 拍卖尾款支付(auction)
+     * 充值(暂不支持)
      * @param request
      * @param modelMap
      * @return
      * @throws Exception
      */
     @RequestMapping("/app/pay/main.do")
-    public String orderInfo(HttpServletRequest request, ModelMap modelMap) throws Exception {
-        String resultHtml;
-        String title = "";
-        String billNo = "";
-
+    @ResponseBody
+    public Map payMain(HttpServletRequest request, ModelMap modelMap) throws Exception {
+        String url;
+        String title = "";//订单名称
+        String billNo = "";//订单号
+        JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+        Map<String,Object> data = new HashMap<>();
         //optional 参数
         Map<String, Object> map = new HashMap<>();
-        map.put("action", request.getParameter("action"));
+        map.put("action", jsonObj.getString("action"));
         //金额
-        BigDecimal money = new BigDecimal(request.getParameter("money"));
+        BigDecimal money = new BigDecimal(jsonObj.getString("money"));
         //支付类型
-        String type = request.getParameter("type");
+        String type = jsonObj.getString("type");
         //用户Id
-        String userId = request.getParameter("userId");
+        String userId = jsonObj.getString("userId");
         if(StringUtils.isEmpty(userId)){
            return null;
         }
-
         //用户
         User user = (User) baseManager.getObject(User.class.getName(),userId);
+        //获取账户信息参数
         LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
         param.put("userId", userId);
         //账户
         Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
+        //生成支出账单
+        Bill bill = new Bill();
+        bill.setStatus("1");
+        bill.setAuthor(user);
+        bill.setPayWay("1");//支付方式为"支付宝"
+        bill.setMoney(money);
+        bill.setOutOrIn("0");
 
-        if (request.getParameter("action").equals("auction")) {
+        if (jsonObj.getString("action").equals("auction")) {//拍卖订单尾款支付
 
-            //项目订单Id
-            AuctionOrder auctionOrder = (AuctionOrder)baseManager.getObject(AuctionOrder.class.getName(),request.getParameter("orderId"));
+           //项目订单Id
+           AuctionOrder auctionOrder = (AuctionOrder)baseManager.getObject(AuctionOrder.class.getName(),jsonObj.getString("orderId"));
            if(auctionOrder==null)
                return null;
 
             title = TITLE_AUCTION;
             billNo = auctionOrder.getId();
-        } else if (request.getParameter("action").equals("invest")) {
 
-            //融资项目Id
-            String artWorkId = request.getParameter("artWorkId");
+            bill.setDetail(user.getName()+"向项目<<"+auctionOrder.getArtwork().getTitle()+">>支付尾款:"+money);
+            bill.setType("2");
+        } else if (jsonObj.getString("action").equals("invest")) {//投资
+
+            //投资项目Id
+            String artWorkId = jsonObj.getString("artWorkId");
+            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
             if(StringUtils.isEmpty(artWorkId))
                 return null;
 
@@ -288,23 +303,101 @@ public class PaymentController extends BaseController {
             artworkInvest.setType(type);
             artworkInvest.setAccount(account);
             baseManager.saveOrUpdate(ArtworkInvest.class.getName(),artworkInvest);
+
             title = TITLE_INVEST;
             billNo = artworkInvest.getId();
-        } else if (request.getParameter("action").equals("add")) {
 
-            RechargeRecord rechargeRecord = new RechargeRecord();
-            rechargeRecord.setAccount(account);
-            rechargeRecord.setStatus("0");
-            rechargeRecord.setType(type);
-            rechargeRecord.setCurrentBalance(money);
-            rechargeRecord.setUser(user);
-            baseManager.saveOrUpdate(RechargeRecord.class.getName(),rechargeRecord);
+            bill.setDetail(user.getName()+"向项目<<"+artwork.getTitle()+">>投资:"+money);
+            bill.setType("1");
+        } else if (jsonObj.getString("action").equals("payMargin")) {//支付保证金
+            //投入保证金的项目Id
+            String artWorkId = jsonObj.getString("artWorkId");
+            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
+            if(StringUtils.isEmpty(artWorkId))
+                return null;
+            MarginAccount marginAccount = new MarginAccount();
+            marginAccount.setStatus("0");
+            marginAccount.setAccount(account);
+            marginAccount.setArtwork(artwork);
+            marginAccount.setCurrentBalance(money);
+            marginAccount.setUser(user);
+            baseManager.saveOrUpdate(MarginAccount.class.getName(),marginAccount);
             title = TITLE_ADD;
-            billNo = rechargeRecord.getId();
+            billNo = marginAccount.getId();
+
+            bill.setDetail(user.getName()+"向项目<<"+artwork.getTitle()+">>支付竞拍保证金："+money);
+            bill.setType("3");
         }
-        resultHtml = paymentManager.payBCOrder(billNo, title, money, map);
-        modelMap.put("resultHtml", resultHtml);
-        return "pay";
+         baseManager.saveOrUpdate(Bill.class.getName(),bill);
+         map.put("Bill_id",bill.getId());
+         BCOrder  bcOrder = paymentManager.payBCOrder(billNo, title, money, map);
+          bill.setNumber(bcOrder.getObjectId());
+          bill.setTitle(title);
+          bill.setFlowAccount(bcOrder.getChannelTradeNo());
+          baseManager.saveOrUpdate(Bill.class.getName(),bill);
+          data.put("url", bcOrder.getUrl());
+
+        return data;
+    }
+
+
+    /**打款接口
+     * action 用来判断是)  返还保证金(restoreMargin)  返利(reward)
+     * 充值(暂不支持)
+     * @param request
+     * @param modelMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/app/restore/main.do")
+    @ResponseBody
+    public Map restoreMain(HttpServletRequest request, ModelMap modelMap) throws Exception {
+        String url = "";
+        String batchNo = autoSerialManager.nextSerial("BatchNo");//批量付款批号
+        JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+        Map<String,Object> data = new HashMap<>();
+
+
+        //完成拍卖/进行返利的项目Id
+        Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artworkId"));
+        if(artwork==null)
+            return null;
+
+        if (jsonObj.getString("action").equals("restoreMargin")) {//返还保证金
+
+            //项目竞拍得主Id
+            String userId = jsonObj.getString("userId");
+            if(StringUtils.isEmpty(userId)){
+                return null;
+            }
+            //获取保证金表信息参数
+            LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+            param.put("userId", userId);
+            param.put("artworkId",artwork.getId());
+            //用户
+            User user = (User) baseManager.getObject(User.class.getName(),userId);
+
+            //返还保证金的list
+            List<MarginAccount> marginAccountList = (List<MarginAccount>)baseManager.getUniqueObjectByConditions(AppConfig.SQL_Margin_RESTORE,param);
+            if(marginAccountList!=null)
+                return null;
+            url = paymentManager.batchReturnMoney(batchNo,marginAccountList,"restoreMargin");
+
+        } else if (jsonObj.getString("action").equals("reward")) {//返利
+
+            //获取保证金表信息参数
+            LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+            param.put("artworkId",artwork.getId());
+            List<ROIRecord> roiRecordList = baseManager.listObject(AppConfig.SQL_Margin_REWARD,param);
+            if(roiRecordList==null)
+                return null;
+            url = paymentManager.batchReturnMoney(batchNo,roiRecordList,"reward");
+
+
+        }
+        data.put("url",url);
+
+        return data;
     }
 
     @RequestMapping("/app/pay/paysuccess.do")

@@ -3,9 +3,13 @@ package com.efeiyi.ec.art.artwork.service.impl;
 
 import cn.beecloud.BCCache;
 import cn.beecloud.BeeCloud;
+import cn.beecloud.bean.ALITransferData;
 import cn.beecloud.bean.BCException;
 import cn.beecloud.bean.BCOrder;
+import cn.beecloud.bean.TransfersParameter;
 import com.efeiyi.ec.art.artwork.service.PaymentManager;
+import com.efeiyi.ec.art.model.MarginAccount;
+import com.efeiyi.ec.art.model.ROIRecord;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.p.PConst;
 import com.ming800.core.p.service.AutoSerialManager;
@@ -20,6 +24,8 @@ import net.sf.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -35,6 +41,12 @@ public class PaymentManagerImpl implements PaymentManager {
     @Autowired
     private BaseManager baseManager;
 
+    @Autowired
+    private AutoSerialManager autoSerialManager;
+
+    private final static  String ACCOUNT_NO = "feiyipark@ich-park.com";//付款方支付宝账号
+
+    private final static  String ACCOUNT_NAME = "永新华韵文化发展有限公司";//付款方支付宝账户名称
 
 
     static {
@@ -101,7 +113,7 @@ public class PaymentManagerImpl implements PaymentManager {
      */
     //支付参数 通过BCOrder对象接收
     @Override
-   public String payBCOrder(String billNo, String title, BigDecimal money, Map<String,Object> map) throws BCException {
+   public BCOrder payBCOrder(String billNo, String title, BigDecimal money, Map<String,Object> map) throws BCException {
        BigDecimal price = new BigDecimal(money.floatValue() * 100);
        BCOrder bcOrder = new BCOrder(BCEumeration.PAY_CHANNEL.ALI_WEB,price.intValue(),billNo,title);
        bcOrder.setBillTimeout(360);
@@ -109,6 +121,45 @@ public class PaymentManagerImpl implements PaymentManager {
        bcOrder.setOptional(map);
        bcOrder = BCPay.startBCPay(bcOrder);
        System.out.println(bcOrder.getObjectId());
-       return bcOrder.getHtml();
+       return bcOrder;
    }
+
+
+    /**
+     * 批量打款
+     */
+    @Override
+    public  String batchReturnMoney(String batchNo, List transferDataList,String type) throws Exception {
+        String url = "";
+        List<ALITransferData> list = new ArrayList<>();
+        if(type.equals("restoreMargin")){
+            List<MarginAccount> marginAccountList = (List<MarginAccount>)transferDataList;
+            for(MarginAccount marginAccount :marginAccountList){
+                String  transferNote = "参与《"+marginAccount.getArtwork().getTitle()+"》项目的保证金";
+                Integer transferFee = marginAccount.getCurrentBalance().multiply(new BigDecimal(100)).intValue();
+                String  transferId = autoSerialManager.nextSerial("transferId");
+                ALITransferData data = new ALITransferData(transferId,"1055303387@qq.com","青石",transferFee,transferNote);
+
+            }
+        }else if(type.equals("reward")){
+            List<ROIRecord> roiRecordList = (List<ROIRecord>)transferDataList;
+            for (ROIRecord roiRecord : roiRecordList){
+                String  transferNote = "参与《"+roiRecord.getArtwork().getTitle()+"》项目投资的本金"+roiRecord.getInvestMoney()+"及收益"+roiRecord.getCurrentBalance();
+                Integer transferFee = roiRecord.getCurrentBalance().add(roiRecord.getInvestMoney()).multiply(new BigDecimal(100)).intValue();
+                String  transferId = autoSerialManager.nextSerial("transferId");
+                ALITransferData data = new ALITransferData(transferId,"1055303387@qq.com","青石",transferFee,transferNote);
+            }
+
+        }
+        TransfersParameter para = new TransfersParameter();
+        para.setBatchNo(batchNo);
+        para.setAccountName(ACCOUNT_NAME);
+        para.setTransferDataList(list);
+        para.setChannel(BCEumeration.PAY_CHANNEL.ALI);
+            url = BCPay.startTransfers(para);
+
+        return url;
+    }
+
+
 }

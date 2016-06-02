@@ -96,4 +96,9 @@ public class AppConfig {
     public static final String SQL_IS_PRAISE = "SELECT a " +
 //            ",IF((select COUNT(c.artwork.id) from ArtWorkPraise c WHERE c.user.id = :currentUserId)>0,'true','false') AS isPraise " +
             "from ArtWorkPraise a where user.id = :userId and status !='0'";
+
+    //返还保证金
+    public static final String SQL_Margin_RESTORE = "FROM MarginAccount where user.id!=:userId and artwork.id=:artworkId and status ='1'" ;
+    //返利
+    public static final String SQL_Margin_REWARD = "FROM ROIRecord where  artwork.id=:artworkId and status ='1'" ;
 }
