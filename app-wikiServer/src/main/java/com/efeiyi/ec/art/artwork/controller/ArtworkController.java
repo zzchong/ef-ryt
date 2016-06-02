@@ -1001,7 +1001,96 @@ public class ArtworkController extends BaseController {
         }
 
     }
+    /**
+     * 项目完成接口
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/artworkComplete.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map artworkComplete(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(request.getParameter("artworkId"));//************记录请求报文
+            logBean.setApiName("artworkComplete");
+            if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
 
+                    || "".equals(request.getParameter("artworkId")))
+                   {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            //校验数字签名
+            String signmsg = request.getParameter("signmsg");
+            treeMap.put("artworkId", request.getParameter("artworkId"));
+            treeMap.put("timestamp", request.getParameter("timestamp"));
+            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), request.getParameter("artworkId"));
+            try {
+                if (artwork != null && artwork.getId() != null) {
+
+                    //创建一个通用的多部分解析器
+                    CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+                    //判断 request 是否有文件上传,即多部分请求
+                    if (multipartResolver.isMultipart(request)) {
+                        //转换成多部分request
+                        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+                        //取得request中的所有文件名
+                        Iterator<String> iter = multiRequest.getFileNames();
+                        int i = 0 ;
+                        while (iter.hasNext()) {
+                            //取得上传文件
+                            MultipartFile file = multiRequest.getFile(iter.next());
+                            if (file != null) {
+                                //取得当前上传文件的文件名称
+                                String myFileName = file.getOriginalFilename();
+                                //如果名称不为“”,说明该文件存在，否则说明该文件不存在
+                                if (myFileName.trim() != "") {
+                                    //重命名上传后的文件名
+                                    String url = "artwork/"+System.currentTimeMillis()+myFileName;
+                                    String pictureUrl = "http://rongyitou2.efeiyi.com/" +url;
+                                    //将图片上传至阿里云
+                                    aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
+                                 if(i==0){
+                                     artwork.setPicture_url(pictureUrl);
+                                 }else if(i==1){
+                                     artwork.setPictureBottom(pictureUrl);
+                                 }else if(i==2){
+                                     artwork.setPictureSide(pictureUrl);
+                                 }
+                                    baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+                                }
+                                i++;
+                            }
+                        }
+                    }
+                    resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+                    resultMap.put("artwork", artwork);
+                    return resultMap;
+
+                } else {
+                    return resultMapHandler.handlerResult("10008", "查无数据，稍后再试", logBean);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return resultMapHandler.handlerResult("10005", "查询数据出现异常", logBean);
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+    }
 
     /**
      * 项目进展动态查询接口

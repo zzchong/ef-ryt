@@ -68,6 +68,9 @@ public class Artwork implements Serializable {
     private boolean isPraise;//冗余字段 在获取点赞项目接口中使用
     private Integer viewNum=0;//浏览次数
 
+    private String pictureBottom;//俯视图
+    private String pictureSide;//侧视图
+
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -475,5 +478,23 @@ public class Artwork implements Serializable {
 
     public void setViewNum(Integer viewNum) {
         this.viewNum = viewNum;
+    }
+
+    @Column(name = "picture_bottom")
+    public String getPictureBottom() {
+        return pictureBottom;
+    }
+
+    public void setPictureBottom(String pictureBottom) {
+        this.pictureBottom = pictureBottom;
+    }
+
+    @Column(name = "picture_side")
+    public String getPictureSide() {
+        return pictureSide;
+    }
+
+    public void setPictureSide(String pictureSide) {
+        this.pictureSide = pictureSide;
     }
 }

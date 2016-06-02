@@ -187,7 +187,7 @@ public class PaymentManagerImpl implements PaymentManager {
         }
         TransfersParameter para = new TransfersParameter();
         para.setBatchNo(batchNo);
-        para.setAccountName(ACCOUNT_NAME);
+        para.setAccountName(ACCOUNT_NO);
         para.setTransferDataList(list);
         para.setChannel(BCEumeration.PAY_CHANNEL.ALI);
         url = BCPay.startTransfers(para);
