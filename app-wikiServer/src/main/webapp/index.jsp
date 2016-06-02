@@ -17,7 +17,6 @@
 
 </head>
 <body>
-<form action="<c:url value="/app/uploadFile.do" />" id="thisForm" method="post" enctype="multipart/form-data">
     <input type="hidden" value="ih36t7ir18t05e6w" name="userId"/>
     <p>name:<input type="file" name="two"/></p>
     <p>gender:<input type="file" name="two"/></p>
@@ -31,7 +30,22 @@
     </audio>
 
     <textarea id="editor" placeholder="这里输入内容" autofocus></textarea>
-</form>
+    <form action="<c:url value="/app/initNewArtWork2.do" />" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="file" name="file">
+        <input type="file" name="file">
+        <input type="text" value="项目说明" name="description">
+        <input type="text" value="制作说明" name="make_instru">
+        <input type="text" value="融资答疑" name="financing_aq">
+        <input type="hidden" value="add" name="actions">
+        <input type="hidden" value="add" name="actions">
+        <input type="hidden" value="add" name="actions">
+        <input type="hidden" value="" name="attachmentIds">
+        <input type="hidden" value="" name="attachmentIds">
+        <input type="hidden" value="" name="attachmentIds">
+        <input type="hidden" value="qydeyugqqiugd2" name="artworkId">
+        <input type="submit" value="测试编辑项目">
+    </form>
 
 <script type="text/javascript">
     $(function(){

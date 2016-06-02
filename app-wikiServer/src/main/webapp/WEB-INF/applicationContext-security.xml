@@ -7,7 +7,7 @@
                         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
     <!-- 配置不过滤的资源（静态资源及登录相关） -->
-    <http pattern="/**/*.css" security="none"/>
+    <http pattern="/**/*.css"  security="none"/>
     <http pattern="/**/*.jpg" security="none"/>
     <http pattern="/**/*.jpeg" security="none"/>
     <http pattern="/**/*.gif" security="none"/>
@@ -20,6 +20,8 @@
     <!--SSO -->
     <http auto-config="true" entry-point-ref="casEntryPoint" use-expressions="true">
         <csrf disabled="true"/>
+        <!--<intercept-url pattern="/" access="isAuthenticated()"/>-->
+        <intercept-url pattern="/wap/getArtWorkList.do" access="isAuthenticated()"/>
         <intercept-url pattern="/wap/projectAttention" access="isAuthenticated()"/>
         <intercept-url pattern="/brifProject/**" access="isAuthenticated()"/>
         <intercept-url pattern="/listProduct/**" access="isAuthenticated()"/>
@@ -45,6 +47,10 @@
         <custom-filter ref="singleLogoutFilter" before="CAS_FILTER" />
         <custom-filter position="CAS_FILTER" ref="casFilter"/>
 
+        <session-management>
+            <concurrency-control max-sessions="1"
+                                 expired-url="/access/same_login.do" error-if-maximum-exceeded="false" />
+        </session-management>
     </http>
 
     <!--<b:bean id="casEntryPoint"  class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
@@ -52,51 +58,31 @@
         &lt;!&ndash;<b:property name="loginUrl" value="http://192.168.1.57/cas/login"/>&ndash;&gt;
         <b:property name="serviceProperties" ref="serviceProperties"/>
     </b:bean>-->
-    <b:bean id="casEntryPoint"  class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
-        <b:property name="loginUrl" value="http://passport.efeiyi.com/login"/>
-        <!--<b:property name="loginUrl" value="http://192.168.1.57/cas/login"/>-->
-        <b:property name="serviceProperties" ref="serviceProperties"/>
+
+
+
+
+
+
+     <!--cas认证过滤器-->
+    <b:bean id="casFilter"  class="org.springframework.security.cas.web.CasAuthenticationFilter">
+        <b:property name="authenticationManager" ref="authenticationManager"/>
+        <!--<b:property name="authenticationFailureHandler" ref="authenticationFailureHandler"/>-->
+        <b:property name="authenticationSuccessHandler" ref="authenticationSuccessHandler"/>
+        <b:property name="filterProcessesUrl" value="/j_spring_cas_security_check"/>
     </b:bean>
+
+    <!--认证失败控制器-->
+    <!--<b:bean id="authenticationFailureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">-->
+        <!--<b:property name="defaultFailureUrl" value="fail.jsp"/>-->
+    <!--</b:bean>-->
+
+    <!--认证成功控制器-->
     <b:bean id="authenticationSuccessHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">
         <b:property name="alwaysUseDefaultTargetUrl" value="false"/>
         <b:property name="defaultTargetUrl"  value="/"/>
     </b:bean>
 
-    <b:bean id="serviceProperties"  class="org.springframework.security.cas.ServiceProperties">
-        <b:property name="service"  value="http://www.efeiyi.com/j_spring_cas_security_check"/>
-        <!--<b:property name="service"  value="http://192.168.1.61:8082/j_spring_cas_security_check"/>-->
-        <b:property name="sendRenew" value="false"/>
-    </b:bean>
-
-
-
-    <b:bean id="casFilter"  class="org.springframework.security.cas.web.CasAuthenticationFilter">
-        <b:property name="authenticationManager" ref="authenticationManager"/>
-    </b:bean>
-
-    <authentication-manager alias="authenticationManager">
-        <authentication-provider ref="casAuthenticationProvider"/>
-    </authentication-manager>
-
-    <b:bean id="casAuthenticationUserDetailsService" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
-        <b:property name="userDetailsService" >
-            <b:ref bean="userManager" />
-        </b:property>
-    </b:bean>
-
-    <b:bean id="casAuthenticationProvider"
-            class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
-        <b:property name="authenticationUserDetailsService" ref="casAuthenticationUserDetailsService"/>
-        <b:property name="serviceProperties" ref="serviceProperties" />
-        <b:property name="ticketValidator">
-            <b:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
-                <b:constructor-arg index="0" value="http://passport.efeiyi.com" />
-               <!-- <b:constructor-arg index="0" value="http://192.168.1.57/cas" />-->
-            </b:bean>
-        </b:property>
-        <b:property name="key" value="an_id_for_this_auth_provider_only"/>
-    </b:bean>
-    <!--<b:bean id="loginOutSuccessHandler" class="com.efeiyi.ec.website.organization.LoginOutSuccessHandler"/>-->
     <!-- 注销客户端 -->
     <b:bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter" />
 
@@ -104,15 +90,64 @@
     <b:bean id="requestSingleLogoutFilter"
             class="org.springframework.security.web.authentication.logout.LogoutFilter">
         <b:constructor-arg
-        value="http://passport.efeiyi.com/logout?service=http://craft2.efeiyi.com" />
-       <!-- value="http://192.168.1.57/cas/logout?service=http://192.168.1.61:8082" />-->
-
-
-
+                value="http://localhost:8080/logout" />
+        <!-- value="http://192.168.1.57/cas/logout?service=http://192.168.1.61:8082" />-->
         <b:constructor-arg>
             <b:bean
                     class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
         </b:constructor-arg>
         <b:property name="filterProcessesUrl" value="/j_spring_cas_security_logout" />
     </b:bean>
+
+    <!--登录后返回地址-->
+    <b:bean id="serviceProperties"  class="org.springframework.security.cas.ServiceProperties">
+        <b:property name="service"  value="http://localhost:8080/j_spring_cas_security_check"/>
+        <!--<b:property name="service"  value="http://192.168.1.61:8082/j_spring_cas_security_check"/>-->
+        <b:property name="sendRenew" value="false"/>
+    </b:bean>
+
+    <!--CAS认证切入点，声明cas服务器端登录的地址-->
+    <b:bean id="casEntryPoint"  class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+        <b:property name="loginUrl" value="http://localhost:8080/login"/>
+        <!--<b:property name="loginUrl" value="http://192.168.1.57/cas/login"/>-->
+        <b:property name="serviceProperties" ref="serviceProperties"/>
+    </b:bean>
+
+    <!--cas认证提供器，定义客户端验证方式-->
+    <b:bean id="casAuthenticationProvider"
+            class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+        <!--客户端只验证用户名是否合法-->
+        <b:property name="authenticationUserDetailsService" ref="casAuthenticationUserDetailsService"/>
+        <b:property name="serviceProperties" ref="serviceProperties" />
+        <b:property name="ticketValidator">
+            <b:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+                <b:constructor-arg index="0" value="http://localhost:8080" />
+                <!-- <b:constructor-arg index="0" value="http://192.168.1.57/cas" />-->
+            </b:bean>
+        </b:property>
+        <b:property name="key" value="an_id_for_this_auth_provider_only"/>
+    </b:bean>
+
+    <!--用户名验证-->
+    <b:bean id="casAuthenticationUserDetailsService" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+        <b:property name="userDetailsService" >
+            <b:ref bean="userManager" />
+        </b:property>
+    </b:bean>
+
+
+    <!--在认证管理器中注册cas认证提供器-->
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="casAuthenticationProvider"/>
+    </authentication-manager>
+
+    <!-- 事件日志 -->
+    <b:bean id="loggerListener"
+                class="org.springframework.security.authentication.event.LoggerListener" />
+
+
+    <!--<b:bean id="loginOutSuccessHandler" class="com.efeiyi.ec.website.organization.LoginOutSuccessHandler"/>-->
+
+
+
 </b:beans>
