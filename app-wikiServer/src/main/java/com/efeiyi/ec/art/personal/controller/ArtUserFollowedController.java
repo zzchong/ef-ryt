@@ -116,6 +116,7 @@ public class ArtUserFollowedController extends BaseController {
                             } else {
                                 followUserUtil.setMaster(null);
                             }
+                            followUserUtil.setFlag("1");
                             followUserUtils.add(followUserUtil);
                         } else if (type.equals("2")) {
                             List<UserBrief> userBrief = (List<UserBrief>) baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
@@ -125,6 +126,7 @@ public class ArtUserFollowedController extends BaseController {
                             } else {
                                 followUserUtil.setUserBrief(new UserBrief());
                             }
+                            followUserUtil.setFlag("1");
                             followUserUtils.add(followUserUtil);
                         }
 
@@ -279,6 +281,7 @@ public class ArtUserFollowedController extends BaseController {
                             } else {
                                 followUserUtil.setMaster(null);
                             }
+                            followUserUtil.setFlag("1");
                             followUserUtils.add(followUserUtil);
                         } else if (type.equals("2")) {
                             List<UserBrief> userBrief = (List<UserBrief>) baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
@@ -288,6 +291,7 @@ public class ArtUserFollowedController extends BaseController {
                             } else {
                                 followUserUtil.setUserBrief(new UserBrief());
                             }
+                            followUserUtil.setFlag("1");
                             followUserUtils.add(followUserUtil);
                         }
 
