@@ -89,9 +89,9 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
                 return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
             }
             LinkedHashMap queryMap = new LinkedHashMap();
-            queryMap.put("userId", jsonObj.getString("userId"));
-            queryMap.put("artworkId", jsonObj.getString("artworkId"));
-            MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
+            queryMap.put("currentUserId", jsonObj.getString("currentUserId"));
+            queryMap.put("artWorkId", jsonObj.getString("artWorkId"));
+            MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :currentUserId AND a.artwork.id = :artWorkId", queryMap);
             if (marginAccount == null || !"0".equals(marginAccount.getStatus())) {//未冻结拍卖保证金
                 return resultMapHandler.handlerResult("10019", "未冻结拍卖保证金", logBean);
             }
@@ -136,21 +136,21 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
     @Transactional
     public Map artWorkAuctionPayDeposit(HttpServletRequest request, JSONObject jsonObj, LogBean logBean) {
         //项目信息
-        Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artworkId"));
+        Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
         if (!"31".equals(artwork.getStep())  //校验拍卖中
                 || !"0".equals(artwork.getStatus()) //校验拍卖未废弃
                 || new Date().compareTo(artwork.getAuctionEndDatetime()) > 0) {//校验拍卖未结束
             return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
         }
         LinkedHashMap queryMap = new LinkedHashMap();
-        queryMap.put("userId", jsonObj.getString("userId"));
-        queryMap.put("artworkId", jsonObj.getString("artworkId"));
-        MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
+        queryMap.put("currentUserId", jsonObj.getString("currentUserId"));
+        queryMap.put("artWorkId", jsonObj.getString("artWorkId"));
+        MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :currentUserId AND a.artwork.id = :artWorkId", queryMap);
         if (marginAccount != null) {//已缴保证金
             return resultMapHandler.handlerResult("0", "成功", logBean);
         }
-        queryMap.remove("artworkId");
-        Account account = (Account) baseManager.getUniqueObjectByConditions("From Account a WHERE a.user.id = :userId", queryMap);
+        queryMap.remove("artWorkId");
+        Account account = (Account) baseManager.getUniqueObjectByConditions("From Account a WHERE a.user.id = :currentUserId", queryMap);
         BigDecimal deposit = artwork.getStartingPrice().movePointLeft(1);
         if (deposit.compareTo(account.getCurrentUsableBalance()) > 0 //保证金充足?
                 || deposit.compareTo(account.getCurrentBalance()) > 0) {
@@ -189,8 +189,8 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
         /**artWorkAuctionView.do测试加密参数**/
         //map.put("artWorkId","qydeyugqqiugd2");
         map.put("timestamp", timestamp);
-        map.put("userId", "igxhnwhnmhlwkvnw");
-        map.put("artworkId", "qydeyugqqiugd7");
+        map.put("currentUserId", "igxhnwhnmhlwkvnw");
+        map.put("artWorkId", "qydeyugqqiugd7");
         map.put("price", "500");
 
         String signmsg = DigitalSignatureUtil.encrypt(map);
