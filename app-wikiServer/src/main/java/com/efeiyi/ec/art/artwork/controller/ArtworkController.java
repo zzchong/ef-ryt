@@ -195,13 +195,19 @@ public class ArtworkController extends BaseController {
             }
             //投资人
             List<User> investPeople = null;
+            LinkedHashMap<String,Object> params = new LinkedHashMap<>();
+            params.put("artworkId",jsonObj.getString("artWorkId"));
+            List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_TOP,params);
+//            xQuery = new XQuery("listArtworkInvest1_default", request);
             //投资人数
             Integer investNum = 0;
-            if (artwork.getArtworkInvests() != null) {
-                investNum = artwork.getArtworkInvests().size();
+            if (artworkInvestList != null) {
+                investNum = artworkInvestList.size();
                 investPeople = new ArrayList<>();
-                for (ArtworkInvest artworkInvest : artwork.getArtworkInvests()){
-                    investPeople.add(artworkInvest.getCreator());
+                if(artworkInvestList.size()!=0) {
+                    for (ArtworkInvest artworkInvest : artworkInvestList) {
+                        investPeople.add(artworkInvest.getCreator());
+                    }
                 }
             }
 
@@ -325,8 +331,10 @@ public class ArtworkController extends BaseController {
 
             //投资记录列表
             List<ArtworkInvest> artworkInvestList = null;
+
             //投资top
             List<ArtworkInvest> artworkInvestTopList = null;
+
             //temp
             List<ArtworkInvest> artworkInvestTopTempList = null;
 
@@ -341,9 +349,12 @@ public class ArtworkController extends BaseController {
 
             data.put("artworkInvestList", artworkInvestList);
 
-            xQuery = new XQuery("listArtworkInvest1_default", request);
-            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-            artworkInvestTopTempList = baseManager.listObject(xQuery);
+            LinkedHashMap<String,Object> params = new LinkedHashMap<>();
+            params.put("artworkId",jsonObj.getString("artWorkId"));
+            artworkInvestTopTempList =(List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_TOP,params);
+//            xQuery = new XQuery("listArtworkInvest1_default", request);
+//            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
+//            artworkInvestTopTempList = baseManager.listObject(xQuery);
             if (artworkInvestTopTempList != null) {
                 if (artworkInvestTopTempList.size() > 3) {
                     artworkInvestTopList = new ArrayList<>();
@@ -680,7 +691,7 @@ public class ArtworkController extends BaseController {
                     }else {
                         artwork = new Artwork();
                     }
-                    artwork.setStatus("0");//不可用状态，不能进入融资阶段
+                    artwork.setStatus("1");//不可用状态，不能进入融资阶段
                     artwork.setType("0");
                     artwork.setStep("100");//编辑阶段，尚未提交 提交后置为 10
                     artwork.setTitle(request.getParameter("title"));

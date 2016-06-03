@@ -101,4 +101,6 @@ public class AppConfig {
     public static final String SQL_Margin_RESTORE = "FROM MarginAccount where user.id!=:userId and artwork.id=:artWorkId and status ='1'" ;
     //返利
     public static final String SQL_Margin_REWARD = "FROM ROIRecord where  artwork.id=:artWorkId and status ='1'" ;
+
+    public  static final String SQL_INVEST_TOP = "FROM ArtworkInvest  where artwork.id = :artworkId and status !='0'  GROUP BY creator.id ORDER BY SUM(price) DESC";
 }
