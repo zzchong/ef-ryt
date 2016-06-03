@@ -455,8 +455,23 @@ public class AuctionController extends BaseController {
             pageEntity1.setIndex(1);
             pageEntity1.setSize(3);
             List<ArtworkBidding> biddingTopThree = baseManager.listPageInfo(xQuery1).getList();
+
+            //竞价记录
+            XQuery xQuery2 = new XQuery("listArtworkBidding_default", request);
+            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
+            List<ArtworkBidding> artworkBiddings = (List<ArtworkBidding>) baseManager.listObject(xQuery);
+            //竞拍人数
+            Integer num = 0;
+            List<User> users = new ArrayList<>();
+            for (ArtworkBidding artworkBidding:artworkBiddings){
+                if(!users.contains(artworkBidding.getCreator())){
+                    users.add(artworkBidding.getCreator());
+                }
+            }
+            num = users.size();
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "查询成功");
+            resultMap.put("biddingUsersNum", num);
             resultMap.put("artworkBiddingList", artworkBiddingList);
             resultMap.put("biddingTopThree", biddingTopThree);
         } catch (Exception e) {
