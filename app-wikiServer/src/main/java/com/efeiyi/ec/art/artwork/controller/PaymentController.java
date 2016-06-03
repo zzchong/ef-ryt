@@ -464,6 +464,7 @@ public class PaymentController extends BaseController {
             data.put("rewardMoney",rewardMoney);
 
             XQuery xQuery = new XQuery("plistBill_default", request);
+            xQuery.put("author_id",jsonObj.getString("userId"));
             PageEntity pageEntity = new PageEntity();
             pageEntity.setSize(jsonObj.getInteger("pageSize"));
             pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
