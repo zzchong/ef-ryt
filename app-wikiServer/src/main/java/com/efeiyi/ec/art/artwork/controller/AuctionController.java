@@ -168,13 +168,13 @@ public class AuctionController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionView");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
+            if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("artworkId", jsonObj.getString("artworkId"));
+            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -182,7 +182,7 @@ public class AuctionController extends BaseController {
             }
 
             //项目信息
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artworkId"));
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
             //增加浏览数
             if(artwork.getViewNum() == null){
                 artwork.setViewNum(1);
@@ -430,7 +430,7 @@ public class AuctionController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artworkId", jsonObj.getString("artworkId"));
+            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
             treeMap.put("pageIndex", jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
@@ -440,15 +440,23 @@ public class AuctionController extends BaseController {
             }
 
             XQuery xQuery = new XQuery("listArtworkBidding_default", request);
-            xQuery.put("artwork_id", jsonObj.getString("artworkId"));
+            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
             PageEntity pageEntity = new PageEntity();
             pageEntity.setSize(jsonObj.getInteger("pageSize"));
             pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
             xQuery.setPageEntity(pageEntity);
             artworkBiddingList = baseManager.listPageInfo(xQuery).getList();
+
+            XQuery xQuery1 = new XQuery("plistArtworkBidding_default1", request);
+            xQuery1.put("artwork_id", jsonObj.getString("artWorkId"));
+            PageEntity pageEntity1 = new PageEntity();
+            pageEntity1.setIndex(1);
+            pageEntity1.setSize(3);
+            List<ArtworkBidding> biddingTopThree = baseManager.listPageInfo(xQuery1).getList();
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "查询成功");
             resultMap.put("artworkBiddingList", artworkBiddingList);
+            resultMap.put("biddingTopThree", biddingTopThree);
         } catch (Exception e) {
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
