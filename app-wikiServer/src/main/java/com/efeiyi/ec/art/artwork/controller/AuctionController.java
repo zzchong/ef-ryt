@@ -174,7 +174,7 @@ public class AuctionController extends BaseController {
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
+            treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -217,7 +217,7 @@ public class AuctionController extends BaseController {
                 isSubmitDepositPrice = "0";
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-            resultMap.put("artWork", artwork);
+            resultMap.put("artwork", artwork);
             resultMap.put("isSubmitDepositPrice",isSubmitDepositPrice);
         } catch (Exception e) {
             e.printStackTrace();
@@ -245,13 +245,13 @@ public class AuctionController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("currentUserId")) || "".equals(jsonObj.getString("artWorkId")) || "".equals(jsonObj.getString("money"))) {
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("artworkId")) || "".equals(jsonObj.getString("money"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("userId", jsonObj.getString("userId"));
-            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
+            treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             treeMap.put("price", jsonObj.getString("price"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
@@ -280,13 +280,13 @@ public class AuctionController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("currentUserId")) || "".equals(jsonObj.getString("artWorkId")) || "".equals(jsonObj.getString("money"))) {
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("artworkId")) || "".equals(jsonObj.getString("money"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
+            treeMap.put("userId", jsonObj.getString("userId"));
+            treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -328,7 +328,7 @@ public class AuctionController extends BaseController {
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("type", jsonObj.getString("type"));
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
+            treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
 
@@ -338,19 +338,19 @@ public class AuctionController extends BaseController {
             //获取订单(2、待付款 3、待收货 4、已完成 1、全部)
             if("2".equals(jsonObj.getString("type"))){
                 XQuery xQuery = new XQuery("listAuctionOrder_default1", request);
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", jsonObj.getString("userId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
             }else if ("3".equals(jsonObj.getString("type"))){
                 XQuery xQuery = new XQuery("listAuctionOrder_default2", request);
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", jsonObj.getString("userId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
             }else if ("4".equals(jsonObj.getString("type"))){
                 XQuery xQuery = new XQuery("listAuctionOrder_default3", request);
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", jsonObj.getString("userId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
             }else {
                 XQuery xQuery = new XQuery("listAuctionOrder_default", request);
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", jsonObj.getString("userId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
             }
 
@@ -383,13 +383,13 @@ public class AuctionController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("currentUserId")) || "".equals(jsonObj.getString("artWorkId")) || "".equals(jsonObj.getString("money"))) {
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("artworkId")) || "".equals(jsonObj.getString("money"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("userId", jsonObj.getString("userId"));
-            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
+            treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             treeMap.put("price", jsonObj.getString("price"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
@@ -430,7 +430,7 @@ public class AuctionController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
+            treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
             treeMap.put("pageIndex", jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
@@ -440,7 +440,7 @@ public class AuctionController extends BaseController {
             }
 
             XQuery xQuery = new XQuery("listArtworkBidding_default", request);
-            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
+            xQuery.put("artwork_id", jsonObj.getString("artworkId"));
             PageEntity pageEntity = new PageEntity();
             pageEntity.setSize(jsonObj.getInteger("pageSize"));
             pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
@@ -448,7 +448,7 @@ public class AuctionController extends BaseController {
             artworkBiddingList = baseManager.listPageInfo(xQuery).getList();
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "查询成功");
-            resultMap.put("artWorkBiddingList", artworkBiddingList);
+            resultMap.put("artworkBiddingList", artworkBiddingList);
         } catch (Exception e) {
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -479,7 +479,7 @@ public class AuctionController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
+            treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -512,7 +512,7 @@ public class AuctionController extends BaseController {
 
         /**artWorkAuctionList.do测试加密参数**/
         map.put("currentUserId", "123456");
-        map.put("artWorkId", "qydeyugqqiugd7");
+        map.put("artworkId", "qydeyugqqiugd7");
         /**artWorkAuctionView.do测试加密参数**/
         //map.put("artWorkId","qydeyugqqiugd2");
         map.put("timestamp", timestamp);
@@ -525,7 +525,7 @@ public class AuctionController extends BaseController {
         /**json参数  artWorkAuctionView.do测试 **/
         //String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artWorkAuctionList.do测试 **/
-        String json = "{\"currentUserId\":\"123456\",\"artWorkId\":\"qydeyugqqiugd7\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"currentUserId\":\"123456\",\"artworkId\":\"qydeyugqqiugd7\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
