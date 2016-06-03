@@ -5,7 +5,7 @@ import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
-import com.efeiyi.ec.art.message.bean.MessageRead;
+//import com.efeiyi.ec.art.message.bean.MessageRead;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkComment;

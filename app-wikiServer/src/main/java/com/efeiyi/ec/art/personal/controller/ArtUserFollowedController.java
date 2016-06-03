@@ -163,7 +163,7 @@ public class ArtUserFollowedController extends BaseController {
                         String is_followed = "2";
                         ArtUserFollowed followed = null;
                         List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap);
-                        if (artUserFollowedList!=null)
+                        if (artUserFollowedList!=null && artUserFollowedList.size()!=0)
                             followed = artUserFollowedList.get(0);
                         if (followed != null && followed.getId() != null) {
                             is_followed = "1";
@@ -328,7 +328,7 @@ public class ArtUserFollowedController extends BaseController {
                         String is_followed = "2";
                         ArtUserFollowed followed = null;
                         List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(AppConfig.SQL_GET_IS_FOLLOWED, paramMap);
-                        if (artUserFollowedList!=null)
+                        if (artUserFollowedList!=null && artUserFollowedList.size()!=0)
                             followed = artUserFollowedList.get(0);
                         if (followed != null && followed.getId() != null) {
                             is_followed = "1";
@@ -418,7 +418,7 @@ public class ArtUserFollowedController extends BaseController {
                 xQuery.put("user_id",userId);
                 xQuery.put("follower_id",followId);
                 List<ArtUserFollowed> artUserFollowedList = baseManager.listObject(xQuery);
-                if(artUserFollowedList!=null)
+                if(artUserFollowedList!=null && artUserFollowedList.size()!=0)
                     userFollowed = artUserFollowedList.get(0);
                 else
                     userFollowed = new ArtUserFollowed();
@@ -433,14 +433,14 @@ public class ArtUserFollowedController extends BaseController {
                     userFollowed.setStatus("1");
                     baseManager.saveOrUpdate(ArtUserFollowed.class.getName(), userFollowed);
                     resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
-                    resultMap.put("status","1");
+                    resultMap.put("flag","1");
                     resultMap.put("artUserFollowed", userFollowed);
                 } else if ("1".equals(jsonObj.getString("identifier"))) {
                     userFollowed.setStatus("0");
                     baseManager.saveOrUpdate(ArtUserFollowed.class.getName(), userFollowed);
                     resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("artUserFollowed", userFollowed);
-                    resultMap.put("status","0");
+                    resultMap.put("flag","2");
                 }
             } else {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
