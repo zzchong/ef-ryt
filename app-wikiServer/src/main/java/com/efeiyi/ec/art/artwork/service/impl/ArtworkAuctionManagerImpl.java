@@ -81,7 +81,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
 //            lock.get().lock();
             lock.lock();
             //项目信息
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artworkId"));
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
             if (!"31".equals(artwork.getStep())  //校验拍卖中
                     || !"0".equals(artwork.getStatus()) //校验拍卖未废弃
                     || new Date().compareTo(artwork.getAuctionEndDatetime()) > 0 //校验拍卖未结束
@@ -113,6 +113,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             EfeiyiPush.buildPushObject_android_and_ios_message(map);
 
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+            resultMap.put("artWorkBidding", artworkBidding);
         } catch (Exception e) {
             e.getMessage();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -138,7 +139,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
         //项目信息
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artworkId"));
         if (!"31".equals(artwork.getStep())  //校验拍卖中
-                || !"0".equals(artwork.getStatus()) //校验拍卖未废弃
+                || "0".equals(artwork.getStatus()) //校验拍卖未废弃
                 || new Date().compareTo(artwork.getAuctionEndDatetime()) > 0) {//校验拍卖未结束
             return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
         }
