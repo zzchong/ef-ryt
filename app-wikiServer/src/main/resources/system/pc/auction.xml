@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module name="order" label="订单" version="" package="com.efeiyi.ec.art.model" path="">
+
+    <entities>
+        <entity name="AuctionOrder" label="拍卖订单"  model="com.efeiyi.ec.art.model.AuctionOrder">
+            <does>
+                <do name="listAuctionOrder" access="" label="拍卖订单">
+                    <query name="default" label="全部订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                    </query>
+                    <query name="default1" label="待付款订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="0" operation="eq"/>
+                    </query>
+                    <query name="default2" label="待收货订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="3" operation="eq"/>
+                    </query>
+                    <query name="default3" label="已完成订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="2" operation="eq"/>
+                    </query>
+                </do>
+            </does>
+        </entity>
+        <entity name="ArtworkBidding" label="拍卖记录"  model="com.efeiyi.ec.art.model.ArtworkBidding">
+            <does>
+                <do name="plistArtworkBidding" access="" label="拍卖记录">
+                    <query name="default" label="拍卖记录" type="auto" orderBy="createDatetime:desc">
+                        <condition name="artwork.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                    </query>
+                </do>
+            </does>
+        </entity>
+    </entities>
+</module>
