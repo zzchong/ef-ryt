@@ -10,10 +10,12 @@ import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AutoSerialManager;
+import com.ming800.core.taglib.PageEntity;
 import com.ming800.core.util.CookieTool;
 import net.sf.json.JSON;
 import org.apache.commons.lang.SystemUtils;
@@ -417,6 +419,50 @@ public class PaymentController extends BaseController {
         return "paySuccess";
     }
 
+
+    /**
+     * 交易记录
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/transactionRecord.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map transactionRecord(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
+        List objectList = null;
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("transactionRecord");
+            if (!CommonUtil.jsonObject(jsonObj)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            XQuery xQuery = new XQuery("plistBill_default", request);
+            PageEntity pageEntity = new PageEntity();
+            pageEntity.setSize(jsonObj.getInteger("pageSize"));
+            pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
+            xQuery.setPageEntity(pageEntity);
+            List<Bill> billList = baseManager.listObject(xQuery);
+            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+            resultMap.put("object", billList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
 
     @Test
     public void testArtworkView() throws Exception {
