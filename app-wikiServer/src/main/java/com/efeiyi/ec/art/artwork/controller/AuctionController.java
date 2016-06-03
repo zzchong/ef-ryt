@@ -193,7 +193,7 @@ public class AuctionController extends BaseController {
 //                ArtWorkBean artWorkBean = new ArtWorkBean();
 //                artWorkBean.setArtwork(artwork);
 //               // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-            /*//竞价记录
+            //竞价记录
             XQuery xQuery = new XQuery("listArtworkBidding_default", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
             List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>) baseManager.listObject(xQuery);
@@ -208,7 +208,7 @@ public class AuctionController extends BaseController {
             //项目动态
             xQuery = new XQuery("listArtworkMessage_default", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-            List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>) baseManager.listObject(xQuery);*/
+            List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>) baseManager.listObject(xQuery);
 
             //判断是否交付保证金
             String isSubmitDepositPrice = "1";
@@ -218,7 +218,9 @@ public class AuctionController extends BaseController {
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             resultMap.put("artwork", artwork);
-            resultMap.put("isSubmitDepositPrice",isSubmitDepositPrice);
+            resultMap.put("artWorkBidding", artworkBiddingList);
+            resultMap.put("artWorkMessage", artworkMessageList);
+            resultMap.put("isSubmitDepositPrice", isSubmitDepositPrice);
         } catch (Exception e) {
             e.printStackTrace();
 
