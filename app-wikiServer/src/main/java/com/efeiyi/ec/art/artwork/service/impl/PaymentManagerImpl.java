@@ -114,7 +114,7 @@ public class PaymentManagerImpl implements PaymentManager {
     @Override
    public BCOrder payBCOrder(String billNo, String title, BigDecimal money, Map<String,Object> map) throws BCException {
        BigDecimal price = new BigDecimal(money.floatValue() * 100);
-       BCOrder bcOrder = new BCOrder(BCEumeration.PAY_CHANNEL.ALI_WEB,price.intValue(),billNo,title);
+       BCOrder bcOrder = new BCOrder(BCEumeration.PAY_CHANNEL.ALI_WAP,price.intValue(),billNo,title);
        bcOrder.setBillTimeout(360);
        bcOrder.setReturnUrl(PConst.RETURN_URL+"/app/pay/paysuccess.do");
        bcOrder.setOptional(map);
