@@ -625,6 +625,7 @@ public class ArtworkController extends BaseController {
             for (ArtworkInvest artworkInvest : artworkInvests) {
                 investsMoney = investsMoney.add(artworkInvest.getPrice());
             }
+
             //投资回报
             BigDecimal reward = new BigDecimal(0);
             xQuery = new XQuery("listROIRecord_default", request);
@@ -633,6 +634,8 @@ public class ArtworkController extends BaseController {
             for (ROIRecord roiRecord : roiRecordList) {
                 reward = reward.add(roiRecord.getCurrentBalance());
             }
+
+
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             resultMap.put("user", user);
             resultMap.put("artworks", artworks);
@@ -783,11 +786,13 @@ public class ArtworkController extends BaseController {
 
                     artworkdirection.setFinancing_aq(request.getParameter("financing_aq"));
                     artworkdirection.setMake_instru(request.getParameter("make_instru"));
-                    artwork.setDescription(request.getParameter("description"));
-                    artwork.setArtworkdirection(artworkdirection);
+                    artworkdirection.setArtwork(artwork);
+
                     //List<ArtworkAttachment> artworkAttachments = new ArrayList<ArtworkAttachment>();
 
                     baseManager.saveOrUpdate(Artworkdirection.class.getName(),artworkdirection);
+                    artwork.setDescription(request.getParameter("description"));
+                    artwork.setArtworkdirection(artworkdirection);
                     List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
 
                     //创建一个通用的多部分解析器
