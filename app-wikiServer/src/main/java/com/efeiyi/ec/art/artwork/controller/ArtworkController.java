@@ -137,7 +137,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            String hql = "from Artwork WHERE 1=1 and status = '1'  order by investStartDatetime asc";
+            String hql = "from Artwork WHERE 1=1 and status = '1'  order by createDatetime DESC";
             artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
 //            List<ArtWorkBean> objectList = new ArrayList<>();
 //            for (Artwork artwork : artworkList){
@@ -776,6 +776,7 @@ public class ArtworkController extends BaseController {
 //            String [] actions = request.getParameterValues("actions");
 //            String [] attachmentIds = request.getParameterValues("attachmentIds");
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), request.getParameter("artworkId"));
+            System.out.println(request.getParameter("artworkId"));
             try {
                 Artworkdirection artworkdirection = null;
                 if (artwork != null && artwork.getId() != null) {
