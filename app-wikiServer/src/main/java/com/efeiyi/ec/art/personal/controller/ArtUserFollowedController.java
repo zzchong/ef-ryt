@@ -304,12 +304,12 @@ public class ArtUserFollowedController extends BaseController {
                 resultMap.put("pageInfoList", followUserUtils);
             } else if ("2".equals(flag)) {//自己查看别人
 
-                XQuery query = new XQuery("listArtUserFollowed_num", request);
+                XQuery query = new XQuery("listArtUserFollowed_fan", request);
                 query.put("follower_id", otherUserId);
                 query.put("user_type", type);
                 List<ArtUserFollowed> userFollowedList = baseManager.listObject(query);
 
-                XQuery xQuery = new XQuery("plistArtUserFollowed_default", request);
+                XQuery xQuery = new XQuery("plistArtUserFollowed_default1", request);
                 xQuery.put("follower_id", otherUserId);
                 xQuery.put("user_type", type);
                 PageEntity entity = new PageEntity();
