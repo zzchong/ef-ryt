@@ -107,4 +107,6 @@ public class AppConfig {
     public static final String SQL_INVEST_TOTAL="SELECT SUM(price) FROM ArtworkInvest where creator.id= :userId and status!='0'";
     //总收益
     public static final String SQL_REWARD_TOTAL="SELECT SUM(currentBalance) FROM ROIRecord WHERE creator.id=:userId and status!='0'";
+    //点赞
+    public static final String SQL_PRAISE="SELECT artwork.id FROM ArtWorkPraise WHERE user.id=:userId and status!='0'";
 }

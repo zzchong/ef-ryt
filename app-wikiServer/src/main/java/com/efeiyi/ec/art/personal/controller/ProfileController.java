@@ -1049,7 +1049,7 @@ public class ProfileController extends BaseController {
 //                    praise.getArtwork().setPraiseNUm(praises.size());
 //                    artworkList.add(praise.getArtwork());
                     artwork = praise.getArtwork();
-                    if(user.getArtWorkPraiseList()!=null && user.getArtWorkPraiseList().size()>0 && user.getArtWorkPraiseList().contains(praise))
+                    if(user.getArtWorkPraiseList()!=null && user.getArtWorkPraiseList().size()>0 && user.getArtWorkList().contains(praise.getArtwork().getId()))
                               artwork.setPraise(true);
                     else
                               artwork.setPraise(false);
