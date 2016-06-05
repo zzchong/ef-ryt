@@ -1031,6 +1031,14 @@ public class ProfileController extends BaseController {
 
             Map<String,Object> data = new HashMap<>();
             User user = (User)baseManager.getObject(User.class.getName(),currentId);
+            List<String> list = new ArrayList<>();
+            if(user.getArtWorkPraiseList()!=null && user.getArtWorkPraiseList().size()>0){
+                for(ArtWorkPraise artWorkPraise :user.getArtWorkPraiseList()){
+                    list.add(artWorkPraise.getArtwork().getId());
+                }
+
+            }
+
             List<Artwork> artworkList = new ArrayList<Artwork>();
             PageEntity entity = new PageEntity();
             entity.setIndex(Integer.parseInt(index));
@@ -1040,6 +1048,9 @@ public class ProfileController extends BaseController {
             xQuery.setPageEntity(entity);
             PageInfo info = baseManager.listPageInfo(xQuery);
             List<ArtWorkPraise> workPraises = info.getList();
+
+
+
             if (workPraises != null && !workPraises.isEmpty() && user!=null){
                 Artwork artwork = null;
                 for (ArtWorkPraise praise : workPraises){
@@ -1049,7 +1060,7 @@ public class ProfileController extends BaseController {
 //                    praise.getArtwork().setPraiseNUm(praises.size());
 //                    artworkList.add(praise.getArtwork());
                     artwork = praise.getArtwork();
-                    if(user.getArtWorkPraiseList()!=null && user.getArtWorkPraiseList().size()>0 && user.getArtWorkList().contains(praise.getArtwork().getId()))
+                    if(user.getArtWorkPraiseList()!=null && user.getArtWorkPraiseList().size()>0 && list.contains(praise.getArtwork().getId()))
                               artwork.setPraise(true);
                     else
                               artwork.setPraise(false);

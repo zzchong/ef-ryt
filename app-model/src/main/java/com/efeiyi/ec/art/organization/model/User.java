@@ -37,7 +37,6 @@ public class User {
     private UserBrief userBrief;//简介和 签名
     private List<ArtWorkPraise> artWorkPraiseList;//点赞项目
 
-    private List<String> artWorkList;//点赞的项目Id
     @OneToOne(mappedBy="user",fetch=FetchType.LAZY)
     @JoinColumn(name = "master_id")
     public Master getMaster() {
@@ -222,18 +221,5 @@ public class User {
         this.artWorkPraiseList = artWorkPraiseList;
     }
 
-    @Transient
-    @JsonIgnore
-    public List<String> getArtWorkList() {
-        if(artWorkPraiseList!=null && artWorkPraiseList.size()>0){
-            for (ArtWorkPraise artWorkPraise : artWorkPraiseList){
-                artWorkList.add(artWorkPraise.getArtwork().getId());
-            }
-        }
-        return artWorkList;
-    }
 
-    public void setArtWorkList(List<String> artWorkList) {
-        this.artWorkList = artWorkList;
-    }
 }
