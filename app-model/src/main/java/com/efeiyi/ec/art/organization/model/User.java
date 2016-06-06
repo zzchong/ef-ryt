@@ -37,7 +37,6 @@ public class User {
     private UserBrief userBrief;//简介和 签名
     private List<ArtWorkPraise> artWorkPraiseList;//点赞项目
 
-
     @OneToOne(mappedBy="user",fetch=FetchType.LAZY)
     @JoinColumn(name = "master_id")
     public Master getMaster() {
@@ -221,4 +220,6 @@ public class User {
     public void setArtWorkPraiseList(List<ArtWorkPraise> artWorkPraiseList) {
         this.artWorkPraiseList = artWorkPraiseList;
     }
+
+
 }

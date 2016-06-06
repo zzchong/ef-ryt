@@ -349,8 +349,7 @@ public class PaymentController extends BaseController {
           bill.setFlowAccount(bcOrder.getChannelTradeNo());
           baseManager.saveOrUpdate(Bill.class.getName(),bill);
           data.put("url", bcOrder.getUrl());
-
-//          modelMap.put("resultHtml",bcOrder.getHtml());
+          modelMap.put("resultHtml",bcOrder.getHtml());
         return data;
     }
 
@@ -445,15 +444,36 @@ public class PaymentController extends BaseController {
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
+            LinkedHashMap<String,Object> map = new LinkedHashMap<>();
+            map.put("userId",jsonObj.getString("userId"));
+            //总投资
+            BigDecimal investMoney = new BigDecimal("0.00");
+            Object tempInvestMoney =  baseManager.getUniqueObjectByConditions(AppConfig.SQL_INVEST_TOTAL,map);
+            if(tempInvestMoney!=null)
+                investMoney.add(new BigDecimal(tempInvestMoney.toString()));
+
+            //总收益
+            BigDecimal rewardMoney = new BigDecimal("0.00");
+            Object tempRewardMoney =  baseManager.getUniqueObjectByConditions(AppConfig.SQL_REWARD_TOTAL,map);
+            if(tempRewardMoney!=null)
+                rewardMoney.add(new BigDecimal(tempRewardMoney.toString()));
+
+
+            data.put("investMoney",investMoney);
+            data.put("rewardMoney",rewardMoney);
 
             XQuery xQuery = new XQuery("plistBill_default", request);
+            xQuery.put("author_id",jsonObj.getString("userId"));
             PageEntity pageEntity = new PageEntity();
             pageEntity.setSize(jsonObj.getInteger("pageSize"));
             pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
             xQuery.setPageEntity(pageEntity);
             List<Bill> billList = baseManager.listObject(xQuery);
+
+            data.put("billList",billList);
+
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-            resultMap.put("object", billList);
+            resultMap.put("object", data);
         } catch (Exception e) {
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
