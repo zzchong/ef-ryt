@@ -840,7 +840,11 @@ public class ProfileController extends BaseController {
             queryMap.put("userId", userId);
             xQuery.setQueryParamMap(queryMap);
             xQuery.setPageEntity(entity);
-            List<ArtworkInvest> invests = baseManager.listPageInfo(xQuery).getList();
+            PageInfo investPage = baseManager.listPageInfo(xQuery);
+            List<ArtworkInvest> invests = new ArrayList<>();
+            if(invests!=null){
+                invests = investPage.getList();
+            }
 
             //根据用户id获取投资记录
             XQuery xquery = new XQuery("listArtworkInvest_default", request);
