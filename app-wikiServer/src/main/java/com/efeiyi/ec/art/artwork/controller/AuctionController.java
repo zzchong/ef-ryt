@@ -133,10 +133,10 @@ public class AuctionController extends BaseController {
                         artwork.setWinner(new User()); //设置竞拍得主为空
                     }*/
                     if (artwork.getWinner()== null || artwork.getWinner().getId()==null){
-                        artwork.setWinner(new User()); //设置竞拍得主为空
+                        artwork.setWinner(null); //设置竞拍得主为空
                     }
                 } else {
-                    artwork.setWinner(new User()); //设置竞拍得主为空
+                    artwork.setWinner(null); //设置竞拍得主为空
                 }
 
             }

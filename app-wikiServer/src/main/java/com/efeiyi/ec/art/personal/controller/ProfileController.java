@@ -385,7 +385,7 @@ public class ProfileController extends BaseController {
             System.out.print(master.getId());
             baseManager.saveOrUpdate(Master.class.getName(), master);
             user.setMaster(master);
-            user.setType("10000");
+            user.setType("1");
             baseManager.saveOrUpdate(User.class.getName(), user);
 
             resultMap = uploadFile(request);
@@ -840,9 +840,10 @@ public class ProfileController extends BaseController {
             queryMap.put("userId", userId);
             xQuery.setQueryParamMap(queryMap);
             xQuery.setPageEntity(entity);
+//            List<ArtworkInvest> artworkInvestList = baseManager.listObject(queryHql,queryMap);
             PageInfo investPage = baseManager.listPageInfo(xQuery);
             List<ArtworkInvest> invests = new ArrayList<>();
-            if(invests!=null){
+            if(investPage!=null){
                 invests = investPage.getList();
             }
 
@@ -1235,15 +1236,16 @@ public class ProfileController extends BaseController {
 //        map.put("pageNum","1");
 //        map.put("pageSize","5");
         /**editProfile.do测试加密参数**/
-        map.put("userId", "ina6pqm2d036fya5");
-        map.put("type", "13");
-        map.put("content", "13ss");
+        map.put("userId", "iickhknq3h7yrku2");
+        map.put("currentId", "iickhknq3h7yrku2");
+        map.put("pageSize", "20");
+        map.put("pageIndex", "1");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         map.put("signmsg",signmsg);
         HttpClient httpClient = new DefaultHttpClient();
 //        String url = "http://192.168.1.41:8080/app/myArtwork.do";
-        String url = "http://192.168.1.75:8080/app/editProfile.do";
+        String url = "http://192.168.1.75:8001/app/my.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
