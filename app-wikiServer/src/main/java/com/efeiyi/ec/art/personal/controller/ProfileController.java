@@ -833,14 +833,14 @@ public class ProfileController extends BaseController {
             List<BigDecimal> investMoney = baseManager.listObject(queryTo);
 
             //按项目分组获取投资记录
-            String querySql = "FROM ArtworkInvest where creator.id = :userId GROUP BY artwork.id ORDER BY createDatetime DESC";
+            String querySql = "FROM ArtworkInvest where creator.id = :userId and status='1' GROUP BY artwork.id ORDER BY createDatetime DESC";
             XQuery xQuery = new XQuery();
             xQuery.setHql(querySql);
             LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
             queryMap.put("userId", userId);
             xQuery.setQueryParamMap(queryMap);
             xQuery.setPageEntity(entity);
-            List<ArtworkInvest> invests = baseManager.listObject(xQuery);
+            List<ArtworkInvest> invests = baseManager.listPageInfo(xQuery).getList();
 
             //根据用户id获取投资记录
             XQuery xquery = new XQuery("listArtworkInvest_default", request);
