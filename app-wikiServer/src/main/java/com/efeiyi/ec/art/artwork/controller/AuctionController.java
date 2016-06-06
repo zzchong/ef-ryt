@@ -397,10 +397,10 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkOrderId"));
+            AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(),jsonObj.getString("artWorkOrderId"));
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "订单详情获取成功");
-            resultMap.put("artwork", artwork);
+            resultMap.put("auctionOrder", auctionOrder);
 
         } catch (Exception e) {
             e.printStackTrace();
