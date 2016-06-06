@@ -17,8 +17,8 @@ public class ConvertArtWorkUtil {
     public static ConvertArtWork convert(List<ArtworkInvest> invests, int followedList, int toFollowedList,
                                          List<BigDecimal> investMoney, BigDecimal sumInvestsMoney, BigDecimal reward, User user) {
         ConvertArtWork convert = new ConvertArtWork();
-        convert.setFollowNum(followedList <= 0 ? 0 : followedList);
-        convert.setNum(toFollowedList <= 0 ? 0 : toFollowedList);
+        convert.setFollowNum(toFollowedList <= 0 ? 0 : toFollowedList);
+        convert.setNum(followedList <= 0 ? 0 : followedList);
         convert.setYield(reward);
         convert.setSumInvestment(sumInvestsMoney);
         List<ConvertWork> list = new ArrayList<ConvertWork>();
