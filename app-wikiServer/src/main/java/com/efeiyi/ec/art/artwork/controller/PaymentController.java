@@ -348,7 +348,6 @@ public class PaymentController extends BaseController {
           bill.setTitle(title);
           bill.setFlowAccount(bcOrder.getChannelTradeNo());
           baseManager.saveOrUpdate(Bill.class.getName(),bill);
-          data.put("url1", bcOrder.getUrl().replace(" ","%20"));
           data.put("url", bcOrder.getUrl());
           modelMap.put("resultHtml",bcOrder.getHtml());
         return data;
