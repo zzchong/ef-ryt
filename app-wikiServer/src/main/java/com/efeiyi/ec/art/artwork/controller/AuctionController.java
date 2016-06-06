@@ -378,28 +378,29 @@ public class AuctionController extends BaseController {
     @ResponseBody
     public Map viewOrder(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap;
+        Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("artworkId")) || "".equals(jsonObj.getString("money"))) {
+            if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
-            treeMap.put("artworkId", jsonObj.getString("artworkId"));
+            treeMap.put("artWorkOrderId", jsonObj.getString("artworkOrderId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            treeMap.put("price", jsonObj.getString("price"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            resultMap = artworkAuctionManager.artworkBidOnAuction(request,jsonObj,logBean);
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkOrderId"));
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "订单详情获取成功");
+            resultMap.put("artwork", artwork);
 
         } catch (Exception e) {
             e.printStackTrace();
