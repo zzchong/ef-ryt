@@ -252,7 +252,7 @@ public class AuctionController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
+            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
             treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             treeMap.put("price", jsonObj.getString("price"));
@@ -287,7 +287,7 @@ public class AuctionController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
+            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
             treeMap.put("artworkId", jsonObj.getString("artworkId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
@@ -319,7 +319,7 @@ public class AuctionController extends BaseController {
         TreeMap treeMap = new TreeMap();
         List<AuctionOrder> auctionOrderList = null;
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("getListOrder");
@@ -330,7 +330,7 @@ public class AuctionController extends BaseController {
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("type", jsonObj.getString("type"));
-            treeMap.put("userId", jsonObj.getString("userId"));
+            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
 
@@ -340,19 +340,19 @@ public class AuctionController extends BaseController {
             //获取订单(2、待付款 3、待收货 4、已完成 1、全部)
             if("2".equals(jsonObj.getString("type"))){
                 XQuery xQuery = new XQuery("listAuctionOrder_default1", request);
-                xQuery.put("user_id", jsonObj.getString("userId"));
+                xQuery.put("user_id", jsonObj.getString("currentUserId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
             }else if ("3".equals(jsonObj.getString("type"))){
                 XQuery xQuery = new XQuery("listAuctionOrder_default2", request);
-                xQuery.put("user_id", jsonObj.getString("userId"));
+                xQuery.put("user_id", jsonObj.getString("currentUserId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
             }else if ("4".equals(jsonObj.getString("type"))){
                 XQuery xQuery = new XQuery("listAuctionOrder_default3", request);
-                xQuery.put("user_id", jsonObj.getString("userId"));
+                xQuery.put("user_id", jsonObj.getString("currentUserId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
             }else {
                 XQuery xQuery = new XQuery("listAuctionOrder_default", request);
-                xQuery.put("user_id", jsonObj.getString("userId"));
+                xQuery.put("user_id", jsonObj.getString("currentUserId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
             }
 
@@ -381,7 +381,7 @@ public class AuctionController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
@@ -390,7 +390,7 @@ public class AuctionController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artWorkOrderId", jsonObj.getString("artworkOrderId"));
+            treeMap.put("artWorkOrderId", jsonObj.getString("artWorkOrderId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -537,21 +537,21 @@ public class AuctionController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**artWorkAuctionList.do测试加密参数**/
-        map.put("currentUserId", "123456");
-        map.put("artworkId", "qydeyugqqiugd7");
+        map.put("artWorkOrderId", "qydeyugqqiugd2");
+        //map.put("type", "1");
         /**artWorkAuctionView.do测试加密参数**/
         //map.put("artWorkId","qydeyugqqiugd2");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.60:8080/app/artWorkAuctionView.do";
+        String url = "http://192.168.1.60:8080/app/viewOrder.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  artWorkAuctionView.do测试 **/
         //String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artWorkAuctionList.do测试 **/
-        String json = "{\"currentUserId\":\"123456\",\"artworkId\":\"qydeyugqqiugd7\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"artWorkOrderId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
