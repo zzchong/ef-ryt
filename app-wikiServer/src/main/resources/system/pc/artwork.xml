@@ -24,11 +24,11 @@
                         <item label="编辑阶段，尚未提交" value="100"/>
                         <item label="融资待审核" value="10"/>
                         <item label="融资审核中" value="11"/>
-                        <item label="融资审核通过" value="12"/>
+                        <!--<item label="融资审核通过" value="12"/>-->
                         <item label="融资审核未通过，已驳回" value="13"/>
                         <item label="融资中" value="14"/>
-                        <item label="融资完成" value="15"/>
-                        <item label="创作前" value="20"/>
+                        <!--<item label="融资完成" value="15"/>-->
+                        <!--<item label="创作前" value="20"/>-->
                         <item label="创作中" value="21"/>
                         <item label="创作延时" value="22"/>
                         <item label="创作完成待审核" value="23"/>
@@ -39,8 +39,8 @@
                         <item label="拍卖结束" value="32"/>
                         <item label="流拍" value="33"/>
                         <item label="待支付尾款" value="34"/>
-                        <item label="待发放" value="35"/>
-                        <item label="已发放" value="36"/>
+                        <!--<item label="待发放" value="35"/>-->
+                        <!--<item label="已发放" value="36"/>-->
                     </statusType>
                 </field>
             </fields>
