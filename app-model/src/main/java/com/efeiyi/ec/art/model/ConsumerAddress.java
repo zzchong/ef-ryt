@@ -4,6 +4,7 @@ import com.efeiyi.ec.art.organization.model.AddressCity;
 import com.efeiyi.ec.art.organization.model.AddressDistrict;
 import com.efeiyi.ec.art.organization.model.AddressProvince;
 import com.efeiyi.ec.art.organization.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.io.Serializable;
  *
  */
 @Entity
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 @Table(name = "app_consumer_address")
 public class ConsumerAddress implements Serializable {
     private String id;
