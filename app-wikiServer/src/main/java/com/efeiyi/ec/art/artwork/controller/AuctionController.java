@@ -319,7 +319,7 @@ public class AuctionController extends BaseController {
         TreeMap treeMap = new TreeMap();
         List<AuctionOrder> auctionOrderList = null;
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("getListOrder");
@@ -381,7 +381,7 @@ public class AuctionController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
