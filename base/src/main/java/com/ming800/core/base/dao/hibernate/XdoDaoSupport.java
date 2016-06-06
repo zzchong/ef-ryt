@@ -4,6 +4,7 @@ import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.taglib.PageEntity;
 import com.ming800.core.does.model.PageInfo;
 import org.hibernate.*;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -262,7 +263,11 @@ public class XdoDaoSupport implements XdoDao {
         }
 
         //查询所有数据的条数
-        info.setCount(((Long) countQuery.uniqueResult()).intValue());
+        System.out.println((Long) countQuery.uniqueResult());
+        if(countQuery.uniqueResult()!=null)
+            info.setCount(((Long) countQuery.uniqueResult()).intValue());
+        else
+            info.setCount(0);
 
         pageEntity.setCount(info.getCount());
 
