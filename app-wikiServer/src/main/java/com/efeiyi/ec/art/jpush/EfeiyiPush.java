@@ -227,6 +227,8 @@ public class EfeiyiPush {
                                 .incrBadge(1)
                                 .addExtra("extra_key", "extra_value").build())
                         .build())
+                .setOptions(Options.newBuilder()
+                        .setApnsProduction(true).build())
                 .build();
     }
 
@@ -260,6 +262,8 @@ public class EfeiyiPush {
                         .setMsgContent(MSG_CONTENT)
                         .addExtra("from", "JPush")
                         .build())
+                .setOptions(Options.newBuilder()
+                        .setApnsProduction(true).build())
                 .build();
     }
 
@@ -275,6 +279,8 @@ public class EfeiyiPush {
                         .setTitle(msg.get("title").toString())
                         .addExtra("extras", msg.get("json").toString())
                         .build())
+                .setOptions(Options.newBuilder()
+                        .setApnsProduction(true).build())
                 .build();
     }
 
@@ -295,6 +301,8 @@ public class EfeiyiPush {
                                 .incrBadge(1)
                                 .addExtra("extra_key", "extra_value").build())
                         .build())
+                .setOptions(Options.newBuilder()
+                        .setApnsProduction(true).build())
                 .build();
     }
 
@@ -323,6 +331,8 @@ public class EfeiyiPush {
                                .incrBadge(1)
                                .addExtra("extra_key", "extra_value").build())
                        .build())
+               .setOptions(Options.newBuilder()
+                       .setApnsProduction(true).build())
                .build();
    }
 

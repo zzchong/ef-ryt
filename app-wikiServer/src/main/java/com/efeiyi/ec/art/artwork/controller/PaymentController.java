@@ -146,7 +146,7 @@ public class PaymentController extends BaseController {
                 }
                 auctionOrder.setType("1");
                 auctionOrder.setPayWay("1");
-                auctionOrder.setPayStatus("1");
+                auctionOrder.setPayStatus("0");
 
                 baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
             }else if(action.equals("payMargin")){
@@ -264,7 +264,7 @@ public class PaymentController extends BaseController {
         //optional 参数
         Map<String, Object> map = new HashMap<>();
         map.put("action", jsonObj.getString("action"));
-        //金额
+        //支付金额
         BigDecimal money = new BigDecimal(jsonObj.getString("money"));
         //支付类型
         String type = jsonObj.getString("type");
@@ -288,10 +288,31 @@ public class PaymentController extends BaseController {
         bill.setMoney(money);
         bill.setOutOrIn("0");
 
+        //项目Id
+        String artWorkId = jsonObj.getString("artWorkId");
+        Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
         if (jsonObj.getString("action").equals("auction")) {//拍卖订单尾款支付
 
+            ConsumerAddress consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(),jsonObj.getString("addressId"));//收货地址
+            //拍卖金额
+            BigDecimal auctionMoney = new BigDecimal(jsonObj.getString("auctionMoney"));
+            if(consumerAddress==null)
+                return null;
+
            //项目订单Id
-           AuctionOrder auctionOrder = (AuctionOrder)baseManager.getObject(AuctionOrder.class.getName(),jsonObj.getString("orderId"));
+            AuctionOrder auctionOrder = new AuctionOrder();
+            auctionOrder.setArtwork(artwork);
+            auctionOrder.setCreateDatetime(new Date());
+            auctionOrder.setStatus("1");
+            auctionOrder.setType("0");
+            auctionOrder.setStatus("1");
+            auctionOrder.setPayWay("1");
+            auctionOrder.setPayStatus("3");
+            auctionOrder.setUser(user);
+            auctionOrder.setConsumerAddress(consumerAddress);
+            auctionOrder.setFinalPayment(money);
+            auctionOrder.setAmount(auctionMoney);
+            baseManager.saveOrUpdate(AuctionOrder.class.getName(),auctionOrder);
            if(auctionOrder==null)
                return null;
 
@@ -302,9 +323,7 @@ public class PaymentController extends BaseController {
             bill.setType("2");
         } else if (jsonObj.getString("action").equals("invest")) {//投资
 
-            //投资项目Id
-            String artWorkId = jsonObj.getString("artWorkId");
-            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
+
             if(StringUtils.isEmpty(artWorkId))
                 return null;
 
@@ -324,8 +343,8 @@ public class PaymentController extends BaseController {
             bill.setType("1");
         } else if (jsonObj.getString("action").equals("payMargin")) {//支付保证金
             //投入保证金的项目Id
-            String artWorkId = jsonObj.getString("artWorkId");
-            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
+//            String artWorkId = jsonObj.getString("artWorkId");
+//            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
             if(StringUtils.isEmpty(artWorkId))
                 return null;
             MarginAccount marginAccount = new MarginAccount();
