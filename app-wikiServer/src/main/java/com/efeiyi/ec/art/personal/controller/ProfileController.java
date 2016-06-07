@@ -1037,11 +1037,13 @@ public class ProfileController extends BaseController {
             Map<String,Object> data = new HashMap<>();
             User user = (User)baseManager.getObject(User.class.getName(),currentId);
             List<String> list = new ArrayList<>();
-            if(user.getArtWorkPraiseList()!=null && user.getArtWorkPraiseList().size()>0){
-                for(ArtWorkPraise artWorkPraise :user.getArtWorkPraiseList()){
-                    list.add(artWorkPraise.getArtwork().getId());
-                }
+            if(user!=null) {
+                if (user.getArtWorkPraiseList() != null && user.getArtWorkPraiseList().size() > 0) {
+                    for (ArtWorkPraise artWorkPraise : user.getArtWorkPraiseList()) {
+                        list.add(artWorkPraise.getArtwork().getId());
+                    }
 
+                }
             }
 
             List<Artwork> artworkList = new ArrayList<Artwork>();
