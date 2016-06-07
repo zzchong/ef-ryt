@@ -90,7 +90,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             }
             LinkedHashMap queryMap = new LinkedHashMap();
             queryMap.put("userId", jsonObj.getString("currentUserId"));
-            queryMap.put("artworkId", jsonObj.getString("artworkId"));
+            queryMap.put("artworkId", jsonObj.getString("artWorkId"));
             MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
             if (marginAccount == null || !"0".equals(marginAccount.getStatus())) {//未冻结拍卖保证金
                 return resultMapHandler.handlerResult("10019", "未冻结拍卖保证金", logBean);
