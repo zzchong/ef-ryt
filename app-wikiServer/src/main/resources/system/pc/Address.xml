@@ -38,5 +38,17 @@
                 </do>
             </does>
         </entity>
+
+        <entity name="ConsumerAddress" label="区县"  model="com.efeiyi.ec.art.model.ConsumerAddress">
+            <does>
+                <do name="plistConsumerAddress" access="" label="区县">
+                    <query name="default" label="全部区县" type="auto" orderBy="status:desc">
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="consumer.id" defaultValue="0" operation="eq"/>
+                    </query>
+
+                </do>
+            </does>
+        </entity>
     </entities>
 </module>
