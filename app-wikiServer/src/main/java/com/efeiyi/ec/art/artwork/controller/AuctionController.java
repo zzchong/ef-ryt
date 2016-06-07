@@ -82,7 +82,7 @@ public class AuctionController extends BaseController {
         TreeMap treeMap = new TreeMap();
         List<Artwork> artworkList = null;
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionList");
@@ -164,7 +164,7 @@ public class AuctionController extends BaseController {
         TreeMap treeMap = new TreeMap();
         List<Artwork> artworkList = null;
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionView");
@@ -246,7 +246,7 @@ public class AuctionController extends BaseController {
         Map<String, Object> resultMap;
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
@@ -281,7 +281,7 @@ public class AuctionController extends BaseController {
         Map<String, Object> resultMap;
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");
@@ -322,7 +322,7 @@ public class AuctionController extends BaseController {
         TreeMap treeMap = new TreeMap();
         List<AuctionOrder> auctionOrderList = null;
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("getListOrder");
@@ -384,7 +384,7 @@ public class AuctionController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
@@ -427,7 +427,7 @@ public class AuctionController extends BaseController {
         TreeMap treeMap = new TreeMap();
         List<ArtworkBidding> artworkBiddingList = null;
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("listArtworkBidding");
@@ -498,7 +498,7 @@ public class AuctionController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");
