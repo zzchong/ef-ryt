@@ -83,7 +83,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             //项目信息
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
             if (!"31".equals(artwork.getStep())  //校验拍卖中
-                    || !"0".equals(artwork.getStatus()) //校验拍卖未废弃
+                    || "0".equals(artwork.getStatus()) //校验拍卖未废弃
                     || new Date().compareTo(artwork.getAuctionEndDatetime()) > 0 //校验拍卖未结束
                     || jsonObj.getBigDecimal("price").compareTo(artwork.getNewBidingPrice()) < 0) {//校验出价大于当前最高价
                 return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
