@@ -147,7 +147,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
         queryMap.put("currentUserId", jsonObj.getString("currentUserId"));
         queryMap.put("artworkId", jsonObj.getString("artWorkId"));
         MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
-        if (marginAccount != null) {//已缴保证金
+        if (marginAccount != null && "0".equals(marginAccount.getStatus())) {//已缴保证金
             return resultMapHandler.handlerResult("0", "成功", logBean);
         }
         queryMap.remove("artworkId");
