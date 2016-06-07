@@ -308,6 +308,10 @@
                     <condition name="user.id" defaultValue="0" operation="ne"/>
                     <condition name="status" defaultValue="1" operation="eq"/>
                 </query>
+                <query name="default2" label="默认" type="auto" orderBy="createDatetime:desc">
+                    <condition name="artwork.id" defaultValue="0" operation="eq"/>
+                    <condition name="user.id" defaultValue="0" operation="ne"/>
+                </query>
             </do>
 
         </does>

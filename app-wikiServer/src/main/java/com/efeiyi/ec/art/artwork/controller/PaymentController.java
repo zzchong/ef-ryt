@@ -147,7 +147,7 @@ public class PaymentController extends BaseController {
                 auctionOrder.setType("1");
                 auctionOrder.setPayWay("1");
                 auctionOrder.setPayStatus("0");
-
+                auctionOrder.setStatus("1");
                 baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
             }else if(action.equals("payMargin")){
                 MarginAccount marginAccount = (MarginAccount) baseManager.getObject(MarginAccount.class.getName(), id);
@@ -299,11 +299,12 @@ public class PaymentController extends BaseController {
             if(consumerAddress==null)
                 return null;
 
+
            //项目订单Id
             AuctionOrder auctionOrder = new AuctionOrder();
             auctionOrder.setArtwork(artwork);
             auctionOrder.setCreateDatetime(new Date());
-            auctionOrder.setStatus("1");
+            auctionOrder.setStatus("0");
             auctionOrder.setType("0");
             auctionOrder.setStatus("1");
             auctionOrder.setPayWay("1");
@@ -347,7 +348,18 @@ public class PaymentController extends BaseController {
 //            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
             if(StringUtils.isEmpty(artWorkId))
                 return null;
-            MarginAccount marginAccount = new MarginAccount();
+
+            MarginAccount marginAccount = null;
+            XQuery xQuery = new XQuery("listMarginAccount_default2",request);
+            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
+            xQuery.put("user_id",jsonObj.getString("userId"));
+            List<MarginAccount> marginAccountList = baseManager.listObject(xQuery);
+
+            if(marginAccountList!=null && marginAccountList.size()>0)
+                marginAccount = marginAccountList.get(0);
+            else
+                marginAccount =  new MarginAccount();
+
             marginAccount.setStatus("0");
             marginAccount.setAccount(account);
             marginAccount.setArtwork(artwork);
