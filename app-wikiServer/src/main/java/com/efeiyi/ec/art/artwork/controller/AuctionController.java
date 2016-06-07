@@ -460,20 +460,14 @@ public class AuctionController extends BaseController {
             //竞价记录
             XQuery xQuery2 = new XQuery("listArtworkBidding_default", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-            List<ArtworkBidding> artworkBiddings = (List<ArtworkBidding>) baseManager.listObject(xQuery);
+            List<ArtworkBidding> artworkBiddings = (List<ArtworkBidding>) baseManager.listObject(xQuery2);
             Integer auctionNum = 0;
             if(artworkBiddings != null && artworkBiddings.size() > 0){
                 auctionNum = artworkBiddings.size();
             }
             //竞拍人数
-            Integer num = 0;
-            List<String> users = new ArrayList<>();
-            for (ArtworkBidding artworkBidding:artworkBiddings){
-                if(!users.contains(artworkBidding.getCreator().getId())){
-                    users.add(artworkBidding.getCreator().getId());
-                }
-            }
-            num = users.size();
+            long biddingUsersNum = artworkBiddings.stream().map(artworkBidding -> artworkBidding.getCreator().getId()).distinct().count();
+            int num = (int) biddingUsersNum;
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "查询成功");
             resultMap.put("biddingUsersNum", num);
