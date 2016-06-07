@@ -23,20 +23,20 @@ public class JsonAcceptUtil {
             return jsonObj;
     }
 
-//    public static JSONObject receiveJson3(HttpServletRequest request) throws  Exception{
-//        Enumeration paramNames = request.getParameterNames();
-//        JSONObject jsonObject = new JSONObject();
-//        while (paramNames.hasMoreElements()){
-//           String paramName = paramNames.nextElement().toString();
-//            String [] paramValues = request.getParameterValues(paramName);
-//            if(paramValues.length==1){
-//                String paramValue = paramValues[0];
-//                jsonObject.put(paramName,paramValue);
-//            }
-//
-//        }
-//        return jsonObject;
-//    }
+    public static JSONObject receiveJson3(HttpServletRequest request) throws  Exception{
+        Enumeration paramNames = request.getParameterNames();
+        JSONObject jsonObject = new JSONObject();
+        while (paramNames.hasMoreElements()){
+           String paramName = paramNames.nextElement().toString();
+            String [] paramValues = request.getParameterValues(paramName);
+            if(paramValues.length==1){
+                String paramValue = paramValues[0];
+                jsonObject.put(paramName,paramValue);
+            }
+
+        }
+        return jsonObject;
+    }
 
     public static JSONObject receiveJson2(HttpServletRequest request) throws  Exception{
         Map map = new HashMap();
