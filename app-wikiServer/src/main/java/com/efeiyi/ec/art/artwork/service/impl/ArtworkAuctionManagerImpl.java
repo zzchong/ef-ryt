@@ -144,8 +144,8 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
         }
         LinkedHashMap queryMap = new LinkedHashMap();
-        queryMap.put("userId", jsonObj.getString("userId"));
-        queryMap.put("artworkId", jsonObj.getString("artworkId"));
+        queryMap.put("currentUserId", jsonObj.getString("currentUserId"));
+        queryMap.put("artworkId", jsonObj.getString("artWorkId"));
         MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
         if (marginAccount != null) {//已缴保证金
             return resultMapHandler.handlerResult("0", "成功", logBean);
