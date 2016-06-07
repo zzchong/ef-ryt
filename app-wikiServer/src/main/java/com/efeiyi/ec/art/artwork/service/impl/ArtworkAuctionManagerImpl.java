@@ -83,14 +83,14 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             //项目信息
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
             if (!"31".equals(artwork.getStep())  //校验拍卖中
-                    || !"0".equals(artwork.getStatus()) //校验拍卖未废弃
+                    || "0".equals(artwork.getStatus()) //校验拍卖未废弃
                     || new Date().compareTo(artwork.getAuctionEndDatetime()) > 0 //校验拍卖未结束
                     || jsonObj.getBigDecimal("price").compareTo(artwork.getNewBidingPrice()) < 0) {//校验出价大于当前最高价
                 return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
             }
             LinkedHashMap queryMap = new LinkedHashMap();
             queryMap.put("userId", jsonObj.getString("currentUserId"));
-            queryMap.put("artworkId", jsonObj.getString("artworkId"));
+            queryMap.put("artworkId", jsonObj.getString("artWorkId"));
             MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
             if (marginAccount == null || !"0".equals(marginAccount.getStatus())) {//未冻结拍卖保证金
                 return resultMapHandler.handlerResult("10019", "未冻结拍卖保证金", logBean);
@@ -144,10 +144,10 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
         }
         LinkedHashMap queryMap = new LinkedHashMap();
-        queryMap.put("userId", jsonObj.getString("userId"));
-        queryMap.put("artworkId", jsonObj.getString("artworkId"));
+        queryMap.put("currentUserId", jsonObj.getString("currentUserId"));
+        queryMap.put("artworkId", jsonObj.getString("artWorkId"));
         MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
-        if (marginAccount != null) {//已缴保证金
+        if (marginAccount != null && "0".equals(marginAccount.getStatus())) {//已缴保证金
             return resultMapHandler.handlerResult("0", "成功", logBean);
         }
         queryMap.remove("artworkId");
