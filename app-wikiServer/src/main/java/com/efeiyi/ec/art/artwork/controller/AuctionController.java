@@ -211,9 +211,12 @@ public class AuctionController extends BaseController {
             List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>) baseManager.listObject(xQuery);
 
             //判断是否交付保证金
+            LinkedHashMap queryMap = new LinkedHashMap();
+            queryMap.put("currentUserId", jsonObj.getString("currentUserId"));
+            queryMap.put("artworkId", jsonObj.getString("artWorkId"));
+            MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
             String isSubmitDepositPrice = "1";
-
-            if (true){
+            if (marginAccount != null && "0".equals(marginAccount.getStatus())){
                 isSubmitDepositPrice = "0";
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
@@ -460,19 +463,18 @@ public class AuctionController extends BaseController {
             //竞价记录
             XQuery xQuery2 = new XQuery("listArtworkBidding_default", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-            List<ArtworkBidding> artworkBiddings = (List<ArtworkBidding>) baseManager.listObject(xQuery);
-            //竞拍人数
-            Integer num = 0;
-            List<User> users = new ArrayList<>();
-            for (ArtworkBidding artworkBidding:artworkBiddings){
-                if(!users.contains(artworkBidding.getCreator())){
-                    users.add(artworkBidding.getCreator());
-                }
+            List<ArtworkBidding> artworkBiddings = (List<ArtworkBidding>) baseManager.listObject(xQuery2);
+            Integer auctionNum = 0;
+            if(artworkBiddings != null && artworkBiddings.size() > 0){
+                auctionNum = artworkBiddings.size();
             }
-            num = users.size();
+            //竞拍人数
+            long biddingUsersNum = artworkBiddings.stream().map(artworkBidding -> artworkBidding.getCreator().getId()).distinct().count();
+            int num = (int) biddingUsersNum;
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "查询成功");
             resultMap.put("biddingUsersNum", num);
+            resultMap.put("auctionNum", auctionNum);
             resultMap.put("artworkBiddingList", artworkBiddingList);
             resultMap.put("biddingTopThree", biddingTopThree);
         } catch (Exception e) {
