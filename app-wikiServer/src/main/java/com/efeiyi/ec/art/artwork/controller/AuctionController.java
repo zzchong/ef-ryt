@@ -211,9 +211,12 @@ public class AuctionController extends BaseController {
             List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>) baseManager.listObject(xQuery);
 
             //判断是否交付保证金
+            LinkedHashMap queryMap = new LinkedHashMap();
+            queryMap.put("currentUserId", jsonObj.getString("currentUserId"));
+            queryMap.put("artworkId", jsonObj.getString("artWorkId"));
+            MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
             String isSubmitDepositPrice = "1";
-
-            if (true){
+            if (marginAccount != null && "0".equals(marginAccount.getStatus())){
                 isSubmitDepositPrice = "0";
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
