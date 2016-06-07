@@ -29,6 +29,10 @@ public class ConsumerAddress implements Serializable {
     private User consumer;//关联用户
     private String status;   //1 正常的 2 默认的
     private  String consignee; //收货人姓名
+    private String provinceStr;//省
+    private String districtStr;//区
+    private String cityStr;//市
+
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -137,5 +141,32 @@ public class ConsumerAddress implements Serializable {
     @Override
     public String toString() {
         return "ConsumerAddress{id = " + id + "}";
+    }
+
+    @Column(name = "city_str")
+    public String getCityStr() {
+        return cityStr;
+    }
+
+    public void setCityStr(String cityStr) {
+        this.cityStr = cityStr;
+    }
+
+    @Column(name = "district_str")
+    public String getDistrictStr() {
+        return districtStr;
+    }
+
+    public void setDistrictStr(String districtStr) {
+        this.districtStr = districtStr;
+    }
+
+    @Column(name = "province_str")
+    public String getProvinceStr() {
+        return provinceStr;
+    }
+
+    public void setProvinceStr(String provinceStr) {
+        this.provinceStr = provinceStr;
     }
 }

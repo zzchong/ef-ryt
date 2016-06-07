@@ -46,7 +46,16 @@
                         <condition name="status" defaultValue="0" operation="ne"/>
                         <condition name="consumer.id" defaultValue="0" operation="eq"/>
                     </query>
-
+                </do>
+                <do name="listAddress" access="" label="地址列表">
+                    <query name="default" label="全部地址" type="auto" orderBy="id:asc">
+                        <condition name="consumer.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                    </query>
+                    <query name="default1" label="默认地址" type="auto" orderBy="id:asc">
+                        <condition name="consumer.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="2" operation="eq"/>
+                    </query>
                 </do>
             </does>
         </entity>

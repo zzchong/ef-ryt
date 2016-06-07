@@ -26,3 +26,10 @@ CREATE TABLE `ef_app_info` (
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态 1正常 0删除',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `app_consumer_address`
+ADD COLUMN `province_str`  varchar(16) NULL AFTER `consignee`,
+ADD COLUMN `city_str`  varchar(16) NULL AFTER `province_str`,
+ADD COLUMN `district_str`  varchar(16) NULL AFTER `city_str`;
+

@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.organization.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.io.Serializable;
  * Time: 2008-7-3 15:27:49
  */
 @Entity
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 @Table(name = "organization_address_province")
 public class AddressProvince implements Serializable {
     private String id;
