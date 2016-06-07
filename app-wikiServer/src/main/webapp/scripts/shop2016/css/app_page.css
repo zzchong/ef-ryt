@@ -1,0 +1,135 @@
+body, h1, h2, h3, h4, h5, h6, ul, li, dl, dt, dd, img, input, a, p, strong, em, i {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    list-style: none;
+    font-family: Microsoft YaHei
+}
+
+strong, b, em {
+    font-weight: normal;
+    font-style: normal
+}
+
+img {
+    border: 0
+}
+
+ul, dl {
+    list-style: none
+}
+
+a {
+    color: #000;
+    outline: none;
+    cursor: pointer
+}
+
+a:hover {
+    color: #f00;
+    text-decoration: underline
+}
+
+input {
+    outline: none
+}
+
+/*--reset--*/
+html, body {
+    height: 100%
+}
+
+.app_page {
+    background: url(../images/app_page_bg.jpg) repeat;
+    min-width: 1200px;
+    min-height: 650px;
+    position: relative;
+}
+
+.app_page .icon {
+    background: url(../images/app_page_icon.png) no-repeat;
+}
+
+.app_page .container {
+    width: 1200px;
+    height: 650px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -600px;
+    margin-top: -325px;
+}
+
+.app_page .container .sleft {
+    width: 696px;
+    float: left;
+}
+
+.app_page .container .sleft h1 {
+    background-position: 0 -662px;
+    width: 120px;
+    height: 170px;
+    float: left;
+    margin-top: 14px;
+    margin-left: 39px;
+    margin-bottom: 50px;
+    line-height: 999px;
+    overflow: hidden;
+}
+
+.app_page .container .sleft .info {
+    width: 576px;
+    padding-left: 40px;
+    padding-right: 80px;
+    float: left;
+}
+
+.app_page .container .sleft .info li {
+    width: 100%;
+    float: left;
+    margin: 17px 0;
+    font-size: 24px;
+    color: #666;
+    position: relative;
+}
+
+.app_page .container .sleft .info li i {
+    width: 8px;
+    height: 8px;
+    background: #e83f55;
+    position: absolute;
+    top: 12px;
+    left: -20px;
+    -webkit-border-radius: 20px;
+    border-radius: 20px;
+}
+
+.app_page .container .sleft .btns {
+    width: 100%;
+    float: left;
+    margin-top: 40px;
+}
+
+.app_page .container .sleft .btns a {
+    width: 150px;
+    height: 150px;
+    float: left;
+    background: url(../images/app_page_icon.png) no-repeat;
+}
+
+.app_page .container .sleft .btns a.ios {
+    background-position: -174px -669px;
+    margin-left: 40px;
+}
+
+.app_page .container .sleft .btns a.android {
+    background-position: -334px -669px;
+    margin-left: 30px;
+}
+
+.app_page .container .sright .preview {
+    background: url(../images/app_page_icon.png) no-repeat;
+    width: 484px;
+    height: 652px;
+    float: left;
+}
