@@ -12,19 +12,19 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class DriverInterceptor extends HandlerInterceptorAdapter {
 
-    public void postHandle(HttpServletRequest request,
-                           HttpServletResponse response, Object o, ModelAndView mav)
-            throws Exception {
-        if (mav != null && mav.getViewName() != null && !mav.getViewName().startsWith("redirect") && !mav.getViewName().startsWith("forward")) {
-
-            if (!HttpUtil.isPhone(request.getHeader("User-Agent"))) {
-                mav.setViewName("/pc" + mav.getViewName());
-            } else {
-                mav.setViewName("/wap" + mav.getViewName());
-            }
-        }
-        response.setHeader("X-Frame-Options","");
-    }
+//    public void postHandle(HttpServletRequest request,
+//                           HttpServletResponse response, Object o, ModelAndView mav)
+//            throws Exception {
+//        if (mav != null && mav.getViewName() != null && !mav.getViewName().startsWith("redirect") && !mav.getViewName().startsWith("forward")) {
+//
+//            if (!HttpUtil.isPhone(request.getHeader("User-Agent"))) {
+//                mav.setViewName("/pc" + mav.getViewName());
+//            } else {
+//                mav.setViewName("/wap" + mav.getViewName());
+//            }
+//        }
+//        response.setHeader("X-Frame-Options","");
+//    }
 
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception{
@@ -32,6 +32,7 @@ public class DriverInterceptor extends HandlerInterceptorAdapter {
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html;charset=utf-8");
         request.setCharacterEncoding("utf-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
 
         return true;
     }
