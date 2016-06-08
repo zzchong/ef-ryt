@@ -23,7 +23,7 @@ public class AppConfig {
             "  WHERE a.status<>'0' AND c.status<>'0' AND a.user_id = c.user_id AND  a.user_id = d.id GROUP BY a.user_id  order by c.rois desc limit ";
 
 
-    public static final String GET_ARTIST_TOP_LIST = "SELECT x.author_id,x.truename,x.username,x.invest_goal_money , aa.turnover from (" +
+    public static final String GET_ARTIST_TOP_LIST = "SELECT x.author_id,x.truename,x.picture,x.username,x.invest_goal_money , aa.turnover from (" +
             "SELECT a.author_id,u.truename,u.username,u.picture, sum(a.invest_goal_money) AS invest_goal_money " +
             "FROM app_art_work a ,organization_user u " +
             "WHERE a.author_id = u.id " +

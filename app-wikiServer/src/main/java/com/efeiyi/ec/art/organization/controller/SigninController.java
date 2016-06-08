@@ -96,6 +96,10 @@ public class SigninController extends BaseController {
             MyUser user;
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
+                if(user==null){
+                    resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);
+                    return resultMap;
+                }
                 if (user.getPassword().equals(jsonObj.getString("password"))) {
                     resultMap = resultMapHandler.handlerResult("0","成功",logBean);
                     resultMap.put("userInfo",(User)baseManager.getObject(User.class.getName(),user.getId()));
