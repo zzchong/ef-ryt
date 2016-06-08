@@ -29,6 +29,7 @@ public class JsonAcceptUtil {
     }
 
     public static JSONObject receiveJson3(HttpServletRequest request) throws Exception {
+        try {
         Enumeration paramNames = request.getParameterNames();
         JSONObject jsonObject = new JSONObject();
         while (paramNames.hasMoreElements()) {
@@ -38,9 +39,12 @@ public class JsonAcceptUtil {
                 String paramValue = paramValues[0];
                 jsonObject.put(paramName, paramValue);
             }
-
         }
-        return jsonObject;
+            return jsonObject;
+
+        } catch (Exception e) {
+            return receiveJson(request);
+        }
     }
 
     public static JSONObject receiveJson2(HttpServletRequest request) throws Exception {
