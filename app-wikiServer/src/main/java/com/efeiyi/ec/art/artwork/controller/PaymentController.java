@@ -484,12 +484,19 @@ public class PaymentController extends BaseController {
                 investMoney.add(new BigDecimal(tempInvestMoney.toString()));
 
             //总收益
+//            BigDecimal rewardMoney = new BigDecimal("0.00");
+//            Object tempRewardMoney =  baseManager.getUniqueObjectByConditions(AppConfig.SQL_REWARD_TOTAL,map);
+//            if(tempRewardMoney!=null)
+//                rewardMoney.add(new BigDecimal(tempRewardMoney.toString()));
+
+            //投资收益
             BigDecimal rewardMoney = new BigDecimal("0.00");
-            Object tempRewardMoney =  baseManager.getUniqueObjectByConditions(AppConfig.SQL_REWARD_TOTAL,map);
-            if(tempRewardMoney!=null)
-                rewardMoney.add(new BigDecimal(tempRewardMoney.toString()));
-
-
+            XQuery xquery = new XQuery("listROIRecord_default",request);
+            xquery.put("user_id",jsonObj.getString("userId"));
+            List<ROIRecord> roiRecordList = (List<ROIRecord>)baseManager.listObject(xquery);
+            for (ROIRecord roiRecord : roiRecordList){
+                rewardMoney = rewardMoney.add(roiRecord.getCurrentBalance());
+            }
             //余额
             BigDecimal restMoney = new BigDecimal("0.00");
             XQuery xQuery1 = new XQuery("listAccount_default",request);

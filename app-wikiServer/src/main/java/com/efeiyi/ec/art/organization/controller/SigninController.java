@@ -5,14 +5,11 @@ import cn.jmessage.api.common.model.RegisterInfo;
 import cn.jpush.api.common.resp.APIConnectionException;
 import cn.jpush.api.common.resp.APIRequestException;
 import com.alibaba.fastjson.JSONObject;
-import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.BigUser;
 import com.efeiyi.ec.art.organization.model.MyUser;
-import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
-import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.service.SmsCheckManager;
 import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
@@ -742,7 +739,7 @@ public class SigninController extends BaseController {
 
 
     public static String RegisterUsers(String username,String password) {
-        JMessageClient client = new JMessageClient(appKey, masterSecret);
+        JMessageClient client = new JMessageClient(JPushConfig.appKey, JPushConfig.masterSecret);
 
         try {
 
