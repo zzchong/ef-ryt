@@ -525,6 +525,74 @@ public class PaymentController extends BaseController {
         return resultMap;
     }
 
+    /**
+     * 保存提现余额
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/getMoney.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map getMoney(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
+        List objectList = null;
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("getMoney");
+            if (!CommonUtil.jsonObject(jsonObj)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            Account account = null;
+
+            User user =(User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+            if(user==null)
+                return resultMapHandler.handlerResult("10007", "用户不存在", logBean);
+            //余额
+            BigDecimal restMoney = new BigDecimal("0.00");
+            XQuery xQuery1 = new XQuery("listAccount_default",request);
+            xQuery1.put("user_id",jsonObj.getString("userId"));
+            List<Account> accountList = baseManager.listObject(xQuery1);
+            if(accountList==null && accountList.size()==0){
+                return resultMapHandler.handlerResult("10007", "用户不存在", logBean);
+            }
+            BigDecimal money = new BigDecimal(jsonObj.getString("money"));
+            account = accountList.get(0);
+            if(money.doubleValue()>account.getCurrentBalance().doubleValue())
+                return resultMapHandler.handlerResult("100015", "账户余额不足", logBean);
+
+            Bill bill = new Bill();
+            bill.setCreateDatetime(new Date());
+            bill.setStatus("1");
+            bill.setType("60");
+            bill.setDetail("提现金额");
+            bill.setOutOrIn("0");
+            bill.setPayName(jsonObj.getString("name"));
+            bill.setPayNumber(jsonObj.getString("number"));
+            bill.setAuthor(user);
+            bill.setMoney(money);
+            bill.setTitle("融易投-余额提现");
+            baseManager.saveOrUpdate(Bill.class.getName(),bill);
+
+            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
+
     @Test
     public void testArtworkView() throws Exception {
         long timestamp = System.currentTimeMillis();

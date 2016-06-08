@@ -27,11 +27,14 @@ public class Bill implements Serializable {
     private BigDecimal money;//账单金额
     private User author;
     private Date createDatetime;
-    private String type;//账单类型  1 投资 2 拍卖订单  3 支付保证金 4 返还保证金 5 返利
+    private String type;//账单类型  1 投资 2 拍卖订单  3 支付保证金 4 返还保证金 5 返利 60 退款余额中 61余额退款成功
     private String outOrIn;//1 进账 0 出账
     private String number;//支付订单唯一标示
     private String payWay;//支付方式 1 支付宝 2 微信
     private String flowAccount;//流水账号
+
+    private String payNumber;//支付宝账号 退款余额时使用
+    private String payName;//支付宝名称
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -144,5 +147,23 @@ public class Bill implements Serializable {
 
     public void setFlowAccount(String flowAccount) {
         this.flowAccount = flowAccount;
+    }
+
+    @Column(name = "pay_number")
+    public String getPayNumber() {
+        return payNumber;
+    }
+
+    public void setPayNumber(String payNumber) {
+        this.payNumber = payNumber;
+    }
+
+    @Column(name = "pay_name")
+    public String getPayName() {
+        return payName;
+    }
+
+    public void setPayName(String payName) {
+        this.payName = payName;
     }
 }
