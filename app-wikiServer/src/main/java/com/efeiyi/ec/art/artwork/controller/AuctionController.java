@@ -212,7 +212,7 @@ public class AuctionController extends BaseController {
 
             //判断是否交付保证金
             LinkedHashMap queryMap = new LinkedHashMap();
-            queryMap.put("currentUserId", jsonObj.getString("currentUserId"));
+            queryMap.put("userId", jsonObj.getString("currentUserId"));
             queryMap.put("artworkId", jsonObj.getString("artWorkId"));
             MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
             String isSubmitDepositPrice = "1";
