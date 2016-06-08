@@ -490,6 +490,16 @@ public class PaymentController extends BaseController {
                 rewardMoney.add(new BigDecimal(tempRewardMoney.toString()));
 
 
+            //余额
+            BigDecimal restMoney = new BigDecimal("0.00");
+            XQuery xQuery1 = new XQuery("listAccount_default",request);
+            xQuery1.put("user_id",jsonObj.getString("userId"));
+            List<Account> accountList = baseManager.listObject(xQuery1);
+            if(accountList!=null && accountList.size()>0){
+                restMoney = accountList.get(0).getCurrentBalance();
+            }
+
+            data.put("restMoney",restMoney);
             data.put("investMoney",investMoney);
             data.put("rewardMoney",rewardMoney);
 
