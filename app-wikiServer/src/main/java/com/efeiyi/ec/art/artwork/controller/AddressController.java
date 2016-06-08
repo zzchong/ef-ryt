@@ -51,7 +51,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by Administrator on 2016/1/29.
@@ -82,44 +84,25 @@ public class AddressController extends BaseController {
 
     @RequestMapping(value = "/app/addressView.do")
     @ResponseBody
-    public Map getAddressList(HttpServletRequest request) {
+    public Map getAddressView(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
-        TreeMap treeMap = new TreeMap();
-        List<Artwork> artworkList = null;
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("addressView");
-            if (CommonUtil.jsonObject(jsonObj)) {
+            if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-//            //校验数字签名
-//            String signmsg = jsonObj.getString("signmsg");
-//            treeMap.put("pageSize", jsonObj.getString("pageSize"));
-//            treeMap.put("pageNum", jsonObj.getString("pageNum"));
-//            treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            Map<String, Object> data = new HashMap<>();
-
-            PageEntity pageEntity = new PageEntity();
-            pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
-            pageEntity.setSize(jsonObj.getInteger("pageSize"));
-            XQuery xQuery = new XQuery("plistConsumerAddress_default", request);
-            xQuery.put("consumer_id", jsonObj.getString("userId"));
-            xQuery.setPageEntity(pageEntity);
-            PageInfo pageInfo = baseManager.listPageInfo(xQuery);
-
-            data.put("addressList", pageInfo.getList());
-
+            ConsumerAddress consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(), jsonObj.getString("addressId"));
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-
-            resultMap.put("data", data);
+            resultMap.put("consumerAddress", consumerAddress);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -187,7 +170,9 @@ public class AddressController extends BaseController {
     }
 
 
-    /**收货地址列表接口（不带分页）
+    /**
+     * 收货地址列表接口（不带分页）
+     *
      * @param request
      * @return
      */
@@ -206,10 +191,7 @@ public class AddressController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
@@ -230,7 +212,49 @@ public class AddressController extends BaseController {
     }
 
 
-    /**创建地址接口
+    /**
+     * 删除收货地址
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/removeAddress.do")
+    @ResponseBody
+    public Map removeAddress(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("removeAddress");
+            if (!CommonUtil.jsonObject(jsonObj)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            //校验数字签名
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            ConsumerAddress consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(), jsonObj.getString("addressId"));
+            consumerAddress.setStatus("0");
+            baseManager.saveOrUpdate(ConsumerAddress.class.getName(), consumerAddress);
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "删除成功");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
+
+
+    /**
+     * 创建地址接口
+     *
      * @param request
      * @return
      */
@@ -239,7 +263,6 @@ public class AddressController extends BaseController {
     public Map addAddress(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<>();
-        TreeMap treeMap = new TreeMap();
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -249,29 +272,24 @@ public class AddressController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("provinceStr", jsonObj.getString("provinceStr"));
-            treeMap.put("cityStr", jsonObj.getString("cityStr"));
-            treeMap.put("districtStr", jsonObj.getString("districtStr"));
-            treeMap.put("details", jsonObj.getString("details"));
-            treeMap.put("phone", jsonObj.getString("phone"));
-            treeMap.put("consignee", jsonObj.getString("consignee"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-
             ConsumerAddress consumerAddress = new ConsumerAddress();
+
+            if (jsonObj.getString("id") != null) {
+                consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(), jsonObj.getString("id"));
+            }
+
             consumerAddress.setConsumer((User) baseManager.getObject(User.class.getName(), jsonObj.getString("currentUserId")));
-            consumerAddress.setProvinceStr(jsonObj.getString("provinceStr"));
-            consumerAddress.setCityStr(jsonObj.getString("cityStr"));
-            consumerAddress.setDistrictStr(jsonObj.getString("districtStr"));
-            consumerAddress.setDetails(jsonObj.getString("details"));
+//            consumerAddress.setProvinceStr(jsonObj.getString("provinceStr"));
+            consumerAddress.setCityStr(URLDecoder.decode(jsonObj.getString("cityStr"), "utf-8"));
+//            consumerAddress.setDistrictStr(jsonObj.getString("districtStr"));
+            consumerAddress.setDetails(URLDecoder.decode(jsonObj.getString("details"), "utf-8"));
             consumerAddress.setPhone(jsonObj.getString("phone"));
-            consumerAddress.setConsignee(jsonObj.getString("consignee"));
-            consumerAddress.setStatus("1");
+            consumerAddress.setConsignee(URLDecoder.decode(jsonObj.getString("consignee"), "utf-8"));
+            consumerAddress.setStatus(jsonObj.getString("status"));
             baseManager.saveOrUpdate(ConsumerAddress.class.getName(), consumerAddress);
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "地址增加成功");
@@ -285,7 +303,9 @@ public class AddressController extends BaseController {
     }
 
 
-    /**设置默认地址
+    /**
+     * 设置默认地址
+     *
      * @param request
      * @return
      */
@@ -316,8 +336,8 @@ public class AddressController extends BaseController {
             XQuery xQuery = new XQuery("listAddress_default1", request);
             xQuery.put("consumer_id", jsonObj.getString("currentUserId"));
             List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
-            if(consumerAddressList != null && consumerAddressList.size()>0){
-                for(ConsumerAddress consumerAddress:consumerAddressList){
+            if (consumerAddressList != null && consumerAddressList.size() > 0) {
+                for (ConsumerAddress consumerAddress : consumerAddressList) {
                     consumerAddress.setStatus("1");
                     baseManager.saveOrUpdate(ConsumerAddress.class.getName(), consumerAddress);
                 }
@@ -336,7 +356,9 @@ public class AddressController extends BaseController {
         return resultMap;
     }
 
-    /**获取默认地址
+    /**
+     * 获取默认地址
+     *
      * @param request
      * @return
      */
@@ -366,10 +388,10 @@ public class AddressController extends BaseController {
             XQuery xQuery = new XQuery("listAddress_default1", request);
             xQuery.put("consumer_id", jsonObj.getString("currentUserId"));
             List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
-            if (consumerAddressList.size() != 1){
+            if (consumerAddressList.size() != 1) {
                 resultMap.put("resultCode", "10005");
                 resultMap.put("resultMsg", "数据查询异常");
-            }else {
+            } else {
                 resultMap.put("defaultAddress", consumerAddressList.get(0));
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "查询默认地址成功");

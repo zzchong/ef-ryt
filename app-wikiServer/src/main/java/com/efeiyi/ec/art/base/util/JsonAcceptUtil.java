@@ -13,36 +13,41 @@ import java.util.Map;
  */
 public class JsonAcceptUtil {
 
-    public static JSONObject receiveJson(HttpServletRequest request) throws  Exception{
+    public static JSONObject receiveJson(HttpServletRequest request) throws Exception {
+        try {
+
             request.setCharacterEncoding("utf-8");
             InputStream inputStream = request.getInputStream();
             byte[] bytes = new byte[request.getContentLength()];
             inputStream.read(bytes);
-            String param = new String(bytes,"UTF-8");
+            String param = new String(bytes, "UTF-8");
             JSONObject jsonObj = (JSONObject) JSONObject.parse(param);
             return jsonObj;
+        } catch (Exception e) {
+            return receiveJson3(request);
+        }
     }
 
-    public static JSONObject receiveJson3(HttpServletRequest request) throws  Exception{
+    public static JSONObject receiveJson3(HttpServletRequest request) throws Exception {
         Enumeration paramNames = request.getParameterNames();
         JSONObject jsonObject = new JSONObject();
-        while (paramNames.hasMoreElements()){
-           String paramName = paramNames.nextElement().toString();
-            String [] paramValues = request.getParameterValues(paramName);
-            if(paramValues.length==1){
+        while (paramNames.hasMoreElements()) {
+            String paramName = paramNames.nextElement().toString();
+            String[] paramValues = request.getParameterValues(paramName);
+            if (paramValues.length == 1) {
                 String paramValue = paramValues[0];
-                jsonObject.put(paramName,paramValue);
+                jsonObject.put(paramName, paramValue);
             }
 
         }
         return jsonObject;
     }
 
-    public static JSONObject receiveJson2(HttpServletRequest request) throws  Exception{
+    public static JSONObject receiveJson2(HttpServletRequest request) throws Exception {
         Map map = new HashMap();
         request.setCharacterEncoding("utf-8");
-        for(Map.Entry<String,String[]> entry : request.getParameterMap().entrySet()){
-            map.put(entry.getKey(),entry.getValue()[0]);
+        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+            map.put(entry.getKey(), entry.getValue()[0]);
         }
         String jsonString = JSONObject.toJSONString(map);
         return JSONObject.parseObject(jsonString);

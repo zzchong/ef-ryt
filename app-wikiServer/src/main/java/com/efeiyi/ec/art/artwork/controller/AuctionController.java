@@ -132,7 +132,7 @@ public class AuctionController extends BaseController {
                     } else {
                         artwork.setWinner(new User()); //设置竞拍得主为空
                     }*/
-                    if (artwork.getWinner()== null || artwork.getWinner().getId()==null){
+                    if (artwork.getWinner() == null || artwork.getWinner().getId() == null) {
                         artwork.setWinner(null); //设置竞拍得主为空
                     }
                 } else {
@@ -172,11 +172,7 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
@@ -184,9 +180,9 @@ public class AuctionController extends BaseController {
             //项目信息
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
             //增加浏览数
-            if(artwork.getViewNum() == null){
+            if (artwork.getViewNum() == null) {
                 artwork.setViewNum(1);
-            }else {
+            } else {
                 artwork.setViewNum(artwork.getViewNum() + 1);
             }
             baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
@@ -216,7 +212,7 @@ public class AuctionController extends BaseController {
             queryMap.put("artworkId", jsonObj.getString("artWorkId"));
             MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
             String isSubmitDepositPrice = "1";
-            if (marginAccount != null && "0".equals(marginAccount.getStatus())){
+            if (marginAccount != null && "0".equals(marginAccount.getStatus())) {
                 isSubmitDepositPrice = "0";
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
@@ -250,21 +246,16 @@ public class AuctionController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("artworkId")) || "".equals(jsonObj.getString("money"))) {
+            if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("artworkId", jsonObj.getString("artworkId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            treeMap.put("price", jsonObj.getString("price"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            resultMap = artworkAuctionManager.artworkBidOnAuction(request,jsonObj,logBean);
+            resultMap = artworkAuctionManager.artworkBidOnAuction(request, jsonObj, logBean);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -331,29 +322,25 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("type", jsonObj.getString("type"));
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
 
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             //获取订单(2、待付款 3、待收货 4、已完成 1、全部)
-            if("2".equals(jsonObj.getString("type"))){
+            if ("2".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default1", request);
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
-            }else if ("3".equals(jsonObj.getString("type"))){
+            } else if ("3".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default2", request);
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
-            }else if ("4".equals(jsonObj.getString("type"))){
+            } else if ("4".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default3", request);
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
-            }else {
+            } else {
                 XQuery xQuery = new XQuery("listAuctionOrder_default", request);
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
                 auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
@@ -392,15 +379,12 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artWorkOrderId", jsonObj.getString("artWorkOrderId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(),jsonObj.getString("artWorkOrderId"));
+            AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), jsonObj.getString("artWorkOrderId"));
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "订单详情获取成功");
             resultMap.put("auctionOrder", auctionOrder);
@@ -435,12 +419,7 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artWorkId", jsonObj.getString("artWorkId"));
-            treeMap.put("pageSize", jsonObj.getString("pageSize"));
-            treeMap.put("pageIndex", jsonObj.getString("pageIndex"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
@@ -465,7 +444,7 @@ public class AuctionController extends BaseController {
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
             List<ArtworkBidding> artworkBiddings = (List<ArtworkBidding>) baseManager.listObject(xQuery2);
             Integer auctionNum = 0;
-            if(artworkBiddings != null && artworkBiddings.size() > 0){
+            if (artworkBiddings != null && artworkBiddings.size() > 0) {
                 auctionNum = artworkBiddings.size();
             }
             //竞拍人数
@@ -514,10 +493,10 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artworkId"));
-            if(artwork.getViewNum()==null){
+            if (artwork.getViewNum() == null) {
                 artwork.setViewNum(1);
-            }else {
-                artwork.setViewNum(artwork.getViewNum()+1);
+            } else {
+                artwork.setViewNum(artwork.getViewNum() + 1);
             }
             baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
             resultMap.put("resultCode", "0");

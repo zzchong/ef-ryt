@@ -65,7 +65,7 @@ public class UserMainController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
-            if (!CommonUtil.jsonObject(jsonObj)) {
+            if (!CommonUtil.jsonObject(jsonObj,"currentId")) {
                 return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
 
