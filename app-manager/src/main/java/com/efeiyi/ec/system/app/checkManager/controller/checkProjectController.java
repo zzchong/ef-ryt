@@ -10,6 +10,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Administrator on 2016/4/7.
@@ -52,7 +55,16 @@ public class checkProjectController {
             artwork.setStep(CheckConstant.ARTWORK_STEP_CHECKING);
         }
         if (CheckConstant.ARTWORK_STEP_CHECKING.equals(type)){
+
+
             artwork.setStep(CheckConstant.ARTWORK_STEP_PASS);
+            artwork.setType(CheckConstant.ARTWORK_STATUS_FINANCING);
+            artwork.setInvestStartDatetime(new Date());
+            //当前时间+30天
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.DAY_OF_MONTH,30);
+            artwork.setInvestEndDatetime(calendar.getTime());
         }
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
         if (null != resultPage && "V".equals(resultPage.trim())){

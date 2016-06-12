@@ -20,6 +20,7 @@ import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.PConst;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.util.CookieTool;
+import com.ming800.core.util.MD5Encode;
 import com.ming800.core.util.VerificationCodeGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

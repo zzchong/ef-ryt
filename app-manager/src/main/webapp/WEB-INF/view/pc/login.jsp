@@ -47,11 +47,11 @@
                 </div>
             </div>
 
-            <div class="am-form-group">
-                <div class="am-u-sm-10 am-u-sm-offset-2">
-                    <a href="<c:url value="/quartz/test.do"/>" class="am-btn am-btn-default">测试</a>
-                </div>
-            </div>
+            <%--<div class="am-form-group">--%>
+                <%--<div class="am-u-sm-10 am-u-sm-offset-2">--%>
+                    <%--<a href="<c:url value="/quartz/test.do"/>" class="am-btn am-btn-default">测试</a>--%>
+                <%--</div>--%>
+            <%--</div>--%>
         </form>
     </div>
 </div>

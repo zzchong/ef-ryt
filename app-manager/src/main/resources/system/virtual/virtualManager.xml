@@ -88,7 +88,7 @@
             <does>
                 <do name="listAppArtwork" access="" label="计划列表" result="">
                     <query name="appDefault" label="默认" type="auto" orderBy="id:desc">
-                        <condition name="status" defaultValue="1" operation="ne" inputType="default"/>
+                        <condition name="status" defaultValue="0" operation="ne" inputType="default"/>
                     </query>
                 </do>
             </does>

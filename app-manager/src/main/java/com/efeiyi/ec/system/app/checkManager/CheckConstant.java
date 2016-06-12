@@ -15,7 +15,7 @@ public class CheckConstant {
     //项目审核-Artwork状态(融资阶段)常量
     public static final String ARTWORK_STEP_WAIT = "10";//待审核
     public static final String ARTWORK_STEP_CHECKING= "11";//审核中
-    public static final String ARTWORK_STEP_PASS = "12";//审核通过
+    public static final String ARTWORK_STEP_PASS = "14";//审核通过
     public static final String ARTWORK_STEP_REJECT = "13";//审核未通过，已驳回
 
     //艺术家审核-Artist状态常量

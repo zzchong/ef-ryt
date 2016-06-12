@@ -432,6 +432,7 @@ public class MessageController extends BaseController {
                             message.setIsRead(l);
                         objectList.add(message);
                     }
+
                 } else {
                     logBean.setResultCode("10002");
                     logBean.setMsg("参数校验不合格，请仔细检查");

@@ -1,6 +1,7 @@
 package com.efeiyi.ec.system.app.checkManager.controller;
 
 import com.efeiyi.ec.art.model.Master;
+import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.system.app.checkManager.CheckConstant;
 import com.ming800.core.base.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,11 @@ public class checkArtistController {
             master.setTheStatus(CheckConstant.ARTIST_STATUS_PASS);
         }
         baseManager.saveOrUpdate(Master.class.getName(), master);
+
+        User user = (User) baseManager.getObject(User.class.getName(),master.getUser().getId());
+        user.setType("1");
+        user.setMaster(master);
+        baseManager.saveOrUpdate(User.class.getName(),user);
         if (null != resultPage && "V".equals(resultPage.trim())){
             return new ModelAndView("redirect:/basic/xm.do?qm=viewCheckMaster&checkMaster=checkMaster&id=" + id);
         }
