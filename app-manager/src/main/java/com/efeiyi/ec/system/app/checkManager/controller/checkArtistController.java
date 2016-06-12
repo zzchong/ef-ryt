@@ -55,13 +55,15 @@ public class checkArtistController {
         }
         if (CheckConstant.ARTIST_STATUS_CHECKING.equals(type)){
             master.setTheStatus(CheckConstant.ARTIST_STATUS_PASS);
+
+            User user = (User) baseManager.getObject(User.class.getName(),master.getUser().getId());
+            user.setType("1");
+            user.setMaster(master);
+            baseManager.saveOrUpdate(User.class.getName(),user);
         }
         baseManager.saveOrUpdate(Master.class.getName(), master);
 
-        User user = (User) baseManager.getObject(User.class.getName(),master.getUser().getId());
-        user.setType("1");
-        user.setMaster(master);
-        baseManager.saveOrUpdate(User.class.getName(),user);
+
         if (null != resultPage && "V".equals(resultPage.trim())){
             return new ModelAndView("redirect:/basic/xm.do?qm=viewCheckMaster&checkMaster=checkMaster&id=" + id);
         }
