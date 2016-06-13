@@ -361,7 +361,11 @@ public class ArtworkController extends BaseController {
 
                     artworkInvestTopList = new ArrayList<>();
                     ArtWorkInvestTopBean artWorkInvestTopBean = null;
-                    for (int i = 0; i < 3; i++) {
+                   int max = 3;
+                   if(artworkInvestTopTempList.size()<max){
+                       max = artworkInvestTopTempList.size();
+                   }
+                    for (int i = 0; i < max; i++) {
                         artWorkInvestTopBean = new ArtWorkInvestTopBean();
                         artWorkInvestTopBean.setUser(artworkInvestTopTempList.get(i).getCreator());
                         artWorkInvestTopBean.setMoney(topMoneyList.get(i));
