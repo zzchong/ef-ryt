@@ -831,9 +831,9 @@ public class ArtworkController extends BaseController {
                                         artworkAttachment.setArtwork(artwork);
                                         artworkAttachment.setFileType(myFileName.substring(myFileName.lastIndexOf("."), myFileName.length()));
                                         artworkAttachment.setFileName(pictureUrl);
-                                        //将图片上传至阿里云
-                                        aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
                                         baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+                                       //将图片上传至阿里云
+                                       aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
                                         //artworkAttachments.add(artworkAttachment);
 //                                        artwork.getArtworkAttachment().add(artworkAttachment);
                                     }

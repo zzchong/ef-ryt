@@ -12,5 +12,8 @@
 </head>
 <body>
    非遗百科
+
+<input type="">
+   <video src="http://ryt.efeiyi.com/message/2.mov" controls="controls"></video>
 </body>
 </html>
