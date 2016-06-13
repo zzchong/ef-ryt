@@ -103,6 +103,9 @@ public class AppConfig {
     public static final String SQL_Margin_REWARD = "FROM ROIRecord where  artwork.id=:artWorkId and status ='1'" ;
     //投资前三
     public  static final String SQL_INVEST_TOP = "FROM ArtworkInvest  where artwork.id = :artworkId and status !='0'  GROUP BY creator.id ORDER BY SUM(price) DESC";
+    //投资前三钱
+    public  static final String SQL_INVEST_TOP_MONEY = "SELECT SUM(price) FROM ArtworkInvest  where artwork.id = :artworkId and status !='0'  GROUP BY creator.id ORDER BY SUM(price) DESC";
+
     //总投资数
     public static final String SQL_INVEST_TOTAL="SELECT SUM(price) FROM ArtworkInvest where creator.id= :userId and status!='0'";
     //总收益

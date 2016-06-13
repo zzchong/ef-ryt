@@ -14,6 +14,7 @@ import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
+import com.efeiyi.ec.art.modelConvert.ArtWorkInvestTopBean;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
@@ -333,7 +334,7 @@ public class ArtworkController extends BaseController {
             List<ArtworkInvest> artworkInvestList = null;
 
             //投资top
-            List<ArtworkInvest> artworkInvestTopList = null;
+            List<ArtWorkInvestTopBean> artworkInvestTopList = null;
 
             //temp
             List<ArtworkInvest> artworkInvestTopTempList = null;
@@ -352,18 +353,20 @@ public class ArtworkController extends BaseController {
             LinkedHashMap<String,Object> params = new LinkedHashMap<>();
             params.put("artworkId",jsonObj.getString("artWorkId"));
             artworkInvestTopTempList =(List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_TOP,params);
+            List<BigDecimal> topMoneyList =(List<BigDecimal>) baseManager.listObject(AppConfig.SQL_INVEST_TOP_MONEY,params);
 //            xQuery = new XQuery("listArtworkInvest1_default", request);
 //            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
 //            artworkInvestTopTempList = baseManager.listObject(xQuery);
             if (artworkInvestTopTempList != null) {
-                if (artworkInvestTopTempList.size() > 3) {
+
                     artworkInvestTopList = new ArrayList<>();
+                    ArtWorkInvestTopBean artWorkInvestTopBean = null;
                     for (int i = 0; i < 3; i++) {
-                        artworkInvestTopList.add(artworkInvestTopTempList.get(i));
+                        artWorkInvestTopBean = new ArtWorkInvestTopBean();
+                        artWorkInvestTopBean.setUser(artworkInvestTopTempList.get(i).getCreator());
+                        artWorkInvestTopBean.setMoney(topMoneyList.get(i));
+                        artworkInvestTopList.add(artWorkInvestTopBean);
                     }
-                } else {
-                    artworkInvestTopList = artworkInvestTopTempList;
-                }
             }
             data.put("artworkInvestTopList", artworkInvestTopList);
 
