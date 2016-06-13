@@ -194,11 +194,13 @@ public class AuctionController extends BaseController {
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
             List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>) baseManager.listObject(xQuery);
             //最新竞价记录
-            artwork.setNewBidingPrice(artworkBiddingList.get(0).getPrice());
             //有效竞价次数
             Integer num = 0;
-            if (artworkBiddingList != null) {
+            if (artworkBiddingList != null && !artworkBiddingList.isEmpty()) {
                 num = artworkBiddingList.size();
+                artwork.setNewBidingPrice(artworkBiddingList.get(0).getPrice());
+            } else {
+                artwork.setNewBidingPrice(artwork.getStartingPrice());
             }
             artwork.setAuctionNum(num);
             //项目动态
