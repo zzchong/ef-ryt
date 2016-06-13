@@ -802,7 +802,7 @@ public class ArtworkController extends BaseController {
                     artwork.setDescription(request.getParameter("description"));
                     artwork.setArtworkdirection(artworkdirection);
                     List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
-
+                    List<String>  urlList = new ArrayList<>();
                     //创建一个通用的多部分解析器
                     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                     //判断 request 是否有文件上传,即多部分请求
@@ -825,15 +825,9 @@ public class ArtworkController extends BaseController {
                                     //重命名上传后的文件名
                                     String url = "artwork/" + System.currentTimeMillis() + myFileName;
                                     String pictureUrl = "http://rongyitou2.efeiyi.com/" + url;
-                                    ArtworkAttachment artworkAttachment = null;
-
-                                        artworkAttachment = new ArtworkAttachment();//项目附件
-                                        artworkAttachment.setArtwork(artwork);
-                                        artworkAttachment.setFileType(myFileName.substring(myFileName.lastIndexOf("."), myFileName.length()));
-                                        artworkAttachment.setFileName(pictureUrl);
-                                        baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
                                        //将图片上传至阿里云
                                        aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
+                                       urlList.add(pictureUrl);
                                         //artworkAttachments.add(artworkAttachment);
 //                                        artwork.getArtworkAttachment().add(artworkAttachment);
                                     }
@@ -845,6 +839,16 @@ public class ArtworkController extends BaseController {
                         for (ArtworkAttachment artworkAttachment : artworkAttachmentList) {
                             baseManager.delete(ArtworkAttachment.class.getName(),artworkAttachment.getId());
                         }
+                    }
+                    if(urlList.size()!=0){
+                       for(String url : urlList){
+                           ArtworkAttachment artworkAttachment = null;
+                           artworkAttachment = new ArtworkAttachment();//项目附件
+                           artworkAttachment.setArtwork(artwork);
+                           artworkAttachment.setFileType(url.substring(url.lastIndexOf("."), url.length()));
+                           artworkAttachment.setFileName(url);
+                           baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+                       }
                     }
                     //artwork.setArtworkAttachment(artworkAttachments);
                     baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
