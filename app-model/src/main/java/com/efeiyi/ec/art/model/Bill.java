@@ -32,7 +32,7 @@ public class Bill implements Serializable {
     private String number;//支付订单唯一标示
     private String payWay;//支付方式 1 支付宝 2 微信
     private String flowAccount;//流水账号
-
+    private BigDecimal  restMoney;//账户余额
 
     private String payNumber;//支付宝账号 退款余额时使用
     private String payName;//支付宝名称
@@ -166,5 +166,14 @@ public class Bill implements Serializable {
 
     public void setPayName(String payName) {
         this.payName = payName;
+    }
+
+    @Column(name = "rest_money")
+    public BigDecimal getRestMoney() {
+        return restMoney;
+    }
+
+    public void setRestMoney(BigDecimal restMoney) {
+        this.restMoney = restMoney;
     }
 }

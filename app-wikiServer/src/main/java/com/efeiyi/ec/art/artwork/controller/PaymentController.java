@@ -64,11 +64,11 @@ public class PaymentController extends BaseController {
     @Autowired
     PaymentManager paymentManager;
 
-    private final static String TITLE_AUCTION = "融易投-项目尾款";
+    private final static String TITLE_AUCTION = "项目尾款";
 
-    private final static String TITLE_ADD = "融易投-保证金";
+    private final static String TITLE_ADD = "保证金";
 
-    private final static String TITLE_INVEST = "融易投-投资";
+    private final static String TITLE_INVEST = "投资";
 
     @RequestMapping(value = "/app/webhoot.do", method = RequestMethod.POST)
     @ResponseBody
@@ -293,9 +293,27 @@ public class PaymentController extends BaseController {
         Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
         if (jsonObj.getString("action").equals("auction")) {//拍卖订单尾款支付
 
-            ConsumerAddress consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(),jsonObj.getString("addressId"));//收货地址
+
+            //收货地址
+            ConsumerAddress consumerAddress = null;
+            XQuery xQuery = new XQuery("listAddress_default1",request);
+            xQuery.put("consumer_id",request);
+            List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
+            if(consumerAddressList!=null)
+                consumerAddress = consumerAddressList.get(0);
+
             //拍卖金额
-            BigDecimal auctionMoney = new BigDecimal(jsonObj.getString("auctionMoney"));
+            BigDecimal auctionMoney = artwork.getNewBidingPrice();
+
+            //保证金
+            xQuery = new XQuery("listMarginAccount_default2",request);
+            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
+            xQuery.put("user_id",jsonObj.getString("userId"));
+            List<MarginAccount> marginAccountList = baseManager.listObject(xQuery);
+
+            if(marginAccountList!=null)
+                money = auctionMoney.subtract(marginAccountList.get(0).getCurrentBalance());
+
             if(consumerAddress==null)
                 return null;
 
@@ -317,11 +335,12 @@ public class PaymentController extends BaseController {
            if(auctionOrder==null)
                return null;
 
-            title = TITLE_AUCTION;
+            title = TITLE_AUCTION+"-"+artwork.getTitle();
             billNo = auctionOrder.getId();
 
             bill.setDetail(user.getName()+"向项目<<"+auctionOrder.getArtwork().getTitle()+">>支付尾款:"+money);
             bill.setType("2");
+            bill.setRestMoney(account.getCurrentUsableBalance());
         } else if (jsonObj.getString("action").equals("invest")) {//投资
 
 
@@ -337,11 +356,12 @@ public class PaymentController extends BaseController {
             artworkInvest.setAccount(account);
             baseManager.saveOrUpdate(ArtworkInvest.class.getName(),artworkInvest);
 
-            title = TITLE_INVEST;
+            title = TITLE_INVEST+"-"+artwork.getTitle();
             billNo = artworkInvest.getId();
 
             bill.setDetail(user.getName()+"向项目<<"+artwork.getTitle()+">>投资:"+money);
             bill.setType("1");
+            bill.setRestMoney(account.getCurrentUsableBalance());
         } else if (jsonObj.getString("action").equals("payMargin")) {//支付保证金
             //投入保证金的项目Id
 //            String artWorkId = jsonObj.getString("artWorkId");
@@ -366,11 +386,12 @@ public class PaymentController extends BaseController {
             marginAccount.setCurrentBalance(money);
             marginAccount.setUser(user);
             baseManager.saveOrUpdate(MarginAccount.class.getName(),marginAccount);
-            title = TITLE_ADD;
+            title = TITLE_ADD+"-"+artwork.getTitle();
             billNo = marginAccount.getId();
 
             bill.setDetail(user.getName()+"向项目<<"+artwork.getTitle()+">>支付竞拍保证金："+money);
             bill.setType("3");
+            bill.setRestMoney(account.getCurrentUsableBalance());
         }
          baseManager.saveOrUpdate(Bill.class.getName(),bill);
          map.put("Bill_id",bill.getId());
@@ -516,7 +537,7 @@ public class PaymentController extends BaseController {
             pageEntity.setSize(jsonObj.getInteger("pageSize"));
             pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
             xQuery.setPageEntity(pageEntity);
-            List<Bill> billList = baseManager.listObject(xQuery);
+            List<Bill> billList = baseManager.listPageInfo(xQuery).getList();
 
             data.put("billList",billList);
 
@@ -573,7 +594,7 @@ public class PaymentController extends BaseController {
             }
             BigDecimal money = new BigDecimal(jsonObj.getString("money"));
             account = accountList.get(0);
-            if(money.doubleValue()>account.getCurrentBalance().doubleValue())
+            if(money.doubleValue()>account.getCurrentUsableBalance().doubleValue())
                 return resultMapHandler.handlerResult("100015", "账户余额不足", logBean);
 
             Bill bill = new Bill();
@@ -587,6 +608,7 @@ public class PaymentController extends BaseController {
             bill.setAuthor(user);
             bill.setMoney(money);
             bill.setTitle("融易投-余额提现");
+            bill.setRestMoney(account.getCurrentUsableBalance().subtract(money));
             baseManager.saveOrUpdate(Bill.class.getName(),bill);
 
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
