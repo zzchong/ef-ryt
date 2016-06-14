@@ -155,14 +155,18 @@ public class ArtWorkCreationController extends BaseController {
 //            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
 //            List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
             //已创作时长
+            String createdTime = "";
+            //剩余时长
+            String restTime = "";
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+            if(artwork.getInvestEndDatetime()!=null && artwork.getCreationEndDatetime()!=null){
+
             String str1 = sdf.format(new Date());
             String str2 = sdf.format(artwork.getInvestEndDatetime());
             String str3 = sdf.format(artwork.getCreationEndDatetime());
-            String createdTime = TimeUtil.getDistanceTimes(str1,str2);
-            //剩余时长
-            String restTime = TimeUtil.getDistanceTimes(str3,str1);
-
+            createdTime = TimeUtil.getDistanceTimes(str1,str2);
+            restTime = TimeUtil.getDistanceTimes(str3,str1);
+            }
             //是否点赞
             Boolean isPraise = false;
             if(!StringUtils.isEmpty(jsonObj.getString("currentUserId"))) {

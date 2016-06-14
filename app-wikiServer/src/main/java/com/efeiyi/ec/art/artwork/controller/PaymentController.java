@@ -297,9 +297,9 @@ public class PaymentController extends BaseController {
             //收货地址
             ConsumerAddress consumerAddress = null;
             XQuery xQuery = new XQuery("listAddress_default1",request);
-            xQuery.put("consumer_id",request);
+            xQuery.put("consumer_id",userId);
             List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
-            if(consumerAddressList!=null)
+            if(consumerAddressList!=null && consumerAddressList.size()>0)
                 consumerAddress = consumerAddressList.get(0);
 
             //拍卖金额
@@ -311,7 +311,7 @@ public class PaymentController extends BaseController {
             xQuery.put("user_id",jsonObj.getString("userId"));
             List<MarginAccount> marginAccountList = baseManager.listObject(xQuery);
 
-            if(marginAccountList!=null)
+            if(marginAccountList!=null && marginAccountList.size()>0)
                 money = auctionMoney.subtract(marginAccountList.get(0).getCurrentBalance());
 
             if(consumerAddress==null)
