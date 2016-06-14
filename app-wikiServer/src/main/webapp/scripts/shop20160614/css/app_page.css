@@ -1,0 +1,45 @@
+body, h1, h2, h3, h4, h5, h6, ul, li, dl, dt, dd, img, input, a, p, strong, em, i {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: Microsoft YaHei
+}
+img {
+    border: 0;
+}
+.bd{width:100%;float: left;}
+
+/*--reset--*/
+body {
+  max-width:640px;
+  margin: 0 auto;
+  background: #fafafa;
+  text-align: center;
+}
+.logo {
+  margin-top: 45px;margin-bottom: 35px;
+}
+.logo:after{
+  content: "";
+  background:url(../images/app_page_icon.png) no-repeat;
+  -webkit-background-size: 155px auto;
+  background-size: 155px auto;
+  width: 80px;
+  height: 107px;
+  display:inline-block;
+}
+.btn_down {margin-bottom: 74px}
+.btn_down a{
+  background:url(../images/app_page_icon.png) no-repeat;
+  -webkit-background-size: 155px auto;
+  background-size: 155px auto;
+  width:155px;
+  height: 43px;
+  display:inline-block;
+}
+.btn_down_ios a{
+  background-position: 0 -168px;
+}
+.btn_down_android a{
+  background-position: 0 -211px;
+}

@@ -173,6 +173,6 @@
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>/app/shareViewWap.do</welcome-file>
     </welcome-file-list>
 </web-app>

@@ -212,9 +212,11 @@ public class ArtworkController extends BaseController {
                 }
             }
 
-
             //剩余时间
-            String time = TimeUtil.getDistanceTimes2(new Date(), artwork.getInvestStartDatetime(), "", TimeUtil.SECOND).get("time").toString();
+            String time = "";
+            if(artwork.getInvestStartDatetime()!=null) {
+                time = TimeUtil.getDistanceTimes2(new Date(), artwork.getInvestStartDatetime(), "", TimeUtil.SECOND).get("time").toString();
+            }
             //项目文件
             List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
             //项目制作过程说明、融资解惑

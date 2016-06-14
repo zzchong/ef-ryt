@@ -87,6 +87,12 @@ public class HArtWorkController extends BaseController {
     }
 
 
+    @RequestMapping("/app/shareViewWap.do")
+    public String shareViewWap(HttpServletRequest request){
+
+        return  "/shareView";
+    }
+
     public static void main(String[] arg) throws Exception {
 
 

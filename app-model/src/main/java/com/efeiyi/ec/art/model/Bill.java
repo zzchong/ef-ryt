@@ -33,6 +33,7 @@ public class Bill implements Serializable {
     private String payWay;//支付方式 1 支付宝 2 微信
     private String flowAccount;//流水账号
 
+
     private String payNumber;//支付宝账号 退款余额时使用
     private String payName;//支付宝名称
 
