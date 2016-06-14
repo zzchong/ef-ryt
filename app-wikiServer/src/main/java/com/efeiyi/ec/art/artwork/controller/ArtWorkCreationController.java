@@ -29,6 +29,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -161,11 +162,26 @@ public class ArtWorkCreationController extends BaseController {
             String createdTime = TimeUtil.getDistanceTimes(str1,str2);
             //剩余时长
             String restTime = TimeUtil.getDistanceTimes(str3,str1);
+
+            //是否点赞
+            Boolean isPraise = false;
+            if(!StringUtils.isEmpty(jsonObj.getString("currentUserId"))) {
+                XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
+                xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
+                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
+                if (artWorkPraiseList != null) {
+                    if (artWorkPraiseList.size() > 0) {
+                        isPraise = true;
+                    }
+                }
+            }
+
             data.put("artwork",artwork);
             data.put("artworkMessageList",artwork.getArtworkMessages());
             data.put("createdTime",createdTime);
             data.put("restTime",restTime);
-
+            data.put("isPraise",isPraise);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("object",data);
         } catch(Exception e){
