@@ -264,8 +264,7 @@ public class PaymentController extends BaseController {
         //optional 参数
         Map<String, Object> map = new HashMap<>();
         map.put("action", jsonObj.getString("action"));
-        //支付金额
-        BigDecimal money = new BigDecimal(jsonObj.getString("money"));
+
         //支付类型
         String type = jsonObj.getString("type");
         //用户Id
@@ -275,6 +274,8 @@ public class PaymentController extends BaseController {
         }
         //用户
         User user = (User) baseManager.getObject(User.class.getName(),userId);
+        //支付金额
+        BigDecimal money = new BigDecimal("0.00");
         //获取账户信息参数
         LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
         param.put("userId", userId);
@@ -285,7 +286,6 @@ public class PaymentController extends BaseController {
         bill.setStatus("1");
         bill.setAuthor(user);
         bill.setPayWay("1");//支付方式为"支付宝"
-        bill.setMoney(money);
         bill.setOutOrIn("0");
 
         //项目Id
@@ -341,8 +341,10 @@ public class PaymentController extends BaseController {
             bill.setDetail(user.getName()+"向项目<<"+auctionOrder.getArtwork().getTitle()+">>支付尾款:"+money);
             bill.setType("2");
             bill.setRestMoney(account.getCurrentUsableBalance());
+            bill.setMoney(money);
         } else if (jsonObj.getString("action").equals("invest")) {//投资
 
+             money = new BigDecimal(jsonObj.getString("money"));
 
             if(StringUtils.isEmpty(artWorkId))
                 return null;
@@ -362,7 +364,10 @@ public class PaymentController extends BaseController {
             bill.setDetail(user.getName()+"向项目<<"+artwork.getTitle()+">>投资:"+money);
             bill.setType("1");
             bill.setRestMoney(account.getCurrentUsableBalance());
+            bill.setMoney(money);
         } else if (jsonObj.getString("action").equals("payMargin")) {//支付保证金
+
+            money = new BigDecimal(jsonObj.getString("money"));
             //投入保证金的项目Id
 //            String artWorkId = jsonObj.getString("artWorkId");
 //            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
@@ -392,6 +397,7 @@ public class PaymentController extends BaseController {
             bill.setDetail(user.getName()+"向项目<<"+artwork.getTitle()+">>支付竞拍保证金："+money);
             bill.setType("3");
             bill.setRestMoney(account.getCurrentUsableBalance());
+            bill.setMoney(money);
         }
          baseManager.saveOrUpdate(Bill.class.getName(),bill);
          map.put("Bill_id",bill.getId());
