@@ -17,6 +17,7 @@ import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AutoSerialManager;
 import com.ming800.core.taglib.PageEntity;
 import com.ming800.core.util.CookieTool;
+import com.ming800.core.util.StringUtil;
 import net.sf.json.JSON;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.http.HttpEntity;
@@ -290,7 +291,10 @@ public class PaymentController extends BaseController {
         bill.setCreateDatetime(new Date());
         //项目Id
         String artWorkId = jsonObj.getString("artWorkId");
-        Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
+        Artwork artwork = null;
+        if(!StringUtils.isEmpty(artWorkId))
+            artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
+
         if (jsonObj.getString("action").equals("auction")) {//拍卖订单尾款支付
 
 
@@ -317,21 +321,28 @@ public class PaymentController extends BaseController {
             if(consumerAddress==null)
                 return null;
 
+            //项目订单Id
+            AuctionOrder auctionOrder = null;
+            if(!StringUtils.isEmpty(jsonObj.getString("orderId"))) {
+                auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), jsonObj.getString("orderId"));
+            }
+            else {
+                auctionOrder = new AuctionOrder();
+                auctionOrder.setArtwork(artwork);
+                auctionOrder.setFinalPayment(money);
+                auctionOrder.setAmount(auctionMoney);
+                auctionOrder.setStatus("0");
+                auctionOrder.setType("0");
+                auctionOrder.setStatus("1");
+                auctionOrder.setPayWay("1");
+                auctionOrder.setPayStatus("3");
+                auctionOrder.setUser(user);
 
-           //项目订单Id
-            AuctionOrder auctionOrder = new AuctionOrder();
-            auctionOrder.setArtwork(artwork);
-            auctionOrder.setCreateDatetime(new Date());
-            auctionOrder.setStatus("0");
-            auctionOrder.setType("0");
-            auctionOrder.setStatus("1");
-            auctionOrder.setPayWay("1");
-            auctionOrder.setPayStatus("3");
-            auctionOrder.setUser(user);
-            auctionOrder.setConsumerAddress(consumerAddress);
-            auctionOrder.setFinalPayment(money);
-            auctionOrder.setAmount(auctionMoney);
-            baseManager.saveOrUpdate(AuctionOrder.class.getName(),auctionOrder);
+            }
+                auctionOrder.setCreateDatetime(new Date());
+                auctionOrder.setConsumerAddress(consumerAddress);
+
+                baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
            if(auctionOrder==null)
                return null;
 
