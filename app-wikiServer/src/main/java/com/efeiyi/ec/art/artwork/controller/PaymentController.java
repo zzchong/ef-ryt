@@ -287,7 +287,7 @@ public class PaymentController extends BaseController {
         bill.setAuthor(user);
         bill.setPayWay("1");//支付方式为"支付宝"
         bill.setOutOrIn("0");
-
+        bill.setCreateDatetime(new Date());
         //项目Id
         String artWorkId = jsonObj.getString("artWorkId");
         Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);

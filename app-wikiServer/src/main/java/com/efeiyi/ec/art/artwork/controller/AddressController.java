@@ -153,6 +153,7 @@ public class AddressController extends BaseController {
             consumerAddress.setDetails(jsonObj.getString("details"));
 //            consumerAddress.setDistrict((AddressDistrict)baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("districtId")));
             consumerAddress.setPhone(jsonObj.getString("phone"));
+            consumerAddress.setProvinceStr(jsonObj.getString("provinceStr"));
 //            consumerAddress.setPost(jsonObj.getString("post"));
 //            consumerAddress.setProvince((AddressProvince) baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("provinceId")));
             baseManager.saveOrUpdate(ConsumerAddress.class.getName(), consumerAddress);

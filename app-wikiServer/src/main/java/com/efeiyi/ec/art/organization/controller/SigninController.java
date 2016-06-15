@@ -818,6 +818,7 @@ public class SigninController extends BaseController {
                     user.setCredentialsExpired(false);
                     user.setEnabled(true);
                     user.setStatus(1);
+                    user.setUtype(2);
                     user.setCreateDatetime(new Date());
                     baseManager.saveOrUpdate(MyUser.class.getName(),user);
                     //给用户绑定一个账户

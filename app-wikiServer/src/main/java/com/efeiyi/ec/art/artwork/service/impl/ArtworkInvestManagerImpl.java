@@ -9,6 +9,7 @@ import com.efeiyi.ec.art.jpush.EfeiyiPush;
 import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkInvest;
+import com.efeiyi.ec.art.model.Bill;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
@@ -109,6 +110,19 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
                             account.setCurrentUsableBalance(account.getCurrentUsableBalance().multiply(price));
                             baseManager.saveOrUpdate(Account.class.getName(),account);//更新用户账户
                         }
+
+                        //生成账单
+                        Bill bill = new Bill();
+                        bill.setCreateDatetime(new Date());
+                        bill.setRestMoney(account.getCurrentBalance());
+                        bill.setStatus("1");
+                        bill.setMoney(price);
+                        bill.setAuthor(user);
+                        bill.setDetail(user.getName()+"向<<"+artwork.getTitle()+">>投资:"+price+"元");
+                        bill.setOutOrIn("0");
+                        bill.setType("1");
+                        bill.setTitle("投资-"+artwork.getTitle());
+                        baseManager.saveOrUpdate(Bill.class.getName(),bill);
                     //发送透传消息，通知客户端更新融资金额  透传消息不需要保存
                         Map<String,Object> map = new HashMap<String,Object>();
                         map.put("msg_content",currentInvestMoney.toString());
