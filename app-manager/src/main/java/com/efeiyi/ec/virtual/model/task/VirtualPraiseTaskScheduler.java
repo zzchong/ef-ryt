@@ -104,7 +104,7 @@ public class VirtualPraiseTaskScheduler extends BaseTimerTask {
             VirtualUser virtualUser = virtualInvestorPlan.getVirtualUserList().get(randomNumber);
             Map resultMap = new TreeMap();
             resultMap.put("currentUserId", virtualUser.getUserBrief().getUser().getId());
-            resultMap.put("artWorkId", artwork.getId());
+            resultMap.put("artworkId", artwork.getId());
             resultMap.put("timestamp", timePoint > 0 ? timePoint : 0);
             try {
                 String msg = DigitalSignatureUtil.encrypt(resultMap);
