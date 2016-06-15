@@ -249,6 +249,7 @@ public class Artwork implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
     @OrderBy(value = "price desc")
     @LazyCollection(LazyCollectionOption.EXTRA)
+    @Where(clause = "status=1")
     public List<ArtworkInvest> getArtworkInvests() {
         return artworkInvests;
     }

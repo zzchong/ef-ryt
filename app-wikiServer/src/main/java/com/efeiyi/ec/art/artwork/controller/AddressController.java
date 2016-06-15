@@ -88,7 +88,7 @@ public class AddressController extends BaseController {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("addressView");
@@ -184,7 +184,7 @@ public class AddressController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");
@@ -226,7 +226,7 @@ public class AddressController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("removeAddress");
@@ -265,7 +265,7 @@ public class AddressController extends BaseController {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");
@@ -317,7 +317,7 @@ public class AddressController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");
@@ -370,7 +370,7 @@ public class AddressController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
         try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");

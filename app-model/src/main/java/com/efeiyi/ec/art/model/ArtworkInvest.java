@@ -79,7 +79,6 @@ public class ArtworkInvest implements Serializable{//投资记录
         this.price = price;
     }
     @Column(name = "status")
-    @Where(clause = "status=1")
     public String getStatus() {
         return status;
     }
