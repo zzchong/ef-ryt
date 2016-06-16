@@ -1,8 +1,11 @@
 package com.efeiyi.ec.system.app.checkManager.controller;
 
 import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.quartz.job.InvestJob;
+import com.efeiyi.ec.quartz.trigger.InvestTrigger;
 import com.efeiyi.ec.system.app.checkManager.CheckConstant;
 import com.ming800.core.base.service.BaseManager;
+import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,8 +68,21 @@ public class checkProjectController {
             calendar.setTime(new Date());
             calendar.add(Calendar.DAY_OF_MONTH,30);
             artwork.setInvestEndDatetime(calendar.getTime());
+
+            calendar.add(Calendar.DAY_OF_MONTH,artwork.getDuration());
+            artwork.setCreationEndDatetime(calendar.getTime());
+
+           //定时器
+//            Calendar calenda11 = Calendar.getInstance();
+//            calenda11.setTime(new Date());
+//            calenda11.add(Calendar.MINUTE,1);
+//            System.out.println(calenda11.getTime());
+            InvestTrigger investTrigger = new InvestTrigger();
+            investTrigger.execute(artwork.getId(),artwork.getInvestEndDatetime(),"invest");
         }
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+
+
         if (null != resultPage && "V".equals(resultPage.trim())){
             return new ModelAndView("redirect:/basic/xm.do?qm=viewCheckArtwork&checkProject=checkProject&id=" + id);
         }

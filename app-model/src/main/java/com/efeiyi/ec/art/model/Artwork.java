@@ -70,6 +70,7 @@ public class Artwork implements Serializable {
 
     private String pictureBottom;//俯视图
     private String pictureSide;//侧视图
+    private String investRestTime;//融资剩余时间
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -497,5 +498,14 @@ public class Artwork implements Serializable {
 
     public void setPictureSide(String pictureSide) {
         this.pictureSide = pictureSide;
+    }
+
+    @Transient
+    public String getInvestRestTime() {
+        return investRestTime;
+    }
+
+    public void setInvestRestTime(String investRestTime) {
+        this.investRestTime = investRestTime;
     }
 }

@@ -141,12 +141,9 @@ public class ArtworkController extends BaseController {
             String hql = "from Artwork WHERE 1=1 and status = '1' and type='1' and step='14' order by createDatetime DESC";
             artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
 //            List<ArtWorkBean> objectList = new ArrayList<>();
-//            for (Artwork artwork : artworkList){
-//                       ArtWorkBean artWorkBean = new ArtWorkBean();
-//                       artWorkBean.setArtwork(artwork);
-//                       artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-//                       objectList.add(artWorkBean);
-//            }
+            for (Artwork artwork : artworkList){
+                     artwork.setInvestRestTime(TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(),new Date(), "", TimeUtil.SECOND).get("time").toString());
+            }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             if (artworkList != null && !artworkList.isEmpty()) {
                 resultMap.put("objectList", artworkList);
@@ -215,7 +212,8 @@ public class ArtworkController extends BaseController {
             //剩余时间
             String time = "";
             if(artwork.getInvestStartDatetime()!=null) {
-                time = TimeUtil.getDistanceTimes2(new Date(), artwork.getInvestStartDatetime(), "", TimeUtil.SECOND).get("time").toString();
+                time = TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(),new Date(), "", TimeUtil.SECOND).get("time").toString();
+                artwork.setInvestRestTime(time);
             }
             //项目文件
             List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
@@ -1332,6 +1330,36 @@ public class ArtworkController extends BaseController {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
     }
+
+
+    @RequestMapping(value = "/app/updateCreationStatus.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map updateCreationStatus(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        TreeMap treeMap = new TreeMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("updateCreationStatus");
+            if (!CommonUtil.jsonObject(jsonObj)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("id"));
+            artwork.setType("2");
+            artwork.setStep("21");
+            return resultMapHandler.handlerResult("0", "成功", logBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+    }
+
 
     @Test
     public void testArtworkView() throws Exception {

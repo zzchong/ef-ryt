@@ -263,15 +263,21 @@ public class XdoDaoSupport implements XdoDao {
         }
 
         //查询所有数据的条数
-//        System.out.println((Long) countQuery.uniqueResult());
-//        if(countQuery.uniqueResult()!=null)
-//            info.setCount(((Long) countQuery.uniqueResult()).intValue());
-//        else
-//            info.setCount(0);
+        try {
+            System.out.println((Long) countQuery.uniqueResult());
+            if(countQuery.uniqueResult()!=null)
+                info.setCount(((Long) countQuery.uniqueResult()).intValue());
+            else
+                info.setCount(0);
 
-//        pageEntity.setCount(info.getCount());
+            pageEntity.setCount(info.getCount());
+            info.setPageEntity(pageEntity);
 
-        info.setPageEntity(pageEntity);
+        }catch (Exception e){
+            info.setPageEntity(pageEntity);
+
+        }
+
 
         return info;
     }
