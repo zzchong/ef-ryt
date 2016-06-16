@@ -130,6 +130,7 @@ public class PaymentController extends BaseController {
             String billId = jsonObject.getString("bill_id");
             Bill bill = (Bill) baseManager.getObject(Bill.class.getName(),billId);
             bill.setCreateDatetime(new Date());
+            bill.setStatus("1");
             baseManager.saveOrUpdate(Bill.class.getName(),bill);
             //订单号 bill_no
             String id = (String) jsonObj.get("transaction_id");
@@ -284,7 +285,7 @@ public class PaymentController extends BaseController {
         Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
         //生成支出账单
         Bill bill = new Bill();
-        bill.setStatus("1");
+        bill.setStatus("0");
         bill.setAuthor(user);
         bill.setPayWay("1");//支付方式为"支付宝"
         bill.setOutOrIn("0");
@@ -306,8 +307,9 @@ public class PaymentController extends BaseController {
             if(consumerAddressList!=null && consumerAddressList.size()>0)
                 consumerAddress = consumerAddressList.get(0);
 
-            //拍卖金额
-            BigDecimal auctionMoney = artwork.getNewBidingPrice();
+
+            if(consumerAddress==null)
+                return null;
 
             //保证金
             xQuery = new XQuery("listMarginAccount_default2",request);
@@ -315,18 +317,25 @@ public class PaymentController extends BaseController {
             xQuery.put("user_id",jsonObj.getString("userId"));
             List<MarginAccount> marginAccountList = baseManager.listObject(xQuery);
 
-            if(marginAccountList!=null && marginAccountList.size()>0)
-                money = auctionMoney.subtract(marginAccountList.get(0).getCurrentBalance());
-
-            if(consumerAddress==null)
-                return null;
-
             //项目订单Id
             AuctionOrder auctionOrder = null;
             if(!StringUtils.isEmpty(jsonObj.getString("orderId"))) {
                 auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), jsonObj.getString("orderId"));
+                if(auctionOrder==null)
+                    return null;
+                money = auctionOrder.getFinalPayment();
+
             }
             else {
+
+                //拍卖金额
+                BigDecimal auctionMoney = new BigDecimal("0.00");
+                if(artwork!=null)
+                    auctionMoney = artwork.getNewBidingPrice();
+
+                if(marginAccountList!=null && marginAccountList.size()>0)
+                    money = auctionMoney.subtract(marginAccountList.get(0).getCurrentBalance());
+
                 auctionOrder = new AuctionOrder();
                 auctionOrder.setArtwork(artwork);
                 auctionOrder.setFinalPayment(money);
@@ -339,14 +348,12 @@ public class PaymentController extends BaseController {
                 auctionOrder.setUser(user);
 
             }
-                auctionOrder.setCreateDatetime(new Date());
-                auctionOrder.setConsumerAddress(consumerAddress);
+            auctionOrder.setConsumerAddress(consumerAddress);
+            auctionOrder.setCreateDatetime(new Date());
+            baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
 
-                baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
-           if(auctionOrder==null)
-               return null;
 
-            title = TITLE_AUCTION+"-"+artwork.getTitle();
+            title = TITLE_AUCTION+"-"+auctionOrder.getArtwork().getTitle();
             billNo = auctionOrder.getId();
 
             bill.setDetail(user.getName()+"向项目<<"+auctionOrder.getArtwork().getTitle()+">>支付尾款:"+money);
