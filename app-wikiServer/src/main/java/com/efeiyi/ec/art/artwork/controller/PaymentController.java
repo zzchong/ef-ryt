@@ -646,7 +646,59 @@ public class PaymentController extends BaseController {
         return resultMap;
     }
 
+    /**
+     * 提现跳转
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/toGetMoney.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map toGetMoney(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
+        List objectList = null;
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("toGetMoney");
+            if (!CommonUtil.jsonObject(jsonObj)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
+            if (verify != true) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
 
+            Account account = null;
+
+            User user =(User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+            if(user==null)
+                return resultMapHandler.handlerResult("10007", "用户不存在", logBean);
+            //余额
+            BigDecimal restMoney = new BigDecimal("0.00");
+            XQuery xQuery1 = new XQuery("listAccount_default",request);
+            xQuery1.put("user_id",jsonObj.getString("userId"));
+            List<Account> accountList = baseManager.listObject(xQuery1);
+            if(accountList==null && accountList.size()==0){
+                return resultMapHandler.handlerResult("10007", "账户不存在", logBean);
+            }
+            account = accountList.get(0);
+            restMoney = account.getCurrentUsableBalance();
+
+            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+            resultMap.put("object",restMoney);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
 
     @Test
     public void testArtworkView() throws Exception {
