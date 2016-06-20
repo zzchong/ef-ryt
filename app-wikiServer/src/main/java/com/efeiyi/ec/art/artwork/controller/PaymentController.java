@@ -491,7 +491,7 @@ public class PaymentController extends BaseController {
 
     @RequestMapping("/app/pay/paysuccess.do")
     public String paysuccess(HttpServletRequest request) {
-        return "paySuccess";
+        return "/paySuccess";
     }
 
 
@@ -645,6 +645,8 @@ public class PaymentController extends BaseController {
 
         return resultMap;
     }
+
+
 
     @Test
     public void testArtworkView() throws Exception {
