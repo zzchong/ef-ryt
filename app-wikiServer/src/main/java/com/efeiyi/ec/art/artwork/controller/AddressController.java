@@ -139,24 +139,7 @@ public class AddressController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            ConsumerAddress consumerAddress = null;
-            if (StringUtils.isEmpty(jsonObj.getString("addressId")))
-                consumerAddress = new ConsumerAddress();
-            else
-                consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(), jsonObj.getString("addressId"));
-
-            consumerAddress.setEmail(jsonObj.getString("email"));
-            consumerAddress.setStatus(jsonObj.getString("status"));
-//            consumerAddress.setCity((AddressCity)baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("cityId")));
-            consumerAddress.setConsignee(jsonObj.getString("consignee"));
-            consumerAddress.setConsumer((User) baseManager.getObject(User.class.getName(), jsonObj.getString("userId")));
-            consumerAddress.setDetails(jsonObj.getString("details"));
-//            consumerAddress.setDistrict((AddressDistrict)baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("districtId")));
-            consumerAddress.setPhone(jsonObj.getString("phone"));
-            consumerAddress.setProvinceStr(jsonObj.getString("provinceStr"));
-//            consumerAddress.setPost(jsonObj.getString("post"));
-//            consumerAddress.setProvince((AddressProvince) baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("provinceId")));
-            baseManager.saveOrUpdate(ConsumerAddress.class.getName(), consumerAddress);
+            ConsumerAddress consumerAddress = artworkManager.saveConsumerAddress(jsonObj,request);
 
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
 

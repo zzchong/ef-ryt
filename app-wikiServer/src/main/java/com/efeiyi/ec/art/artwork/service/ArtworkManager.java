@@ -2,6 +2,7 @@ package com.efeiyi.ec.art.artwork.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
+import com.efeiyi.ec.art.model.ConsumerAddress;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -29,6 +30,8 @@ public interface ArtworkManager {
      * @return
      */
     boolean  saveArtWorkComment(String id,String content,String fatherCommentId,String currentUserId,String messageId);
+
+    ConsumerAddress saveConsumerAddress(JSONObject jsonObject,HttpServletRequest request) throws Exception;
 
 
 }

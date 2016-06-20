@@ -48,7 +48,7 @@
                     </query>
                 </do>
                 <do name="listAddress" access="" label="地址列表">
-                    <query name="default" label="全部地址" type="auto" orderBy="id:asc">
+                    <query name="default" label="全部地址" type="auto" orderBy="status:desc">
                         <condition name="consumer.id" defaultValue="0" operation="eq"/>
                         <condition name="status" defaultValue="0" operation="ne"/>
                     </query>

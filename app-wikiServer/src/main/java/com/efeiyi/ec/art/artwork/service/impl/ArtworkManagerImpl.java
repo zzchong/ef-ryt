@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.artwork.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.JPushConfig;
@@ -7,11 +8,13 @@ import com.efeiyi.ec.art.jpush.EfeiyiPush;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.does.model.XQuery;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -197,6 +200,39 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
         return notification;
 
+    }
+
+    @Override
+    public ConsumerAddress saveConsumerAddress(JSONObject jsonObj, HttpServletRequest request) throws Exception{
+        ConsumerAddress consumerAddress = null;
+        if (org.springframework.util.StringUtils.isEmpty(jsonObj.getString("addressId")))
+            consumerAddress = new ConsumerAddress();
+        else
+            consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(), jsonObj.getString("addressId"));
+
+        consumerAddress.setEmail(jsonObj.getString("email"));
+        if("2".equals(jsonObj.getString("status"))){
+            XQuery xQuery = new XQuery("listAddress_default1",request);
+            xQuery.put("consumer_id",jsonObj.getString("userId"));
+            List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
+            if(consumerAddressList!=null && consumerAddressList.size()>0){
+                ConsumerAddress consumerAddress1 = consumerAddressList.get(0);
+                consumerAddress1.setStatus("1");
+                baseManager.saveOrUpdate(ConsumerAddress.class.getName(),consumerAddress1);
+            }
+        }
+        consumerAddress.setStatus(jsonObj.getString("status"));
+//            consumerAddress.setCity((AddressCity)baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("cityId")));
+        consumerAddress.setConsignee(jsonObj.getString("consignee"));
+        consumerAddress.setConsumer((User) baseManager.getObject(User.class.getName(), jsonObj.getString("userId")));
+        consumerAddress.setDetails(jsonObj.getString("details"));
+//            consumerAddress.setDistrict((AddressDistrict)baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("districtId")));
+        consumerAddress.setPhone(jsonObj.getString("phone"));
+        consumerAddress.setProvinceStr(jsonObj.getString("provinceStr"));
+//            consumerAddress.setPost(jsonObj.getString("post"));
+//            consumerAddress.setProvince((AddressProvince) baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("provinceId")));
+        baseManager.saveOrUpdate(ConsumerAddress.class.getName(), consumerAddress);
+        return consumerAddress;
     }
 }
 
