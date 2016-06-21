@@ -621,6 +621,10 @@ public class PaymentController extends BaseController {
             if(money.doubleValue()>account.getCurrentUsableBalance().doubleValue())
                 return resultMapHandler.handlerResult("100015", "账户余额不足", logBean);
 
+            //修改账户金额
+            account.setCurrentBalance(account.getCurrentBalance().subtract(money));
+            account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(money));
+
             Bill bill = new Bill();
             bill.setCreateDatetime(new Date());
             bill.setStatus("1");
@@ -635,6 +639,7 @@ public class PaymentController extends BaseController {
             bill.setRestMoney(account.getCurrentUsableBalance().subtract(money));
             baseManager.saveOrUpdate(Bill.class.getName(),bill);
 
+            baseManager.saveOrUpdate(Account.class.getName(),account);
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {
             e.printStackTrace();
