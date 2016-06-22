@@ -7,10 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.Bean.JsonFile;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.util.AppConfig;
-import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
-import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
-import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
@@ -199,8 +196,8 @@ public class ArtworkController extends BaseController {
 //            xQuery = new XQuery("listArtworkInvest1_default", request);
             //投资人数
             Integer investNum = 0;
+            investNum = artwork.getInvestNum();
             if (artworkInvestList != null) {
-                investNum = artworkInvestList.size();
                 investPeople = new ArrayList<>();
                 if(artworkInvestList.size()!=0) {
                     for (ArtworkInvest artworkInvest : artworkInvestList) {
@@ -217,6 +214,10 @@ public class ArtworkController extends BaseController {
             }
             //项目文件
             List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
+            for (ArtworkAttachment artworkAttachment : artworkAttachmentList){
+                artworkAttachment.setWidth(ImgUtil.getWidth(artworkAttachment.getFileName()));
+                artworkAttachment.setHeight(ImgUtil.getHeight(artworkAttachment.getFileName()));
+            }
             //项目制作过程说明、融资解惑
             Artworkdirection artworkdirection = artwork.getArtworkdirection();
 

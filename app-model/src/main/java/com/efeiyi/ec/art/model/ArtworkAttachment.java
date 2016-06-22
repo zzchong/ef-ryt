@@ -20,6 +20,9 @@ public class ArtworkAttachment implements Serializable {
     private String fileType;
     private String fileName;//文件名称
 
+    private Integer width;//图片宽度
+    private Integer height;//图片高度
+
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -55,5 +58,22 @@ public class ArtworkAttachment implements Serializable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+    @Transient
+    public Integer getWidth() {
+        return width;
+    }
+
+
+    public void setWidth(Integer width) {
+        this.width = width;
+    }
+    @Transient
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
     }
 }

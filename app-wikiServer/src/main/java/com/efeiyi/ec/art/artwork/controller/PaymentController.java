@@ -261,7 +261,14 @@ public class PaymentController extends BaseController {
         String url;
         String title = "";//订单名称
         String billNo = "";//订单号
+
         JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+
+        LogBean logBean = new LogBean();
+        logBean.setApiName("makeRecharge");
+        logBean.setCreateDate(new Date());
+        logBean.setRequestMessage(jsonObj.toString());
+
         Map<String,Object> data = new HashMap<>();
         //optional 参数
         Map<String, Object> map = new HashMap<>();
@@ -272,7 +279,7 @@ public class PaymentController extends BaseController {
         //用户Id
         String userId = jsonObj.getString("userId");
         if(StringUtils.isEmpty(userId)){
-           return null;
+           return resultMapHandler.handlerResult("10002", "用户为空", logBean);
         }
         //用户
         User user = (User) baseManager.getObject(User.class.getName(),userId);
@@ -309,7 +316,7 @@ public class PaymentController extends BaseController {
 
 
             if(consumerAddress==null)
-                return null;
+                return resultMapHandler.handlerResult("10002", "收货地址为空", logBean);
 
             //保证金
             xQuery = new XQuery("listMarginAccount_default2",request);
@@ -322,7 +329,7 @@ public class PaymentController extends BaseController {
             if(!StringUtils.isEmpty(jsonObj.getString("orderId"))) {
                 auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), jsonObj.getString("orderId"));
                 if(auctionOrder==null)
-                    return null;
+                    return resultMapHandler.handlerResult("10002", "项目订单为空", logBean);
                 money = auctionOrder.getFinalPayment();
 
             }
@@ -365,7 +372,7 @@ public class PaymentController extends BaseController {
              money = new BigDecimal(jsonObj.getString("money"));
 
             if(StringUtils.isEmpty(artWorkId))
-                return null;
+                return resultMapHandler.handlerResult("10002", "项目为空", logBean);
 
             ArtworkInvest artworkInvest = new ArtworkInvest();
             artworkInvest.setCreator(user);
@@ -390,7 +397,7 @@ public class PaymentController extends BaseController {
 //            String artWorkId = jsonObj.getString("artWorkId");
 //            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
             if(StringUtils.isEmpty(artWorkId))
-                return null;
+                return resultMapHandler.handlerResult("10002", "项目为空", logBean);
 
             MarginAccount marginAccount = null;
             XQuery xQuery = new XQuery("listMarginAccount_default2",request);
