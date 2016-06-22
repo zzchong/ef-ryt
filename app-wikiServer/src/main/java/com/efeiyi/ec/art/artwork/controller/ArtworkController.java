@@ -966,7 +966,7 @@ public class ArtworkController extends BaseController {
                     artworkMessage.setArtwork(artwork);
                     artworkMessage.setCreateDatetime(new Date());
                     baseManager.saveOrUpdate(ArtworkMessage.class.getName(), artworkMessage);
-                    //List<ArtworkMessageAttachment> artworkMessageAttachments =  new ArrayList<ArtworkMessageAttachment>();//动态附件有可能是多个文件
+                    List<ArtworkMessageAttachment> artworkMessageAttachments =  new ArrayList<ArtworkMessageAttachment>();//动态附件有可能是多个文件
                     //创建一个通用的多部分解析器
                     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                     //判断 request 是否有文件上传,即多部分请求
@@ -1002,10 +1002,17 @@ public class ArtworkController extends BaseController {
                                     artworkMessageAttachment.setArtworkMessage(artworkMessage);
                                     artworkMessageAttachment.setFileType(request.getParameter("type"));
                                     //artworkMessageAttachments.add(artworkMessageAttachment);
-                                    baseManager.saveOrUpdate(ArtworkMessageAttachment.class.getName(), artworkMessageAttachment);
+                                    artworkMessageAttachments.add(artworkMessageAttachment);
                                     //artworkMessage.getArtworkMessageAttachments().add(artworkMessageAttachment);
                                 }
                             }
+                        }
+                    }
+
+                    if(artworkMessageAttachments.size()>0){
+                        for (ArtworkMessageAttachment artworkMessageAttachment :artworkMessageAttachments ){
+                            baseManager.saveOrUpdate(ArtworkMessageAttachment.class.getName(), artworkMessageAttachment);
+
                         }
                     }
                     //artworkMessage.setCreateDatetime(new Date());

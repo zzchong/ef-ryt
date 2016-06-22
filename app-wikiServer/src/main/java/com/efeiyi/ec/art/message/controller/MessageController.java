@@ -209,7 +209,7 @@ public class MessageController extends BaseController {
                         queryKey = "targetUser_id";
                         break;
                     case "notification":
-                        group = "lisNotification_default";
+                        group = "listNotification_default";
                         queryKey = "targetUser_id";
                         break;
                     case "comment":
