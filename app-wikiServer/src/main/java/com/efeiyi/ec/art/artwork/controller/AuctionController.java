@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -309,7 +310,7 @@ public class AuctionController extends BaseController {
      */
     @RequestMapping(value = "/app/getListOrder.do")
     @ResponseBody
-    public Map getListOrder(HttpServletRequest request) {
+    public Map getListOrder(HttpServletRequest request, HttpServletResponse response) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
@@ -356,6 +357,8 @@ public class AuctionController extends BaseController {
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
+
+        response.addHeader("Cache-Control", "no-cache");
 
         return resultMap;
     }
@@ -443,7 +446,7 @@ public class AuctionController extends BaseController {
 
             //竞价记录
             XQuery xQuery2 = new XQuery("listArtworkBidding_default", request);
-            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
+            xQuery2.put("artwork_id", jsonObj.getString("artWorkId"));
             List<ArtworkBidding> artworkBiddings = (List<ArtworkBidding>) baseManager.listObject(xQuery2);
             Integer auctionNum = 0;
             if (artworkBiddings != null && artworkBiddings.size() > 0) {
