@@ -139,7 +139,7 @@ public class AddressController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            ConsumerAddress consumerAddress = artworkManager.saveConsumerAddress(jsonObj,request);
+            ConsumerAddress consumerAddress = artworkManager.saveConsumerAddress(jsonObj, request);
 
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
 
@@ -361,11 +361,7 @@ public class AddressController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
@@ -375,8 +371,12 @@ public class AddressController extends BaseController {
             if (consumerAddressList.size() != 1) {
                 resultMap.put("resultCode", "10005");
                 resultMap.put("resultMsg", "数据查询异常");
-            } else {
+            } else if (!consumerAddressList.isEmpty()) {
                 resultMap.put("defaultAddress", consumerAddressList.get(0));
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "查询默认地址成功");
+            } else {
+                resultMap.put("defaultAddress", null);
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "查询默认地址成功");
             }

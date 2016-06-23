@@ -1,12 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="ming800" uri="http://java.ming800.com/taglib" %>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>介绍页</title>
-    <link rel="stylesheet" href="<c:url value="/scripts/shop2016/css/app_page.css?t=20160413"/>">
+    <link rel="stylesheet" href="<c:url value="/scripts/shop20160614/css/app_page.css?t=20160413"/>">
 </head>
 <body class="app_page">
 

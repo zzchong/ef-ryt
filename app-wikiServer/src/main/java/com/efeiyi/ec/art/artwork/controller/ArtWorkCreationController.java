@@ -131,10 +131,7 @@ public class ArtWorkCreationController extends BaseController {
         Map<String, Object> data = new HashMap<String, Object>();
         List<Artwork> artworkList = null;
         try{
-            System.out.println(request.getParameter("artWorkId"));
-
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
-
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkCreationView");
@@ -144,7 +141,6 @@ public class ArtWorkCreationController extends BaseController {
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
             //项目 艺术家信息
 //            ArtWorkBean artWorkBean = new ArtWorkBean();
@@ -160,7 +156,6 @@ public class ArtWorkCreationController extends BaseController {
             String restTime = "";
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             if(artwork.getInvestEndDatetime()!=null && artwork.getCreationEndDatetime()!=null){
-
             String str1 = sdf.format(new Date());
             String str2 = sdf.format(artwork.getInvestEndDatetime());
             String str3 = sdf.format(artwork.getCreationEndDatetime());

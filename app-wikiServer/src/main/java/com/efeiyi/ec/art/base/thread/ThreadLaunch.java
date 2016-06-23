@@ -3,9 +3,6 @@ package com.efeiyi.ec.art.base.thread;
 import com.efeiyi.ec.art.base.util.Capture;
 import com.efeiyi.ec.art.base.util.ContextUtils;
 import com.efeiyi.ec.art.model.Artwork;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;

@@ -2,20 +2,11 @@ package com.efeiyi.ec.art.base.service.impl;
 
 import com.efeiyi.ec.art.base.service.ThreadManager;
 import com.efeiyi.ec.art.base.thread.ThreadLaunch;
-import com.efeiyi.ec.art.base.thread.UpdateArtWorkStatusThread;
 import com.efeiyi.ec.art.model.Artwork;
-import com.efeiyi.ec.art.organization.OrganizationConst;
-import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
-import com.ming800.core.p.model.SolrReactor;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by Administrator on 2015/12/10.

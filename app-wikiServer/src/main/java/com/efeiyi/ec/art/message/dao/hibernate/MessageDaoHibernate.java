@@ -2,9 +2,6 @@ package com.efeiyi.ec.art.message.dao.hibernate;
 
 
 import com.efeiyi.ec.art.message.dao.MessageDao;
-import com.efeiyi.ec.art.organization.dao.UserDao;
-import com.efeiyi.ec.art.organization.model.MyUser;
-import com.ming800.core.base.dao.hibernate.BaseDaoSupport;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
