@@ -57,6 +57,9 @@ public class checkProjectController {
         if (CheckConstant.ARTWORK_STEP_WAIT.equals(type)){
             artwork.setStep(CheckConstant.ARTWORK_STEP_CHECKING);
         }
+        if(CheckConstant.ARTWORK_STEP_CREATION_WAIT.equals(type)){
+            artwork.setStep(CheckConstant.ARTWORK_STEP_CREATION_CHECKING);
+        }
         if (CheckConstant.ARTWORK_STEP_CHECKING.equals(type)){
 
 
@@ -79,6 +82,18 @@ public class checkProjectController {
 //            System.out.println(calenda11.getTime());
             InvestTrigger investTrigger = new InvestTrigger();
             investTrigger.execute(artwork.getId(),artwork.getInvestEndDatetime(),"invest");
+        }
+        if(CheckConstant.ARTWORK_STEP_CREATION_CHECKING.equals(type)){
+            artwork.setStep(CheckConstant.ARTWORK_STEP_CREATION_PASS);
+            artwork.setType(CheckConstant.ARTWORK_STATUS_SALE);
+            artwork.setAuctionStartDatetime(new Date());
+            //当前时间+30天
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.DAY_OF_MONTH,30);
+            artwork.setAuctionEndDatetime(calendar.getTime());
+            InvestTrigger investTrigger = new InvestTrigger();
+            investTrigger.execute(artwork.getId(),artwork.getAuctionEndDatetime(),"auction");
         }
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
 

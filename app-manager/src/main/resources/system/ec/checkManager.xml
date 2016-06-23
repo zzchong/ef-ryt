@@ -26,7 +26,7 @@
                 <do name="plistCheckArtwork" access="" label="项目列表" result="/checkProject/checkProjectPList">
                     <query name="checkDefault" label="默认" type="auto" orderBy="createDatetime:desc">
                         <condition name="status" defaultValue="1" operation="eq" inputType="default"/>
-                        <condition name="step" defaultValue="10,11,12,13,14" operation="in" inputType="default"/>
+                        <!--<condition name="step" defaultValue="10,11,12,13,14,20" operation="in" inputType="default"/>-->
                     </query>
                 </do>
                 <do name="viewCheckArtwork" label="查看项目详情" access="" result="/checkProject/checkProjectView"/>

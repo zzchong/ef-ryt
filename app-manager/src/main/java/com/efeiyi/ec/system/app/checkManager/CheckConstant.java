@@ -13,10 +13,16 @@ public class CheckConstant {
     public static final String ARTWORK_STATUS_DRAW = "4";//抽奖阶段
 
     //项目审核-Artwork状态(融资阶段)常量
-    public static final String ARTWORK_STEP_WAIT = "10";//待审核
-    public static final String ARTWORK_STEP_CHECKING= "11";//审核中
-    public static final String ARTWORK_STEP_PASS = "14";//审核通过
-    public static final String ARTWORK_STEP_REJECT = "13";//审核未通过，已驳回
+    public static final String ARTWORK_STEP_WAIT = "10";//融资待审核
+    public static final String ARTWORK_STEP_CHECKING= "11";//融资审核中
+    public static final String ARTWORK_STEP_PASS = "14";//融资审核通过
+    public static final String ARTWORK_STEP_REJECT = "13";//融资审核未通过，已驳回
+
+    public static final String ARTWORK_STEP_CREATION_WAIT = "23";//创作待审核
+    public static final String ARTWORK_STEP_CREATION_CHECKING= "24";//创作审核中
+    public static final String ARTWORK_STEP_CREATION_PASS = "31";//创作审核通过
+    public static final String ARTWORK_STEP_CREATION_REJECT = "25";//创作审核未通过，已驳回
+
 
     //艺术家审核-Artist状态常量
     public static final String ARTIST_STATUS_REMOVE = "0";//删除-假删

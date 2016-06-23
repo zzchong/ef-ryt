@@ -47,11 +47,11 @@
                     class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only">删除</button>
             <button onclick="window.location.href='<c:url value="/basic/xm.do?qm=viewCheckArtwork&checkProject=checkProject&id=${artwork.id}"/>'"
                     class="am-btn am-btn-default am-btn-xs am-hide-sm-only">查看</button>
-            <c:if test="${artwork.step == '10'}">
+            <c:if test="${artwork.step == '10' || artwork.step=='23'}">
               <button onclick="window.location.href='<c:url value="/checkProject/checkPass.do?id=${artwork.id}&type=${artwork.step}&resultPage=L"/>'"
                       class="am-btn am-btn-default am-btn-xs am-hide-sm-only">标记</button>
             </c:if>
-            <c:if test="${artwork.step == '11'}">
+            <c:if test="${artwork.step == '11' || artwork.step == '24'}">
               <button onclick="window.location.href='<c:url value="/checkProject/checkPass.do?id=${artwork.id}&type=${artwork.step}&resultPage=L"/>'"
                       class="am-btn am-btn-default am-btn-xs am-hide-sm-only">通过</button>
               <button onclick="myReject('<c:url value="/checkProject/checkReject.do?id=${artwork.id}&resultPage=L"/>')"

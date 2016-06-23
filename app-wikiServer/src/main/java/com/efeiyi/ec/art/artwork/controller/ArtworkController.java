@@ -7,10 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.Bean.JsonFile;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.util.AppConfig;
-import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
-import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
-import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
@@ -198,8 +195,9 @@ public class ArtworkController extends BaseController {
 //            xQuery = new XQuery("listArtworkInvest1_default", request);
             //投资人数
             Integer investNum = 0;
+            investNum = artwork.getInvestNum();
             if (artworkInvestList != null) {
-                investNum = artworkInvestList.size();
+//                investNum = artworkInvestList.size();
                 investPeople = new ArrayList<>();
                 if (artworkInvestList.size() != 0) {
                     for (ArtworkInvest artworkInvest : artworkInvestList) {
@@ -216,6 +214,10 @@ public class ArtworkController extends BaseController {
             }
             //项目文件
             List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
+            for (ArtworkAttachment artworkAttachment : artworkAttachmentList){
+                artworkAttachment.setWidth(ImgUtil.getWidth(artworkAttachment.getFileName()));
+                artworkAttachment.setHeight(ImgUtil.getHeight(artworkAttachment.getFileName()));
+            }
             //项目制作过程说明、融资解惑
             Artworkdirection artworkdirection = artwork.getArtworkdirection();
 
@@ -1093,6 +1095,8 @@ public class ArtworkController extends BaseController {
                             }
                         }
                     }
+                    artwork.setStep("23");
+                    baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
                     resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                     resultMap.put("artwork", artwork);
                     return resultMap;
@@ -1343,9 +1347,18 @@ public class ArtworkController extends BaseController {
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("id"));
-            artwork.setType("2");
-            artwork.setStep("21");
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("id"));
+            String type =jsonObj.getString("type");
+            if("invest".equals(type)) {
+                if (artwork.getInvestsMoney().compareTo(artwork.getInvestGoalMoney()) >= 0 && "1".equals(artwork.getType())) {
+                    artwork.setType("2");
+                    artwork.setStep("21");
+                    baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+                }
+            }else if("auction".equals(type)){
+                artwork.setType("3");
+                artwork.setStep("32");
+            }
             return resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {
             e.printStackTrace();
