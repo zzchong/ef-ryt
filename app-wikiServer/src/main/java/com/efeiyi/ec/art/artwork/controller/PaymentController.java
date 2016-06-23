@@ -94,9 +94,9 @@ public class PaymentController extends BaseController {
 
         String sign = jsonObj.getString("sign");
         String timestamp = jsonObj.getString("timestamp");
-
+        System.out.println("签名："+sign+"--------"+"时间戳："+timestamp);
         boolean status = paymentManager.verifySign(sign, timestamp);
-
+        System.out.println("校验:"+status);
         PrintWriter out = null;
         try {
             out = response.getWriter();//给客户端返回数据
