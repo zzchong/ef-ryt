@@ -128,10 +128,10 @@ public class PaymentController extends BaseController {
             String action = jsonObject.getString("action");
             //账单Id
             String billId = jsonObject.getString("bill_id");
-            Bill bill = (Bill) baseManager.getObject(Bill.class.getName(),billId);
-            bill.setCreateDatetime(new Date());
-            bill.setStatus("1");
-            baseManager.saveOrUpdate(Bill.class.getName(),bill);
+            //是否融资成功
+            boolean isOk = jsonObject.getBoolean("isOk");
+
+
             //订单号 bill_no
             String id = (String) jsonObj.get("transaction_id");
             //金额
@@ -182,8 +182,20 @@ public class PaymentController extends BaseController {
                 artworkInvest.setStatus("1");
                 artworkInvest.setCreateDatetime(new Date());
                 baseManager.saveOrUpdate(ArtworkInvest.class.getName(), artworkInvest);
+
+                if(isOk){
+                    String artworkId = jsonObject.getString("artworkId");
+                    Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),artworkId);
+                    artwork.setType("2");
+                    artwork.setStep("21");
+                    baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+                }
             }
 
+            Bill bill = (Bill) baseManager.getObject(Bill.class.getName(),billId);
+            bill.setCreateDatetime(new Date());
+            bill.setStatus("1");
+            baseManager.saveOrUpdate(Bill.class.getName(),bill);
             out.println("success"); //请不要修改或删除
         } catch (Exception e) {
             out.println("fail");
@@ -262,6 +274,7 @@ public class PaymentController extends BaseController {
         String title = "";//订单名称
         String billNo = "";//订单号
 
+        boolean isOk = false;
         JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
 
         LogBean logBean = new LogBean();
@@ -374,6 +387,13 @@ public class PaymentController extends BaseController {
             if(StringUtils.isEmpty(artWorkId))
                 return resultMapHandler.handlerResult("10002", "项目为空", logBean);
 
+            if(artwork.getInvestsMoney().add(money).compareTo(artwork.getInvestGoalMoney())==1){
+                return resultMapHandler.handlerResult("10002", "最多只能投资"+artwork.getInvestGoalMoney().subtract(artwork.getInvestsMoney()), logBean);
+            }
+            if(artwork.getInvestsMoney().add(money).compareTo(artwork.getInvestGoalMoney())==0){
+                isOk = true;
+            }
+
             ArtworkInvest artworkInvest = new ArtworkInvest();
             artworkInvest.setCreator(user);
             artworkInvest.setPrice(money);
@@ -426,6 +446,9 @@ public class PaymentController extends BaseController {
         }
          baseManager.saveOrUpdate(Bill.class.getName(),bill);
          map.put("Bill_id",bill.getId());
+         map.put("isOk",isOk);
+         if(isOk)
+            map.put("artworkId",artwork.getId());
          BCOrder  bcOrder = paymentManager.payBCOrder(billNo, title, money, map);
           bill.setNumber(bcOrder.getObjectId());
           bill.setTitle(title);
