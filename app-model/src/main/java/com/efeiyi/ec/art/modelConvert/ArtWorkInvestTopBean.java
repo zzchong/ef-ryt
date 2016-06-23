@@ -5,16 +5,16 @@ import com.efeiyi.ec.art.model.Master;
 import com.efeiyi.ec.art.organization.model.User;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Created by Administrator on 2016/1/25.
- *
  */
 public class ArtWorkInvestTopBean {
 
     private User user;
-
     private BigDecimal money;
+    private Date createDatetime;
 
     public User getUser() {
         return user;
@@ -30,5 +30,13 @@ public class ArtWorkInvestTopBean {
 
     public void setMoney(BigDecimal money) {
         this.money = money;
+    }
+
+    public Date getCreateDatetime() {
+        return createDatetime;
+    }
+
+    public void setCreateDatetime(Date createDatetime) {
+        this.createDatetime = createDatetime;
     }
 }

@@ -52,7 +52,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Controller
 public class AuctionController extends BaseController {
-    private static Logger logger = Logger.getLogger(AuctionController.class);
 
     @Autowired
     private MessageDao messageDao;
@@ -63,25 +62,20 @@ public class AuctionController extends BaseController {
     @Autowired
     BaseManager baseManager;
 
-    @Autowired
-    private XdoDaoSupport xdoDao;
 
     @Autowired
     private ArtworkAuctionManager artworkAuctionManager;
 
     /**
      * 拍卖首页
-     *
-     * @param request
-     * @return
      */
     @RequestMapping(value = "/app/artWorkAuctionList.do", method = RequestMethod.POST)
     @ResponseBody
     public Map ArtWorkCreation(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap = new HashMap<String, Object>();
-        TreeMap treeMap = new TreeMap();
-        List<Artwork> artworkList = null;
+        Map<String, Object> resultMap;
+        TreeMap<String, Object> treeMap = new TreeMap<>();
+        List artworkList;
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -90,56 +84,34 @@ public class AuctionController extends BaseController {
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("pageNum", jsonObj.getString("pageNum"));
-            treeMap.put("pageSize", jsonObj.getString("pageSize"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-
             //项目信息
             String hql = "from Artwork WHERE 1=1 and status = '1' and type = '3' order by investStartDatetime asc";
-            artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
-//            List<ArtWorkBean> objectList = new ArrayList<>();
-            for (Artwork artwork : artworkList) {
-
+            artworkList = messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
+            for (Object artwork : artworkList) {
+                Artwork artworkTemp = (Artwork) artwork;
                 XQuery xQuery = new XQuery("listArtworkBidding_default", request);
-                xQuery.put("artwork_id", artwork.getId());
-                List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>) baseManager.listObject(xQuery);
+                xQuery.put("artwork_id", artworkTemp.getId());
+                List artworkBiddingList = baseManager.listObject(xQuery);
                 //出价次数 当前价格 几分钟前
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
                 String str1 = sdf.format(new Date());
                 if (artworkBiddingList != null && !artworkBiddingList.isEmpty()) {
-                    artwork.setAuctionNum(artworkBiddingList.size());
-                    artwork.setNewBidingPrice(artworkBiddingList.get(0).getPrice());
-                    String str2 = sdf.format(artworkBiddingList.get(0).getCreateDatetime());
-                    artwork.setNewBiddingDate(TimeUtil.getDistanceTimes(str1, str2));
+                    artworkTemp.setAuctionNum(artworkBiddingList.size());
+                    ArtworkBidding artworkBiddingTemp = ((ArtworkBidding) artworkBiddingList.get(0));
+                    artworkTemp.setNewBidingPrice(artworkBiddingTemp.getPrice());
+                    String str2 = sdf.format(artworkBiddingTemp.getCreateDatetime());
+                    artworkTemp.setNewBiddingDate(TimeUtil.getDistanceTimes(str1, str2));
                 }
-
-//                ArtWorkBean artWorkBean = new ArtWorkBean();
-//                artWorkBean.setArtwork(artwork);
-//               // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-//                objectList.add(artWorkBean);
-
-                if ("3".equals(artwork.getType()) && "32".equals(artwork.getStep())) {//拍卖已经结束
-
-                    //ArtworkBidding artworkBidding = (ArtworkBidding)baseManager.getUniqueObjectByConditions(AppConfig.GET_ART_WORK_WINNER,param);
-                  /*  ArtworkBidding artworkBidding = (ArtworkBidding) xdoDao.getSession().createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
-                    if (artworkBidding != null && artworkBidding.getId() != null) {
-                        artwork.setWinner(artworkBidding.getCreator()); //设置竞拍得主
-                    } else {
-                        artwork.setWinner(new User()); //设置竞拍得主为空
-                    }*/
-                    if (artwork.getWinner() == null || artwork.getWinner().getId() == null) {
-                        artwork.setWinner(null); //设置竞拍得主为空
+                if ("3".equals(artworkTemp.getType()) && "32".equals(artworkTemp.getStep())) {//拍卖已经结束
+                    if (artworkTemp.getWinner() == null || artworkTemp.getWinner().getId() == null) {
+                        artworkTemp.setWinner(null); //设置竞拍得主为空
                     }
                 } else {
-                    artwork.setWinner(null); //设置竞拍得主为空
+                    artworkTemp.setWinner(null); //设置竞拍得主为空
                 }
-
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             resultMap.put("objectList", artworkList);
@@ -161,9 +133,7 @@ public class AuctionController extends BaseController {
     @ResponseBody
     public Map artWorkAuctionView(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap = null;
-        TreeMap treeMap = new TreeMap();
-        List<Artwork> artworkList = null;
+        Map<String, Object> resultMap;
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -172,12 +142,9 @@ public class AuctionController extends BaseController {
             if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            //校验数字签名
-            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
-            if (verify != true) {
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-
             //项目信息
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
             //增加浏览数
@@ -187,14 +154,11 @@ public class AuctionController extends BaseController {
                 artwork.setViewNum(artwork.getViewNum() + 1);
             }
             baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
-//                ArtWorkBean artWorkBean = new ArtWorkBean();
-//                artWorkBean.setArtwork(artwork);
-//               // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
             //竞价记录
             XQuery xQuery = new XQuery("listArtworkBidding_default", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-            List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>) baseManager.listObject(xQuery);
             //最新竞价记录
+            List<ArtworkBidding> artworkBiddingList = (List<ArtworkBidding>) baseManager.listObject(xQuery);
             //有效竞价次数
             Integer num = 0;
             if (artworkBiddingList != null && !artworkBiddingList.isEmpty()) {
@@ -207,10 +171,10 @@ public class AuctionController extends BaseController {
             //项目动态
             xQuery = new XQuery("listArtworkMessage_default", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-            List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>) baseManager.listObject(xQuery);
+            List artworkMessageList = baseManager.listObject(xQuery);
 
             //判断是否交付保证金
-            LinkedHashMap queryMap = new LinkedHashMap();
+            LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
             queryMap.put("userId", jsonObj.getString("currentUserId"));
             queryMap.put("artworkId", jsonObj.getString("artWorkId"));
             MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
@@ -225,7 +189,6 @@ public class AuctionController extends BaseController {
             resultMap.put("isSubmitDepositPrice", isSubmitDepositPrice);
         } catch (Exception e) {
             e.printStackTrace();
-
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
 
@@ -235,15 +198,12 @@ public class AuctionController extends BaseController {
     /**
      * 拍卖出价
      *
-     * @param request
-     * @return
      */
     @RequestMapping(value = "/app/artworkBid.do")
     @ResponseBody
     public Map artWorkBidOnAuction(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap;
-        TreeMap treeMap = new TreeMap();
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -253,8 +213,7 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
-            if (verify != true) {
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
@@ -272,8 +231,7 @@ public class AuctionController extends BaseController {
     @ResponseBody
     public Map artWorkAuctionPayDeposit(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap;
-        TreeMap treeMap = new TreeMap();
+        Map resultMap;
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -283,15 +241,9 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
-            treeMap.put("artworkId", jsonObj.getString("artworkId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-
             resultMap = artworkAuctionManager.artWorkAuctionPayDeposit(request, jsonObj, logBean);
 
         } catch (Exception e) {
@@ -305,50 +257,43 @@ public class AuctionController extends BaseController {
     /**
      * 拍卖订单列表
      *
-     * @param request
-     * @return
      */
     @RequestMapping(value = "/app/getListOrder.do")
     @ResponseBody
     public Map getListOrder(HttpServletRequest request, HttpServletResponse response) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<>();
-        TreeMap treeMap = new TreeMap();
-        List<AuctionOrder> auctionOrderList = null;
+        List auctionOrderList;
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("getListOrder");
-            boolean flag = CommonUtil.jsonObject(jsonObj);
-            if (!flag) {
+            if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
-
-            if (verify != true) {
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             //获取订单(2、待付款 3、待收货 4、已完成 1、全部)
             if ("2".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default1", request);
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
-                auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
+                auctionOrderList = baseManager.listObject(xQuery);
             } else if ("3".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default2", request);
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
-                auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
+                auctionOrderList = baseManager.listObject(xQuery);
             } else if ("4".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default3", request);
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
-                auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
+                auctionOrderList = baseManager.listObject(xQuery);
             } else {
                 XQuery xQuery = new XQuery("listAuctionOrder_default", request);
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
-                auctionOrderList = (List<AuctionOrder>) baseManager.listObject(xQuery);
+                auctionOrderList = baseManager.listObject(xQuery);
             }
-
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "订单获取成功");
             resultMap.put("auctionOrderList", auctionOrderList);
@@ -366,15 +311,12 @@ public class AuctionController extends BaseController {
     /**
      * 拍卖订单详情
      *
-     * @param request
-     * @return
      */
     @RequestMapping(value = "/app/viewOrder.do")
     @ResponseBody
     public Map viewOrder(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<>();
-        TreeMap treeMap = new TreeMap();
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -384,8 +326,7 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
-            if (verify != true) {
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
@@ -404,17 +345,13 @@ public class AuctionController extends BaseController {
 
     /**
      * 拍卖记录接口
-     *
-     * @param request
-     * @return
      */
     @RequestMapping(value = "/app/plistArtworkBidding.do")
     @ResponseBody
     public Map listArtworkBidding(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<>();
-        TreeMap treeMap = new TreeMap();
-        List<ArtworkBidding> artworkBiddingList = null;
+        List artworkBiddingList;
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -424,8 +361,7 @@ public class AuctionController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
-            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
-            if (!verify) {
+            if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
@@ -442,12 +378,12 @@ public class AuctionController extends BaseController {
             PageEntity pageEntity1 = new PageEntity();
             pageEntity1.setIndex(1);
             pageEntity1.setSize(3);
-            List<ArtworkBidding> biddingTopThree = baseManager.listPageInfo(xQuery1).getList();
+            List biddingTopThree = baseManager.listPageInfo(xQuery1).getList();
 
             //竞价记录
             XQuery xQuery2 = new XQuery("listArtworkBidding_default", request);
             xQuery2.put("artwork_id", jsonObj.getString("artWorkId"));
-            List<ArtworkBidding> artworkBiddings = (List<ArtworkBidding>) baseManager.listObject(xQuery2);
+            List<ArtworkBidding> artworkBiddings = baseManager.listObject(xQuery2);
             Integer auctionNum = 0;
             if (artworkBiddings != null && artworkBiddings.size() > 0) {
                 auctionNum = artworkBiddings.size();
@@ -467,103 +403,6 @@ public class AuctionController extends BaseController {
         }
 
         return resultMap;
-    }
-
-    /**
-     * 浏览次数增加接口
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "/app/addViewNum.do")
-    @ResponseBody
-    public Map addViewNum(HttpServletRequest request) {
-        LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap = new HashMap<>();
-        TreeMap treeMap = new TreeMap();
-        try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson3(request);//入参
-            logBean.setCreateDate(new Date());//操作时间
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            logBean.setApiName("artWorkAuctionPayDeposit");
-            if (!CommonUtil.jsonObject(jsonObj)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-            }
-            //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("artworkId", jsonObj.getString("artworkId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artworkId"));
-            if (artwork.getViewNum() == null) {
-                artwork.setViewNum(1);
-            } else {
-                artwork.setViewNum(artwork.getViewNum() + 1);
-            }
-            baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "浏览次数增加成功");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
-        }
-
-        return resultMap;
-    }
-
-    public static void main(String[] arg) throws Exception {
-
-
-        String appKey = "BL2QEuXUXNoGbNeHObD4EzlX+KuGc70U";
-        long timestamp = System.currentTimeMillis();
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        /**artWorkAuctionList.do测试加密参数**/
-        map.put("artWorkOrderId", "qydeyugqqiugd2");
-        //map.put("type", "1");
-        /**artWorkAuctionView.do测试加密参数**/
-        //map.put("artWorkId","qydeyugqqiugd2");
-        map.put("timestamp", timestamp);
-        String signmsg = DigitalSignatureUtil.encrypt(map);
-        HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.60:8080/app/viewOrder.do";
-        HttpPost httppost = new HttpPost(url);
-        httppost.setHeader("Content-Type", "application/json;charset=utf-8");
-
-        /**json参数  artWorkAuctionView.do测试 **/
-        //String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
-        /**json参数  artWorkAuctionList.do测试 **/
-        String json = "{\"artWorkOrderId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
-        JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
-        String jsonString = jsonObj.toJSONString();
-
-        StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
-        stringEntity.setContentType("text/json");
-        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-        httppost.setEntity(stringEntity);
-        System.out.println("url:  " + url);
-        try {
-            byte[] b = new byte[(int) stringEntity.getContentLength()];
-            System.out.println(stringEntity);
-            stringEntity.getContent().read(b);
-            System.out.println("报文:" + new String(b, "utf-8"));
-            HttpResponse response = httpClient.execute(httppost);
-            HttpEntity entity = response.getEntity();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    entity.getContent(), "UTF-8"));
-            String line;
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-
-        } catch (Exception e) {
-
-        }
     }
 
 

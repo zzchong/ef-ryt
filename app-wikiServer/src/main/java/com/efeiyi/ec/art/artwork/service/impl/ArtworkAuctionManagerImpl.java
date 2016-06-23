@@ -51,34 +51,17 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
     private BaseManager baseManager;
     @Autowired
     ResultMapHandler resultMapHandler;
-//    private Map<String, SoftReference<Lock>> auctionLockMap = new HashMap<>();
-//security come first
+
     private Lock lock = new ReentrantLock();
 
     /**
      * 竞拍出价
-     *
-     * @param request
-     * @param jsonObj
-     * @param logBean
-     * @return
      */
     @Override
     @Transactional
-    public Map artworkBidOnAuction(HttpServletRequest request, JSONObject jsonObj, LogBean logBean) {
-//        SoftReference<Lock> lock = auctionLockMap.get(jsonObj.get("artworkId"));//以防内存吃紧
-//        if (lock == null) {
-//            synchronized (this.getClass()) {
-//                lock = auctionLockMap.get(jsonObj.get("artworkId"));
-//                if (lock == null) {
-//                    lock = new SoftReference(new ReentrantLock());
-//                    auctionLockMap.put(jsonObj.getString("artworkId"), lock);
-//                }
-//            }
-//        }
-        Map resultMap = new HashMap();
+    public Map<String, Object> artworkBidOnAuction(HttpServletRequest request, JSONObject jsonObj, LogBean logBean) {
+        Map<String, Object> resultMap = new HashMap<>();
         try {
-//            lock.get().lock();
             lock.lock();
             //项目信息
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
@@ -88,7 +71,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
                     || jsonObj.getBigDecimal("price").compareTo(artwork.getNewBidingPrice()) < 0) {//校验出价大于当前最高价
                 return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
             }
-            LinkedHashMap queryMap = new LinkedHashMap();
+            LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
             queryMap.put("userId", jsonObj.getString("currentUserId"));
             queryMap.put("artworkId", jsonObj.getString("artWorkId"));
             MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
@@ -105,10 +88,10 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             getCurrentSession().saveOrUpdate(artworkBidding);
 
             //透传所有终端新竞价
-            Map<String,Object> map = new HashMap();
-            map.put("msg_content","new bid updated");
-            map.put("content_type","text");
-            map.put("title","newBid");
+            Map<String, Object> map = new HashMap<>();
+            map.put("msg_content", "new bid updated");
+            map.put("content_type", "text");
+            map.put("title", "newBid");
             map.put("json", JsonUtil.getJsonString(artworkBidding));
             EfeiyiPush.buildPushObject_android_and_ios_message(map);
 
@@ -118,9 +101,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             e.getMessage();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         } finally {
-//            lock.get().unlock();
             lock.unlock();
-
         }
         return resultMap;
     }

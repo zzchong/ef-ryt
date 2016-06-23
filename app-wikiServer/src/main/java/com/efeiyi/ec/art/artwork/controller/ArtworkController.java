@@ -7,7 +7,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.Bean.JsonFile;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.util.*;
+import com.efeiyi.ec.art.base.util.AppConfig;
+import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
+import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
+import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
@@ -77,7 +80,7 @@ public class ArtworkController extends BaseController {
 
     @RequestMapping(value = "/app/getArtWorkList.do")
     @ResponseBody
-    public Map getArtWorkList(HttpServletRequest request,HttpServletResponse response) {
+    public Map getArtWorkList(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
 //        response.setHeader("Access-Control-Allow-Origin","*");
@@ -138,8 +141,8 @@ public class ArtworkController extends BaseController {
             String hql = "from Artwork WHERE 1=1 and status = '1' and type='1' and step='14' order by createDatetime DESC";
             artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
 //            List<ArtWorkBean> objectList = new ArrayList<>();
-            for (Artwork artwork : artworkList){
-                     artwork.setInvestRestTime(TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(),new Date(), "", TimeUtil.SECOND).get("time").toString());
+            for (Artwork artwork : artworkList) {
+                artwork.setInvestRestTime(TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(), new Date(), "", TimeUtil.SECOND).get("time").toString());
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             if (artworkList != null && !artworkList.isEmpty()) {
@@ -169,7 +172,6 @@ public class ArtworkController extends BaseController {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
-        List objectList = null;
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -190,16 +192,16 @@ public class ArtworkController extends BaseController {
             }
             //投资人
             List<User> investPeople = null;
-            LinkedHashMap<String,Object> params = new LinkedHashMap<>();
-            params.put("artworkId",jsonObj.getString("artWorkId"));
-            List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_TOP,params);
+            LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+            params.put("artworkId", jsonObj.getString("artWorkId"));
+            List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_TOP, params);
 //            xQuery = new XQuery("listArtworkInvest1_default", request);
             //投资人数
             Integer investNum = 0;
-            investNum = artwork.getInvestNum();
             if (artworkInvestList != null) {
+                investNum = artworkInvestList.size();
                 investPeople = new ArrayList<>();
-                if(artworkInvestList.size()!=0) {
+                if (artworkInvestList.size() != 0) {
                     for (ArtworkInvest artworkInvest : artworkInvestList) {
                         investPeople.add(artworkInvest.getCreator());
                     }
@@ -208,22 +210,18 @@ public class ArtworkController extends BaseController {
 
             //剩余时间
             String time = "";
-            if(artwork.getInvestStartDatetime()!=null) {
-                time = TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(),new Date(), "", TimeUtil.SECOND).get("time").toString();
+            if (artwork.getInvestStartDatetime() != null) {
+                time = TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(), new Date(), "", TimeUtil.SECOND).get("time").toString();
                 artwork.setInvestRestTime(time);
             }
             //项目文件
             List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
-            for (ArtworkAttachment artworkAttachment : artworkAttachmentList){
-                artworkAttachment.setWidth(ImgUtil.getWidth(artworkAttachment.getFileName()));
-                artworkAttachment.setHeight(ImgUtil.getHeight(artworkAttachment.getFileName()));
-            }
             //项目制作过程说明、融资解惑
             Artworkdirection artworkdirection = artwork.getArtworkdirection();
 
             //是否点赞
             Boolean isPraise = false;
-            if(!StringUtils.isEmpty(jsonObj.getString("currentUserId"))) {
+            if (!StringUtils.isEmpty(jsonObj.getString("currentUserId"))) {
                 XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
                 xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
                 xQuery.put("user_id", jsonObj.getString("currentUserId"));
@@ -234,7 +232,7 @@ public class ArtworkController extends BaseController {
                     }
                 }
             }
-            data.put("investPeople",investPeople);
+            data.put("investPeople", investPeople);
             data.put("artWork", artwork);
             data.put("investNum", investNum);
             data.put("time", time);
@@ -266,7 +264,6 @@ public class ArtworkController extends BaseController {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
-        List objectList = null;
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
@@ -332,13 +329,13 @@ public class ArtworkController extends BaseController {
             }
 
             //投资记录列表
-            List<ArtworkInvest> artworkInvestList = null;
+            List<ArtworkInvest> artworkInvestList;
 
             //投资top
             List<ArtWorkInvestTopBean> artworkInvestTopList = null;
 
             //temp
-            List<ArtworkInvest> artworkInvestTopTempList = null;
+            List<ArtworkInvest> artworkInvestTopTempList;
 
 
             XQuery xQuery = new XQuery("plistArtworkInvest_default", request);
@@ -349,31 +346,29 @@ public class ArtworkController extends BaseController {
             xQuery.setPageEntity(pageEntity);
             artworkInvestList = baseManager.listPageInfo(xQuery).getList();
 
-            data.put("artworkInvestList", artworkInvestList);
 
-            LinkedHashMap<String,Object> params = new LinkedHashMap<>();
-            params.put("artworkId",jsonObj.getString("artWorkId"));
-            artworkInvestTopTempList =(List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_TOP,params);
-            List<BigDecimal> topMoneyList =(List<BigDecimal>) baseManager.listObject(AppConfig.SQL_INVEST_TOP_MONEY,params);
-//            xQuery = new XQuery("listArtworkInvest1_default", request);
-//            xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-//            artworkInvestTopTempList = baseManager.listObject(xQuery);
+            LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+            params.put("artworkId", jsonObj.getString("artWorkId"));
+            artworkInvestTopTempList = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_TOP, params);
+            List<BigDecimal> topMoneyList = (List<BigDecimal>) baseManager.listObject(AppConfig.SQL_INVEST_TOP_MONEY, params);
             if (artworkInvestTopTempList != null) {
 
-                    artworkInvestTopList = new ArrayList<>();
-                    ArtWorkInvestTopBean artWorkInvestTopBean = null;
-                   int max = 3;
-                   if(artworkInvestTopTempList.size()<max){
-                       max = artworkInvestTopTempList.size();
-                   }
-                    for (int i = 0; i < max; i++) {
-                        artWorkInvestTopBean = new ArtWorkInvestTopBean();
-                        artWorkInvestTopBean.setUser(artworkInvestTopTempList.get(i).getCreator());
-                        artWorkInvestTopBean.setMoney(topMoneyList.get(i));
-                        artworkInvestTopList.add(artWorkInvestTopBean);
-                    }
+                artworkInvestTopList = new ArrayList<>();
+                ArtWorkInvestTopBean artWorkInvestTopBean;
+                int max = 3;
+                if (artworkInvestTopTempList.size() < max) {
+                    max = artworkInvestTopTempList.size();
+                }
+                for (int i = 0; i < max; i++) {
+                    artWorkInvestTopBean = new ArtWorkInvestTopBean();
+                    artWorkInvestTopBean.setUser(artworkInvestTopTempList.get(i).getCreator());
+                    artWorkInvestTopBean.setMoney(topMoneyList.get(i));
+                    artWorkInvestTopBean.setCreateDatetime(artworkInvestTopTempList.get(i).getCreateDatetime());
+                    artworkInvestTopList.add(artWorkInvestTopBean);
+                }
             }
             data.put("artworkInvestTopList", artworkInvestTopList);
+            data.put("artworkInvestList", artworkInvestList);
 
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             resultMap.put("object", data);
@@ -697,9 +692,9 @@ public class ArtworkController extends BaseController {
             try {
                 if (user != null && user.getId() != null) {
 
-                    if(!StringUtils.isEmpty(request.getParameter("artWorkId"))){
-                        artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),request.getParameter("artWorkId"));
-                    }else {
+                    if (!StringUtils.isEmpty(request.getParameter("artWorkId"))) {
+                        artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), request.getParameter("artWorkId"));
+                    } else {
                         artwork = new Artwork();
                     }
                     artwork.setStatus("1");//不可用状态，不能进入融资阶段
@@ -788,10 +783,10 @@ public class ArtworkController extends BaseController {
             try {
                 Artworkdirection artworkdirection = null;
                 if (artwork != null && artwork.getId() != null) {
-                     if(artwork.getArtworkdirection()!=null )
-                         artworkdirection = artwork.getArtworkdirection();
-                     else
-                         artworkdirection = new Artworkdirection();
+                    if (artwork.getArtworkdirection() != null)
+                        artworkdirection = artwork.getArtworkdirection();
+                    else
+                        artworkdirection = new Artworkdirection();
 
                     artworkdirection.setFinancing_aq(request.getParameter("financing_aq"));
                     artworkdirection.setMake_instru(request.getParameter("make_instru"));
@@ -799,11 +794,11 @@ public class ArtworkController extends BaseController {
 
                     //List<ArtworkAttachment> artworkAttachments = new ArrayList<ArtworkAttachment>();
 
-                    baseManager.saveOrUpdate(Artworkdirection.class.getName(),artworkdirection);
+                    baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);
                     artwork.setDescription(request.getParameter("description"));
                     artwork.setArtworkdirection(artworkdirection);
                     List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
-                    List<String>  urlList = new ArrayList<>();
+                    List<String> urlList = new ArrayList<>();
                     //创建一个通用的多部分解析器
                     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                     //判断 request 是否有文件上传,即多部分请求
@@ -826,36 +821,36 @@ public class ArtworkController extends BaseController {
                                     //重命名上传后的文件名
                                     String url = "artwork/" + System.currentTimeMillis() + myFileName;
                                     String pictureUrl = "http://rongyitou2.efeiyi.com/" + url;
-                                       //将图片上传至阿里云
-                                       aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
-                                       urlList.add(pictureUrl);
-                                        //artworkAttachments.add(artworkAttachment);
+                                    //将图片上传至阿里云
+                                    aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
+                                    urlList.add(pictureUrl);
+                                    //artworkAttachments.add(artworkAttachment);
 //                                        artwork.getArtworkAttachment().add(artworkAttachment);
-                                    }
-
                                 }
+
+                            }
                         }
                     }
-                    if(artworkAttachmentList!=null) {
+                    if (artworkAttachmentList != null) {
                         for (ArtworkAttachment artworkAttachment : artworkAttachmentList) {
-                            baseManager.delete(ArtworkAttachment.class.getName(),artworkAttachment.getId());
+                            baseManager.delete(ArtworkAttachment.class.getName(), artworkAttachment.getId());
                         }
                     }
-                    if(urlList.size()!=0){
-                       for(String url : urlList){
-                           ArtworkAttachment artworkAttachment = null;
-                           artworkAttachment = new ArtworkAttachment();//项目附件
-                           artworkAttachment.setArtwork(artwork);
-                           artworkAttachment.setFileType(url.substring(url.lastIndexOf("."), url.length()));
-                           artworkAttachment.setFileName(url);
-                           baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
-                       }
+                    if (urlList.size() != 0) {
+                        for (String url : urlList) {
+                            ArtworkAttachment artworkAttachment = null;
+                            artworkAttachment = new ArtworkAttachment();//项目附件
+                            artworkAttachment.setArtwork(artwork);
+                            artworkAttachment.setFileType(url.substring(url.lastIndexOf("."), url.length()));
+                            artworkAttachment.setFileName(url);
+                            baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+                        }
                     }
                     //artwork.setArtworkAttachment(artworkAttachments);
                     baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
                     resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                     resultMap.put("artworkId", artwork.getId());
-                     return resultMap;
+                    return resultMap;
 
                 } else {
                     return resultMapHandler.handlerResult("10008", "查无数据，稍后再试", logBean);
@@ -872,9 +867,6 @@ public class ArtworkController extends BaseController {
         }
 
     }
-
-
-
 
 
     /**
@@ -907,7 +899,7 @@ public class ArtworkController extends BaseController {
             treeMap.put("artworkId", jsonObject.getString("artworkId"));
             treeMap.put("step", jsonObject.getString("step"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-             if (verify != true) {
+            if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
@@ -966,7 +958,7 @@ public class ArtworkController extends BaseController {
                     artworkMessage.setArtwork(artwork);
                     artworkMessage.setCreateDatetime(new Date());
                     baseManager.saveOrUpdate(ArtworkMessage.class.getName(), artworkMessage);
-                    List<ArtworkMessageAttachment> artworkMessageAttachments =  new ArrayList<ArtworkMessageAttachment>();//动态附件有可能是多个文件
+                    //List<ArtworkMessageAttachment> artworkMessageAttachments =  new ArrayList<ArtworkMessageAttachment>();//动态附件有可能是多个文件
                     //创建一个通用的多部分解析器
                     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                     //判断 request 是否有文件上传,即多部分请求
@@ -1002,17 +994,10 @@ public class ArtworkController extends BaseController {
                                     artworkMessageAttachment.setArtworkMessage(artworkMessage);
                                     artworkMessageAttachment.setFileType(request.getParameter("type"));
                                     //artworkMessageAttachments.add(artworkMessageAttachment);
-                                    artworkMessageAttachments.add(artworkMessageAttachment);
+                                    baseManager.saveOrUpdate(ArtworkMessageAttachment.class.getName(), artworkMessageAttachment);
                                     //artworkMessage.getArtworkMessageAttachments().add(artworkMessageAttachment);
                                 }
                             }
-                        }
-                    }
-
-                    if(artworkMessageAttachments.size()>0){
-                        for (ArtworkMessageAttachment artworkMessageAttachment :artworkMessageAttachments ){
-                            baseManager.saveOrUpdate(ArtworkMessageAttachment.class.getName(), artworkMessageAttachment);
-
                         }
                     }
                     //artworkMessage.setCreateDatetime(new Date());
@@ -1037,6 +1022,7 @@ public class ArtworkController extends BaseController {
         }
 
     }
+
     /**
      * 项目完成接口
      *
@@ -1055,8 +1041,7 @@ public class ArtworkController extends BaseController {
             logBean.setApiName("artworkComplete");
             if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
 
-                    || "".equals(request.getParameter("artworkId")))
-                   {
+                    || "".equals(request.getParameter("artworkId"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             //校验数字签名
@@ -1081,7 +1066,7 @@ public class ArtworkController extends BaseController {
                         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
                         //取得request中的所有文件名
                         Iterator<String> iter = multiRequest.getFileNames();
-                        int i = 0 ;
+                        int i = 0;
                         while (iter.hasNext()) {
                             //取得上传文件
                             MultipartFile file = multiRequest.getFile(iter.next());
@@ -1091,18 +1076,18 @@ public class ArtworkController extends BaseController {
                                 //如果名称不为“”,说明该文件存在，否则说明该文件不存在
                                 if (myFileName.trim() != "") {
                                     //重命名上传后的文件名
-                                    String url = "artwork/"+System.currentTimeMillis()+myFileName;
-                                    String pictureUrl = "http://rongyitou2.efeiyi.com/" +url;
+                                    String url = "artwork/" + System.currentTimeMillis() + myFileName;
+                                    String pictureUrl = "http://rongyitou2.efeiyi.com/" + url;
                                     //将图片上传至阿里云
                                     aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
-                                 if(i==0){
-                                     artwork.setPicture_url(pictureUrl);
-                                 }else if(i==1){
-                                     artwork.setPictureBottom(pictureUrl);
-                                 }else if(i==2){
-                                     artwork.setPictureSide(pictureUrl);
-                                 }
-                                    baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+                                    if (i == 0) {
+                                        artwork.setPicture_url(pictureUrl);
+                                    } else if (i == 1) {
+                                        artwork.setPictureBottom(pictureUrl);
+                                    } else if (i == 2) {
+                                        artwork.setPictureSide(pictureUrl);
+                                    }
+                                    baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
                                 }
                                 i++;
                             }
@@ -1162,12 +1147,12 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artworkId);
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-            resultMap.put("artwork",artwork);
-            resultMap.put("investTimes",artwork.getArtworkInvests().size());
-            resultMap.put("artworkMessages",artwork.getArtworkMessages());
-            resultMap.put("artworkBidding",artwork.getArtworkBiddings());
+            resultMap.put("artwork", artwork);
+            resultMap.put("investTimes", artwork.getArtworkInvests().size());
+            resultMap.put("artworkMessages", artwork.getArtworkMessages());
+            resultMap.put("artworkBidding", artwork.getArtworkBiddings());
         } catch (Exception e) {
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -1282,10 +1267,10 @@ public class ArtworkController extends BaseController {
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("artworkId","qydeyugqqiugd2"));
-        params.add(new BasicNameValuePair("timestamp",Long.toString(timestamp)));
-        params.add(new BasicNameValuePair("signmsg",signmsg));
-        String url = "http://192.168.1.41:8085/app/artworkProgress.do?" + URLEncodedUtils.format(params,HTTP.UTF_8);
+        params.add(new BasicNameValuePair("artworkId", "qydeyugqqiugd2"));
+        params.add(new BasicNameValuePair("timestamp", Long.toString(timestamp)));
+        params.add(new BasicNameValuePair("signmsg", signmsg));
+        String url = "http://192.168.1.41:8085/app/artworkProgress.do?" + URLEncodedUtils.format(params, HTTP.UTF_8);
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeader("Content-Type", "application/json;charset=utf-8");
         System.out.println("url:  " + url);
@@ -1358,12 +1343,9 @@ public class ArtworkController extends BaseController {
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("id"));
-            if(artwork.getInvestsMoney().compareTo(artwork.getInvestGoalMoney())>=0 && "1".equals(artwork.getType())) {
-                artwork.setType("2");
-                artwork.setStep("21");
-                baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
-            }
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("id"));
+            artwork.setType("2");
+            artwork.setStep("21");
             return resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1380,7 +1362,7 @@ public class ArtworkController extends BaseController {
 
         /**investorArtWorkView.do测试加密参数**/
         map.put("artWorkId", "qydeyugqqiugd2");
-        map.put("currentUserId","iickhknq3h7yrku2");
+        map.put("currentUserId", "iickhknq3h7yrku2");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
@@ -1391,11 +1373,11 @@ public class ArtworkController extends BaseController {
         /**json参数  artWorkCreationList.do测试 **/
 //        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artWorkCreationView.do测试 **/
-        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"currentUserId\":\"iickhknq3h7yrku2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
-        JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
+        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"currentUserId\":\"iickhknq3h7yrku2\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
-        StringEntity stringEntity = new StringEntity(jsonString,"utf-8");
+        StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
         stringEntity.setContentType("text/json");
         stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         httppost.setEntity(stringEntity);
@@ -1415,7 +1397,7 @@ public class ArtworkController extends BaseController {
                 stringBuilder.append(line);
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }

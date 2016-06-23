@@ -16,7 +16,6 @@ import java.util.Map;
 
 /**
  * Created by Administrator on 2016/3/9.
- *
  */
 @Service
 public class ResultMapHandler {
@@ -24,10 +23,10 @@ public class ResultMapHandler {
     @Autowired
     BaseManager baseManager;
 
-    public  Map handlerResult(String code,String msg,LogBean logBean) {
+    public Map handlerResult(String code, String msg, LogBean logBean) {
         HttpServletRequest request = getRequest();
         String flag = PlatformVersionUtil.CheckAgent(request);
-        Map<String, String> resultMap = new HashMap<String, String>();
+        Map<String, String> resultMap = new HashMap<>();
         resultMap.put("resultCode", code);
         resultMap.put("resultMsg", msg);
         logBean.setResultCode(code);
@@ -37,13 +36,11 @@ public class ResultMapHandler {
         return resultMap;
     }
 
-    public HttpServletRequest getRequest(){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        return request;
+    public HttpServletRequest getRequest() {
+        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     }
-    public HttpServletResponse getResponse(){
 
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
-        return response;
+    public HttpServletResponse getResponse() {
+        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
     }
 }
