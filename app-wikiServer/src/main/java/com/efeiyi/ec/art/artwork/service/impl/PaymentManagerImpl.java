@@ -47,6 +47,9 @@ public class PaymentManagerImpl implements PaymentManager {
 
     private final static  String ACCOUNT_NAME = "永新华韵文化发展有限公司";//付款方支付宝账户名称
 
+    private final static String APPID = "bad9ddf8-b5d8-475d-ae5b-1a244b9b9993";
+
+    private final static String APPSECRET = "dfbedf37-97d9-4d35-aa32-cd8b3d6fed93";
 
     static {
         BeeCloud.registerApp("bad9ddf8-b5d8-475d-ae5b-1a244b9b9993","4d164cf7-211f-452f-8d85-417556656577","dfbedf37-97d9-4d35-aa32-cd8b3d6fed93","b5b9b602-6e9c-4e5a-8c37-7071974c3720"); //正式环境
@@ -87,7 +90,7 @@ public class PaymentManagerImpl implements PaymentManager {
         log.info("sign:" + sign);
         log.info("timestamp:" + timestamp);
 
-        return verify(sign, BCCache.getAppID() + BCCache.getAppSecret(),
+        return verify(sign, APPID + APPSECRET,
                 timestamp, "UTF-8");
 
     }

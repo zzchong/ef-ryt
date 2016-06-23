@@ -180,7 +180,7 @@ public class PaymentController extends BaseController {
                     return;
                 }
                 artworkInvest.setStatus("1");
-                artworkInvest.setCreateDatetime(new Date());
+//                artworkInvest.setCreateDatetime(new Date());
                 baseManager.saveOrUpdate(ArtworkInvest.class.getName(), artworkInvest);
 
                 if(isOk){
@@ -401,6 +401,7 @@ public class PaymentController extends BaseController {
             artworkInvest.setArtwork((Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId));
             artworkInvest.setType(type);
             artworkInvest.setAccount(account);
+            artworkInvest.setCreateDatetime(new Date());
             baseManager.saveOrUpdate(ArtworkInvest.class.getName(),artworkInvest);
 
             title = TITLE_INVEST+"-"+artwork.getTitle();

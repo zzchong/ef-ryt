@@ -21,6 +21,7 @@ import com.ming800.core.p.PConst;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.util.CookieTool;
 import com.ming800.core.util.MD5Encode;
+import com.ming800.core.util.StringUtil;
 import com.ming800.core.util.VerificationCodeGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +99,7 @@ public class SigninController extends BaseController {
                     resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);
                     return resultMap;
                 }
-                if (user.getPassword().equals(jsonObj.getString("password"))) {
+                if (user.getPassword().equals(StringUtil.encodePassword(jsonObj.getString("password"), "SHA1"))) {
                     resultMap = resultMapHandler.handlerResult("0","成功",logBean);
                     resultMap.put("userInfo",(User)baseManager.getObject(User.class.getName(),user.getId()));
                     //获取用户的关注数量  粉丝
@@ -251,7 +252,7 @@ public class SigninController extends BaseController {
            //***************************************保存用户信息
             MyUser myUser = new MyUser();
             myUser.setUsername(jsonObj.getString("username"));
-            myUser.setPassword(jsonObj.getString("password"));
+            myUser.setPassword(StringUtil.encodePassword(jsonObj.getString("password"),"SHA1"));
             //myUser.setName2(jsonObj.getString("truename2"));
             myUser.setAccountExpired(false);
             myUser.setAccountLocked(false);
