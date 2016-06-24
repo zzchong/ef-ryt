@@ -144,6 +144,20 @@
 
             </does>
         </entity>
+        <entity name="ArtWorkBidding" label="拍卖纪录"
+                basic="simple" others=""
+                model="com.efeiyi.ec.art.model.ArtworkBidding">
+            <does>
+                <do name="listArtworkBidding" label="菜单项列表" access="" result="/simpleMenuItem/simpleMenuItemList">
+                    <query name="default" label="默认" type="auto" orderBy="price:desc">
+                        <condition label="菜单项主键" name="status" defaultValue="1" operation="eq"/>
+                        <condition label="菜单项主键" name="artwork.id" defaultValue="1" operation="eq"/>
+
+                    </query>
+                </do>
+
+            </does>
+        </entity>
 
     </entities>
 </module>

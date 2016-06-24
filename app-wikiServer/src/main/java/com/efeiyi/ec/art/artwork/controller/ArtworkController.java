@@ -1,10 +1,7 @@
 package com.efeiyi.ec.art.artwork.controller;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.efeiyi.ec.art.Bean.JsonFile;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.*;
@@ -140,6 +137,10 @@ public class ArtworkController extends BaseController {
 //            List<ArtWorkBean> objectList = new ArrayList<>();
             for (Artwork artwork : artworkList) {
                 artwork.setInvestRestTime(TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(), new Date(), "", TimeUtil.SECOND).get("time").toString());
+                if(artwork.getPicture_url()!=null) {
+                    artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
+                    artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
+                }
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             if (artworkList != null && !artworkList.isEmpty()) {
@@ -707,6 +708,7 @@ public class ArtworkController extends BaseController {
                     artwork.setDuration(Integer.parseInt(request.getParameter("duration")));
                     artwork.setCreateDatetime(new Date());
                     artwork.setInvestGoalMoney(new BigDecimal(request.getParameter("investGoalMoney")));
+                    artwork.setStartingPrice(new BigDecimal(request.getParameter("investGoalMoney")));
                     MultipartFile artwork_img = ((MultipartHttpServletRequest) request).getFile("picture_url");
                     String fileType = "";
                     if (artwork_img.getContentType().contains("jpg")) {
@@ -1357,7 +1359,16 @@ public class ArtworkController extends BaseController {
                 }
             }else if("auction".equals(type)){
                 artwork.setType("3");
-                artwork.setStep("32");
+                XQuery xQuery = new XQuery("listArtworkBidding_default",request);
+                xQuery.put("artwork_id",artwork.getId());
+                List<ArtworkBidding> artworkBiddingList = baseManager.listObject(xQuery);
+                if(artworkBiddingList!=null && artworkBiddingList.size()>0){
+                    artwork.setStep("32");
+                    artwork.setWinner(artworkBiddingList.get(0).getCreator());
+                }else {
+                    artwork.setStep("33");
+                }
+                baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
             }
             return resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {

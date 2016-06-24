@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkAuctionManager;
 import com.efeiyi.ec.art.artwork.service.ArtworkInvestManager;
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.util.AppConfig;
-import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
-import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
-import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
@@ -92,6 +89,10 @@ public class AuctionController extends BaseController {
             artworkList = messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
             for (Object artwork : artworkList) {
                 Artwork artworkTemp = (Artwork) artwork;
+                if(artworkTemp.getPicture_url()!=null) {
+                    artworkTemp.setHeight(ImgUtil.getHeight(artworkTemp.getPicture_url()));
+                    artworkTemp.setWidth(ImgUtil.getWidth(artworkTemp.getPicture_url()));
+                }
                 XQuery xQuery = new XQuery("listArtworkBidding_default", request);
                 xQuery.put("artwork_id", artworkTemp.getId());
                 List artworkBiddingList = baseManager.listObject(xQuery);

@@ -51,7 +51,7 @@ public class Artwork implements Serializable {
     private String newCreationDate;//最新创作时间
 
     private Integer auctionNum;//竞价记录次数
-    private BigDecimal newBidingPrice;//最新竞价价格
+    private BigDecimal newBidingPrice=new BigDecimal("0.00");//最新竞价价格
     private String newBiddingDate;//最新出价时间
     private String sorts;//排序
     private User winner;//竞拍得主
@@ -71,6 +71,9 @@ public class Artwork implements Serializable {
     private String pictureBottom;//俯视图
     private String pictureSide;//侧视图
     private String investRestTime;//融资剩余时间
+
+    private Integer height=0;
+    private Integer width=0;
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -507,5 +510,23 @@ public class Artwork implements Serializable {
 
     public void setInvestRestTime(String investRestTime) {
         this.investRestTime = investRestTime;
+    }
+
+    @Transient
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    @Transient
+    public Integer getWidth() {
+        return width;
+    }
+
+    public void setWidth(Integer width) {
+        this.width = width;
     }
 }

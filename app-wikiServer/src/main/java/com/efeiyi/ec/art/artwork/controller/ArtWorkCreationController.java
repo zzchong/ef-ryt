@@ -3,10 +3,7 @@ package com.efeiyi.ec.art.artwork.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.util.AppConfig;
-import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
-import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
-import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
@@ -94,6 +91,10 @@ public class ArtWorkCreationController extends BaseController {
             String str1 = sdf.format(new Date());
             if(artworkList!=null){
             for (Artwork artwork : artworkList) {
+                if(artwork.getPicture_url()!=null) {
+                    artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
+                    artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
+                }
                 //项目动态
                 if (artwork.getArtworkMessages() != null && artwork.getArtworkMessages().size() > 0) {
                     artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1, sdf.format(artwork.getArtworkMessages().get(0).getCreateDatetime())));
