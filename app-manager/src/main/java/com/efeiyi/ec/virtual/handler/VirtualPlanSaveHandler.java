@@ -39,7 +39,7 @@ public class VirtualPlanSaveHandler implements DoHandler {
 
         if ("new".equals(type)){
             virtualPlan.setStatus("1");
-            virtualPlan.setSerial(autoSerialManager.nextSerial("virtualPlan"));
+            virtualPlan.setSerial(System.currentTimeMillis()+"");
             virtualPlan.setCreateDatetime(new Date());
         }
 

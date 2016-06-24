@@ -85,7 +85,7 @@ public class RankListController extends BaseController {
 
 
 
-    @RequestMapping(value = "/app/getArtistTopList.do", method = RequestMethod.POST)//获取艺术家排行榜
+    @RequestMapping(value = "/app/2/getArtistTopList.do", method = RequestMethod.POST)//获取艺术家排行榜
     @ResponseBody
     public Map getArtistTopList(HttpServletRequest request) {
         LogBean logBean = new LogBean();
@@ -124,7 +124,7 @@ public class RankListController extends BaseController {
 
 
 
-    @RequestMapping(value = "/app/2/getArtistTopList.do", method = RequestMethod.POST)//获取艺术家排行榜
+    @RequestMapping(value = "/app/getArtistTopList.do", method = RequestMethod.POST)//获取艺术家排行榜
     @ResponseBody
     public Map getArtistTopList2(HttpServletRequest request) {
         LogBean logBean = new LogBean();

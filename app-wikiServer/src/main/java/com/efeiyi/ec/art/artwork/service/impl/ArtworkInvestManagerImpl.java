@@ -78,8 +78,7 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
                         BigDecimal  currentInvestMoney = investMoney.add(price);//加上本次投资额度
                         ArtworkInvest artworkInvest = new ArtworkInvest();
                         if ((currentInvestMoney.doubleValue() -investGoalMoney.doubleValue())>=0.0){
-                            return resultMapHandler.handlerResult("100013","您好，你最多投资"+(investGoalMoney.doubleValue()-investMoney.doubleValue())+"元",logBean);
-                        }else if (investGoalMoney.doubleValue()-currentInvestMoney.doubleValue()<=1.0 ) {//小于等于1 视为融资成功
+                            price = investGoalMoney.subtract(investMoney);
 
                             artworkInvest.setStatus("1");
                             artworkInvest.setCreateDatetime(new Date());
@@ -97,8 +96,8 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
                             artwork.setType("2");
                             artwork.setStep("21");//修改项目状态
                             baseManager.saveOrUpdate(Artwork.class.getName(),artwork);//更新项目
-
-                        }else{
+                        }
+                        else{
                             artworkInvest.setStatus("1");
                             artworkInvest.setCreateDatetime(new Date());
                             artworkInvest.setCreator(user);
