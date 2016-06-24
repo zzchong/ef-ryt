@@ -150,10 +150,12 @@ public class RankListController extends BaseController {
             }
             Session session = xdoDao.getSession();
             int beginNum = (jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize"));
-            String sqlString = AppConfig.GET_ARTIST_TOP_LIST2+beginNum+","+jsonObj.getInteger("pageSize");
-            List<ArtistBiddingTopListVO> list = session.createSQLQuery(sqlString).setResultTransformer(Transformers.aliasToBean(com.efeiyi.ec.art.model.ArtistBiddingTopListVO.class)).list();
+            String sqlString = AppConfig.GET_ARTIST_TOP_LIST3+beginNum+","+jsonObj.getInteger("pageSize");
+            List<ArtistBiddingTopListVO> objectList = (List<ArtistBiddingTopListVO>) baseManager.executeHql("list",sqlString,null);
+
+//            List<ArtistBiddingTopListVO> list = session.createSQLQuery(sqlString).setResultTransformer(Transformers.aliasToBean(com.efeiyi.ec.art.model.ArtistBiddingTopListVO.class)).list();
             resultMap = resultMapHandler.handlerResult("0","成功!",logBean);
-            resultMap.put("ArtistTopList",list);
+            resultMap.put("ArtistTopList",objectList);
         } catch(Exception e){
             return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }

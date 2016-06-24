@@ -41,7 +41,12 @@ public class AppConfig {
             " GROUP BY aw.id " +
             " ORDER BY Bidding_rate desc " +
             " LIMIT ";
-
+    public static final String GET_ARTIST_TOP_LIST3 = "SELECT aw.author.id as author_id,ou.username,ou.name as truename,((sum(aw.newBidingPrice)-sum(aw.investGoalMoney))/sum(aw.investGoalMoney)) AS bidding_rate " +
+            " from User ou left join Artwork aw on ou.id = aw.author.id  " +
+            " WHERE ou.status<>'0' and ou.type='1' and aw.type='3' AND aw.step='32'  AND aw.status<>'0' " +
+            " GROUP BY ou.id " +
+            " ORDER BY Bidding_rate desc " +
+            " LIMIT ";
 
     public static final String SQL_USER_BINDING_GET = "from PushUserBinding WHERE user.id= :userId ";
 
