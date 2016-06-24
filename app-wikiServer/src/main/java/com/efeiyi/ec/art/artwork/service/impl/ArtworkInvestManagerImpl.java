@@ -94,8 +94,8 @@ public class ArtworkInvestManagerImpl implements ArtworkInvestManager {
                             baseManager.saveOrUpdate(Account.class.getName(),account);//更新用户账户
 
                             //修改项目
-                            artwork.setType("1");
-                            artwork.setStep("15");//修改项目状态
+                            artwork.setType("2");
+                            artwork.setStep("21");//修改项目状态
                             baseManager.saveOrUpdate(Artwork.class.getName(),artwork);//更新项目
 
                         }else{
