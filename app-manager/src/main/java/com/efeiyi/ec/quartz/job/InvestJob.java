@@ -25,7 +25,9 @@ import java.io.InputStreamReader;
 public class InvestJob implements Job {
 
 
-    private static final String URL = "http://192.168.1.75:8080/app/updateCreationStatus.do";
+//    private static final String URL = "http://192.168.1.75:8080/app/updateCreationStatus.do";
+
+    private static final String URL = "http://ryt.efeiyi.com/app/updateCreationStatus.do";
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
