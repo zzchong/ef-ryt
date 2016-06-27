@@ -134,7 +134,8 @@ public class ArtworkController extends BaseController {
             artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
 //            List<ArtWorkBean> objectList = new ArrayList<>();
             for (Artwork artwork : artworkList) {
-                artwork.setInvestRestTime(TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(), new Date(), "", TimeUtil.MIN).get("time").toString());
+//                artwork.setInvestRestTime(TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(), new Date(), "", TimeUtil.MIN).get("time").toString());
+                artwork.setInvestRestTime(TimeUtil.getDistanceTimes(artwork.getInvestEndDatetime(),new Date()));
                 if(artwork.getPicture_url()!=null) {
                     artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
                     artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
@@ -206,9 +207,9 @@ public class ArtworkController extends BaseController {
             }
 
             //剩余时间
-            String time = "";
+            Date time = null;
             if (artwork.getInvestStartDatetime() != null) {
-                time = TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(), new Date(), "", TimeUtil.MIN).get("time").toString();
+                time = TimeUtil.getDistanceTimes(artwork.getInvestEndDatetime(), new Date());
                 artwork.setInvestRestTime(time);
             }
             //项目文件

@@ -70,7 +70,7 @@ public class Artwork implements Serializable {
 
     private String pictureBottom;//俯视图
     private String pictureSide;//侧视图
-    private String investRestTime;//融资剩余时间
+    private Date investRestTime;//融资剩余时间
 
     private Integer height=0;
     private Integer width=0;
@@ -503,12 +503,13 @@ public class Artwork implements Serializable {
         this.pictureSide = pictureSide;
     }
 
+
     @Transient
-    public String getInvestRestTime() {
+    public Date getInvestRestTime() {
         return investRestTime;
     }
 
-    public void setInvestRestTime(String investRestTime) {
+    public void setInvestRestTime(Date investRestTime) {
         this.investRestTime = investRestTime;
     }
 

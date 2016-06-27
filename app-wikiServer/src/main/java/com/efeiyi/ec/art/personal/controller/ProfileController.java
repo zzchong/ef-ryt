@@ -379,6 +379,7 @@ public class ProfileController extends BaseController {
             master.setPresentAddress(provinceName);
             master.setProvinceName(province);
             master.setArtCategory(artCategory);
+            master.setTitle(titleCertificate);
             master.setTitleCertificate(titleCertificate);
             User user = (User) baseManager.getObject(User.class.getName(), userId);
             master.setUser(user);

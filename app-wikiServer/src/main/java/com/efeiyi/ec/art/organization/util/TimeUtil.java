@@ -8,7 +8,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +55,23 @@ public class TimeUtil {
     }
 
 
+    //时间比较去时间戳
+    public static Date getDistanceTimes(Date date1,Date date2) throws ParseException {
 
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        long distanceTime = Math.abs(date1.getTime()-date2.getTime());
+
+        return new Date(distanceTime);
+
+    }
+
+    public static Date getDay(Date date){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.YEAR,Calendar.MONTH,Calendar.DATE);
+
+        return  calendar.getTime();
+    }
     //时间比较
 
     /**
@@ -116,6 +134,8 @@ public class TimeUtil {
         }
         return map;
     }
+
+
 
 
 }
