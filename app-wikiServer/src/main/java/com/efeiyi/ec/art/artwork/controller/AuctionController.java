@@ -3,46 +3,25 @@ package com.efeiyi.ec.art.artwork.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkAuctionManager;
-import com.efeiyi.ec.art.artwork.service.ArtworkInvestManager;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
-import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
-import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
-import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
-import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.base.service.BaseManager;
-import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.taglib.PageEntity;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Administrator on 2016/1/29.
