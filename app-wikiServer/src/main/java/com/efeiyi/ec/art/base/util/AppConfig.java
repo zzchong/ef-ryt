@@ -45,8 +45,8 @@ public class AppConfig {
             " from User ou left join Artwork aw on ou.id = aw.author.id  " +
             " WHERE ou.status<>'0' and ou.type='1' and aw.type='3' AND aw.step='32'  AND aw.status<>'0' " +
             " GROUP BY ou.id " +
-            " ORDER BY Bidding_rate desc " +
-            " LIMIT ";
+            " ORDER BY Bidding_rate desc "
+           ;
 
     public static final String SQL_USER_BINDING_GET = "from PushUserBinding WHERE user.id= :userId ";
 

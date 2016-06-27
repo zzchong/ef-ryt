@@ -6,6 +6,7 @@ import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.ArtistBiddingTopListVO;
 import com.efeiyi.ec.art.model.ArtistTopListVO;
 import com.efeiyi.ec.art.model.InvestorTopListVO;
@@ -21,6 +22,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class RankListController extends BaseController {
     ResultMapHandler resultMapHandler;
     @Autowired
     private XdoDaoSupport xdoDao;
+
+    @Autowired
+    private MessageDao messageDao;
     @RequestMapping(value = "/app/getInvestorTopList.do", method = RequestMethod.POST)//获取投资者排行榜
     @ResponseBody
     public Map getInvestorTopList(HttpServletRequest request) {
@@ -150,12 +155,17 @@ public class RankListController extends BaseController {
             }
             Session session = xdoDao.getSession();
             int beginNum = (jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize"));
-            String sqlString = AppConfig.GET_ARTIST_TOP_LIST3+beginNum+","+jsonObj.getInteger("pageSize");
-            List<ArtistBiddingTopListVO> objectList = (List<ArtistBiddingTopListVO>) baseManager.executeHql("list",sqlString,null);
+            String sqlString = AppConfig.GET_ARTIST_TOP_LIST2+beginNum+","+jsonObj.getInteger("pageSize");
+//            String hqlString = AppConfig.GET_ARTIST_TOP_LIST3;
+//            Query query = session.createQuery(hqlString);
+//            query.setFirstResult(jsonObj.getInteger("pageNum"));
+//            query.setMaxResults(jsonObj.getInteger("pageSize"));
+//            List<ArtistBiddingTopListVO> objectList = query.list();
+//            List<ArtistBiddingTopListVO> objectList = (List<ArtistBiddingTopListVO>) baseManager.executeHql("list",hqlString,null,jsonObj.getInteger("pageNum"),jsonObj.getInteger("pageSize"));
 
-//            List<ArtistBiddingTopListVO> list = session.createSQLQuery(sqlString).setResultTransformer(Transformers.aliasToBean(com.efeiyi.ec.art.model.ArtistBiddingTopListVO.class)).list();
+            List<ArtistBiddingTopListVO> list = session.createSQLQuery(sqlString).setResultTransformer(Transformers.aliasToBean(com.efeiyi.ec.art.model.ArtistBiddingTopListVO.class)).list();
             resultMap = resultMapHandler.handlerResult("0","成功!",logBean);
-            resultMap.put("ArtistTopList",objectList);
+            resultMap.put("ArtistTopList",list);
         } catch(Exception e){
             return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
@@ -185,7 +195,7 @@ public class RankListController extends BaseController {
 
 
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.69:8001/app/2/getArtistTopList.do";
+        String url = "http://192.168.1.75:8080/app/getArtistTopList.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
