@@ -420,20 +420,20 @@ public class ProfileController extends BaseController {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         LogBean logBean = new LogBean();
         try {
-            String querySql = "from Master m where m.user.id=:userId and m.theStatus = '1'";
+            String querySql = "from Master m where m.user.id=:userId and m.theStatus != '0'";
             LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
             String userId = request.getParameter("userId");
             queryMap.put("userId", userId);
             Master master = (Master) baseManager.getUniqueObjectByConditions(querySql, queryMap);
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-            List<MultipartFile> oneList = multipartRequest.getFiles("one");
-            List<MultipartFile> twoList = multipartRequest.getFiles("two");
-            List<MultipartFile> threeList = multipartRequest.getFiles("three");
-            MultipartFile identityFront = multipartRequest.getFile("identityFront");
-            MultipartFile identityBack = multipartRequest.getFile("identityBack");
+            List<MultipartFile> oneList = multipartRequest.getFiles("one");//工作照片
+            List<MultipartFile> twoList = multipartRequest.getFiles("two");//工作室照片
+            List<MultipartFile> threeList = multipartRequest.getFiles("three");//资格认证照片
+            MultipartFile identityFront = multipartRequest.getFile("identityFront");//身份证前照
+            MultipartFile identityBack = multipartRequest.getFile("identityBack");//身份证后照
             String filePath;
             String paramType = request.getParameter("paramType");
-            if ("yes".equals(paramType)){
+//            if ("yes".equals(paramType)){
                 if (!oneList.isEmpty()) {
                     uploadFilePath(oneList, master, "1");
                 }
@@ -443,7 +443,7 @@ public class ProfileController extends BaseController {
                 if (!threeList.isEmpty()){
                     uploadFilePath(threeList,master,"3");
                 }
-            }else{
+//            }else{
                 if (identityFront!=null){
                     filePath = uploadFile(identityFront);
                     master.setIdentityFront(filePath);
@@ -454,7 +454,7 @@ public class ProfileController extends BaseController {
                     master.setIdentityBack(filePath);
                     baseManager.saveOrUpdate(Master.class.getName(),master);
                 }
-            }
+//            }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
 
         } catch (Exception e) {
