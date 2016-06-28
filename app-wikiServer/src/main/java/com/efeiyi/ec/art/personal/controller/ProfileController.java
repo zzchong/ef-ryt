@@ -354,14 +354,23 @@ public class ProfileController extends BaseController {
             String provinceName = request.getParameter("provinceName");
             String artCategory = request.getParameter("artCategory");
             String titleCertificate = request.getParameter("titleCertificate");
+            String name = request.getParameter("name");
+            String phone = request.getParameter("phone");
             if ("".equals(signmsg)
                     || "".equals(timestamp)
                     || "".equals(userId)
                     || "".equals(paramType)
-                    ) {
+                    || "".equals(artCategory)
+                    || "".equals(titleCertificate)
+                    || "".equals(provinceName)
+                    || "".equals(province)
+                    || "".equals(name)
+                    || "".equals(phone)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             treeMap.put("userId", userId);
+            treeMap.put("name", name);
+            treeMap.put("phone", phone);
             treeMap.put("paramType", paramType);
             treeMap.put("timestamp", timestamp);
             treeMap.put("province", province);
@@ -374,6 +383,7 @@ public class ProfileController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
+            User user = (User) baseManager.getObject(User.class.getName(), userId);
             Master master = new Master();
             master.setTheStatus("1");
             master.setPresentAddress(provinceName);
@@ -381,7 +391,8 @@ public class ProfileController extends BaseController {
             master.setArtCategory(artCategory);
             master.setTitle(titleCertificate);
             master.setTitleCertificate(titleCertificate);
-            User user = (User) baseManager.getObject(User.class.getName(), userId);
+            master.setPhone(phone);
+            master.setName(name);
             master.setUser(user);
             System.out.print(master.getId());
             baseManager.saveOrUpdate(Master.class.getName(), master);

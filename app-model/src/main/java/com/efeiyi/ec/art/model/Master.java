@@ -49,6 +49,9 @@ public class Master implements Serializable{
     private String identityFront;//身份证正面
     private String identityBack;//身份证反面
     private List<ArtMasterAttachment> certificatePhotos;//证书附件
+
+    private  String name;//真实姓名
+    private String phone;//手机号
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -277,5 +280,23 @@ public class Master implements Serializable{
 
     public void setCertificatePhotos(List<ArtMasterAttachment> certificatePhotos) {
         this.certificatePhotos = certificatePhotos;
+    }
+
+    @Column(name = "name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Column(name = "phone")
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
