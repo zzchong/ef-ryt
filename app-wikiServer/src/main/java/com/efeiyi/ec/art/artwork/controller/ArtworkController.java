@@ -9,6 +9,7 @@ import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestTopBean;
+import com.efeiyi.ec.art.modelConvert.ArtWorkPraiseBean;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
@@ -124,6 +125,7 @@ public class ArtworkController extends BaseController {
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
             treeMap.put("pageNum", jsonObj.getString("pageNum"));
+            treeMap.put("userId",jsonObj.getString("userId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -131,15 +133,35 @@ public class ArtworkController extends BaseController {
             }
 
             String hql = "from Artwork WHERE 1=1 and status = '1' and type='1' and step='14' order by createDatetime DESC";
+            String sql = "SELECT COUNT(1) FROM ArtWorkPraise m where user.id=:userId and artwork.id=:artworkId and status !='0'";
             artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
-//            List<ArtWorkBean> objectList = new ArrayList<>();
+            List<ArtWorkPraiseBean> objectList = new ArrayList<>();
+            LinkedHashMap<String,Object> map = new LinkedHashMap<>();
+            map.put("userId",jsonObj.getString("userId"));
+//            ArtWorkPraiseBean artWorkPraiseBean = null;
+
             for (Artwork artwork : artworkList) {
+
+//                artWorkPraiseBean = new ArtWorkPraiseBean();
 //                artwork.setInvestRestTime(TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(), new Date(), "", TimeUtil.MIN).get("time").toString());
                 artwork.setInvestRestTime(TimeUtil.getDistanceTimes(artwork.getInvestEndDatetime(),new Date()));
                 if(artwork.getPicture_url()!=null) {
                     artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
                     artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
                 }
+                map.put("artworkId",artwork.getId());
+                List<Long> count = (List<Long>) baseManager.listObject(sql,map);
+                if(count.get(0)==0) {
+                    artwork.setPraise(false);
+//                    artWorkPraiseBean.setPraise(false);
+                }
+                else {
+                    artwork.setPraise(true);
+//                    artWorkPraiseBean.setPraise(true);
+                }
+
+//                artWorkPraiseBean.setArtwork(artwork);
+//                objectList.add(artWorkPraiseBean);
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             if (artworkList != null && !artworkList.isEmpty()) {
@@ -1174,15 +1196,15 @@ public class ArtworkController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**investorIndex.do测试加密参数**/
-//        map.put("pageSize","3");
-//        map.put("pageNum","1");
-//        map.put("timestamp", timestamp);
-        /**investorArtWorkView.do测试加密参数**/
-        map.put("artWorkId", "qydeyugqqiugd2");
-//        map.put("messageId","2");
-        map.put("pageSize", "4");
-        map.put("pageIndex", "1");
+        map.put("pageSize","10");
+        map.put("pageNum","1");
         map.put("timestamp", timestamp);
+        /**investorArtWorkView.do测试加密参数**/
+//        map.put("artWorkId", "qydeyugqqiugd2");
+////        map.put("messageId","2");
+//        map.put("pageSize", "4");
+//        map.put("pageIndex", "1");
+//        map.put("timestamp", timestamp);
 
         /**masterView.do测试加密参数**/
 //        map.put("pageSize","3");
@@ -1207,12 +1229,12 @@ public class ArtworkController extends BaseController {
 //        map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.75:8001/app/investorArtWorkComment.do";
+        String url = "http://192.168.1.75:8080/app/investorIndex.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  investorArtWork.do测试 **/
-        String json = "{\"pageIndex\":\"1\",\"pageSize\":\"4\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"pageNum\":\"1\",\"pageSize\":\"10\",\"userId\":\"imhfp1yr4636pj49\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
 //        String json = "{\"currentUserId\":\"iickhknq3h7yrku2\",\"artWorkId\":\"qydeyugqqiugd2\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  investorIndex.do测试 **/
 //        String json = "{\"pageSize\":\"3\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
@@ -1383,20 +1405,20 @@ public class ArtworkController extends BaseController {
 
         Map<String, Object> map = new TreeMap<>();
 
-        /**investorArtWorkView.do测试加密参数**/
-        map.put("artWorkId", "qydeyugqqiugd2");
-        map.put("currentUserId", "iickhknq3h7yrku2");
+        /**investorIndex.do测试加密参数**/
+        map.put("pageNum", "1");
+        map.put("pageSize", "10");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.75:8080/app/investorArtWorkView.do";
+        String url = "http://192.168.1.75:8080/app/investorIndex.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
         /**json参数  artWorkCreationList.do测试 **/
 //        String json = "{\"pageNum\":\"1\",\"pageSize\":\"5\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
         /**json参数  artWorkCreationView.do测试 **/
-        String json = "{\"artWorkId\":\"qydeyugqqiugd2\",\"currentUserId\":\"iickhknq3h7yrku2\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
+        String json = "{\"pageNum\":\"1\",\"pageSize\":\"10\",\"userId\":\"ipcgwgyj28ppzwiw\",\"signmsg\":\"" + signmsg + "\",\"timestamp\":\"" + timestamp + "\"}";
         JSONObject jsonObj = (JSONObject) JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
 
