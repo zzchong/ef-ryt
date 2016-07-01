@@ -23,7 +23,16 @@ import com.ming800.core.util.CookieTool;
 import com.ming800.core.util.MD5Encode;
 import com.ming800.core.util.StringUtil;
 import com.ming800.core.util.VerificationCodeGenerator;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
@@ -38,9 +47,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -64,145 +71,145 @@ public class SigninController extends BaseController {
     ResultMapHandler resultMapHandler;
     @Autowired
     AliOssUploadManager aliOssUploadManager;
-    @RequestMapping(value = "/app/login.do", method = RequestMethod.POST)
-    @ResponseBody
-    public Map login(HttpServletRequest request) {
-        LogBean logBean = new LogBean();
-        logBean.setApiName("login");
-        Map<String, Object> resultMap = new HashMap<String, Object>();
-        TreeMap treeMap = new TreeMap();
-        try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
-            logBean.setCreateDate(new Date());
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) || "".equals(jsonObj.getString("password")) || "".equals(jsonObj.getString("timestamp"))) {
-
-                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-            }
-
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("username", jsonObj.getString("username"));
-            treeMap.put("password", jsonObj.getString("password"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-
-                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-            }
-
-            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("username", jsonObj.getString("username"));
-            MyUser user;
-            try {
-                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
-                if(user==null){
-                    resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);
-                    return resultMap;
-                }
-                if (user.getPassword().equals(StringUtil.encodePassword(jsonObj.getString("password"), "SHA1"))) {
-                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
-                    resultMap.put("userInfo",(User)baseManager.getObject(User.class.getName(),user.getId()));
-                    //获取用户的关注数量  粉丝
-                    LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
-                    paramMap.put("userId", user.getId());
-                    List<Long> counts = (List<Long>)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, paramMap);
-                    Long count =0l;
-                    if(counts != null && !counts.isEmpty()){
-                        count= counts.get(0);
-                    }
-                    //Long count = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, paramMap).get(0);
-                    List<Long> count1s = (List<Long>)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, paramMap);
-                    //Long count1 = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, paramMap).get(0);
-                    Long count1 =0l;
-                    if(count1s != null && !count1s.isEmpty()){
-                        count1= count1s.get(0);
-                    }
-                    //获取签名 SQL_GET_USER_SIGNER
-                    List<UserBrief> userBriefs = (List<UserBrief>)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
-                    UserBrief userBrief = new UserBrief();
-                    if (userBriefs!=null && !userBriefs.isEmpty()){
-                        userBrief = userBriefs.get(0);
-                    }
-                    //UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
-                    resultMap.put("count",count);
-                    resultMap.put("count1",count1);
-                    resultMap.put("userBrief",userBrief.getSigner());
-                    User user1 = (User)baseManager.getObject(User.class.getName(),user.getId());
-                    BigDecimal investsMoney = new BigDecimal("0.00");
-                    BigDecimal roiMoney = new BigDecimal("0.00");
-                    BigDecimal rate = new BigDecimal("0.00");
-
-                    BigDecimal investsMoney2 = new BigDecimal("0.00");
-                    BigDecimal roiMoney2 = new BigDecimal("0.00");
-                    BigDecimal rate2 = new BigDecimal("0.00");
-                    if(user1.getMaster()!=null && user1.getMaster().getId()!=null){
-                       // 2 艺术家
-                       //项目总金额
-                        List<Artwork> artworks = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK, paramMap);
-                        for (Artwork artwork:artworks){
-                            investsMoney2 = investsMoney2.add(artwork.getInvestGoalMoney());
-                        }
-
-
-                       //项目总拍卖金额
-                        List<Artwork> artworks2 = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK_OVER, paramMap);
-                        for (Artwork artwork:artworks2){
-                            ArtworkBidding artworkBidding = (ArtworkBidding)xdoDao.getSession().createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
-                            roiMoney2 = roiMoney2.add(artworkBidding.getPrice());
-                        }
-                        //项目拍卖溢价率
-                       if(investsMoney2.doubleValue()!=0.00 && roiMoney2.doubleValue()!=0.00){
-                           rate2 = roiMoney2.divide(investsMoney2,2);
-                       }
-
-                        resultMap.put("investsMoney",investsMoney2);
-                        resultMap.put("roiMoney",roiMoney2);
-                        resultMap.put("rate",rate2);
-                        resultMap.put("flag","2");
-
-
-                   }else {
-                       // 1 普通用户
-                       //获取投资金额
-                       List<ArtworkInvest> artworkInvests = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_ARTWORK_APP, paramMap);
-                       for (ArtworkInvest artworkInvest:artworkInvests){
-                           investsMoney =  investsMoney.add(artworkInvest.getPrice());
-                       }
-
-                       //获取投资收益金额 SQL_GET_USER_ROI
-                     List<ROIRecord>  roiRecords = (List<ROIRecord>) baseManager.listObject(AppConfig.SQL_GET_USER_ROI, paramMap);
-                       for (ROIRecord roiRecord : roiRecords){
-                           roiMoney = roiMoney.add(roiRecord.getCurrentBalance().subtract(roiRecord.getArtworkInvest().getPrice()));
-                       }
-
-                       //投资回报率
-                        if(investsMoney.doubleValue()!=0.00&&roiMoney.doubleValue()!=0.00){
-                            rate = roiMoney.divide(investsMoney,2);
-
-                        }
-                        resultMap.put("investsMoney",investsMoney);
-                        resultMap.put("roiMoney",roiMoney);
-                        resultMap.put("rate",rate);
-                        resultMap.put("flag","1");
-
-                   }
-
-
-
-                }else{
-
-                    resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);
-                }
-            } catch (Exception e) {
-
-                resultMap = resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
-            }
-        } catch (Exception e) {
-
-            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-        }
-        return resultMap;
-    }
+//    @RequestMapping(value = "/app/login.do", method = RequestMethod.POST)
+//    @ResponseBody
+//    public Map login(HttpServletRequest request) {
+//        LogBean logBean = new LogBean();
+//        logBean.setApiName("login");
+//        Map<String, Object> resultMap = new HashMap<String, Object>();
+//        TreeMap treeMap = new TreeMap();
+//        try {
+//            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+//            logBean.setCreateDate(new Date());
+//            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+//            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("username")) || "".equals(jsonObj.getString("password")) || "".equals(jsonObj.getString("timestamp"))) {
+//
+//                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
+//            }
+//
+//            String signmsg = jsonObj.getString("signmsg");
+//            treeMap.put("username", jsonObj.getString("username"));
+//            treeMap.put("password", jsonObj.getString("password"));
+//            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+//            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+//            if (verify != true) {
+//
+//                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+//            }
+//
+//            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+//            map.put("username", jsonObj.getString("username"));
+//            MyUser user;
+//            try {
+//                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
+//                if(user==null){
+//                    resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);
+//                    return resultMap;
+//                }
+//                if (user.getPassword().equals(StringUtil.encodePassword(jsonObj.getString("password"), "SHA1"))) {
+//                    resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+//                    resultMap.put("userInfo",(User)baseManager.getObject(User.class.getName(),user.getId()));
+//                    //获取用户的关注数量  粉丝
+//                    LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
+//                    paramMap.put("userId", user.getId());
+//                    List<Long> counts = (List<Long>)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, paramMap);
+//                    Long count =0l;
+//                    if(counts != null && !counts.isEmpty()){
+//                        count= counts.get(0);
+//                    }
+//                    //Long count = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOWED, paramMap).get(0);
+//                    List<Long> count1s = (List<Long>)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, paramMap);
+//                    //Long count1 = (Long)baseManager.listObject(AppConfig.SQL_GET_USER_FOLLOW, paramMap).get(0);
+//                    Long count1 =0l;
+//                    if(count1s != null && !count1s.isEmpty()){
+//                        count1= count1s.get(0);
+//                    }
+//                    //获取签名 SQL_GET_USER_SIGNER
+//                    List<UserBrief> userBriefs = (List<UserBrief>)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap);
+//                    UserBrief userBrief = new UserBrief();
+//                    if (userBriefs!=null && !userBriefs.isEmpty()){
+//                        userBrief = userBriefs.get(0);
+//                    }
+//                    //UserBrief userBrief = (UserBrief)baseManager.listObject(AppConfig.SQL_GET_USER_SIGNER, paramMap).get(0);
+//                    resultMap.put("count",count);
+//                    resultMap.put("count1",count1);
+//                    resultMap.put("userBrief",userBrief.getSigner());
+//                    User user1 = (User)baseManager.getObject(User.class.getName(),user.getId());
+//                    BigDecimal investsMoney = new BigDecimal("0.00");
+//                    BigDecimal roiMoney = new BigDecimal("0.00");
+//                    BigDecimal rate = new BigDecimal("0.00");
+//
+//                    BigDecimal investsMoney2 = new BigDecimal("0.00");
+//                    BigDecimal roiMoney2 = new BigDecimal("0.00");
+//                    BigDecimal rate2 = new BigDecimal("0.00");
+//                    if(user1.getMaster()!=null && user1.getMaster().getId()!=null){
+//                       // 2 艺术家
+//                       //项目总金额
+//                        List<Artwork> artworks = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK, paramMap);
+//                        for (Artwork artwork:artworks){
+//                            investsMoney2 = investsMoney2.add(artwork.getInvestGoalMoney());
+//                        }
+//
+//
+//                       //项目总拍卖金额
+//                        List<Artwork> artworks2 = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK_OVER, paramMap);
+//                        for (Artwork artwork:artworks2){
+//                            ArtworkBidding artworkBidding = (ArtworkBidding)xdoDao.getSession().createSQLQuery(AppConfig.GET_ART_WORK_WINNER).addEntity(ArtworkBidding.class).setString("artworkId", artwork.getId()).uniqueResult();
+//                            roiMoney2 = roiMoney2.add(artworkBidding.getPrice());
+//                        }
+//                        //项目拍卖溢价率
+//                       if(investsMoney2.doubleValue()!=0.00 && roiMoney2.doubleValue()!=0.00){
+//                           rate2 = roiMoney2.divide(investsMoney2,2);
+//                       }
+//
+//                        resultMap.put("investsMoney",investsMoney2);
+//                        resultMap.put("roiMoney",roiMoney2);
+//                        resultMap.put("rate",rate2);
+//                        resultMap.put("flag","2");
+//
+//
+//                   }else {
+//                       // 1 普通用户
+//                       //获取投资金额
+//                       List<ArtworkInvest> artworkInvests = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_ARTWORK_APP, paramMap);
+//                       for (ArtworkInvest artworkInvest:artworkInvests){
+//                           investsMoney =  investsMoney.add(artworkInvest.getPrice());
+//                       }
+//
+//                       //获取投资收益金额 SQL_GET_USER_ROI
+//                     List<ROIRecord>  roiRecords = (List<ROIRecord>) baseManager.listObject(AppConfig.SQL_GET_USER_ROI, paramMap);
+//                       for (ROIRecord roiRecord : roiRecords){
+//                           roiMoney = roiMoney.add(roiRecord.getCurrentBalance().subtract(roiRecord.getArtworkInvest().getPrice()));
+//                       }
+//
+//                       //投资回报率
+//                        if(investsMoney.doubleValue()!=0.00&&roiMoney.doubleValue()!=0.00){
+//                            rate = roiMoney.divide(investsMoney,2);
+//
+//                        }
+//                        resultMap.put("investsMoney",investsMoney);
+//                        resultMap.put("roiMoney",roiMoney);
+//                        resultMap.put("rate",rate);
+//                        resultMap.put("flag","1");
+//
+//                   }
+//
+//
+//
+//                }else{
+//
+//                    resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);
+//                }
+//            } catch (Exception e) {
+//
+//                resultMap = resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
+//            }
+//        } catch (Exception e) {
+//
+//            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+//        }
+//        return resultMap;
+//    }
 
 
     @RequestMapping(value = "/app/register.do", method = RequestMethod.POST)
@@ -845,5 +852,49 @@ public class SigninController extends BaseController {
         }
     }
 
+
+    @Test
+    public void testArtworkPraise() throws Exception {
+        long timestamp = System.currentTimeMillis();
+
+        Map<String, Object> map = new TreeMap<>();
+
+        /**登录.do测试加密参数**/
+        map.put("username", "admin");
+        map.put("password", "rongyitou");
+        String signmsg = DigitalSignatureUtil.encrypt(map);
+        HttpClient httpClient = new DefaultHttpClient();
+        map.put("signmsg", signmsg);
+        String url = "http://192.168.1.75:8080/j_spring_security_check";
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Content-Type", "application/json;charset=utf-8");
+        System.out.println("url:  " + url);
+
+        String jsonString = JSONObject.toJSONString(map);
+        StringEntity stringEntity = new StringEntity(jsonString, "utf-8");
+        stringEntity.setContentType("text/json");
+        stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+        httpPost.setEntity(stringEntity);
+        System.out.println("url:  " + url);
+        try {
+            byte[] b = new byte[(int) stringEntity.getContentLength()];
+            System.out.println(stringEntity);
+            stringEntity.getContent().read(b);
+            System.out.println("报文:" + new String(b, "utf-8"));
+            HttpResponse response = httpClient.execute(httpPost);
+            HttpEntity entity = response.getEntity();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    entity.getContent(), "UTF-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            System.out.println(stringBuilder);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

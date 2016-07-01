@@ -11,6 +11,7 @@ import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestTopBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkPraiseBean;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
@@ -125,19 +126,22 @@ public class ArtworkController extends BaseController {
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
             treeMap.put("pageNum", jsonObj.getString("pageNum"));
-            treeMap.put("userId",jsonObj.getString("userId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+//            treeMap.put("userId",jsonObj.getString("userId"));
+            treeMap.put("timestamp", jsonObj.getString("timestamsp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-
+            String userId = "";
+            if(AuthorizationUtil.getUser()!=null)
+                userId = AuthorizationUtil.getUser().getId();
+            System.out.println(userId);
             String hql = "from Artwork WHERE 1=1 and status = '1' and type='1' and step='14' order by createDatetime DESC";
             String sql = "SELECT COUNT(1) FROM ArtWorkPraise m where user.id=:userId and artwork.id=:artworkId and status !='0'";
             artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
             List<ArtWorkPraiseBean> objectList = new ArrayList<>();
             LinkedHashMap<String,Object> map = new LinkedHashMap<>();
-            map.put("userId",jsonObj.getString("userId"));
+            map.put("userId", userId);
 //            ArtWorkPraiseBean artWorkPraiseBean = null;
 
             for (Artwork artwork : artworkList) {
