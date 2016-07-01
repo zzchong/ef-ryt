@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.ServletException;
@@ -29,7 +30,7 @@ public class RestfulUsernamePasswordAuthenticationInterceptor extends AbstractAu
 
     private String username = "";
 
-    private String password = "";
+    private String password = "rongyitou";
 
     private boolean postOnly = true;
 
@@ -50,10 +51,10 @@ public class RestfulUsernamePasswordAuthenticationInterceptor extends AbstractAu
             String username = jsonObj.getString("username");
             String password = jsonObj.getString("password");
 
-            if(username==null)
+            if(StringUtils.isEmpty(username))
                 username = "";
-            if(password==null)
-                password="";
+            if(StringUtils.isEmpty(password))
+                password="rongyitou";
 
             username = username.trim();
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username,password);

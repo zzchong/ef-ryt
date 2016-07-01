@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -813,11 +814,20 @@ public class SigninController extends BaseController {
                 if (user!=null && user.getId()!=null) {
 //                    user.setPassword(jsonObj.getString("password"));
 //                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    if(StringUtils.isEmpty(user.getUsername())){
+                        user.setUsername(System.currentTimeMillis()+"");
+                        user.setPassword(StringUtil.encodePassword("rongyitou","SHA1"));
+                        baseManager.saveOrUpdate(User.class.getName(),user);
+                    }
                     resultMap =  resultMapHandler.handlerResult("0","成功",logBean);
-                    resultMap.put("userInfo",(User) baseManager.getObject(User.class.getName(), user.getId()));
+//                    resultMap.put("userInfo",(User) baseManager.getObject(User.class.getName(), user.getId()));
+                    resultMap.put("username",user.getUsername());
+//                    resultMap.put("password","rongyitou");
                     return  resultMap;
                 }else {
                     user = new MyUser();
+                    user.setUsername(System.currentTimeMillis()+"");
+                    user.setPassword(StringUtil.encodePassword("rongyitou","SHA1"));
                     user.setName(jsonObj.getString("nickname"));
                     user.setUnionid(jsonObj.getString("unionid"));
                     user.setPictureUrl(jsonObj.getString("headimgurl"));
@@ -838,7 +848,9 @@ public class SigninController extends BaseController {
                     account.setUser((User)baseManager.getObject(User.class.getName(),user.getId()));
                     baseManager.saveOrUpdate(Account.class.getName(),account);
                     resultMap =  resultMapHandler.handlerResult("0","成功",logBean);
-                    resultMap.put("userInfo",(User) baseManager.getObject(User.class.getName(), user.getId()));
+//                    resultMap.put("userInfo",(User) baseManager.getObject(User.class.getName(), user.getId()));
+                    resultMap.put("username",user.getUsername());
+//                    resultMap.put("password","rongyitou");
                     return  resultMap;
                 }
             } catch (Exception e) {
