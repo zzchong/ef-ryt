@@ -865,7 +865,7 @@ public class SigninController extends BaseController {
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
         map.put("signmsg", signmsg);
-        String url = "http://192.168.1.75:8080/j_spring_security_check";
+        String url = "http://192.168.1.75:8080/app/j_spring_security_check";
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader("Content-Type", "application/json;charset=utf-8");
         System.out.println("url:  " + url);

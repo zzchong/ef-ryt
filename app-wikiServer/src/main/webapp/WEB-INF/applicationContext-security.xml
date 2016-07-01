@@ -13,15 +13,14 @@
     <http pattern="/**/*.gif" security="none"/>
     <http pattern="/**/*.png" security="none"/>
     <http pattern="/js/*.js" security="none"/>
-    <http pattern="/*" entry-point-ref="restfulAuthenticationEntryPointInterceptor"
+    <http pattern="/**/*" entry-point-ref="restfulAuthenticationEntryPointInterceptor"
     authentication-manager-ref="authenticationManager">
-    <custom-filter position="FORM_LOGIN_FILTER"
+    <custom-filter after="FORM_LOGIN_FILTER"
     ref="ajaxLoginFilter" />
     <csrf disabled="true" />
    </http>
     <http realm="Contacts Realm" use-expressions="true">
         <csrf disabled="true"/>
-
         <intercept-url pattern="/main.do" access="isAuthenticated()"/>
         <intercept-url pattern="/basic/**" access="isAuthenticated()"/>
         <intercept-url pattern="/company/**" access="isAuthenticated()"/><!--企业礼品卡-->
@@ -54,7 +53,7 @@
         <b:property name="authenticationManager" ref="authenticationManager"/>
         <b:property name="authenticationFailureHandler" ref="ajaxFailureHandler"/>
         <b:property name="authenticationSuccessHandler" ref="ajaxSuccessHandler"/>
-        <b:property name="filterProcessesUrl" value="/j_spring_security_check"/>
+        <b:property name="filterProcessesUrl" value="/app/j_spring_security_check"/>
     </b:bean>
 
     <b:bean id="ajaxFailureHandler" class="com.efeiyi.ec.art.organization.AjaxLoginFailureHandler">
