@@ -21,12 +21,12 @@ public class AuthorizationUtil {
         try {
             return (MyUser) authentication.getPrincipal();
         } catch (Exception e) {
-            MyUser myUser = new MyUser();
-            Role role = new Role();
-            role.setBasicType("all");
-
-            myUser.setRole(role);
-            return myUser;
+//            MyUser myUser = new MyUser();
+//            Role role = new Role();
+//            role.setBasicType("all");
+//
+//            myUser.setRole(role);
+            return null;
 
 
         }
@@ -36,12 +36,17 @@ public class AuthorizationUtil {
     public static User getUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        MyUser myUser = (MyUser) authentication.getPrincipal();
-        User user = new User();
-        user.setId(myUser.getId());
-        user.setName(myUser.getName());
-        user.setUsername(myUser.getUsername());
-        return user;
+        try {
+            MyUser myUser = (MyUser) authentication.getPrincipal();
+            User user = new User();
+            user.setId(myUser.getId());
+            user.setName(myUser.getName());
+            user.setUsername(myUser.getUsername());
+            return user;
+        }catch (Exception e){
+             return null;
+        }
+
     }
 
     public static String getRoleType() {

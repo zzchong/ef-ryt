@@ -5,6 +5,7 @@ import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.organization.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,9 +29,8 @@ import java.util.TreeMap;
  */
 public class RestfulUsernamePasswordAuthenticationInterceptor extends AbstractAuthenticationProcessingFilter {
 
-    private String username = "";
-
-    private String password = "rongyitou";
+    @Autowired
+    private UserManager userManager;
 
     private boolean postOnly = true;
 
@@ -48,16 +48,17 @@ public class RestfulUsernamePasswordAuthenticationInterceptor extends AbstractAu
 
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
-            String username = jsonObj.getString("username");
-            String password = jsonObj.getString("password");
-
-            if(StringUtils.isEmpty(username))
-                username = "";
-            if(StringUtils.isEmpty(password))
-                password="rongyitou";
-
-            username = username.trim();
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username,password);
+            Map<String,String> map = userManager.usernameAuthentication(jsonObj);
+//            String username = jsonObj.getString("username");
+//            String password = jsonObj.getString("password");
+//
+//            if(StringUtils.isEmpty(username))
+//                username = "";
+//            if(StringUtils.isEmpty(password))
+//                password="rongyitou";
+//
+//            username = username.trim();
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(map.get("username"),map.get("password"));
             return this.getAuthenticationManager().authenticate(authRequest);
         } catch (Exception e) {
             e.printStackTrace();

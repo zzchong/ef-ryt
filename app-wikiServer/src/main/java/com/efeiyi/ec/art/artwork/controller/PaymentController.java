@@ -10,6 +10,7 @@ import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
@@ -218,14 +219,14 @@ public class PaymentController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg"))
-                    || "".equals(jsonObj.getString("userId"))
+//                    || "".equals(jsonObj.getString("userId"))
                     || "".equals(jsonObj.getString("timestamp"))
                     || "".equals(jsonObj.getString("payWay"))
                     || "".equals(jsonObj.getString("price"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
+//            treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("price", jsonObj.getString("price"));
             treeMap.put("payWay", jsonObj.getString("payWay"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
@@ -236,7 +237,7 @@ public class PaymentController extends BaseController {
             // 查出账户ID
             // 生成充值记录
             LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
-            param.put("userId", jsonObj.getString("userId"));
+            param.put("userId", AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId());
             Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
             RechargeRecord rechargeRecord = new RechargeRecord();
             rechargeRecord.setUser(account.getUser());
@@ -290,12 +291,13 @@ public class PaymentController extends BaseController {
         //支付类型
         String type = jsonObj.getString("type");
         //用户Id
-        String userId = jsonObj.getString("userId");
+        String userId = AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId();
         if(StringUtils.isEmpty(userId)){
            return resultMapHandler.handlerResult("10002", "用户为空", logBean);
         }
         //用户
-        User user = (User) baseManager.getObject(User.class.getName(),userId);
+//        User user = (User) baseManager.getObject(User.class.getName(),userId);
+        User user = AuthorizationUtil.getUser();
         //支付金额
         BigDecimal money = new BigDecimal("0.00");
         //获取账户信息参数
@@ -334,7 +336,7 @@ public class PaymentController extends BaseController {
             //保证金
             xQuery = new XQuery("listMarginAccount_default2",request);
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
-            xQuery.put("user_id",jsonObj.getString("userId"));
+            xQuery.put("user_id",userId);
             List<MarginAccount> marginAccountList = baseManager.listObject(xQuery);
 
             //项目订单Id
@@ -423,7 +425,7 @@ public class PaymentController extends BaseController {
             MarginAccount marginAccount = null;
             XQuery xQuery = new XQuery("listMarginAccount_default2",request);
             xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
-            xQuery.put("user_id",jsonObj.getString("userId"));
+            xQuery.put("user_id",userId);
             List<MarginAccount> marginAccountList = baseManager.listObject(xQuery);
 
             if(marginAccountList!=null && marginAccountList.size()>0)
@@ -551,8 +553,9 @@ public class PaymentController extends BaseController {
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
+            String userId = AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId();
             LinkedHashMap<String,Object> map = new LinkedHashMap<>();
-            map.put("userId",jsonObj.getString("userId"));
+            map.put("userId",userId);
             //总投资
             BigDecimal investMoney = new BigDecimal("0.00");
             Object tempInvestMoney =  baseManager.getUniqueObjectByConditions(AppConfig.SQL_INVEST_TOTAL,map);
@@ -568,7 +571,7 @@ public class PaymentController extends BaseController {
             //投资收益
             BigDecimal rewardMoney = new BigDecimal("0.00");
             XQuery xquery = new XQuery("listROIRecord_default",request);
-            xquery.put("user_id",jsonObj.getString("userId"));
+            xquery.put("user_id",userId);
             List<ROIRecord> roiRecordList = (List<ROIRecord>)baseManager.listObject(xquery);
             for (ROIRecord roiRecord : roiRecordList){
                 rewardMoney = rewardMoney.add(roiRecord.getCurrentBalance());
@@ -576,7 +579,7 @@ public class PaymentController extends BaseController {
             //余额
             BigDecimal restMoney = new BigDecimal("0.00");
             XQuery xQuery1 = new XQuery("listAccount_default",request);
-            xQuery1.put("user_id",jsonObj.getString("userId"));
+            xQuery1.put("user_id",userId);
             List<Account> accountList = baseManager.listObject(xQuery1);
             if(accountList!=null && accountList.size()>0){
                 restMoney = accountList.get(0).getCurrentBalance();
@@ -587,7 +590,7 @@ public class PaymentController extends BaseController {
             data.put("rewardMoney",rewardMoney);
 
             XQuery xQuery = new XQuery("plistBill_default", request);
-            xQuery.put("author_id",jsonObj.getString("userId"));
+            xQuery.put("author_id",userId);
             PageEntity pageEntity = new PageEntity();
             pageEntity.setSize(jsonObj.getInteger("pageSize"));
             pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
@@ -636,7 +639,8 @@ public class PaymentController extends BaseController {
 
             Account account = null;
 
-            User user =(User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+//            User user =(User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+            User user = AuthorizationUtil.getUser();
             if(user==null)
                 return resultMapHandler.handlerResult("10007", "用户不存在", logBean);
             //余额
@@ -710,7 +714,8 @@ public class PaymentController extends BaseController {
 
             Account account = null;
 
-            User user =(User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+//            User user =(User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+            User user = AuthorizationUtil.getUser();
             if(user==null)
                 return resultMapHandler.handlerResult("10007", "用户不存在", logBean);
             //余额

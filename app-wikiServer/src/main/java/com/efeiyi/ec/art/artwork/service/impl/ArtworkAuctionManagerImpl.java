@@ -11,6 +11,7 @@ import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ArtworkBidding;
 import com.efeiyi.ec.art.model.MarginAccount;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.util.JsonUtil;
 import org.apache.http.HttpEntity;
@@ -72,7 +73,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
                 return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
             }
             LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
-            queryMap.put("userId", jsonObj.getString("currentUserId"));
+            queryMap.put("userId", AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId());
             queryMap.put("artworkId", jsonObj.getString("artWorkId"));
             MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
             if (marginAccount == null || !"0".equals(marginAccount.getStatus())) {//未冻结拍卖保证金
@@ -125,7 +126,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             return resultMapHandler.handlerResult("10012", "不正确的拍卖状态", logBean);
         }
         LinkedHashMap queryMap = new LinkedHashMap();
-        queryMap.put("userId", jsonObj.getString("currentUserId"));
+        queryMap.put("userId", AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId());
         queryMap.put("artworkId", jsonObj.getString("artWorkId"));
         MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
         if (marginAccount != null && "0".equals(marginAccount.getStatus())) {//已缴保证金

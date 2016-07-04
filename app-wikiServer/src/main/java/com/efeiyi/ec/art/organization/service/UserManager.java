@@ -1,6 +1,8 @@
 package com.efeiyi.ec.art.organization.service;
 
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Map;
 
 /**
@@ -13,4 +15,6 @@ import java.util.Map;
 public interface UserManager {
 
      Map loginSuccess(String userId);
+
+    Map<String,String> usernameAuthentication(JSONObject jsonObj);
 }

@@ -94,7 +94,7 @@ public class MasterController extends BaseController {
             logBean.setApiName("saveMasterWork");
             if(StringUtils.isEmpty(request.getParameter("name"))
                     ||StringUtils.isEmpty(request.getParameter("material"))
-                    || StringUtils.isEmpty(request.getParameter("currentUserId"))
+//                    || StringUtils.isEmpty(request.getParameter("currentUserId"))
                     || StringUtils.isEmpty(request.getParameter("type"))
                     || StringUtils.isEmpty(request.getParameter("timestamp"))
                     || StringUtils.isEmpty(request.getParameter("createYear"))){
@@ -102,7 +102,7 @@ public class MasterController extends BaseController {
             }
             map.put("name",request.getParameter("name"));
             map.put("material",request.getParameter("material"));
-            map.put("currentUserId",request.getParameter("currentUserId"));
+//            map.put("currentUserId",request.getParameter("currentUserId"));
             map.put("type",request.getParameter("type"));
             map.put("createYear",request.getParameter("createYear"));
             map.put("timestamp",request.getParameter("timestamp"));

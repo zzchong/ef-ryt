@@ -7,6 +7,8 @@ import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
+import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
@@ -127,6 +129,9 @@ public class AuctionController extends BaseController {
             }
             //项目信息
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
+
+            //当前用户
+
             //增加浏览数
             if (artwork.getViewNum() == null) {
                 artwork.setViewNum(1);
@@ -155,7 +160,7 @@ public class AuctionController extends BaseController {
 
             //判断是否交付保证金
             LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
-            queryMap.put("userId", jsonObj.getString("currentUserId"));
+            queryMap.put("userId", AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId());
             queryMap.put("artworkId", jsonObj.getString("artWorkId"));
             MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
             String isSubmitDepositPrice = "1";
@@ -256,22 +261,25 @@ public class AuctionController extends BaseController {
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
+
+            String userId = AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId();
+
             //获取订单(2、待付款 3、待收货 4、已完成 1、全部)
             if ("2".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default1", request);
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", userId);
                 auctionOrderList = baseManager.listObject(xQuery);
             } else if ("3".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default2", request);
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", userId);
                 auctionOrderList = baseManager.listObject(xQuery);
             } else if ("4".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default3", request);
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", userId);
                 auctionOrderList = baseManager.listObject(xQuery);
             } else {
                 XQuery xQuery = new XQuery("listAuctionOrder_default", request);
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", userId);
                 auctionOrderList = baseManager.listObject(xQuery);
             }
             resultMap.put("resultCode", "0");

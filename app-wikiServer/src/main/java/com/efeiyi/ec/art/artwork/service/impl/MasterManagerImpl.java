@@ -8,6 +8,7 @@ import com.efeiyi.ec.art.base.util.JPushConfig;
 import com.efeiyi.ec.art.jpush.EfeiyiPush;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.p.service.AliOssUploadManager;
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +43,7 @@ public class MasterManagerImpl implements MasterManager {
 
             masterWork.setStatus("1");
 
-            masterWork.setCreator((User)baseManager.getObject(User.class.getName(),request.getParameter("currentUserId")));
+            masterWork.setCreator(AuthorizationUtil.getUser());
 
             masterWork.setCreateDatetime(new Date());
 

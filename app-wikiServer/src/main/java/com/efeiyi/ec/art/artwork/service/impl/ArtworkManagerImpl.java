@@ -7,6 +7,7 @@ import com.efeiyi.ec.art.base.util.JPushConfig;
 import com.efeiyi.ec.art.jpush.EfeiyiPush;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
 import org.apache.commons.lang.StringUtils;
@@ -29,11 +30,12 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
 
     @Override
-    public  boolean  saveArtWorkPraise(String id,String currentUserId,String messageId){
+    public  boolean  saveArtWorkPraise(String id,String messageId){
 
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),id);
 
-        User currentUser = (User) baseManager.getObject(User.class.getName(),currentUserId);
+//        User currentUser = (User) baseManager.getObject(User.class.getName(),currentUserId);
+        User currentUser = AuthorizationUtil.getUser();
         try {
 
             ArtWorkPraise artWorkPraise = new ArtWorkPraise();
@@ -224,7 +226,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
         consumerAddress.setStatus(jsonObj.getString("status"));
 //            consumerAddress.setCity((AddressCity)baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("cityId")));
         consumerAddress.setConsignee(jsonObj.getString("consignee"));
-        consumerAddress.setConsumer((User) baseManager.getObject(User.class.getName(), jsonObj.getString("userId")));
+        consumerAddress.setConsumer(AuthorizationUtil.getUser());
         consumerAddress.setDetails(jsonObj.getString("details"));
 //            consumerAddress.setDistrict((AddressDistrict)baseManager.getObject(AddressCity.class.getName(),jsonObj.getString("districtId")));
         consumerAddress.setPhone(jsonObj.getString("phone"));

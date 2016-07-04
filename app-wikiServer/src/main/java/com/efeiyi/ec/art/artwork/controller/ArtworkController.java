@@ -127,7 +127,7 @@ public class ArtworkController extends BaseController {
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
             treeMap.put("pageNum", jsonObj.getString("pageNum"));
 //            treeMap.put("userId",jsonObj.getString("userId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamsp"));
+            treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
@@ -249,10 +249,10 @@ public class ArtworkController extends BaseController {
 
             //是否点赞
             Boolean isPraise = false;
-            if (!StringUtils.isEmpty(jsonObj.getString("currentUserId"))) {
+            if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
                 XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
                 xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", AuthorizationUtil.getUser().getId());
                 List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
                 if (artWorkPraiseList != null) {
                     if (artWorkPraiseList.size() > 0) {
@@ -435,7 +435,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("currentUserId"), jsonObject.getString("messageId"))) {
+            if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);

@@ -9,6 +9,7 @@ import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
@@ -165,10 +166,10 @@ public class ArtWorkCreationController extends BaseController {
             }
             //是否点赞
             Boolean isPraise = false;
-            if(!StringUtils.isEmpty(jsonObj.getString("currentUserId"))) {
+            if(!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
                 XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
                 xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
-                xQuery.put("user_id", jsonObj.getString("currentUserId"));
+                xQuery.put("user_id", AuthorizationUtil.getUser().getId());
                 List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
                 if (artWorkPraiseList != null) {
                     if (artWorkPraiseList.size() > 0) {

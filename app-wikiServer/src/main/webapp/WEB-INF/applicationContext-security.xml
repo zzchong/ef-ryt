@@ -19,25 +19,16 @@
     ref="ajaxLoginFilter" />
     <csrf disabled="true" />
    </http>
-    <http realm="Contacts Realm" use-expressions="true">
-        <csrf disabled="true"/>
-        <intercept-url pattern="/main.do" access="isAuthenticated()"/>
-        <intercept-url pattern="/basic/**" access="isAuthenticated()"/>
-        <intercept-url pattern="/company/**" access="isAuthenticated()"/><!--企业礼品卡-->
-        <intercept-url pattern="/promotionPlan/**" access="isAuthenticated()"/><!--返利链接-->
-        <intercept-url pattern="/virtualPlan/**" access="isAuthenticated()"/><!--虚拟计划-->
-        <intercept-url pattern="/scoreboard/**" access="isAuthenticated()"/><!--微信答题-->
-        <intercept-url pattern="/master/addWork.do" access="isAnonymous()"/><!--大师添加作品-->
-        <anonymous key="cookie_key" username="ananoymous" granted-authority="anonymous,ROLE_ANONYMOUS"/>
-        <!--<custom-filter ref="ajaxLoginFilter" position="FORM_LOGIN_FILTER"/>-->
-        <form-login login-page="/app/login.do" login-processing-url="/login"
-                    authentication-success-handler-ref="loginSuccessHandler"
-                    authentication-failure-handler-ref="loginFailureHandler"/>
-        <logout invalidate-session="true" logout-url="/j_spring_security_logout"
-                success-handler-ref="loginOutSuccessHandler"/>
-        <remember-me user-service-ref="userManager" data-source-ref="dataSource" token-validity-seconds="1209600" remember-me-parameter="remember-me"/>
-    </http>
-    <b:bean id="loginOutSuccessHandler" class="com.efeiyi.ec.art.organization.LoginOutSuccessHandler"/>
+    <!--<http realm="Contacts Realm" use-expressions="true">-->
+        <!--<csrf disabled="true"/>-->
+        <!--<form-login login-page="/app/login.do" login-processing-url="/login"-->
+                    <!--authentication-success-handler-ref="loginSuccessHandler"-->
+                    <!--authentication-failure-handler-ref="loginFailureHandler"/>-->
+        <!--<logout invalidate-session="true" logout-url="/j_spring_security_logout"-->
+                <!--success-handler-ref="loginOutSuccessHandler"/>-->
+        <!--<remember-me user-service-ref="userManager" data-source-ref="dataSource" token-validity-seconds="1209600" remember-me-parameter="remember-me"/>-->
+    <!--</http>-->
+    <!--<b:bean id="loginOutSuccessHandler" class="com.efeiyi.ec.art.organization.LoginOutSuccessHandler"/>-->
     <global-method-security pre-post-annotations="disabled"/>
 
     <authentication-manager alias="authenticationManager">

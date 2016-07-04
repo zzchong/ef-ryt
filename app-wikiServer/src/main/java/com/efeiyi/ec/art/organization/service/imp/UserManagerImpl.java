@@ -1,6 +1,7 @@
 package com.efeiyi.ec.art.organization.service.imp;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
@@ -14,6 +15,7 @@ import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.taglib.PageEntity;
+import com.ming800.core.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -177,6 +180,76 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
             e.printStackTrace();
             resultMap = resultMapHandler.handlerResult("10005","查询数据出现异常:"+e.getMessage(),logBean);
             return resultMap;
+        }
+    }
+
+    /**
+     * 微信，手机登录验证
+     * @param jsonObj
+     * @return
+     */
+    @Override
+    public Map<String,String> usernameAuthentication(JSONObject jsonObj){
+        Map<String, String> resultMap = new HashMap<String, String>();
+        if(!StringUtils.isEmpty(jsonObj.getString("unionid"))){//微信登录
+            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("unionid", jsonObj.getString("unionid"));
+            MyUser user = null;
+            try {
+                user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_WX_LOGIN, map);
+                if (user!=null && user.getId()!=null) {
+                    if(StringUtils.isEmpty(user.getUsername())){
+                        user.setUsername(System.currentTimeMillis()+"");
+                        user.setPassword(StringUtil.encodePassword("rongyitou","SHA1"));
+                        baseManager.saveOrUpdate(User.class.getName(),user);
+                    }
+                    resultMap.put("username",user.getUsername());
+                    resultMap.put("password","rongyitou");
+                    return  resultMap;
+                }else {
+                    user = new MyUser();
+                    user.setUsername(System.currentTimeMillis()+"");
+                    user.setPassword(StringUtil.encodePassword("rongyitou","SHA1"));
+                    user.setName(jsonObj.getString("nickname"));
+                    user.setUnionid(jsonObj.getString("unionid"));
+                    user.setPictureUrl(jsonObj.getString("headimgurl"));
+                    user.setAccountExpired(false);
+                    user.setAccountLocked(false);
+                    user.setCredentialsExpired(false);
+                    user.setEnabled(true);
+                    user.setStatus(1);
+                    user.setUtype(2);
+                    user.setCreateDatetime(new Date());
+                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    //给用户绑定一个账户
+                    Account account = new Account();
+                    account.setCurrentUsableBalance(new BigDecimal("0.00"));
+                    account.setCurrentBalance(new BigDecimal("0.00"));
+                    account.setCreateDatetime(new Date());
+                    account.setStatus("1");
+                    account.setUser((User)baseManager.getObject(User.class.getName(),user.getId()));
+                    baseManager.saveOrUpdate(Account.class.getName(),account);
+                    resultMap.put("username",user.getUsername());
+                    resultMap.put("password","rongyitou");
+                    return  resultMap;
+                }
+            } catch (Exception e) {
+                resultMap.put("errorMsg",e.getMessage());
+                return  resultMap;
+            }
+        }else {//手机登录
+            String username = jsonObj.getString("username");
+            String password = jsonObj.getString("password");
+
+            if(StringUtils.isEmpty(username))
+                username = "";
+            if(StringUtils.isEmpty(password))
+                password="";
+
+            resultMap.put("username",username.trim());
+            resultMap.put("password",password);
+            return  resultMap;
+
         }
     }
 
