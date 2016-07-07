@@ -13,6 +13,7 @@ import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.service.SmsCheckManager;
 import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.base.service.BaseManager;
@@ -422,24 +423,24 @@ public class SigninController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("id")) ||
+            if ("".equals(jsonObj.getString("signmsg")) ||
                     "".equals(jsonObj.getString("cid")) || "".equals(jsonObj.getString("timestamp"))
                     ) {
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("id", jsonObj.getString("id"));
             treeMap.put("cid", jsonObj.getString("cid"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
-            User user =null;
+            User user =AuthorizationUtil.getUser();
+            String userId = AuthorizationUtil.getUserId();
             PushUserBinding pushUserBinding;
             try {
                 XQuery xQuery = new XQuery("listPushUserBinding_default",request);
-                xQuery.put("user_id",jsonObj.getString("id"));
+                xQuery.put("user_id",userId);
                 List<PushUserBinding> pushUserBindingList = (List<PushUserBinding>)baseManager.listObject(xQuery);
                 if(pushUserBindingList!=null && pushUserBindingList.size()!=0){
                     if(!pushUserBindingList.get(0).getCid().equals(jsonObj.getString("cid"))){
@@ -450,7 +451,7 @@ public class SigninController extends BaseController {
 
                    return   resultMapHandler.handlerResult("0","成功",logBean);
                 }
-                user = (User) baseManager.getObject(User.class.getName(), jsonObj.getString("id"));
+//                user = (User) baseManager.getObject(User.class.getName(), jsonObj.getString("id"));
                 if (user==null || user.getId()==null) {
                     return resultMapHandler.handlerResult("10007","用户名不存在",logBean);
                 }

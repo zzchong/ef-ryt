@@ -6,6 +6,7 @@ import com.efeiyi.ec.art.organization.dao.UserDao;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.organization.service.UserManager;
 import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
+import com.efeiyi.ec.art.organization.util.CookieUtil;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +22,7 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -57,6 +59,7 @@ public class AjaxLoginSuccessHandler implements AuthenticationSuccessHandler {
             //成功为0
             JSONObject jsonData = new JSONObject(map);
             objectMapper.writeValue(jsonGenerator, jsonData);
+            CookieUtil.addCookie(response,"active","yes",-1);
         } catch (JsonProcessingException ex) {
             throw new HttpMessageNotWritableException("Could not write JSON: " + ex.getMessage(), ex);
         }

@@ -88,13 +88,10 @@ public class MasterController extends BaseController {
         TreeMap map = new TreeMap();
         List objectList = null;
         try{
-//            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
-//            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("saveMasterWork");
             if(StringUtils.isEmpty(request.getParameter("name"))
                     ||StringUtils.isEmpty(request.getParameter("material"))
-//                    || StringUtils.isEmpty(request.getParameter("currentUserId"))
                     || StringUtils.isEmpty(request.getParameter("type"))
                     || StringUtils.isEmpty(request.getParameter("timestamp"))
                     || StringUtils.isEmpty(request.getParameter("createYear"))){
@@ -102,7 +99,6 @@ public class MasterController extends BaseController {
             }
             map.put("name",request.getParameter("name"));
             map.put("material",request.getParameter("material"));
-//            map.put("currentUserId",request.getParameter("currentUserId"));
             map.put("type",request.getParameter("type"));
             map.put("createYear",request.getParameter("createYear"));
             map.put("timestamp",request.getParameter("timestamp"));

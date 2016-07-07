@@ -6,14 +6,10 @@ import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
-import com.efeiyi.ec.art.modelConvert.ArtWorkBean;
-import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
-import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
-import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.taglib.PageEntity;
 import org.apache.http.HttpEntity;
@@ -85,17 +81,14 @@ public class ArtWorkCreationController extends BaseController {
             pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
             xQuery.setPageEntity(pageEntity);
             artworkList = baseManager.listPageInfo(xQuery).getList();
-//            String hql = "from Artwork WHERE 1=1 and status = '1' and type = '2' order by investStartDatetime asc";
-//            artworkList =  (List<Artwork>)messageDao.getPageList(hql,(jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize")),jsonObj.getInteger("pageSize"));
-//            List<ArtWorkBean> objectList = new ArrayList<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             String str1 = sdf.format(new Date());
             if(artworkList!=null){
             for (Artwork artwork : artworkList) {
-                if(artwork.getPicture_url()!=null) {
-                    artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
-                    artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
-                }
+//                if(artwork.getPicture_url()!=null) {
+//                    artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
+//                    artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
+//                }
                 //项目动态
                 if (artwork.getArtworkMessages() != null && artwork.getArtworkMessages().size() > 0) {
                     artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1, sdf.format(artwork.getArtworkMessages().get(0).getCreateDatetime())));
@@ -103,10 +96,6 @@ public class ArtWorkCreationController extends BaseController {
                     artwork.setNewCreationDate("暂无更新状态");
                 }
             }
-//                ArtWorkBean artWorkBean = new ArtWorkBean();
-//             //   artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-//                artWorkBean.setArtwork(artwork);
-//                objectList.add(artWorkBean);
             }
             data.put("artworkList",artworkList);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
@@ -144,14 +133,6 @@ public class ArtWorkCreationController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
-            //项目 艺术家信息
-//            ArtWorkBean artWorkBean = new ArtWorkBean();
-//            artWorkBean.setArtwork(artwork);
-           // artWorkBean.setMaster((Master)baseManager.getObject(Master.class.getName(),artwork.getAuthor().getId()));
-           //项目动态
-//            XQuery xQuery = new XQuery("listArtworkMessage_default",request);
-//            xQuery.put("artwork_id",jsonObj.getString("artWorkId"));
-//            List<ArtworkMessage> artworkMessageList = (List<ArtworkMessage>)baseManager.listObject(xQuery);
             //已创作时长
             String createdTime = "";
             //剩余时长

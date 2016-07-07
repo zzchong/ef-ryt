@@ -78,7 +78,6 @@ public class PaymentController extends BaseController {
 
         LogBean logBean = new LogBean();
         logBean.setApiName("webhoot");
-//        Map<String, String> resultMap = new HashMap<String, String>();
         StringBuffer json = new StringBuffer();
         String line;
 
@@ -92,7 +91,7 @@ public class PaymentController extends BaseController {
         }
 
         net.sf.json.JSONObject jsonObj = net.sf.json.JSONObject.fromObject(json.toString());
-
+        System.out.println(jsonObj);
         String sign = jsonObj.getString("sign");
         String timestamp = jsonObj.getString("timestamp");
         System.out.println("签名："+sign+"--------"+"时间戳："+timestamp);
@@ -102,7 +101,7 @@ public class PaymentController extends BaseController {
         try {
             out = response.getWriter();//给客户端返回数据
             if (!status) {
-                out.println("fail");
+                out.println("status is false");
                 return;
             }//验证成功
             //  获取订单Id
@@ -135,16 +134,18 @@ public class PaymentController extends BaseController {
 
             //订单号 bill_no
             String id = (String) jsonObj.get("transaction_id");
+
+            System.out.println("jsonObject:"+jsonObject+"----action:"+action+"---billId:"+billId+"------isOk:"+isOk);
             //金额
             BigDecimal transactionFee = new BigDecimal((double) jsonObj.get("transaction_fee") / 100);
             if(action.equals("auction")){
                 AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), id);
                 if (auctionOrder == null) {
-                    out.println("fail");
+                    out.println("order is null");
                     return;
                 }
                 if(!auctionOrder.getFinalPayment().equals(transactionFee)){
-                    out.println("fail");
+                    out.println("money is not equal");
                     return;
                 }
                 auctionOrder.setType("1");
@@ -155,11 +156,11 @@ public class PaymentController extends BaseController {
             }else if(action.equals("payMargin")){
                 MarginAccount marginAccount = (MarginAccount) baseManager.getObject(MarginAccount.class.getName(), id);
                 if (marginAccount == null) {
-                    out.println("fail");
+                    out.println("payMargin is null");
                     return;
                 }
                 if(!marginAccount.getCurrentBalance().equals(transactionFee)){
-                    out.println("fail");
+                    out.println("money is not rich");
                     return;
                 }
                 marginAccount.setStatus("1");
@@ -173,11 +174,11 @@ public class PaymentController extends BaseController {
             }else if(action.equals("invest")){
                 ArtworkInvest artworkInvest = (ArtworkInvest) baseManager.getObject(ArtworkInvest.class.getName(), id);
                 if (artworkInvest == null) {
-                    out.println("fail");
+                    out.println("artworkInvest is null");
                     return;
                 }
                 if(!artworkInvest.getPrice().equals(transactionFee)){
-                    out.println("fail");
+                    out.println("money is not equal");
                     return;
                 }
                 artworkInvest.setStatus("1");
@@ -219,14 +220,12 @@ public class PaymentController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg"))
-//                    || "".equals(jsonObj.getString("userId"))
                     || "".equals(jsonObj.getString("timestamp"))
                     || "".equals(jsonObj.getString("payWay"))
                     || "".equals(jsonObj.getString("price"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
-//            treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("price", jsonObj.getString("price"));
             treeMap.put("payWay", jsonObj.getString("payWay"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));

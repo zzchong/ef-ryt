@@ -17,6 +17,8 @@
     authentication-manager-ref="authenticationManager">
     <custom-filter after="FORM_LOGIN_FILTER"
     ref="ajaxLoginFilter" />
+        <!--<intercept-url pattern="/*" access="isAuthenticated()"/>-->
+        <!--<remember-me user-service-ref="userManager" data-source-ref="dataSource" token-validity-seconds="1209600" remember-me-parameter="remember-me"/>-->
     <csrf disabled="true" />
    </http>
     <!--<http realm="Contacts Realm" use-expressions="true">-->

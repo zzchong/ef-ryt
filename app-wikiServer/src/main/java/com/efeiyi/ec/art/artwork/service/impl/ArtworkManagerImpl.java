@@ -34,7 +34,6 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),id);
 
-//        User currentUser = (User) baseManager.getObject(User.class.getName(),currentUserId);
         User currentUser = AuthorizationUtil.getUser();
         try {
 

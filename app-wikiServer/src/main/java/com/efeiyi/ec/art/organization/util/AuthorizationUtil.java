@@ -58,5 +58,15 @@ public class AuthorizationUtil {
         }
     }
 
+   public static String getUserId(){
+       SecurityContext securityContext = SecurityContextHolder.getContext();
+       Authentication authentication = securityContext.getAuthentication();
+       try {
+           MyUser myUser = (MyUser) authentication.getPrincipal();
+           return myUser.getId();
+       }catch (Exception e){
+           return "";
+       }
 
+   }
 }

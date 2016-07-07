@@ -6,6 +6,7 @@ import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.p.PConst;
@@ -57,22 +58,13 @@ public class HArtWorkController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
-                    "".equals(jsonObj.getString("timestamp"))
-                    ) {
-                return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-            }
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
-            }
-            User user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+
+//            User user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+            User user = AuthorizationUtil.getUser();
+            String userId = user==null?"":user.getId();
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("user",user);//响应的用户信息
-            resultMap.put("url","http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+URL+"?userId="+jsonObj.getString("userId"));
+            resultMap.put("url","http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+URL+"?userId="+userId);
             System.out.println(request.getServerName()+"-----"+request.getServerPort()+"-----"+request.getContextPath());
         } catch(Exception e){
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);

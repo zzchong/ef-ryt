@@ -7,6 +7,7 @@ import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ConvertArtWork;
 import com.efeiyi.ec.art.organization.model.*;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
@@ -1033,12 +1034,12 @@ public class ProfileController extends BaseController {
             String type = jsonObj.getString("type");
             String index = jsonObj.getString("pageIndex");
             String size = jsonObj.getString("pageSize");
-            String currentId = jsonObj.getString("currentId");
+//            String currentId = jsonObj.getString("currentId");
             treeMap.put("userId", userId);
             treeMap.put("type", type);
             treeMap.put("pageIndex", index);
             treeMap.put("pageSize", size);
-            treeMap.put("currentId", currentId);
+//            treeMap.put("currentId", currentId);
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (!verify) {
@@ -1047,7 +1048,7 @@ public class ProfileController extends BaseController {
 
 
             Map<String,Object> data = new HashMap<>();
-            User user = (User)baseManager.getObject(User.class.getName(),currentId);
+            User user = AuthorizationUtil.getUser();
             List<String> list = new ArrayList<>();
             if(user!=null) {
                 if (user.getArtWorkPraiseList() != null && user.getArtWorkPraiseList().size() > 0) {

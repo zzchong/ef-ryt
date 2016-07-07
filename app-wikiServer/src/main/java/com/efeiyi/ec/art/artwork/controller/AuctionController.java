@@ -70,10 +70,10 @@ public class AuctionController extends BaseController {
             artworkList = messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
             for (Object artwork : artworkList) {
                 Artwork artworkTemp = (Artwork) artwork;
-                if(artworkTemp.getPicture_url()!=null) {
-                    artworkTemp.setHeight(ImgUtil.getHeight(artworkTemp.getPicture_url()));
-                    artworkTemp.setWidth(ImgUtil.getWidth(artworkTemp.getPicture_url()));
-                }
+//                if(artworkTemp.getPicture_url()!=null) {
+//                    artworkTemp.setHeight(ImgUtil.getHeight(artworkTemp.getPicture_url()));
+//                    artworkTemp.setWidth(ImgUtil.getWidth(artworkTemp.getPicture_url()));
+//                }
                 XQuery xQuery = new XQuery("listArtworkBidding_default", request);
                 xQuery.put("artwork_id", artworkTemp.getId());
                 List artworkBiddingList = baseManager.listObject(xQuery);

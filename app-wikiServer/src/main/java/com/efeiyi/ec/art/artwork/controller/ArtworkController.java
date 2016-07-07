@@ -126,7 +126,6 @@ public class ArtworkController extends BaseController {
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
             treeMap.put("pageNum", jsonObj.getString("pageNum"));
-//            treeMap.put("userId",jsonObj.getString("userId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -142,30 +141,20 @@ public class ArtworkController extends BaseController {
             List<ArtWorkPraiseBean> objectList = new ArrayList<>();
             LinkedHashMap<String,Object> map = new LinkedHashMap<>();
             map.put("userId", userId);
-//            ArtWorkPraiseBean artWorkPraiseBean = null;
-
             for (Artwork artwork : artworkList) {
-
-//                artWorkPraiseBean = new ArtWorkPraiseBean();
-//                artwork.setInvestRestTime(TimeUtil.getDistanceTimes2(artwork.getInvestEndDatetime(), new Date(), "", TimeUtil.MIN).get("time").toString());
                 artwork.setInvestRestTime(TimeUtil.getDistanceTimes(artwork.getInvestEndDatetime(),new Date()));
-                if(artwork.getPicture_url()!=null) {
-                    artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
-                    artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
-                }
+//                if(artwork.getPicture_url()!=null) {
+//                    artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
+//                    artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
+//                }
                 map.put("artworkId",artwork.getId());
                 List<Long> count = (List<Long>) baseManager.listObject(sql,map);
                 if(count.get(0)==0) {
                     artwork.setPraise(false);
-//                    artWorkPraiseBean.setPraise(false);
                 }
                 else {
                     artwork.setPraise(true);
-//                    artWorkPraiseBean.setPraise(true);
                 }
-
-//                artWorkPraiseBean.setArtwork(artwork);
-//                objectList.add(artWorkPraiseBean);
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             if (artworkList != null && !artworkList.isEmpty()) {
@@ -213,17 +202,18 @@ public class ArtworkController extends BaseController {
             if (artwork == null) {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
             }
+//            //浏览次数
+//            artwork.setViewNum(artwork.getViewNum()+1);
+//            baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
             //投资人
             List<User> investPeople = null;
             LinkedHashMap<String, Object> params = new LinkedHashMap<>();
             params.put("artworkId", jsonObj.getString("artWorkId"));
             List<ArtworkInvest> artworkInvestList = (List<ArtworkInvest>) baseManager.listObject(AppConfig.SQL_INVEST_TOP, params);
-//            xQuery = new XQuery("listArtworkInvest1_default", request);
             //投资人数
             Integer investNum = 0;
             investNum = artwork.getInvestNum();
             if (artworkInvestList != null) {
-//                investNum = artworkInvestList.size();
                 investPeople = new ArrayList<>();
                 if (artworkInvestList.size() != 0) {
                     for (ArtworkInvest artworkInvest : artworkInvestList) {
@@ -240,10 +230,10 @@ public class ArtworkController extends BaseController {
             }
             //项目文件
             List<ArtworkAttachment> artworkAttachmentList = artwork.getArtworkAttachment();
-            for (ArtworkAttachment artworkAttachment : artworkAttachmentList){
-                artworkAttachment.setWidth(ImgUtil.getWidth(artworkAttachment.getFileName()));
-                artworkAttachment.setHeight(ImgUtil.getHeight(artworkAttachment.getFileName()));
-            }
+//            for (ArtworkAttachment artworkAttachment : artworkAttachmentList){
+//                artworkAttachment.setWidth(ImgUtil.getWidth(artworkAttachment.getFileName()));
+//                artworkAttachment.setHeight(ImgUtil.getHeight(artworkAttachment.getFileName()));
+//            }
             //项目制作过程说明、融资解惑
             Artworkdirection artworkdirection = artwork.getArtworkdirection();
 
@@ -458,11 +448,10 @@ public class ArtworkController extends BaseController {
         /**investorArtWorkView.do测试加密参数**/
         map.put("artworkId", "qydeyugqqiugd2");
         map.put("timestamp", timestamp);
-        map.put("currentUserId", "ieatht97wfw30hfd");
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
         map.put("signmsg", signmsg);
-        String url = "http://192.168.1.41:8085/app/artworkPraise.do";
+        String url = "http://192.168.1.80:8080/app/investorArtWorkView.do";
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader("Content-Type", "application/json;charset=utf-8");
         System.out.println("url:  " + url);

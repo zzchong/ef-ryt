@@ -13,6 +13,7 @@ import com.efeiyi.ec.art.model.Message;
 import com.efeiyi.ec.art.model.Notification;
 import com.efeiyi.ec.art.modelConvert.ArtworkCommentBean;
 import com.efeiyi.ec.art.modelConvert.FatherArtworkCommentBean;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.dao.XdoDao;
 import com.ming800.core.base.service.BaseManager;
@@ -75,37 +76,37 @@ public class MessageController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
-                logBean.setResultCode("10001");
-                logBean.setMsg("必选参数为空，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                resultMap.put("resultCode", "10001");
-                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
-                return resultMap;
-            }
-            //校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                logBean.setResultCode("10002");
-                logBean.setMsg("参数校验不合格，请仔细检查");
-                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
-                return resultMap;
-            }
+//            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
+//                logBean.setResultCode("10001");
+//                logBean.setMsg("必选参数为空，请仔细检查");
+//                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+//                resultMap.put("resultCode", "10001");
+//                resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+//                return resultMap;
+//            }
+//            //校验数字签名
+//            String signmsg = jsonObj.getString("signmsg");
+//            treeMap.put("userId", jsonObj.getString("userId"));
+//            treeMap.put("timestamp", jsonObj.getString("timestamp"));
+//            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+//            if (verify != true) {
+//                logBean.setResultCode("10002");
+//                logBean.setMsg("参数校验不合格，请仔细检查");
+//                baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
+//                resultMap.put("resultCode", "10002");
+//                resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
+//                return resultMap;
+//            }
             //查询数据参数
-            String userId = jsonObj.getString("userId");
+            String userId = AuthorizationUtil.getUserId();
 
             try {
                 if ("".equals(userId)) {
-                    logBean.setResultCode("10001");
-                    logBean.setMsg("必选参数为空，请仔细检查");
+                    logBean.setResultCode("10002");
+                    logBean.setMsg("用户名不存在");
                     baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                    resultMap.put("resultCode", "10001");
-                    resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                    resultMap.put("resultCode", "10002");
+                    resultMap.put("resultMsg", "用户名不存在");
                     return resultMap;
                 }
                 //私信 未读数
@@ -177,7 +178,6 @@ public class MessageController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             treeMap.put("group", jsonObj.getString("group"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
@@ -190,15 +190,15 @@ public class MessageController extends BaseController {
                 return resultMap;
             }
             //查询数据参数
-            String userId = jsonObj.getString("userId");
+            String userId = AuthorizationUtil.getUserId();
 
             try {
                 if ("".equals(userId)) {
-                    logBean.setResultCode("10001");
-                    logBean.setMsg("必选参数为空，请仔细检查");
+                    logBean.setResultCode("10002");
+                    logBean.setMsg("用户名不存在");
                     baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                    resultMap.put("resultCode", "10001");
-                    resultMap.put("resultMsg", "必选参数为空，请仔细检查");
+                    resultMap.put("resultCode", "10002");
+                    resultMap.put("resultMsg", "用户名不存在");
                     return resultMap;
                 }
                 String group = (String) treeMap.get("group");
@@ -350,7 +350,6 @@ public class MessageController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("type", jsonObj.getString("type"));
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
             treeMap.put("pageNum", jsonObj.getString("pageNum"));
@@ -364,9 +363,11 @@ public class MessageController extends BaseController {
                 resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
                 return resultMap;
             }
+
+            String userId = AuthorizationUtil.getUserId();
             //查询数据参数
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("userId", jsonObj.getString("userId"));
+            map.put("userId", userId);
 
             //0 通知 1 评价 2 私信
             String type = jsonObj.getString("type");
@@ -381,13 +382,13 @@ public class MessageController extends BaseController {
                     resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                     return resultMap;
                 } else if ("0".equals(type)) {
-                    String hql = "from Notification WHERE targetUser.id=" + "'" + jsonObj.getString("userId").toString() + "'" + " AND status<>'0'  order by isWatch asc,createDatetime desc";
+                    String hql = "from Notification WHERE targetUser.id=" + "'" + userId + "'" + " AND status<>'0'  order by isWatch asc,createDatetime desc";
                     objectList = (List<Notification>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
-                    updateWatch(request,"listNotification_default",jsonObj.getString("userId"),"");
+                    updateWatch(request,"listNotification_default",userId,"");
 //                    objectList =  (List<Notification>)baseManager.listObject(AppConfig.SQL_NOTICE_GET_APP, map);
                 } else if ("1".equals(type)) {
                     objectList = new ArrayList();
-                    String hql = "from ArtworkComment WHERE fatherComment.creator.id= " + "'" + jsonObj.getString("userId").toString() + "'" + " AND status<>'0'  order by isWatch asc, createDatetime desc";
+                    String hql = "from ArtworkComment WHERE fatherComment.creator.id= " + "'" + userId + "'" + " AND status<>'0'  order by isWatch asc, createDatetime desc";
                     List<ArtworkComment> objectTempList = (List<ArtworkComment>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
                     for (ArtworkComment artworkComment : objectTempList) {
                         ArtworkCommentBean artworkCommentBean = new ArtworkCommentBean();
@@ -404,7 +405,7 @@ public class MessageController extends BaseController {
                         BeanUtils.copyProperties(artworkCommentBean, artworkComment);
                         artworkCommentBean.setFatherArtworkCommentBean(fatherArtworkCommentBean);
                         objectList.add(artworkCommentBean);
-                        updateWatch(request,"listArtworkComment_default",jsonObj.getString("userId"),"");
+                        updateWatch(request,"listArtworkComment_default",userId,"");
                     }
                 } else if ("2".equals(type)) {
                     objectList = new ArrayList();
@@ -422,7 +423,7 @@ public class MessageController extends BaseController {
                     for (int i = 0; i < objectTempList.size(); i++) {
                         Message message = objectTempList.get(i);
                         maptemp.put("fromUserId",message.getFromUser().getId());
-                        maptemp.put("userId",jsonObj.getString("userId"));
+                        maptemp.put("userId",userId);
                         List<Message> objectMessageList = (List<Message>) baseManager.listObject(AppConfig.SQL_LSAT_MESSAGE, maptemp);
                         if(objectMessageList!=null)
                             message.setContent(objectMessageList.get(0).getContent());
@@ -503,7 +504,6 @@ public class MessageController extends BaseController {
             }
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));//当前用户
             treeMap.put("fromUserId", jsonObj.getString("fromUserId"));//私信用户
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
@@ -515,9 +515,10 @@ public class MessageController extends BaseController {
                 resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
                 return resultMap;
             }
+            String userId = AuthorizationUtil.getUserId();
             //查询数据参数
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("userId", jsonObj.getString("userId"));
+            map.put("userId", userId);
             map.put("fromUserId", jsonObj.getString("fromUserId"));
 
             //查询结果
@@ -529,7 +530,7 @@ public class MessageController extends BaseController {
                     logBean.setResultCode("0");
                     logBean.setMsg("成功");
                     baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
-                    updateWatch(request,"listMessage1_default",jsonObj.getString("userId"),jsonObj.getString("fromUserId"));
+                    updateWatch(request,"listMessage1_default",userId,jsonObj.getString("fromUserId"));
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
                     resultMap.put("objectList", objectList);
