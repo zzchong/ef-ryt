@@ -8,6 +8,7 @@ import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
@@ -65,7 +66,7 @@ public class UserMainController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
-            if (!CommonUtil.jsonObject(jsonObj,"currentId")) {
+            if (!CommonUtil.jsonObject(jsonObj)) {
                 return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
 
@@ -74,7 +75,7 @@ public class UserMainController extends BaseController {
                 return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 
-            String currentId = jsonObj.getString("currentId");
+            String currentId = AuthorizationUtil.getUserId();
             String userId = jsonObj.getString("userId");
             User user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
 

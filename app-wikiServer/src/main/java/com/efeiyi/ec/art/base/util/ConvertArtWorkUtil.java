@@ -21,15 +21,17 @@ public class ConvertArtWorkUtil {
         convert.setNum(followedList <= 0 ? 0 : followedList);
         convert.setYield(reward);
         convert.setSumInvestment(sumInvestsMoney);
-        List<ConvertWork> list = new ArrayList<ConvertWork>();
+//        List<ConvertWork> list = new ArrayList<ConvertWork>();
+        List<Artwork> list = new ArrayList<Artwork>();
         if (invests != null && invests.size() > 0) {
             for (int i = 0; i < invests.size(); i++) {
                 Artwork artwork = invests.get(i).getArtwork();
-                ConvertWork work = artWork(artwork, investMoney.get(i));
-                list.add(work);
+//                ConvertWork work = artWork(artwork, investMoney.get(i));
+                artwork.setInvestsMoney(investMoney.get(i));
+                list.add(artwork);
             }
         }
-        convert.setArtworks(list);
+        convert.setArtworkList(list);
         convert.setUser(user);
         return convert;
     }

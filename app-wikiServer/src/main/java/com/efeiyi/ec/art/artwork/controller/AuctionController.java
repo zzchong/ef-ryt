@@ -133,11 +133,11 @@ public class AuctionController extends BaseController {
             //当前用户
 
             //增加浏览数
-            if (artwork.getViewNum() == null) {
-                artwork.setViewNum(1);
-            } else {
-                artwork.setViewNum(artwork.getViewNum() + 1);
-            }
+//            if (artwork.getViewNum() == null) {
+//                artwork.setViewNum(1);
+//            } else {
+//                artwork.setViewNum(artwork.getViewNum() + 1);
+//            }
             baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
             //竞价记录
             XQuery xQuery = new XQuery("listArtworkBidding_default", request);

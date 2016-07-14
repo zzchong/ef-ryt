@@ -25,10 +25,9 @@ public interface ArtworkManager {
      * @param id
      * @param content
      * @param fatherCommentId
-     * @param currentUserId
      * @return
      */
-    boolean  saveArtWorkComment(String id,String content,String fatherCommentId,String currentUserId,String messageId);
+    boolean  saveArtWorkComment(String id,String content,String fatherCommentId,String messageId);
 
     ConsumerAddress saveConsumerAddress(JSONObject jsonObject,HttpServletRequest request) throws Exception;
 

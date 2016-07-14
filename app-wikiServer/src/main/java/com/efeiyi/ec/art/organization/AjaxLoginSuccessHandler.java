@@ -59,7 +59,7 @@ public class AjaxLoginSuccessHandler implements AuthenticationSuccessHandler {
             //成功为0
             JSONObject jsonData = new JSONObject(map);
             objectMapper.writeValue(jsonGenerator, jsonData);
-            CookieUtil.addCookie(response,"active","yes",-1);
+            CookieUtil.addCookie(response,"active","yes",5*365*24*60*60);
         } catch (JsonProcessingException ex) {
             throw new HttpMessageNotWritableException("Could not write JSON: " + ex.getMessage(), ex);
         }

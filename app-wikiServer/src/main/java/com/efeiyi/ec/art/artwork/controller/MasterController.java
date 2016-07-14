@@ -103,7 +103,7 @@ public class MasterController extends BaseController {
             map.put("createYear",request.getParameter("createYear"));
             map.put("timestamp",request.getParameter("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(map,request.getParameter("signmsg"));
-            if (verify != true) {
+            if (!verify) {
                 return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
 

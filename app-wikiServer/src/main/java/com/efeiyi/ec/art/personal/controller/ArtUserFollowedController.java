@@ -12,6 +12,7 @@ import com.efeiyi.ec.art.model.Master;
 import com.efeiyi.ec.art.model.UserBrief;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
@@ -395,16 +396,16 @@ public class ArtUserFollowedController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             if (!"".equals(jsonObj.getString("identifier"))) {
-                if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("followId")) ||
-                        "".equals(jsonObj.getString("userId")) || "".equals(jsonObj.getString("followType"))) {
+                if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("followId"))
+                      || "".equals(jsonObj.getString("followType"))) {
                     return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
                 }
                 String signmsg = jsonObj.getString("signmsg");
-                String userId = jsonObj.getString("userId");
+                String userId = AuthorizationUtil.getUserId();
                 String followId = jsonObj.getString("followId");
                 String identifier = jsonObj.getString("identifier");
                 String followType = jsonObj.getString("followType");
-                treeMap.put("userId", userId);
+//                treeMap.put("userId", userId);
                 treeMap.put("followId", followId);
                 treeMap.put("identifier", identifier);
                 treeMap.put("followType", followType);
@@ -440,7 +441,7 @@ public class ArtUserFollowedController extends BaseController {
                     baseManager.saveOrUpdate(ArtUserFollowed.class.getName(), userFollowed);
                     resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("artUserFollowed", userFollowed);
-                    resultMap.put("flag","2");
+                    resultMap.put("flag","0");
                 }
             } else {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);

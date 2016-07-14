@@ -784,7 +784,7 @@ public class ProfileController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             String signmsg = jsonObj.getString("signmsg");
-            String currentId = jsonObj.getString("currentId");
+//            String currentId = jsonObj.getString("currentId");
             String userId = jsonObj.getString("userId");
             String index = jsonObj.getString("pageIndex");
             String size = jsonObj.getString("pageSize");
@@ -794,7 +794,7 @@ public class ProfileController extends BaseController {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             treeMap.put("userId", userId);
-            treeMap.put("currentId", currentId);
+//            treeMap.put("currentId", currentId);
             treeMap.put("pageIndex", index);
             treeMap.put("pageSize", size);
             treeMap.put("timestamp", timestamp);
@@ -803,7 +803,7 @@ public class ProfileController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             User user = (User) baseManager.getObject(User.class.getName(), userId);
-
+            String currentId = AuthorizationUtil.getUserId();
             //关注列表
             XQuery beQuery = new XQuery("listArtUserFollowed_followed", request);
             beQuery.put("user_id", userId);
@@ -885,7 +885,6 @@ public class ProfileController extends BaseController {
 
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("pageInfo", convert);
-            System.out.print(convert);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
@@ -1048,7 +1047,7 @@ public class ProfileController extends BaseController {
 
 
             Map<String,Object> data = new HashMap<>();
-            User user = AuthorizationUtil.getUser();
+            User user = (User) baseManager.getObject(User.class.getName(),AuthorizationUtil.getUserId());
             List<String> list = new ArrayList<>();
             if(user!=null) {
                 if (user.getArtWorkPraiseList() != null && user.getArtWorkPraiseList().size() > 0) {
@@ -1190,6 +1189,7 @@ public class ProfileController extends BaseController {
             UserBrief userBrief = (UserBrief) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_BRIEF, map);
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("userBrief",userBrief);
+            resultMap.put("user",userBrief.getUser());
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }

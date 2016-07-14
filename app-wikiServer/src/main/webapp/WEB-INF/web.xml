@@ -90,6 +90,10 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <!--<session-config>-->
+        <!--<session-timeout>30</session-timeout>-->
+    <!--</session-config>-->
+
     <!-- 拦截匹配的请求，这里所有请求采用名字为dispatcher的DispatcherServlet处理 -->
     <servlet-mapping>
         <servlet-name>mvc-dispatcher</servlet-name>

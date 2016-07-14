@@ -276,6 +276,7 @@ public class Artwork implements Serializable {
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
+    @Where(clause = "status=1")
     public List<ArtWorkPraise> getArtWorkPraiseList() {
         return artWorkPraiseList;
     }

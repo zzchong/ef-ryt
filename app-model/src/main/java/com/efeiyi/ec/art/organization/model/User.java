@@ -5,10 +5,12 @@ package com.efeiyi.ec.art.organization.model;
 //import com.efeiyi.ec.zero.promotion.model.PromotionPlan;
 import com.efeiyi.ec.art.model.ArtWorkPraise;
 import com.efeiyi.ec.art.model.Master;
+import com.efeiyi.ec.art.model.MasterWork;
 import com.efeiyi.ec.art.model.UserBrief;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -36,7 +38,9 @@ public class User {
     private Integer sex;
     private UserBrief userBrief;//简介和 签名
     private List<ArtWorkPraise> artWorkPraiseList;//点赞项目
+    private  List<MasterWork> masterWorkList;//作品
 
+    private Integer masterWorkNum=0;
     @OneToOne(mappedBy="user",fetch=FetchType.LAZY)
     @JoinColumn(name = "master_id")
     public Master getMaster() {
@@ -221,5 +225,25 @@ public class User {
         this.artWorkPraiseList = artWorkPraiseList;
     }
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "creator")
+    @Where(clause = "status=1")
+    public List<MasterWork> getMasterWorkList() {
+        return masterWorkList;
+    }
 
+    public void setMasterWorkList(List<MasterWork> masterWorkList) {
+        this.masterWorkList = masterWorkList;
+    }
+
+    @Transient
+    public Integer getMasterWorkNum() {
+        if(masterWorkList!=null)
+            masterWorkNum = masterWorkList.size();
+        return masterWorkNum;
+    }
+
+    public void setMasterWorkNum(Integer masterWorkNum) {
+        this.masterWorkNum = masterWorkNum;
+    }
 }

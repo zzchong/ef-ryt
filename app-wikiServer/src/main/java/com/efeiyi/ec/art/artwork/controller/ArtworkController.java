@@ -10,6 +10,7 @@ import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestTopBean;
 import com.efeiyi.ec.art.modelConvert.ArtWorkPraiseBean;
+import com.efeiyi.ec.art.modelConvert.UserFollowedBean;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
@@ -48,6 +49,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.junit.*;
@@ -77,18 +79,104 @@ public class ArtworkController extends BaseController {
     public Map getArtWorkList(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
-//        response.setHeader("Access-Control-Allow-Origin","*");
-//        response.setHeader("Access-Control-Allow-Methods","GET");
-//        response.setHeader("Access-Control-Allow-Headers","x-requested-with,content-type");
         try {
-            XQuery query = new XQuery("plistArtwork_default", request);
-            PageInfo pageInfo = baseManager.listPageInfo(query);
-            List<Artwork> list = pageInfo.getList();
-            if (list != null && !list.isEmpty()) {
-                resultMap.put("responseInfo", list);
-            } else {
-                resultMap.put("responseInfo", null);
+
+            JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
+
+            List<Artwork> artworkList = null;
+            List<ArtWorkPraise> artWorkPraiseList = null;
+            List<ArtworkInvest> artworkInvestList = null;
+
+            User user = AuthorizationUtil.getUser();
+
+            PageEntity pageEntity = new PageEntity();
+            pageEntity.setIndex(jsonObject.getInteger("index"));
+            pageEntity.setSize(jsonObject.getInteger("size"));
+
+
+            String type = jsonObject.getString("type");
+            String step = jsonObject.getString("step");
+
+            String action = jsonObject.getString("action");
+
+            if(action.equals("index")){
+                XQuery query = new XQuery("plistArtwork_default", request);
+                query.setPageEntity(pageEntity);
+                query.put("type",type);
+                query.put("step",step);
+                artworkList = baseManager.listPageInfo(query).getList();
+
+            }else if(action.equals("userMain")){
+                XQuery query = new XQuery("plistArtwork_default",request);
+                query.setPageEntity(pageEntity);
+                query.put("author_id",user.getId());
+                artworkList = baseManager.listPageInfo(query).getList();
+
+            }else if(action.equals("invest")){
+                artworkList = new ArrayList<>();
+                XQuery query = new XQuery("plistArtworkInvest_default",request);
+                query.setPageEntity(pageEntity);
+                query.put("creator_id",user.getId());
+                artworkInvestList = baseManager.listPageInfo(query).getList();
+                for (ArtworkInvest artworkInvest : artworkInvestList){
+                    artworkList.add(artworkInvest.getArtwork());
+                }
+
+            }else if(action.equals(("praise"))){
+                artworkList = new ArrayList<>();
+                XQuery query = new XQuery("plistArtworkPraise_default",request);
+                query.setPageEntity(pageEntity);
+                query.put("user_id",user.getId());
+                artWorkPraiseList = baseManager.listPageInfo(query).getList();
+                for (ArtWorkPraise artWorkPraise : artWorkPraiseList){
+                    artworkList.add(artWorkPraise.getArtwork());
+                }
             }
+
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+            String str1 = sdf.format(new Date());
+            LinkedHashMap<String,Object> map = new LinkedHashMap<>();
+            map.put("userId", user.getId());
+            for(Artwork artwork : artworkList){
+                map.put("artworkId",artwork.getId());
+                List<Long> count = (List<Long>) baseManager.listObject("SELECT COUNT(1) FROM ArtWorkPraise m where user.id=:userId and artwork.id=:artworkId and status !='0'",map);
+                if(count.get(0)==0) {
+                    artwork.setPraise(false);
+                }
+                else {
+                    artwork.setPraise(true);
+                }
+
+                if (artwork.getArtworkMessages() != null && artwork.getArtworkMessages().size() > 0) {
+                    artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1, sdf.format(artwork.getArtworkMessages().get(0).getCreateDatetime())));
+                } else {
+                    artwork.setNewCreationDate("暂无更新状态");
+                }
+
+
+                XQuery xQuery = new XQuery("listArtworkBidding_default", request);
+                xQuery.put("artwork_id", artwork.getId());
+                List artworkBiddingList = baseManager.listObject(xQuery);
+                //出价次数 当前价格 几分钟前
+                if (artworkBiddingList != null && !artworkBiddingList.isEmpty()) {
+                    artwork.setAuctionNum(artworkBiddingList.size());
+                    ArtworkBidding artworkBiddingTemp = ((ArtworkBidding) artworkBiddingList.get(0));
+                    artwork.setNewBidingPrice(artworkBiddingTemp.getPrice());
+                    String str2 = sdf.format(artworkBiddingTemp.getCreateDatetime());
+                    artwork.setNewBiddingDate(TimeUtil.getDistanceTimes(str1, str2));
+                }
+                if ("3".equals(artwork.getType()) && "32".equals(artwork.getStep())) {//拍卖已经结束
+                    if (artwork.getWinner() == null || artwork.getWinner().getId() == null) {
+                        artwork.setWinner(null); //设置竞拍得主为空
+                    }
+                } else {
+                    artwork.setWinner(null); //设置竞拍得主为空
+                }
+
+            }
+
+
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "成功");
         } catch (Exception e) {
@@ -202,9 +290,13 @@ public class ArtworkController extends BaseController {
             if (artwork == null) {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
             }
-//            //浏览次数
-//            artwork.setViewNum(artwork.getViewNum()+1);
-//            baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+            //增加浏览数
+            if (artwork.getViewNum() == null) {
+                artwork.setViewNum(1);
+            } else {
+                artwork.setViewNum(artwork.getViewNum() + 1);
+            }
+            baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
             //投资人
             List<User> investPeople = null;
             LinkedHashMap<String, Object> params = new LinkedHashMap<>();
@@ -220,6 +312,31 @@ public class ArtworkController extends BaseController {
                         investPeople.add(artworkInvest.getCreator());
                     }
                 }
+            }
+
+            List<UserFollowedBean> userFollowedBeanList = new ArrayList<>();
+            //点赞列表
+            XQuery xQuery1 = new XQuery("listArtWorkPraise_byArtWorkId",request);
+            xQuery1.put("artwork_id",jsonObj.getString("artWorkId"));
+            List<ArtWorkPraise> artWorkPraiseList1 = baseManager.listObject(xQuery1);
+            UserFollowedBean userFollowedBean = null;
+            for (ArtWorkPraise artWorkPraise :artWorkPraiseList1){
+                 boolean isFollowed = false;
+                  userFollowedBean = new UserFollowedBean();
+                if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                    XQuery xQuery = new XQuery("listArtUserFollowed_isFollowed", request);
+                    xQuery.put("user_id", AuthorizationUtil.getUserId());
+                    xQuery.put("follower_id", artWorkPraise.getUser().getId());
+                    List<ArtUserFollowed> artUserFollowedList = baseManager.listObject(xQuery);
+                    if (artUserFollowedList != null) {
+                        if (artUserFollowedList.size() > 0) {
+                            isFollowed = true;
+                        }
+                    }
+                }
+                userFollowedBean.setUser(artWorkPraise.getUser());
+                userFollowedBean.setFollowed(isFollowed);
+                  userFollowedBeanList.add(userFollowedBean);
             }
 
             //剩余时间
@@ -250,14 +367,29 @@ public class ArtworkController extends BaseController {
                     }
                 }
             }
+
+            //是否关注
+            Boolean isFollowed = false;
+            if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                XQuery xQuery = new XQuery("listArtUserFollowed_isFollowed", request);
+                xQuery.put("user_id", AuthorizationUtil.getUserId());
+                xQuery.put("follower_id", artwork.getAuthor().getId());
+                List<ArtUserFollowed> artUserFollowedList = baseManager.listObject(xQuery);
+                if (artUserFollowedList != null) {
+                    if (artUserFollowedList.size() > 0) {
+                        isFollowed = true;
+                    }
+                }
+            }
             data.put("investPeople", investPeople);
             data.put("artWork", artwork);
             data.put("investNum", investNum);
             data.put("time", time);
             data.put("artworkdirection", artworkdirection);
             data.put("artworkAttachmentList", artworkAttachmentList);
+            data.put("artWorkPraiseList", userFollowedBeanList);
             data.put("isPraise", isPraise);
-
+            data.put("isFollowed",isFollowed);
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
 
             resultMap.put("object", data);
@@ -400,6 +532,48 @@ public class ArtworkController extends BaseController {
         return resultMap;
     }
 
+    /**
+     * 点赞列表
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/artworkPraiseList.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map artworkPraiseList(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        Map<String, Object> resultMap = new HashMap<>();
+        List objectList = null;
+        try {
+            JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObject.toString());
+            logBean.setApiName("artworkPraiseList");
+            if (!CommonUtil.jsonObject(jsonObject)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            if (!DigitalSignatureUtil.verify2(jsonObject)) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+
+            PageEntity pageEntity = new PageEntity();
+            pageEntity.setSize(jsonObject.getInteger("size"));
+            pageEntity.setIndex(jsonObject.getInteger("index"));
+
+            XQuery xQuery = new XQuery("plistArtWorkPraise_default",request);
+            xQuery.put("artwork_id",jsonObject.getString("artworkId"));
+            xQuery.setPageEntity(pageEntity);
+            List<ArtWorkPraise> artWorkPraiseList = baseManager.listPageInfo(xQuery).getList();
+            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+            resultMap.put("object",artWorkPraiseList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+        return resultMap;
+    }
 
     /**
      * 点赞
@@ -507,7 +681,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            if (artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("currentUserId"), jsonObject.getString("messageId"))) {
+            if (artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -688,12 +862,13 @@ public class ArtworkController extends BaseController {
             logBean.setApiName("initNewArtWork");
             if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
                     || "".equals(request.getParameter("title")) || "".equals(request.getParameter("brief")) || "".equals(request.getParameter("duration"))
-                    || "".equals(request.getParameter("userId")) || "".equals(request.getParameter("investGoalMoney"))) {
+                    || "".equals(request.getParameter("investGoalMoney"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
+
+            String userId = AuthorizationUtil.getUserId();
             //校验数字签名
             String signmsg = request.getParameter("signmsg");
-            treeMap.put("userId", request.getParameter("userId"));
 //            treeMap.put("artWorkId", request.getParameter("artWorkId"));
             treeMap.put("timestamp", request.getParameter("timestamp"));
             treeMap.put("title", request.getParameter("title"));
@@ -705,8 +880,10 @@ public class ArtworkController extends BaseController {
             }
 
             Artwork artwork = null;
-            User user = (User) baseManager.getObject(User.class.getName(), request.getParameter("userId"));
+//            User user = (User) baseManager.getObject(User.class.getName(), request.getParameter("userId"));
+            User user = AuthorizationUtil.getUser();
             try {
+
                 if (user != null && user.getId() != null) {
 
                     if (!StringUtils.isEmpty(request.getParameter("artWorkId"))) {

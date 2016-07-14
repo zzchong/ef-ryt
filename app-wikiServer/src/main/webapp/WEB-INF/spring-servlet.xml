@@ -32,32 +32,39 @@
             <mvc:exclude-mapping path="/app/shareViewWap.do"/>
             <mvc:exclude-mapping path="/app/shareView.do"/>
             <mvc:exclude-mapping path="/app/toShareView.do"/>
-            <!--<mvc:exclude-mapping path="/app/upgrade.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/investorIndex.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/artWorkCreationList.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/artWorkAuctionList.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/investorArtWorkView.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/investorArtWorkComment.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/investorArtWorkInvest.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/artWorkCreationView.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/my.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/followed.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/intro.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/userMain.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/userWork.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/retrievePassword.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/checkUserName.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/sendCode.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/artWorkAuctionView.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/plistArtworkBidding.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/artworkBid.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/getDefaultAddress.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/completeUserInfo.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/register.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/getInvestorTopList.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/getArtistTopList.do"/>-->
-            <!--<mvc:exclude-mapping path="/app/user.do"/>-->
             <bean class="com.efeiyi.ec.art.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/app/**"/>
+            <mvc:exclude-mapping path="/app/shareViewWap.do"/>
+            <mvc:exclude-mapping path="/app/shareView.do"/>
+            <mvc:exclude-mapping path="/app/toShareView.do"/>
+            <mvc:exclude-mapping path="/app/upgrade.do"/>
+            <mvc:exclude-mapping path="/app/investorIndex.do"/>
+            <mvc:exclude-mapping path="/app/artWorkCreationList.do"/>
+            <mvc:exclude-mapping path="/app/artWorkAuctionList.do"/>
+            <mvc:exclude-mapping path="/app/investorArtWorkView.do"/>
+            <mvc:exclude-mapping path="/app/investorArtWorkComment.do"/>
+            <mvc:exclude-mapping path="/app/investorArtWorkInvest.do"/>
+            <mvc:exclude-mapping path="/app/artWorkCreationView.do"/>
+            <mvc:exclude-mapping path="/app/my.do"/>
+            <mvc:exclude-mapping path="/app/followed.do"/>
+            <mvc:exclude-mapping path="/app/intro.do"/>
+            <mvc:exclude-mapping path="/app/userMain.do"/>
+            <mvc:exclude-mapping path="/app/userWork.do"/>
+            <mvc:exclude-mapping path="/app/retrievePassword.do"/>
+            <mvc:exclude-mapping path="/app/checkUserName.do"/>
+            <mvc:exclude-mapping path="/app/sendCode.do"/>
+            <mvc:exclude-mapping path="/app/artWorkAuctionView.do"/>
+            <mvc:exclude-mapping path="/app/plistArtworkBidding.do"/>
+            <mvc:exclude-mapping path="/app/artworkBid.do"/>
+            <mvc:exclude-mapping path="/app/getDefaultAddress.do"/>
+            <mvc:exclude-mapping path="/app/completeUserInfo.do"/>
+            <mvc:exclude-mapping path="/app/register.do"/>
+            <mvc:exclude-mapping path="/app/getInvestorTopList.do"/>
+            <mvc:exclude-mapping path="/app/getArtistTopList.do"/>
+            <mvc:exclude-mapping path="/app/user.do"/>
+            <bean class="com.efeiyi.ec.art.interceptor.AppInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
 

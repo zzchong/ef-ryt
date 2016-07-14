@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.modelConvert;
 
+import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.organization.model.User;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.List;
  */
 public class ConvertArtWork implements Serializable {
     private List<ConvertWork> artworks;
+    private List<Artwork> artworkList;
     private BigDecimal sumInvestment; //全部投资金额
     private BigDecimal yield; //投资收益
     private User user;
@@ -19,12 +21,29 @@ public class ConvertArtWork implements Serializable {
     private Boolean isFollowed;//是否被关注
     private  String artUserFollowId;//关注Id
 
+//    public List<ConvertWork> getArtworks() {
+//        return artworks;
+//    }
+//
+//    public void setArtworks(List<ConvertWork> artworks) {
+//        this.artworks = artworks;
+//    }
+
+
     public List<ConvertWork> getArtworks() {
         return artworks;
     }
 
     public void setArtworks(List<ConvertWork> artworks) {
         this.artworks = artworks;
+    }
+
+    public List<Artwork> getArtworkList() {
+        return artworkList;
+    }
+
+    public void setArtworkList(List<Artwork> artworkList) {
+        this.artworkList = artworkList;
     }
 
     public BigDecimal getSumInvestment() {

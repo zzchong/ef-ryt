@@ -85,16 +85,15 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
 
     @Override
-    public boolean saveArtWorkComment(String id, String content,String fatherCommentId,String currentUserId,String messageId) {
+    public boolean saveArtWorkComment(String id, String content,String fatherCommentId,String messageId) {
 
-        if(StringUtils.isEmpty(currentUserId) || StringUtils.isEmpty(id)) {
 
-            return  false;
-        }
+
+        String currentUserId =AuthorizationUtil.getUserId();
 
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), id);
 
-        User currentUser = (User)baseManager.getObject(User.class.getName(),currentUserId);
+        User currentUser = AuthorizationUtil.getUser();
 
         Map<String,Object> map = new HashMap();
 
