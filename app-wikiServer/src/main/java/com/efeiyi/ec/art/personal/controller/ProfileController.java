@@ -34,6 +34,7 @@ import org.jdom.output.XMLOutputter;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -733,6 +734,21 @@ public class ProfileController extends BaseController {
                 data.put("followNum",0);
 
 
+            //是否关注
+            Boolean isFollowed = false;
+            if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                XQuery xQuery = new XQuery("listArtUserFollowed_isFollowed", request);
+                xQuery.put("user_id", AuthorizationUtil.getUserId());
+                xQuery.put("follower_id", jsonObj.getString("userId"));
+                List<ArtUserFollowed> artUserFollowedList = baseManager.listObject(xQuery);
+                if (artUserFollowedList != null) {
+                    if (artUserFollowedList.size() > 0) {
+                        isFollowed = true;
+                    }
+                }
+            }
+
+
             //根据用户id获取投资记录
             XQuery xquery = new XQuery("listArtworkInvest_default", request);
             xquery.put("creator_id", userId);
@@ -755,6 +771,7 @@ public class ProfileController extends BaseController {
             }
 
             data.put("yield",reward);
+            data.put("isFollowed",isFollowed);
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("data", data);
         } catch (Exception e) {

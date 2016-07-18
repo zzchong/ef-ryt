@@ -83,15 +83,18 @@ public class ArtworkController extends BaseController {
 
             JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
 
+
+            Map<String,Object> paramMap = new HashMap<>();
+
             List<Artwork> artworkList = null;
             List<ArtWorkPraise> artWorkPraiseList = null;
             List<ArtworkInvest> artworkInvestList = null;
 
-            User user = AuthorizationUtil.getUser();
+            User user = (User) baseManager.getObject(User.class.getName(),jsonObject.getString("userId"));
 
             PageEntity pageEntity = new PageEntity();
-            pageEntity.setIndex(jsonObject.getInteger("index"));
-            pageEntity.setSize(jsonObject.getInteger("size"));
+            pageEntity.setIndex(jsonObject.getInteger("pageIndex"));
+            pageEntity.setSize(jsonObject.getInteger("pageSize"));
 
 
             String type = jsonObject.getString("type");
@@ -99,86 +102,94 @@ public class ArtworkController extends BaseController {
 
             String action = jsonObject.getString("action");
 
-            if(action.equals("index")){
+            if("index".equals(action)){
                 XQuery query = new XQuery("plistArtwork_default", request);
                 query.setPageEntity(pageEntity);
                 query.put("type",type);
                 query.put("step",step);
                 artworkList = baseManager.listPageInfo(query).getList();
 
-            }else if(action.equals("userMain")){
+            }else if("userMain".equals(action)){
                 XQuery query = new XQuery("plistArtwork_default",request);
                 query.setPageEntity(pageEntity);
                 query.put("author_id",user.getId());
                 artworkList = baseManager.listPageInfo(query).getList();
 
-            }else if(action.equals("invest")){
+            }else if("invest".equals(action)){
                 artworkList = new ArrayList<>();
-                XQuery query = new XQuery("plistArtworkInvest_default",request);
+                XQuery query = new XQuery("plistArtworkInvest_byUser",request);
                 query.setPageEntity(pageEntity);
                 query.put("creator_id",user.getId());
                 artworkInvestList = baseManager.listPageInfo(query).getList();
                 for (ArtworkInvest artworkInvest : artworkInvestList){
                     artworkList.add(artworkInvest.getArtwork());
                 }
-
-            }else if(action.equals(("praise"))){
+//                //当前用户的投资金额
+//                LinkedHashMap<String,Object> investParam = new LinkedHashMap<>();
+//                investParam.put("userId",AuthorizationUtil.getUserId());
+//                BigDecimal investTotal = (BigDecimal) baseManager.listObject(AppConfig.SQL_INVEST_TOTAL,investParam).get(0);
+//                //当前用户的回报金额
+//                BigDecimal rewardTotal = (BigDecimal) baseManager.listObject(AppConfig.SQL_REWARD_TOTAL,investParam).get(0);
+//                paramMap.put("artworkList",artworkList);
+//                paramMap.put("investTotal",investTotal==null?0:investTotal);
+//                paramMap.put("rewardTotal",rewardTotal==null?0:rewardTotal);
+//                paramMap.put("author",AuthorizationUtil.getUser());
+            }else if("praise".equals(action)){
                 artworkList = new ArrayList<>();
-                XQuery query = new XQuery("plistArtworkPraise_default",request);
+                XQuery query = new XQuery("plistArtWorkPraise_byUser",request);
                 query.setPageEntity(pageEntity);
                 query.put("user_id",user.getId());
                 artWorkPraiseList = baseManager.listPageInfo(query).getList();
                 for (ArtWorkPraise artWorkPraise : artWorkPraiseList){
                     artworkList.add(artWorkPraise.getArtwork());
                 }
-            }
-
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-            String str1 = sdf.format(new Date());
-            LinkedHashMap<String,Object> map = new LinkedHashMap<>();
-            map.put("userId", user.getId());
-            for(Artwork artwork : artworkList){
-                map.put("artworkId",artwork.getId());
-                List<Long> count = (List<Long>) baseManager.listObject("SELECT COUNT(1) FROM ArtWorkPraise m where user.id=:userId and artwork.id=:artworkId and status !='0'",map);
-                if(count.get(0)==0) {
-                    artwork.setPraise(false);
-                }
-                else {
-                    artwork.setPraise(true);
-                }
-
-                if (artwork.getArtworkMessages() != null && artwork.getArtworkMessages().size() > 0) {
-                    artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1, sdf.format(artwork.getArtworkMessages().get(0).getCreateDatetime())));
-                } else {
-                    artwork.setNewCreationDate("暂无更新状态");
-                }
-
-
-                XQuery xQuery = new XQuery("listArtworkBidding_default", request);
-                xQuery.put("artwork_id", artwork.getId());
-                List artworkBiddingList = baseManager.listObject(xQuery);
-                //出价次数 当前价格 几分钟前
-                if (artworkBiddingList != null && !artworkBiddingList.isEmpty()) {
-                    artwork.setAuctionNum(artworkBiddingList.size());
-                    ArtworkBidding artworkBiddingTemp = ((ArtworkBidding) artworkBiddingList.get(0));
-                    artwork.setNewBidingPrice(artworkBiddingTemp.getPrice());
-                    String str2 = sdf.format(artworkBiddingTemp.getCreateDatetime());
-                    artwork.setNewBiddingDate(TimeUtil.getDistanceTimes(str1, str2));
-                }
-                if ("3".equals(artwork.getType()) && "32".equals(artwork.getStep())) {//拍卖已经结束
-                    if (artwork.getWinner() == null || artwork.getWinner().getId() == null) {
-                        artwork.setWinner(null); //设置竞拍得主为空
-                    }
-                } else {
-                    artwork.setWinner(null); //设置竞拍得主为空
-                }
 
             }
 
+
+
+            paramMap.put("artworkList",artworkList);
 
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "成功");
+            resultMap.put("data",paramMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+        }
+
+        return resultMap;
+    }
+
+    //
+    @RequestMapping(value = "/app/inform.do")
+    @ResponseBody
+    public Map isFollowed(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        try {
+
+            JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
+            Map<String,Object> paramMap = new HashMap<>();
+
+            //是否关注
+            Boolean isFollowed = false;
+            if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                XQuery xQuery = new XQuery("listArtUserFollowed_isFollowed", request);
+                xQuery.put("user_id", AuthorizationUtil.getUserId());
+                xQuery.put("follower_id", jsonObject.getString("userId"));
+                List<ArtUserFollowed> artUserFollowedList = baseManager.listObject(xQuery);
+                if (artUserFollowedList != null) {
+                    if (artUserFollowedList.size() > 0) {
+                        isFollowed = true;
+                    }
+                }
+            }
+            paramMap.put("isFollowed",isFollowed);
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "成功");
+            resultMap.put("data",paramMap);
         } catch (Exception e) {
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -491,7 +502,7 @@ public class ArtworkController extends BaseController {
             List<ArtworkInvest> artworkInvestTopTempList;
 
 
-            XQuery xQuery = new XQuery("plistArtworkInvest_default", request);
+            XQuery xQuery = new XQuery("plistArtworkInvest_byArtWork", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
             PageEntity pageEntity = new PageEntity();
             pageEntity.setSize(jsonObj.getInteger("pageSize"));

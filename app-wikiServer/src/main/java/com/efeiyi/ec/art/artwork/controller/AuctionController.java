@@ -65,6 +65,8 @@ public class AuctionController extends BaseController {
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
+
+            Map paramMap = new HashMap<>();
             //项目信息
             String hql = "from Artwork WHERE 1=1 and status = '1' and type = '3' order by investStartDatetime asc";
             artworkList = messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
@@ -95,8 +97,10 @@ public class AuctionController extends BaseController {
                     artworkTemp.setWinner(null); //设置竞拍得主为空
                 }
             }
+
+            paramMap.put("artworkList",artworkList);
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-            resultMap.put("objectList", artworkList);
+            resultMap.put("data", paramMap);
         } catch (Exception e) {
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
