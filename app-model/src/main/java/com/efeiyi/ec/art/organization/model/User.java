@@ -3,10 +3,7 @@ package com.efeiyi.ec.art.organization.model;
 
 
 //import com.efeiyi.ec.zero.promotion.model.PromotionPlan;
-import com.efeiyi.ec.art.model.ArtWorkPraise;
-import com.efeiyi.ec.art.model.Master;
-import com.efeiyi.ec.art.model.MasterWork;
-import com.efeiyi.ec.art.model.UserBrief;
+import com.efeiyi.ec.art.model.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
@@ -40,7 +37,10 @@ public class User {
     private List<ArtWorkPraise> artWorkPraiseList;//点赞项目
     private  List<MasterWork> masterWorkList;//作品
 
-    private Integer masterWorkNum=0;
+    private  List<ArtUserFollowed> artUserFollowedList;//粉丝列表
+
+    private Integer masterWorkNum=0;//作品数
+    private Integer fansNum = 0;//粉丝数
     @OneToOne(mappedBy="user",fetch=FetchType.LAZY)
     @JoinColumn(name = "master_id")
     public Master getMaster() {
@@ -245,5 +245,27 @@ public class User {
 
     public void setMasterWorkNum(Integer masterWorkNum) {
         this.masterWorkNum = masterWorkNum;
+    }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "follower")
+    @Where(clause = "status=1")
+    public List<ArtUserFollowed> getArtUserFollowedList() {
+        return artUserFollowedList;
+    }
+
+    public void setArtUserFollowedList(List<ArtUserFollowed> artUserFollowedList) {
+        this.artUserFollowedList = artUserFollowedList;
+    }
+
+    @Transient
+    public Integer getFansNum() {
+        if(artUserFollowedList!=null)
+            fansNum = artUserFollowedList.size();
+        return fansNum;
+    }
+
+    public void setFansNum(Integer fansNum) {
+        this.fansNum = fansNum;
     }
 }

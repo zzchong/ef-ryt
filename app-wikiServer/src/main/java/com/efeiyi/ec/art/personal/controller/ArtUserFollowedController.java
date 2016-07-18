@@ -59,7 +59,7 @@ public class ArtUserFollowedController extends BaseController {
             jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
+            if ("".equals(jsonObj.getString("signmsg"))  ||
                     "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("flag"))
                     || "".equals(jsonObj.getString("type")) ||
                     "".equals(jsonObj.getString("pageIndex")) || "".equals(jsonObj.getString("pageSize"))) {
@@ -68,12 +68,13 @@ public class ArtUserFollowedController extends BaseController {
 
             String flag = jsonObj.getString("flag");
             String signmsg = jsonObj.getString("signmsg");
-            String userId = jsonObj.getString("userId");
+//            String userId = jsonObj.getString("userId");
+            String userId = AuthorizationUtil.getUserId();
             String type = jsonObj.getString("type");
             String index = jsonObj.getString("pageIndex");
             String size = jsonObj.getString("pageSize");
             String otherUserId = jsonObj.getString("otherUserId");
-            treeMap.put("userId", userId);
+//            treeMap.put("userId", userId);
             treeMap.put("type", type);
             treeMap.put("pageIndex", index);
             treeMap.put("pageSize", size);
@@ -226,7 +227,7 @@ public class ArtUserFollowedController extends BaseController {
             jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
+            if ("".equals(jsonObj.getString("signmsg"))  ||
                     "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("flag"))
                     || "".equals(jsonObj.getString("type")) ||
                     "".equals(jsonObj.getString("pageIndex")) || "".equals(jsonObj.getString("pageSize"))) {
@@ -235,12 +236,12 @@ public class ArtUserFollowedController extends BaseController {
 
             String flag = jsonObj.getString("flag");
             String signmsg = jsonObj.getString("signmsg");
-            String userId = jsonObj.getString("userId");
+//            String userId = jsonObj.getString("userId");
             String type = jsonObj.getString("type");
             String index = jsonObj.getString("pageIndex");
             String size = jsonObj.getString("pageSize");
             String otherUserId = jsonObj.getString("otherUserId");
-            treeMap.put("userId", userId);
+//            treeMap.put("userId", userId);
             treeMap.put("type", type);
             treeMap.put("pageIndex", index);
             treeMap.put("pageSize", size);
@@ -252,6 +253,7 @@ public class ArtUserFollowedController extends BaseController {
             if (!verify) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
+            String userId = AuthorizationUtil.getUserId();
             if ("1".equals(flag)) {//自己查看自己
 
                 XQuery query = new XQuery("listArtUserFollowed_fan", request);

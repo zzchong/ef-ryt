@@ -12,24 +12,24 @@ import java.util.Date;
  */
 public class ArtWorkInvestTopBean {
 
-    private User user;
-    private BigDecimal money;
+    private User creator;
+    private BigDecimal price;
     private Date createDatetime;
 
-    public User getUser() {
-        return user;
+    public User getCreator() {
+        return creator;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
-    public BigDecimal getMoney() {
-        return money;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setMoney(BigDecimal money) {
-        this.money = money;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public Date getCreateDatetime() {

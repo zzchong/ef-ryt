@@ -210,6 +210,8 @@ public class ArtworkController extends BaseController {
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
+
+            Map paramMap = new HashMap<>();
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
@@ -245,10 +247,11 @@ public class ArtworkController extends BaseController {
                 }
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+            paramMap.put("artworkList",artworkList);
             if (artworkList != null && !artworkList.isEmpty()) {
-                resultMap.put("objectList", artworkList);
+                resultMap.put("data", paramMap);
             } else {
-                resultMap.put("objectList", null);
+                resultMap.put("data", null);
             }
 
         } catch (Exception e) {
@@ -511,8 +514,8 @@ public class ArtworkController extends BaseController {
                 }
                 for (int i = 0; i < max; i++) {
                     artWorkInvestTopBean = new ArtWorkInvestTopBean();
-                    artWorkInvestTopBean.setUser(artworkInvestTopTempList.get(i).getCreator());
-                    artWorkInvestTopBean.setMoney(topMoneyList.get(i));
+                    artWorkInvestTopBean.setCreator(artworkInvestTopTempList.get(i).getCreator());
+                    artWorkInvestTopBean.setPrice(topMoneyList.get(i));
                     artWorkInvestTopBean.setCreateDatetime(artworkInvestTopTempList.get(i).getCreateDatetime());
                     artworkInvestTopList.add(artWorkInvestTopBean);
                 }

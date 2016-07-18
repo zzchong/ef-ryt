@@ -11,7 +11,7 @@
     </context-param>
     <!-- session 2分钟之内失效-->
     <session-config>
-        <session-timeout>2</session-timeout>
+        <session-timeout>1</session-timeout>
     </session-config>
 
     <!--编码配置-->

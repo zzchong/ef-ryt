@@ -9,6 +9,7 @@ import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.Account;
 import com.efeiyi.ec.art.model.UserBrief;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import org.apache.http.HttpEntity;
@@ -56,7 +57,7 @@ public class UserBriefController  extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
             if ("".equals(jsonObj.getString("signmsg"))
-                    || "".equals(jsonObj.getString("userId"))
+//                    || "".equals(jsonObj.getString("userId"))
                     ||"".equals(jsonObj.getString("timestamp"))
                   //  || "".equals(jsonObj.getString("content"))
                     || "".equals(jsonObj.getString("type"))
@@ -65,18 +66,19 @@ public class UserBriefController  extends BaseController {
             }
 
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId",jsonObj.getString("userId"));
+//            treeMap.put("userId",jsonObj.getString("userId"));
             treeMap.put("type",jsonObj.getString("type"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
-            User user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+//            User user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+            User user = AuthorizationUtil.getUser();
             //
 
             LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
-            param.put("userId", jsonObj.getString("userId"));
+            param.put("userId", user.getId());
             UserBrief userBrief =  (UserBrief)baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_BRIEF, param);//如果已存在
             if(userBrief==null || userBrief.getId()==null){
                 userBrief = new UserBrief();

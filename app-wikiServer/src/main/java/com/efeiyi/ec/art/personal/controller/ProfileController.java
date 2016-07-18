@@ -1252,15 +1252,15 @@ public class ProfileController extends BaseController {
 //        map.put("pageSize","5");
         /**editProfile.do测试加密参数**/
         map.put("userId", "iickhknq3h7yrku2");
-        map.put("currentId", "iickhknq3h7yrku2");
+//        map.put("currentId", "iickhknq3h7yrku2");
         map.put("pageSize", "20");
-        map.put("pageIndex", "1");
+        map.put("pageIndex", "7");
         map.put("timestamp", timestamp);
         String signmsg = DigitalSignatureUtil.encrypt(map);
         map.put("signmsg",signmsg);
         HttpClient httpClient = new DefaultHttpClient();
 //        String url = "http://192.168.1.41:8080/app/myArtwork.do";
-        String url = "http://192.168.1.75:8001/app/my.do";
+        String url = "http://192.168.1.75:8080/app/my.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 

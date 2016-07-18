@@ -693,12 +693,12 @@ public class SigninController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
+            if ("".equals(jsonObj.getString("signmsg"))  ||
                     "".equals(jsonObj.getString("timestamp"))|| "".equals(jsonObj.getString("content"))) {
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("userId", jsonObj.getString("userId"));
+//            treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("content", jsonObj.getString("content"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
@@ -708,7 +708,8 @@ public class SigninController extends BaseController {
 
             User user = null;
             try {
-                user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+//                user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
+                user = AuthorizationUtil.getUser();
                 if (user!=null && user.getId()!=null) {
                     UserFeedBack userFeedBack = new UserFeedBack();
                     userFeedBack.setCreateDatetime(new Date());

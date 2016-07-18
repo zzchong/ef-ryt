@@ -15,6 +15,7 @@ import com.efeiyi.ec.art.organization.model.AddressCity;
 import com.efeiyi.ec.art.organization.model.AddressDistrict;
 import com.efeiyi.ec.art.organization.model.AddressProvince;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
@@ -181,7 +182,7 @@ public class AddressController extends BaseController {
             }
 
             XQuery xQuery = new XQuery("listAddress_default", request);
-            xQuery.put("consumer_id", jsonObj.getString("currentUserId"));
+            xQuery.put("consumer_id", AuthorizationUtil.getUserId());
             List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
             resultMap.put("consumerAddressList", consumerAddressList);
             resultMap.put("resultCode", "0");

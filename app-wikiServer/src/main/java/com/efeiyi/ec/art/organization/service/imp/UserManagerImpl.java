@@ -128,7 +128,7 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
             BigDecimal investsMoney2 = new BigDecimal("0.00");
             BigDecimal roiMoney2 = new BigDecimal("0.00");
             BigDecimal rate2 = new BigDecimal("0.00");
-            if (user1.getMaster() != null && user1.getMaster().getId() != null && user.getType().equals("1")) {
+            if (user1.getMaster() != null && user1.getMaster().getId() != null && "1".equals(user1.getType())) {
                 // 2 艺术家
                 //项目总金额
                 List<Artwork> artworks = (List<Artwork>) baseManager.listObject(AppConfig.SQL_GET_USER_ARTWORK, paramMap);

@@ -90,6 +90,7 @@ public class MasterController extends BaseController {
         try{
             logBean.setCreateDate(new Date());//操作时间
             logBean.setApiName("saveMasterWork");
+            System.out.println(request.getParameter("name"));
             if(StringUtils.isEmpty(request.getParameter("name"))
                     ||StringUtils.isEmpty(request.getParameter("material"))
                     || StringUtils.isEmpty(request.getParameter("type"))
