@@ -102,6 +102,8 @@ public class ArtworkController extends BaseController {
 
             String action = jsonObject.getString("action");
 
+
+
             if("index".equals(action)){
                 XQuery query = new XQuery("plistArtwork_default", request);
                 query.setPageEntity(pageEntity);
@@ -121,8 +123,25 @@ public class ArtworkController extends BaseController {
                 query.setPageEntity(pageEntity);
                 query.put("creator_id",user.getId());
                 artworkInvestList = baseManager.listPageInfo(query).getList();
-                for (ArtworkInvest artworkInvest : artworkInvestList){
-                    artworkList.add(artworkInvest.getArtwork());
+                if(artworkInvestList!=null && artworkInvestList.size()>0) {
+                    for (ArtworkInvest artworkInvest : artworkInvestList) {
+                        Artwork artwork = artworkInvest.getArtwork();
+                        //是否点赞
+                        Boolean isPraise = false;
+                        if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                            XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
+                            xQuery.put("artwork_id", artwork.getId());
+                            xQuery.put("user_id", AuthorizationUtil.getUser().getId());
+                            List<ArtWorkPraise> artWorkPraiseList1 = baseManager.listObject(xQuery);
+                            if (artWorkPraiseList1 != null) {
+                                if (artWorkPraiseList1.size() > 0) {
+                                    isPraise = true;
+                                }
+                            }
+                            artwork.setPraise(isPraise);
+                        }
+                        artworkList.add(artwork);
+                    }
                 }
 //                //当前用户的投资金额
 //                LinkedHashMap<String,Object> investParam = new LinkedHashMap<>();
@@ -140,8 +159,26 @@ public class ArtworkController extends BaseController {
                 query.setPageEntity(pageEntity);
                 query.put("user_id",user.getId());
                 artWorkPraiseList = baseManager.listPageInfo(query).getList();
-                for (ArtWorkPraise artWorkPraise : artWorkPraiseList){
-                    artworkList.add(artWorkPraise.getArtwork());
+                if(artWorkPraiseList!=null && artWorkPraiseList.size()>0) {
+                    for (ArtWorkPraise artWorkPraise : artWorkPraiseList) {
+                        Artwork artwork = artWorkPraise.getArtwork();
+                        //是否点赞
+                        Boolean isPraise = false;
+                        if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                            XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
+                            xQuery.put("artwork_id", artWorkPraise.getArtwork().getId());
+                            xQuery.put("user_id", AuthorizationUtil.getUser().getId());
+                            List<ArtWorkPraise> artWorkPraiseList1 = baseManager.listObject(xQuery);
+                            if (artWorkPraiseList1 != null) {
+                                if (artWorkPraiseList1.size() > 0) {
+                                    isPraise = true;
+                                }
+                            }
+                            artwork.setPraise(isPraise);
+                        }
+
+                        artworkList.add(artwork);
+                    }
                 }
 
             }
