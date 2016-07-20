@@ -17,7 +17,8 @@
     <img class="bd" src="<c:url value="/scripts/shop20160614/images/app_2.jpg"/>" alt="">
     <img class="bd" src="<c:url value="/scripts/shop20160614/images/app_3.jpg"/>" alt="">
 </div>
-<div class="bd btn_down"><a href="" title="融易投app下载"></a></div>
+<div class="bd btn_down"><a href="" title="融易投app下载"></a>
+</div>
 </body>
 <script>
     $(function() {
