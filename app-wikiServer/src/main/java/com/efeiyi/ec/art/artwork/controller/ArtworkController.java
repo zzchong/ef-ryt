@@ -1352,8 +1352,11 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("id"));
-            artwork.setType("2");
-            artwork.setStep("21");
+            if(artwork.getInvestsMoney().compareTo(artwork.getInvestGoalMoney())>=0 && "1".equals(artwork.getType())) {
+                artwork.setType("2");
+                artwork.setStep("21");
+                baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+            }
             return resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {
             e.printStackTrace();
