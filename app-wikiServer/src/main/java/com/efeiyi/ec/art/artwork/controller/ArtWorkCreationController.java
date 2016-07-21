@@ -81,8 +81,8 @@ public class ArtWorkCreationController extends BaseController {
             pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
             xQuery.setPageEntity(pageEntity);
             artworkList = baseManager.listPageInfo(xQuery).getList();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-            String str1 = sdf.format(new Date());
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+//            String str1 = sdf.format(new Date());
             if(artworkList!=null){
             for (Artwork artwork : artworkList) {
 //                if(artwork.getPicture_url()!=null) {
@@ -91,9 +91,9 @@ public class ArtWorkCreationController extends BaseController {
 //                }
                 //项目动态
                 if (artwork.getArtworkMessages() != null && artwork.getArtworkMessages().size() > 0) {
-                    artwork.setNewCreationDate(TimeUtil.getDistanceTimes(str1, sdf.format(artwork.getArtworkMessages().get(0).getCreateDatetime())));
+                    artwork.setNewCreationDate(artwork.getArtworkMessages().get(0).getCreateDatetime());
                 } else {
-                    artwork.setNewCreationDate("暂无更新状态");
+                    artwork.setNewCreationDate(null);
                 }
             }
             }

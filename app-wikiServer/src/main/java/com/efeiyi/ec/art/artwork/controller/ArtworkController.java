@@ -1202,6 +1202,7 @@ public class ArtworkController extends BaseController {
                     artworkMessage.setContent(!"".equals(request.getParameter("content")) ? request.getParameter("content") : "");
                     artworkMessage.setCreator(artwork.getAuthor());
                     artworkMessage.setArtwork(artwork);
+                    artworkMessage.setStatus("1");
                     artworkMessage.setCreateDatetime(new Date());
                     baseManager.saveOrUpdate(ArtworkMessage.class.getName(), artworkMessage);
                     //List<ArtworkMessageAttachment> artworkMessageAttachments =  new ArrayList<ArtworkMessageAttachment>();//动态附件有可能是多个文件

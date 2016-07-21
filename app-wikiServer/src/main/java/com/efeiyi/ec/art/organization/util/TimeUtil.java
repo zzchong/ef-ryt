@@ -58,7 +58,7 @@ public class TimeUtil {
     //时间比较去时间戳
     public static Date getDistanceTimes(Date date1,Date date2) throws ParseException {
 
-        SimpleDateFormat sdf = new SimpleDateFormat();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         long distanceTime = Math.abs(date1.getTime()-date2.getTime());
 
         return new Date(distanceTime);

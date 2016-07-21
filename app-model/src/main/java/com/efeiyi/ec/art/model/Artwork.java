@@ -48,7 +48,7 @@ public class Artwork implements Serializable {
     private Date creationEndDatetime;//创作完成时间=融资结束时间+30(默认)
     private String type;//1 融资阶段  2 制作阶段  3 拍卖阶段  4 抽奖阶段   0 发起 5驳回
 
-    private String newCreationDate;//最新创作时间
+    private Date newCreationDate;//最新创作时间
 
     private Integer auctionNum;//竞价记录次数
     private BigDecimal newBidingPrice=new BigDecimal("0.00");//最新竞价价格
@@ -202,6 +202,7 @@ public class Artwork implements Serializable {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
     @OrderBy(value = "createDatetime desc")
+    @Where(clause = "status=1")
     public List<ArtworkMessage> getArtworkMessages() {
         return artworkMessages;
     }
@@ -389,13 +390,15 @@ public class Artwork implements Serializable {
     }
 
     @Transient
-    public String getNewCreationDate() {
+    public Date getNewCreationDate() {
         return newCreationDate;
     }
 
-    public void setNewCreationDate(String newCreationDate) {
+    public void setNewCreationDate(Date newCreationDate) {
         this.newCreationDate = newCreationDate;
     }
+
+
 
    // @Transient
    @ManyToOne(fetch = FetchType.EAGER)
