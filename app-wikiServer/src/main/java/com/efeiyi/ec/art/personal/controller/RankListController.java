@@ -63,21 +63,21 @@ public class RankListController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("pageNum")) ||
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("pageIndex")) ||
                     "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("pageSize")) ) {
                 return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
 
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("pageSize",jsonObj.getString("pageSize"));
-            treeMap.put("pageNum",jsonObj.getString("pageNum"));
+            treeMap.put("pageIndex",jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             Session session = xdoDao.getSession();
-            int beginNum = (jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize"));
+            int beginNum = (jsonObj.getInteger("pageIndex")-1)*(jsonObj.getInteger("pageSize"));
             String sqlString = AppConfig.GET_INVESTOR_TOP_LIST+beginNum+","+jsonObj.getInteger("pageSize");
             List<InvestorTopListVO> list = session.createSQLQuery(sqlString).setResultTransformer(Transformers.aliasToBean(com.efeiyi.ec.art.model.InvestorTopListVO.class)).list();
             resultMap = resultMapHandler.handlerResult("0","成功!",logBean);
@@ -101,21 +101,21 @@ public class RankListController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("pageNum")) ||
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("pageIndex")) ||
                     "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("pageSize")) ) {
                 return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
 
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("pageSize",jsonObj.getString("pageSize"));
-            treeMap.put("pageNum",jsonObj.getString("pageNum"));
+            treeMap.put("pageIndex",jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             Session session = xdoDao.getSession();
-            int beginNum = (jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize"));
+            int beginNum = (jsonObj.getInteger("pageIndex")-1)*(jsonObj.getInteger("pageSize"));
             String sqlString = AppConfig.GET_ARTIST_TOP_LIST+beginNum+","+jsonObj.getInteger("pageSize");
             List<ArtistTopListVO> list = session.createSQLQuery(sqlString).setResultTransformer(Transformers.aliasToBean(com.efeiyi.ec.art.model.ArtistTopListVO.class)).list();
             resultMap = resultMapHandler.handlerResult("0","成功!",logBean);
@@ -140,21 +140,21 @@ public class RankListController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("pageNum")) ||
+            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("pageIndex")) ||
                     "".equals(jsonObj.getString("timestamp")) || "".equals(jsonObj.getString("pageSize")) ) {
                 return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
 
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("pageSize",jsonObj.getString("pageSize"));
-            treeMap.put("pageNum",jsonObj.getString("pageNum"));
+            treeMap.put("pageIndex",jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return  resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
             }
             Session session = xdoDao.getSession();
-            int beginNum = (jsonObj.getInteger("pageNum")-1)*(jsonObj.getInteger("pageSize"));
+            int beginNum = (jsonObj.getInteger("pageIndex")-1)*(jsonObj.getInteger("pageSize"));
             String sqlString = AppConfig.GET_ARTIST_TOP_LIST2+beginNum+","+jsonObj.getInteger("pageSize");
 //            String hqlString = AppConfig.GET_ARTIST_TOP_LIST3;
 //            Query query = session.createQuery(hqlString);

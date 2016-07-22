@@ -263,7 +263,7 @@ public class ArtworkController extends BaseController {
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
-            treeMap.put("pageNum", jsonObj.getString("pageNum"));
+            treeMap.put("pageIndex", jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -275,7 +275,7 @@ public class ArtworkController extends BaseController {
             System.out.println(userId);
             String hql = "from Artwork WHERE 1=1 and status = '1' and type='1' and step='14' order by createDatetime DESC";
             String sql = "SELECT COUNT(1) FROM ArtWorkPraise m where user.id=:userId and artwork.id=:artworkId and status !='0'";
-            artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
+            artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageIndex") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
             List<ArtWorkPraiseBean> objectList = new ArrayList<>();
             LinkedHashMap<String,Object> map = new LinkedHashMap<>();
             map.put("userId", userId);
@@ -770,7 +770,7 @@ public class ArtworkController extends BaseController {
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("masterId", jsonObj.getString("masterId"));
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
-            treeMap.put("pageNum", jsonObj.getString("pageNum"));
+            treeMap.put("pageIndex", jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -790,7 +790,7 @@ public class ArtworkController extends BaseController {
             xQuery = new XQuery("plistArtwork_default1", request);
             xQuery.put("author_id", master.getUser().getId());
             xQuery.getPageEntity().setSize(jsonObj.getInteger("pageSize"));
-            xQuery.getPageEntity().setIndex(jsonObj.getInteger("pageNum"));
+            xQuery.getPageEntity().setIndex(jsonObj.getInteger("pageIndex"));
             PageInfo pageInfo = baseManager.listPageInfo(xQuery);
             List<Artwork> artworks = (List<Artwork>) pageInfo.getList();
             //投资者

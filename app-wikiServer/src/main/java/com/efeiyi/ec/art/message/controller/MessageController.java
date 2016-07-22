@@ -352,7 +352,7 @@ public class MessageController extends BaseController {
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("type", jsonObj.getString("type"));
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
-            treeMap.put("pageNum", jsonObj.getString("pageNum"));
+            treeMap.put("pageIndex", jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
@@ -383,13 +383,13 @@ public class MessageController extends BaseController {
                     return resultMap;
                 } else if ("0".equals(type)) {
                     String hql = "from Notification WHERE targetUser.id=" + "'" + userId + "'" + " AND status<>'0'  order by isWatch asc,createDatetime desc";
-                    objectList = (List<Notification>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
+                    objectList = (List<Notification>) messageDao.getPageList(hql, (jsonObj.getInteger("pageIndex") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
                     updateWatch(request,"listNotification_default",userId,"");
 //                    objectList =  (List<Notification>)baseManager.listObject(AppConfig.SQL_NOTICE_GET_APP, map);
                 } else if ("1".equals(type)) {
                     objectList = new ArrayList();
                     String hql = "from ArtworkComment WHERE fatherComment.creator.id= " + "'" + userId + "'" + " AND status<>'0'  order by isWatch asc, createDatetime desc";
-                    List<ArtworkComment> objectTempList = (List<ArtworkComment>) messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
+                    List<ArtworkComment> objectTempList = (List<ArtworkComment>) messageDao.getPageList(hql, (jsonObj.getInteger("pageIndex") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
                     for (ArtworkComment artworkComment : objectTempList) {
                         ArtworkCommentBean artworkCommentBean = new ArtworkCommentBean();
                         FatherArtworkCommentBean fatherArtworkCommentBean = new FatherArtworkCommentBean();

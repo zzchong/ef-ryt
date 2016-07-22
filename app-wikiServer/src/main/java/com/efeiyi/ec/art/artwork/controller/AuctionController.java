@@ -17,6 +17,7 @@ import com.ming800.core.does.model.XQuery;
 import com.ming800.core.taglib.PageEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -69,13 +70,29 @@ public class AuctionController extends BaseController {
             Map paramMap = new HashMap<>();
             //项目信息
             String hql = "from Artwork WHERE 1=1 and status = '1' and type = '3' order by investStartDatetime asc";
-            artworkList = messageDao.getPageList(hql, (jsonObj.getInteger("pageNum") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
+            artworkList = messageDao.getPageList(hql, (jsonObj.getInteger("pageIndex") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
             for (Object artwork : artworkList) {
                 Artwork artworkTemp = (Artwork) artwork;
 //                if(artworkTemp.getPicture_url()!=null) {
 //                    artworkTemp.setHeight(ImgUtil.getHeight(artworkTemp.getPicture_url()));
 //                    artworkTemp.setWidth(ImgUtil.getWidth(artworkTemp.getPicture_url()));
 //                }
+
+                //是否点赞
+                Boolean isPraise = false;
+                if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                    XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
+                    xQuery.put("artwork_id", artworkTemp.getId());
+                    xQuery.put("user_id", AuthorizationUtil.getUser().getId());
+                    List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
+                    if (artWorkPraiseList != null) {
+                        if (artWorkPraiseList.size() > 0) {
+                            isPraise = true;
+                        }
+                    }
+                }
+                artworkTemp.setPraise(isPraise);
+
                 XQuery xQuery = new XQuery("listArtworkBidding_default", request);
                 xQuery.put("artwork_id", artworkTemp.getId());
                 List artworkBiddingList = baseManager.listObject(xQuery);

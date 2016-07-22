@@ -89,6 +89,20 @@ public class ArtWorkCreationController extends BaseController {
 //                    artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
 //                    artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
 //                }
+                //是否点赞
+                Boolean isPraise = false;
+                if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                    XQuery xQuery1 = new XQuery("listArtWorkPraise_default", request);
+                    xQuery1.put("artwork_id", artwork.getId());
+                    xQuery1.put("user_id", AuthorizationUtil.getUser().getId());
+                    List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery1);
+                    if (artWorkPraiseList != null) {
+                        if (artWorkPraiseList.size() > 0) {
+                            isPraise = true;
+                        }
+                    }
+                }
+                artwork.setPraise(isPraise);
                 //项目动态
                 if (artwork.getArtworkMessages() != null && artwork.getArtworkMessages().size() > 0) {
                     artwork.setNewCreationDate(artwork.getArtworkMessages().get(0).getCreateDatetime());
