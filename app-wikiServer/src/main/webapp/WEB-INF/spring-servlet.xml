@@ -53,6 +53,7 @@
             <mvc:exclude-mapping path="/app/userMain.do"/>
             <mvc:exclude-mapping path="/app/userWork.do"/>
             <mvc:exclude-mapping path="/app/retrievePassword.do"/>
+            <mvc:exclude-mapping path="/app/getArtWorkList.do"/>
             <mvc:exclude-mapping path="/app/checkUserName.do"/>
             <mvc:exclude-mapping path="/app/sendCode.do"/>
             <mvc:exclude-mapping path="/app/artWorkAuctionView.do"/>

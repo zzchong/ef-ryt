@@ -87,8 +87,8 @@ public class ArtworkController extends BaseController {
             Map<String,Object> paramMap = new HashMap<>();
 
             List<Artwork> artworkList = null;
-            List<ArtWorkPraise> artWorkPraiseList = null;
-            List<ArtworkInvest> artworkInvestList = null;
+            List<ArtWorkPraise> artWorkPraiseList = new ArrayList<>();
+            List<ArtworkInvest> artworkInvestList = new ArrayList<>();
 
             User user = (User) baseManager.getObject(User.class.getName(),jsonObject.getString("userId"));
 
@@ -119,10 +119,14 @@ public class ArtworkController extends BaseController {
 
             }else if("invest".equals(action)){
                 artworkList = new ArrayList<>();
-                XQuery query = new XQuery("plistArtworkInvest_byUser",request);
-                query.setPageEntity(pageEntity);
-                query.put("creator_id",user.getId());
-                artworkInvestList = baseManager.listPageInfo(query).getList();
+                LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+                params.put("userId", user.getId());
+                artworkInvestList = baseManager.listPageInfo(AppConfig.SQL_INVEST_ARTWORK,pageEntity, params).getList();
+
+//                XQuery query = new XQuery("plistArtworkInvest_byUser",request);
+//                query.setPageEntity(pageEntity);
+//                query.put("creator_id",user.getId());
+//                artworkInvestList = baseManager.listPageInfo(query).getList();
                 if(artworkInvestList!=null && artworkInvestList.size()>0) {
                     for (ArtworkInvest artworkInvest : artworkInvestList) {
                         Artwork artwork = artworkInvest.getArtwork();
@@ -651,6 +655,43 @@ public class ArtworkController extends BaseController {
             }
 
             if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
+                resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+            } else {
+                return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+        return resultMap;
+    }
+
+    /**
+     * 取消点赞
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/cancelArtworkPraise.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map cancelArtworkPraise(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        Map<String, Object> resultMap = new HashMap<>();
+        List objectList = null;
+        try {
+            JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());
+            logBean.setRequestMessage(jsonObject.toString());
+            logBean.setApiName("cancelArtworkPraise");
+            if (!CommonUtil.jsonObject(jsonObject)) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+            if (!DigitalSignatureUtil.verify2(jsonObject)) {
+                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+            }
+
+            if (artworkManager.cancelArtWorkPraise(request, jsonObject.getString("artworkId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);

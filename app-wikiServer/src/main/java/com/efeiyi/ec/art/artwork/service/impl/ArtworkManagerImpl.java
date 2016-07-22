@@ -11,6 +11,7 @@ import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,27 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
     }
 
+    @Override
+    public boolean cancelArtWorkPraise(HttpServletRequest request,String artworkId){
+
+        try {
+
+           XQuery xQuery = new XQuery("listArtWorkPraise_default",request);
+            xQuery.put("artwork_id",artworkId);
+            xQuery.put("user_id",AuthorizationUtil.getUser().getId());
+            List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
+            if(artWorkPraiseList!=null && artWorkPraiseList.size()>0){
+                ArtWorkPraise artWorkPraise = artWorkPraiseList.get(0);
+                artWorkPraise.setStatus("0");
+                baseManager.saveOrUpdate(ArtWorkPraise.class.getName(),artWorkPraise);
+                return true;
+            }
+            return  false;
+        }catch (Exception e){
+            e.printStackTrace();
+            return  false;
+        }
+    }
 
     @Override
     public boolean saveArtWorkComment(String id, String content,String fatherCommentId,String messageId) {

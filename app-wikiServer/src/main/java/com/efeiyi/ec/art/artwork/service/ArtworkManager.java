@@ -21,6 +21,15 @@ public interface ArtworkManager {
     boolean  saveArtWorkPraise(String id,String messageId);
 
     /**
+     *
+     * 取消点赞
+     * @param request
+     * @param artworkId
+     * @return
+     */
+     boolean cancelArtWorkPraise(HttpServletRequest request,String artworkId);
+
+    /**
      * 评论
      * @param id
      * @param content

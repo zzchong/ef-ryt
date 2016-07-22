@@ -15,7 +15,8 @@ import java.util.Map;
  * Time: 下午4:18
  * To change this template use File | Settings | File Templates.
  */
-public interface MessageDao {
+public interface
+MessageDao {
 
 
          List getPageList(String hql,Integer index,Integer size);
