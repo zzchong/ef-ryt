@@ -97,12 +97,16 @@ public class UserMainController extends BaseController {
             }
             //是否关注
             boolean isFollowed = false;
-            if(!StringUtils.isEmpty(currentId) && currentId.equals(userId)){
-                XQuery xQuery1  = new XQuery("listArtUserFollowed_isFollowed",request);
-                xQuery1.put("follower_id",userId);
-                xQuery1.put("user_id",currentId);
-                List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(xQuery1);
-                if(artUserFollowedList!=null && artUserFollowedList.size()!=0){
+            if(!StringUtils.isEmpty(currentId)){
+                if(!currentId.equals(userId)) {
+                    XQuery xQuery1 = new XQuery("listArtUserFollowed_isFollowed", request);
+                    xQuery1.put("follower_id", userId);
+                    xQuery1.put("user_id", currentId);
+                    List<ArtUserFollowed> artUserFollowedList = (List<ArtUserFollowed>) baseManager.listObject(xQuery1);
+                    if (artUserFollowedList != null && artUserFollowedList.size() != 0) {
+                        isFollowed = true;
+                    }
+                }else {
                     isFollowed = true;
                 }
             }

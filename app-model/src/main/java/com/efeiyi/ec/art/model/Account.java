@@ -116,6 +116,7 @@ public class Account implements Serializable {
     public void setCurrentUsableBalance(BigDecimal currentUsableBalance) {
         this.currentUsableBalance = currentUsableBalance;
     }
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account")
     public List<MarginAccount> getMarginAccounts() {
         return marginAccounts;
