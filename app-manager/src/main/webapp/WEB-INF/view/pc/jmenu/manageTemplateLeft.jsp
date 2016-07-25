@@ -15,13 +15,11 @@
     <ul class="am-list admin-sidebar-list">
       <c:forEach items="${jnode.children}" var="childJnode">
         <c:if test="${!empty childJnode.children&& childJnode.children.size()>0}">
-            <security:authorize ifAnyGranted="${childJnode.access}">
           <li class="admin-parent">
             <a class="am-cf" data-am-collapse="{target: '#${childJnode.id}'}"><span
                     class="am-icon-file"></span> ${childJnode.text_zh_CN}</a>
             <ul class="am-list am-collapse admin-sidebar-sub am-in" id="${childJnode.id}">
               <c:forEach items="${childJnode.children}" var="childchildJnode">
-                  <security:authorize ifAnyGranted="${childchildJnode.access}">
                 <li>
                     <%--<c:if test="${!empty requestScope.qm && childchildJnode.contain(requestScope.qm)}">--%>
                   <a href="<c:url value="${childchildJnode.url}"/>"
@@ -32,11 +30,9 @@
                     <%--class="am-cf">${childchildJnode.text_zh_CN}</a>--%>
                     <%--</c:if>--%>
                 </li>
-                  </security:authorize>
               </c:forEach>
             </ul>
           </li>
-            </security:authorize>
         </c:if>
         <c:if test="${empty childJnode.children}">
           <%--<c:if test="${empty requestScope.qm || !childchildJnode.contain(requestScope.qm)}">--%>
