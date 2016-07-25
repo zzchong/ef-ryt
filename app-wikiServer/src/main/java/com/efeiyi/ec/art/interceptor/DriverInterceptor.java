@@ -33,7 +33,9 @@ public class DriverInterceptor extends HandlerInterceptorAdapter {
         response.setContentType("text/html;charset=utf-8");
         request.setCharacterEncoding("utf-8");
         response.setHeader("Access-Control-Allow-Origin", "*");
-
+//        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Methods","POST");
+        response.setHeader("Access-Control-Allow-Headers","x-requested-with,content-type");
         return true;
     }
 
