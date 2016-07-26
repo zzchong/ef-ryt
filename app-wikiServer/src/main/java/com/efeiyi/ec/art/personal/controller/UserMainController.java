@@ -149,15 +149,16 @@ public class UserMainController extends BaseController {
             }
 
             List<Artwork> artworks = null;
+            String action = jsonObj.getString("action");
             //项目
-            if(userId.equals(currentId)) {
+            if("1".equals(action)) {
                 xQuery = new XQuery("plistArtworkPage_default", request);
                 xQuery.put("author_id", jsonObj.getString("userId"));
                 xQuery.getPageEntity().setSize(jsonObj.getInteger("pageSize"));
                 xQuery.getPageEntity().setIndex(jsonObj.getInteger("pageIndex"));
                 PageInfo pageInfo = baseManager.listPageInfo(xQuery);
                 artworks = (List<Artwork>) pageInfo.getList();
-            }else {
+            }else if("0".equals(action)){
                 xQuery = new XQuery("plistArtworkPage_bySelf", request);
                 xQuery.put("author_id", jsonObj.getString("userId"));
                 xQuery.getPageEntity().setSize(jsonObj.getInteger("pageSize"));
