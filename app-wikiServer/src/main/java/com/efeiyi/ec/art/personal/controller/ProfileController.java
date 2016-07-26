@@ -387,7 +387,7 @@ public class ProfileController extends BaseController {
 
             User user = (User) baseManager.getObject(User.class.getName(), userId);
             Master master = new Master();
-            master.setTheStatus("1");
+            master.setTheStatus("2");
             master.setPresentAddress(provinceName);
             master.setProvinceName(province);
             master.setArtCategory(artCategory);
@@ -399,8 +399,8 @@ public class ProfileController extends BaseController {
             System.out.print(master.getId());
             baseManager.saveOrUpdate(Master.class.getName(), master);
 //            user.setMaster(master);
-//            user.setType("2");
-//            baseManager.saveOrUpdate(User.class.getName(), user);
+            user.setType("0");
+            baseManager.saveOrUpdate(User.class.getName(), user);
 
             resultMap = uploadFile(request);
 
