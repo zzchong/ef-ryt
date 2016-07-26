@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -46,9 +47,20 @@ public class RestfulUsernamePasswordAuthenticationInterceptor extends AbstractAu
             throw new AuthenticationServiceException("Authentication method not supported : "+request.getMethod());
         }
 
+        Map<String,String> map = new HashMap<>();
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
-            Map<String,String> map = userManager.usernameAuthentication(jsonObj);
+            map = userManager.usernameAuthentication(jsonObj);
+        } catch (Exception e) {
+            map.put("username","");
+            map.put("password","");
+            e.printStackTrace();
+        }finally {
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(map.get("username"),map.get("password"));
+            return this.getAuthenticationManager().authenticate(authRequest);
+
+        }
+
 //            String username = jsonObj.getString("username");
 //            String password = jsonObj.getString("password");
 //
@@ -58,13 +70,6 @@ public class RestfulUsernamePasswordAuthenticationInterceptor extends AbstractAu
 //                password="rongyitou";
 //
 //            username = username.trim();
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(map.get("username"),map.get("password"));
-            return this.getAuthenticationManager().authenticate(authRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-         return  null;
 
 
     }

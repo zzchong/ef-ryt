@@ -875,7 +875,7 @@ public class SigninController extends BaseController {
 
         /**登录.do测试加密参数**/
         map.put("username", "18612997469");
-        map.put("password", "123456");
+        map.put("password", "5555");
         String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
         map.put("signmsg", signmsg);
