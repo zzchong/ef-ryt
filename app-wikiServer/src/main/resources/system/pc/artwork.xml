@@ -65,7 +65,7 @@
                     </query>
                     <query name="bySelf" label="默认" type="auto" orderBy="createDatetime:desc">
                         <condition name="author.id" defaultValue="0" operation="eq"/>
-                        <condition name="step" defaultValue="100"  operation="ne"/>
+                        <condition name="step" defaultValue="13"  operation="gt"/>
                         <condition name="type" defaultValue="0" operation="ne" />
                         <condition name="status" defaultValue="0" operation="ne"/>
                     </query>
