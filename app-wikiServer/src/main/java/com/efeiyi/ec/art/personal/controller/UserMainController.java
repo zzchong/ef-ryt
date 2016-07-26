@@ -148,14 +148,23 @@ public class UserMainController extends BaseController {
                 reward = reward.add(roiRecord.getCurrentBalance());
             }
 
+            List<Artwork> artworks = null;
             //项目
-            xQuery = new XQuery("plistArtworkPage_default",request);
-            xQuery.put("author_id",jsonObj.getString("userId"));
-            xQuery.getPageEntity().setSize(jsonObj.getInteger("pageSize"));
-            xQuery.getPageEntity().setIndex(jsonObj.getInteger("pageIndex"));
-            PageInfo pageInfo = baseManager.listPageInfo(xQuery);
-            List<Artwork> artworks = (List<Artwork>) pageInfo.getList();
-
+            if(userId.equals(currentId)) {
+                xQuery = new XQuery("plistArtworkPage_default", request);
+                xQuery.put("author_id", jsonObj.getString("userId"));
+                xQuery.getPageEntity().setSize(jsonObj.getInteger("pageSize"));
+                xQuery.getPageEntity().setIndex(jsonObj.getInteger("pageIndex"));
+                PageInfo pageInfo = baseManager.listPageInfo(xQuery);
+                artworks = (List<Artwork>) pageInfo.getList();
+            }else {
+                xQuery = new XQuery("plistArtworkPage_bySelf", request);
+                xQuery.put("author_id", jsonObj.getString("userId"));
+                xQuery.getPageEntity().setSize(jsonObj.getInteger("pageSize"));
+                xQuery.getPageEntity().setIndex(jsonObj.getInteger("pageIndex"));
+                PageInfo pageInfo = baseManager.listPageInfo(xQuery);
+                artworks = (List<Artwork>) pageInfo.getList();
+            }
 
             data.put("artworkList",artworks);
             data.put("followNum",followNum);
