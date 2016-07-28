@@ -632,7 +632,7 @@ public class ProfileController extends BaseController {
             }
             url = "master/" + file + identify + prefix;
             aliOssUploadManager.uploadFile(mf, "ec-efeiyi2", url);
-            pictureUrl = "http://rongyitou2.efeiyi.com/" + url + "@!ryt_head_portrai";
+            pictureUrl = "http://rongyitou2.efeiyi.com/" + url ;
         }catch (Exception e){
             e.printStackTrace();
         }
