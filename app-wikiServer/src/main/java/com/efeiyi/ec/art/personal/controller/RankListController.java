@@ -9,10 +9,13 @@ import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.ArtistBiddingTopListVO;
 import com.efeiyi.ec.art.model.ArtistTopListVO;
+import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.InvestorTopListVO;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.dao.hibernate.XdoDaoSupport;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.does.model.XQuery;
+import com.ming800.core.taglib.PageEntity;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -155,7 +158,7 @@ public class RankListController extends BaseController {
             }
             Session session = xdoDao.getSession();
             int beginNum = (jsonObj.getInteger("pageIndex")-1)*(jsonObj.getInteger("pageSize"));
-            String sqlString = AppConfig.GET_ARTIST_TOP_LIST2+beginNum+","+jsonObj.getInteger("pageSize");
+            String sqlString = AppConfig.GET_ARTIST_TOP_LIST3+beginNum+","+jsonObj.getInteger("pageSize");
 //            String hqlString = AppConfig.GET_ARTIST_TOP_LIST3;
 //            Query query = session.createQuery(hqlString);
 //            query.setFirstResult(jsonObj.getInteger("pageNum"));
@@ -188,7 +191,7 @@ public class RankListController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         map.put("pageSize","5");
-        map.put("pageNum","1");
+        map.put("pageIndex","1");
         map.put("timestamp", timestamp);
 
         String signmsg = DigitalSignatureUtil.encrypt(map);
@@ -199,7 +202,7 @@ public class RankListController extends BaseController {
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
 
-        String json = "{\"pageSize\":\"5\",\"pageNum\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
+        String json = "{\"pageSize\":\"5\",\"pageIndex\":\"1\",\"signmsg\":\"" + signmsg+"\",\"timestamp\":\""+timestamp+"\"}";
 
         JSONObject jsonObj = (JSONObject)JSONObject.parse(json);
         String jsonString = jsonObj.toJSONString();
