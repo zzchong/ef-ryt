@@ -159,7 +159,7 @@ public class AuctionController extends BaseController {
 //            } else {
 //                artwork.setViewNum(artwork.getViewNum() + 1);
 //            }
-            baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+//            baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
             //竞价记录
             XQuery xQuery = new XQuery("listArtworkBidding_default", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));

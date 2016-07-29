@@ -751,7 +751,7 @@ public class PaymentController extends BaseController {
         map.put("action","restoreMargin");
 //        String signmsg = DigitalSignatureUtil.encrypt(map);
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.75:8080/app/restore/main.do";
+        String url = "http://ryt.efeiyi.com/app/pay/main.do";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("Content-Type", "application/json;charset=utf-8");
         JSONObject jsonObj = (JSONObject)JSONObject.toJSON(map);

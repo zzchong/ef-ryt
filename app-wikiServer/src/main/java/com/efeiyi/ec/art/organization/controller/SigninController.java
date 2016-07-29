@@ -660,7 +660,7 @@ public class SigninController extends BaseController {
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user!=null && user.getId()!=null) {
-                    user.setPassword(jsonObj.getString("password"));
+                    user.setPassword(DigitalSignatureUtil.MD5(jsonObj.getString("password")));
                     baseManager.saveOrUpdate(MyUser.class.getName(),user);
                     return  resultMapHandler.handlerResult("0","成功",logBean);
                 }else {
