@@ -46,6 +46,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -127,7 +128,7 @@ public class PaymentController extends BaseController {
             //竞拍 融资 充值
             String action = jsonObject.getString("action");
             //账单Id
-            String billId = jsonObject.getString("bill_id");
+            String billId = jsonObject.getString("Bill_id");
             //是否融资成功
             boolean isOk = jsonObject.getBoolean("isOk");
 
@@ -136,8 +137,11 @@ public class PaymentController extends BaseController {
             String id = (String) jsonObj.get("transaction_id");
 
             System.out.println("jsonObject:"+jsonObject+"----action:"+action+"---billId:"+billId+"------isOk:"+isOk);
+            System.out.println("money is :"+jsonObj.getDouble("transaction_fee"));
             //金额
-            BigDecimal transactionFee = new BigDecimal((double) jsonObj.get("transaction_fee") / 100);
+            DecimalFormat df=new DecimalFormat("0.00");
+            BigDecimal transactionFee = new BigDecimal(df.format(jsonObj.getDouble("transaction_fee") / 100));
+            System.out.println(transactionFee);
             if(action.equals("auction")){
                 AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), id);
                 if (auctionOrder == null) {
@@ -172,12 +176,15 @@ public class PaymentController extends BaseController {
                 baseManager.saveOrUpdate(MarginAccount.class.getName(), marginAccount);
 
             }else if(action.equals("invest")){
+                System.out.println("come in");
                 ArtworkInvest artworkInvest = (ArtworkInvest) baseManager.getObject(ArtworkInvest.class.getName(), id);
                 if (artworkInvest == null) {
+                    System.out.println("artworkInvest is null");
                     out.println("artworkInvest is null");
                     return;
                 }
                 if(!artworkInvest.getPrice().equals(transactionFee)){
+                    System.out.println("money is not equal");
                     out.println("money is not equal");
                     return;
                 }
@@ -192,12 +199,17 @@ public class PaymentController extends BaseController {
                     artwork.setStep("21");
                     baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
                 }
+            }else if(action.equals("account")){
+                Account account = (Account) baseManager.getObject(Account.class.getName(),id);
+                account.setCurrentBalance(account.getCurrentBalance().add(transactionFee));
+                baseManager.saveOrUpdate(Account.class.getName(),account);
             }
 
             Bill bill = (Bill) baseManager.getObject(Bill.class.getName(),billId);
             bill.setCreateDatetime(new Date());
             bill.setStatus("1");
             baseManager.saveOrUpdate(Bill.class.getName(),bill);
+            System.out.println("success");
             out.println("success"); //请不要修改或删除
         } catch (Exception e) {
             out.println("fail");
@@ -443,6 +455,14 @@ public class PaymentController extends BaseController {
 
             bill.setDetail(user.getName()+"向项目<<"+artwork.getTitle()+">>支付竞拍保证金："+money);
             bill.setType("3");
+            bill.setRestMoney(account.getCurrentUsableBalance());
+            bill.setMoney(money);
+        }else if(jsonObj.getString("action").equals("account")){
+            title = "充值";
+            billNo = account.getId();
+
+            bill.setDetail("充值："+money);
+            bill.setType("0");
             bill.setRestMoney(account.getCurrentUsableBalance());
             bill.setMoney(money);
         }
