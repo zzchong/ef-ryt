@@ -32,6 +32,7 @@
             <mvc:exclude-mapping path="/app/shareViewWap.do"/>
             <mvc:exclude-mapping path="/app/shareView.do"/>
             <mvc:exclude-mapping path="/app/toShareView.do"/>
+            <mvc:exclude-mapping path="/app/webhoot.do"/>
             <bean class="com.efeiyi.ec.art.interceptor.LoginInterceptor"/>
         </mvc:interceptor>
         <mvc:interceptor>
@@ -65,6 +66,7 @@
             <mvc:exclude-mapping path="/app/getInvestorTopList.do"/>
             <mvc:exclude-mapping path="/app/getArtistTopList.do"/>
             <mvc:exclude-mapping path="/app/user.do"/>
+            <mvc:exclude-mapping path="/app/webhoot.do"/>
             <bean class="com.efeiyi.ec.art.interceptor.AppInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
