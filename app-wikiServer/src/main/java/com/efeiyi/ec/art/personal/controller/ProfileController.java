@@ -156,7 +156,7 @@ public class ProfileController extends BaseController {
                 if ("11".equals(type)) {
                     user.setName(content);
                     baseManager.saveOrUpdate(User.class.getName(), user);
-                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                   resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("userInfo", user);
                 } else if ("12".equals(type)) {
                     /**
@@ -170,7 +170,7 @@ public class ProfileController extends BaseController {
                     if (flag) {
                         user.setUsername(content);
                         baseManager.saveOrUpdate(User.class.getName(), user);
-                        resultMapHandler.handlerResult("0", "请求成功", logBean);
+                       resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                         resultMap.put("userInfo", user);
                     } else {
                         return resultMapHandler.handlerResult("10006", "手机号码校验不合格", logBean);
@@ -198,7 +198,7 @@ public class ProfileController extends BaseController {
                         userBrief.setType("2");
                     baseManager.saveOrUpdate(UserBrief.class.getName(), userBrief);
                     user.setUserBrief(userBrief);
-                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("userInfo", user);
                 }else if("10".equals(type)){
                     MultipartFile headPortrait = ((MultipartHttpServletRequest) request).getFile("headPortrait");
@@ -213,7 +213,7 @@ public class ProfileController extends BaseController {
                 }else if("14".equals(type)){
                     user.setSex(Integer.parseInt(content));
                     baseManager.saveOrUpdate(User.class.getName(), user);
-                    resultMapHandler.handlerResult("0", "请求成功", logBean);
+                    resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
                     resultMap.put("userInfo", user);
                 }
             } else {
