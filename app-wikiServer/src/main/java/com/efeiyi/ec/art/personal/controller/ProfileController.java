@@ -350,7 +350,7 @@ public class ProfileController extends BaseController {
 //            logBean.setMsg(jsonObj.toString());//************记录请求报文
             String signmsg = request.getParameter("signmsg");
             String timestamp = request.getParameter("timestamp");
-            String userId = request.getParameter("userId");
+//            String userId = request.getParameter("userId");
             String paramType = request.getParameter("paramType");
             String province = request.getParameter("province");
             String provinceName = request.getParameter("provinceName");
@@ -360,7 +360,7 @@ public class ProfileController extends BaseController {
             String phone = request.getParameter("phone");
             if ("".equals(signmsg)
                     || "".equals(timestamp)
-                    || "".equals(userId)
+//                    || "".equals(userId)
                     || "".equals(paramType)
                     || "".equals(artCategory)
                     || "".equals(titleCertificate)
@@ -370,7 +370,7 @@ public class ProfileController extends BaseController {
                     || "".equals(phone)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            treeMap.put("userId", userId);
+//            treeMap.put("userId", userId);
             treeMap.put("name", name);
             treeMap.put("phone", phone);
             treeMap.put("paramType", paramType);
@@ -385,7 +385,7 @@ public class ProfileController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            User user = (User) baseManager.getObject(User.class.getName(), userId);
+            User user = AuthorizationUtil.getUser();
             Master master = new Master();
             master.setTheStatus("2");
             master.setPresentAddress(provinceName);
