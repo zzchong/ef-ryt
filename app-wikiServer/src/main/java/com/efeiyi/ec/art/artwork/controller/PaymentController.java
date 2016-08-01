@@ -73,6 +73,8 @@ public class PaymentController extends BaseController {
 
     private final static String TITLE_INVEST = "投资";
 
+    private final static String ACCOUNT_INVEST = "余额投资";
+
     @RequestMapping(value = "/app/webhoot.do", method = RequestMethod.POST)
     @ResponseBody
     public void checkOrderPay(HttpServletRequest request, HttpServletResponse response) {
@@ -286,7 +288,7 @@ public class PaymentController extends BaseController {
         String title = "";//订单名称
         String billNo = "";//订单号
 
-        boolean isOk = false;
+        boolean isOk = false;//投资时使用 是否投资完成
         JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
 
         LogBean logBean = new LogBean();
@@ -458,6 +460,9 @@ public class PaymentController extends BaseController {
             bill.setRestMoney(account.getCurrentUsableBalance());
             bill.setMoney(money);
         }else if(jsonObj.getString("action").equals("account")){
+
+            money = new BigDecimal(jsonObj.getString("money"));
+
             title = "充值";
             billNo = account.getId();
 
@@ -465,6 +470,52 @@ public class PaymentController extends BaseController {
             bill.setType("0");
             bill.setRestMoney(account.getCurrentUsableBalance());
             bill.setMoney(money);
+        }else if(jsonObj.getString("action").equals("investAccount")){//余额投资s
+            if(account.getCurrentBalance().compareTo(money)<-1) {
+                 data.put("resultCode","100015");
+                 data.put("resultMsg","账户余额不足");
+                 return data;
+            }
+
+            if(artwork.getInvestsMoney().add(money).compareTo(artwork.getInvestGoalMoney())==1){
+                return resultMapHandler.handlerResult("10002", "最多只能投资"+artwork.getInvestGoalMoney().subtract(artwork.getInvestsMoney()), logBean);
+            }
+            if(artwork.getInvestsMoney().add(money).compareTo(artwork.getInvestGoalMoney())==0){
+                isOk = true;
+            }
+
+
+
+            account.setCurrentBalance(account.getCurrentBalance().subtract(money));
+            baseManager.saveOrUpdate(Account.class.getName(),account);
+
+            if(isOk){
+                artwork.setType("2");
+                artwork.setStep("21");
+                baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+            }
+
+            ArtworkInvest artworkInvest = new ArtworkInvest();
+            artworkInvest.setCreator(user);
+            artworkInvest.setPrice(money);
+            artworkInvest.setStatus("1");
+            artworkInvest.setArtwork(artwork);
+            artworkInvest.setType(type);
+            artworkInvest.setAccount(account);
+            artworkInvest.setCreateDatetime(new Date());
+            baseManager.saveOrUpdate(ArtworkInvest.class.getName(),artworkInvest);
+
+
+            bill.setDetail(user.getName()+"向项目<<"+artwork.getTitle()+">>投资:"+money);
+            bill.setType("1");
+            bill.setRestMoney(account.getCurrentUsableBalance());
+            bill.setMoney(money);
+            bill.setTitle(ACCOUNT_INVEST+"-"+artwork.getTitle());
+            baseManager.saveOrUpdate(Bill.class.getName(),bill);
+
+            data.put("resultCode","0");
+            data.put("resultMsg","成功");
+            return data;
         }
          baseManager.saveOrUpdate(Bill.class.getName(),bill);
          map.put("Bill_id",bill.getId());
@@ -477,6 +528,8 @@ public class PaymentController extends BaseController {
           bill.setFlowAccount(bcOrder.getChannelTradeNo());
           baseManager.saveOrUpdate(Bill.class.getName(),bill);
           data.put("url", bcOrder.getUrl());
+          data.put("resultCode","0");
+          data.put("resultMsg","成功");
           modelMap.put("resultHtml",bcOrder.getHtml());
         return data;
     }
