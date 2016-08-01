@@ -385,7 +385,9 @@ public class ProfileController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            User user = AuthorizationUtil.getUser();
+
+
+            User user = (User)baseManager.getObject(User.class.getName(),AuthorizationUtil.getUserId());
             Master master = new Master();
             master.setTheStatus("2");
             master.setPresentAddress(provinceName);
