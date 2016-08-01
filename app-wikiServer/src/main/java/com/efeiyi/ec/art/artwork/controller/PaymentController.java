@@ -472,7 +472,8 @@ public class PaymentController extends BaseController {
             bill.setMoney(money);
         }else if(jsonObj.getString("action").equals("investAccount")){//余额投资s
             money = new BigDecimal(jsonObj.getString("money"));
-            if(account.getCurrentBalance().compareTo(money)<-1) {
+            System.out.println(account.getCurrentBalance().compareTo(money));
+            if(account.getCurrentBalance().compareTo(money)<0) {
                  data.put("resultCode","100015");
                  data.put("resultMsg","账户余额不足");
                  return data;
