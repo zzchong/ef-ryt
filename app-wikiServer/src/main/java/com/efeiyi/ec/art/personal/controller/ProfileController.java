@@ -362,28 +362,28 @@ public class ProfileController extends BaseController {
                     || "".equals(timestamp)
 //                    || "".equals(userId)
                     || "".equals(paramType)
-                    || "".equals(artCategory)
-                    || "".equals(titleCertificate)
-                    || "".equals(provinceName)
-                    || "".equals(province)
+//                    || "".equals(artCategory)
+//                    || "".equals(titleCertificate)
+//                    || "".equals(provinceName)
+//                    || "".equals(province)
                     || "".equals(name)
                     || "".equals(phone)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
 //            treeMap.put("userId", userId);
-            treeMap.put("name", name);
-            treeMap.put("phone", phone);
-            treeMap.put("paramType", paramType);
-            treeMap.put("timestamp", timestamp);
-            treeMap.put("province", province);
-            treeMap.put("provinceName", provinceName);
-            treeMap.put("artCategory", artCategory);
-            treeMap.put("titleCertificate", titleCertificate);
-
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (!verify) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+//            treeMap.put("name", name);
+//            treeMap.put("phone", phone);
+//            treeMap.put("paramType", paramType);
+//            treeMap.put("timestamp", timestamp);
+//            treeMap.put("province", province);
+//            treeMap.put("provinceName", provinceName);
+//            treeMap.put("artCategory", artCategory);
+//            treeMap.put("titleCertificate", titleCertificate);
+//
+//            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+//            if (!verify) {
+//                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+//            }
 
 
 
