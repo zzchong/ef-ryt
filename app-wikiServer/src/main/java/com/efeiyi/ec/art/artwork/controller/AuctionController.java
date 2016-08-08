@@ -16,6 +16,7 @@ import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.taglib.PageEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -134,7 +135,7 @@ public class AuctionController extends BaseController {
      */
     @RequestMapping(value = "/app/artWorkAuctionView.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map artWorkAuctionView(HttpServletRequest request) {
+    public MappingJacksonValue artWorkAuctionView(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap;
         try {
@@ -142,12 +143,12 @@ public class AuctionController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionView");
-            if (!CommonUtil.jsonObject(jsonObj)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            /*if (!CommonUtil.jsonObject(jsonObj)) {
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean));
             }
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean));
+            }*/
             //项目信息
              Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
 
@@ -195,10 +196,10 @@ public class AuctionController extends BaseController {
             resultMap.put("isSubmitDepositPrice", isSubmitDepositPrice);
         } catch (Exception e) {
             e.printStackTrace();
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
     /**
@@ -207,7 +208,7 @@ public class AuctionController extends BaseController {
      */
     @RequestMapping(value = "/app/artworkBid.do")
     @ResponseBody
-    public Map artWorkBidOnAuction(HttpServletRequest request) {
+    public MappingJacksonValue artWorkBidOnAuction(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap;
         try {
@@ -215,22 +216,22 @@ public class AuctionController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkBidOnAuction");
-            if (!CommonUtil.jsonObject(jsonObj)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            /*if (!CommonUtil.jsonObject(jsonObj)) {
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean));
             }
             //校验数字签名
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean));
+            }*/
 
             resultMap = artworkAuctionManager.artworkBidOnAuction(request, jsonObj, logBean);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
     @RequestMapping(value = "/app/artWorkAuctionPayDeposit.do")
@@ -357,7 +358,7 @@ public class AuctionController extends BaseController {
      */
     @RequestMapping(value = "/app/plistArtworkBidding.do")
     @ResponseBody
-    public Map listArtworkBidding(HttpServletRequest request) {
+    public MappingJacksonValue listArtworkBidding(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<>();
         List artworkBiddingList;
@@ -366,14 +367,14 @@ public class AuctionController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("listArtworkBidding");
-            if (!CommonUtil.jsonObject(jsonObj)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            /*if (!CommonUtil.jsonObject(jsonObj)) {
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean));
             }
             //校验数字签名
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean));
             }
-
+*/
             XQuery xQuery = new XQuery("listArtworkBidding_default", request);
             xQuery.put("artwork_id", jsonObj.getString("artWorkId"));
             PageEntity pageEntity = new PageEntity();
@@ -408,10 +409,10 @@ public class AuctionController extends BaseController {
             resultMap.put("biddingTopThree", biddingTopThree);
         } catch (Exception e) {
             e.printStackTrace();
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
 

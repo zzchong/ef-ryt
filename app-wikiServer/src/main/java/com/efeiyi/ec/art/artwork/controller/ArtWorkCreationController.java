@@ -22,6 +22,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -130,7 +131,7 @@ public class ArtWorkCreationController extends BaseController {
      */
     @RequestMapping(value = "/app/artWorkCreationView.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map ArtWorkCreationView(HttpServletRequest request) {
+    public MappingJacksonValue ArtWorkCreationView(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
@@ -140,12 +141,12 @@ public class ArtWorkCreationController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkCreationView");
-            if (!CommonUtil.jsonObject(jsonObj)) {
+            /*if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+            }*/
             Artwork artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),jsonObj.getString("artWorkId"));
             //已创作时长
             String createdTime = "";
@@ -182,10 +183,10 @@ public class ArtWorkCreationController extends BaseController {
             resultMap.put("object",data);
         } catch(Exception e){
             e.printStackTrace();
-            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean));
         }
 
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
 

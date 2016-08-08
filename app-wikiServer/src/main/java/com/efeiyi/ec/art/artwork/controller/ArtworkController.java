@@ -34,6 +34,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -323,7 +324,7 @@ public class ArtworkController extends BaseController {
      */
     @RequestMapping(value = "/app/investorArtWorkView.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map investorArtWork(HttpServletRequest request) {
+    public MappingJacksonValue investorArtWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
@@ -332,18 +333,18 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("investorArtWorkView");
-            if (!CommonUtil.jsonObject(jsonObj)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            /*if (!CommonUtil.jsonObject(jsonObj)) {
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean));
             }
             boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean));
+            }*/
 
             //项目详情
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
             if (artwork == null) {
-                return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
             }
             //增加浏览数
             if (artwork.getViewNum() == null) {
@@ -451,10 +452,10 @@ public class ArtworkController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
     /**
@@ -465,7 +466,7 @@ public class ArtworkController extends BaseController {
      */
     @RequestMapping(value = "/app/investorArtWorkComment.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map investorArtWorkComment(HttpServletRequest request) {
+    public MappingJacksonValue investorArtWorkComment(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
@@ -474,13 +475,13 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("investorArtWorkComment");
-            if (!CommonUtil.jsonObject(jsonObj)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            /*if (!CommonUtil.jsonObject(jsonObj)) {
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean));
             }
             boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean));
+            }*/
 
 //            评论列表
             List<ArtworkComment> artworkCommentList = null;
@@ -501,10 +502,10 @@ public class ArtworkController extends BaseController {
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
     /**
@@ -515,7 +516,7 @@ public class ArtworkController extends BaseController {
      */
     @RequestMapping(value = "/app/investorArtWorkInvest.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map investorArtWorkInvest(HttpServletRequest request) {
+    public MappingJacksonValue investorArtWorkInvest(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
@@ -525,13 +526,13 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("investorArtWorkInvest");
-            if (!CommonUtil.jsonObject(jsonObj)) {
+            /*if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+            }*/
 
             //投资记录列表
             List<ArtworkInvest> artworkInvestList;
@@ -581,10 +582,10 @@ public class ArtworkController extends BaseController {
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
     /**

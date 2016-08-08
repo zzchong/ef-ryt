@@ -4,6 +4,7 @@ import com.efeiyi.ec.art.base.model.LogBean;
 import com.ming800.core.base.service.BaseManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -42,5 +43,15 @@ public class ResultMapHandler {
 
     public HttpServletResponse getResponse() {
         return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+    }
+
+    public MappingJacksonValue handlerResultType(HttpServletRequest request, Map<String, Object> map){
+        MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(map);
+        if(null != request.getParameter("callback") && !request.getParameter("callback").equals("")){
+            mappingJacksonValue.setJsonpFunction(request.getParameter("callback"));
+            return mappingJacksonValue;
+        }else {
+            return mappingJacksonValue;
+        }
     }
 }

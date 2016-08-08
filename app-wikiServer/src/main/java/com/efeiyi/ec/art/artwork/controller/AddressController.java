@@ -38,6 +38,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -349,7 +350,7 @@ public class AddressController extends BaseController {
      */
     @RequestMapping(value = "/app/getDefaultAddress.do")
     @ResponseBody
-    public Map getDefaultAddress(HttpServletRequest request) {
+    public MappingJacksonValue getDefaultAddress(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<>();
         TreeMap treeMap = new TreeMap();
@@ -358,13 +359,13 @@ public class AddressController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");
-            if (!CommonUtil.jsonObject(jsonObj)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            /*if (!CommonUtil.jsonObject(jsonObj)) {
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean));
             }
             //校验数字签名
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean));
+            }*/
 
             XQuery xQuery = new XQuery("listAddress_default1", request);
             xQuery.put("consumer_id", jsonObj.getString("currentUserId"));
@@ -384,10 +385,10 @@ public class AddressController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
 }
