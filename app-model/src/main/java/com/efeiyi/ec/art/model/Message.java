@@ -22,7 +22,7 @@ public class Message implements Serializable{
     private Date createDatetime;
     private String isWatch; //0 未读 1 已读
     private String status;
-    private Long isRead;
+    private Long isRead;//(好像废弃了)
 
     private String cid;
 

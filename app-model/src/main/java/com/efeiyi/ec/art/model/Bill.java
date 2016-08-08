@@ -19,7 +19,7 @@ import java.util.List;
 @Entity
 @Table(name = "app_bill_detail")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class Bill implements Serializable {
+public class Bill implements Serializable {//账单
     private String id;
     private String title;//标题
     private String detail;//账单详情

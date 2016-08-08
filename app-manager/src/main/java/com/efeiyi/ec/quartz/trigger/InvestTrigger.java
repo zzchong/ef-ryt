@@ -1,6 +1,6 @@
 package com.efeiyi.ec.quartz.trigger;
 
-import com.efeiyi.ec.quartz.job.AuctionJob;
+//import com.efeiyi.ec.quartz.job.AuctionJob;
 import com.efeiyi.ec.quartz.job.InvestJob;
 import com.efeiyi.ec.virtual.util.DigitalSignatureUtil;
 import org.quartz.*;

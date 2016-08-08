@@ -23,13 +23,13 @@ import java.util.Date;
 public class ArtworkInvest implements Serializable{//投资记录
     private String id;
     private Artwork artwork;
-    private BigDecimal price;//融资金额
+    private BigDecimal price;//投资金额
     private String status;//1成功 0 失败
     private User creator;//关联用户
-    private Date createDatetime;//融资时间
+    private Date createDatetime;//投资时间
     private Account account;//关联账户
-    private String type;//融资支付类型 1 支付宝 2 微信 0 余额
-    private String details;//融资详情
+    private String type;//投资支付类型 1 支付宝 2 微信 0 余额
+    private String details;//投资详情
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")

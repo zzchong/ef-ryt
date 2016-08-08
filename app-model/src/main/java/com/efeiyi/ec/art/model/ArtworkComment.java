@@ -26,7 +26,7 @@ public class ArtworkComment implements Serializable {
     private User creator;
     private Date createDatetime;
     private String status;
-    private String isWatch;
+    private String isWatch;//是否已读
     private ArtworkComment fatherComment;
     private List<ArtworkComment> subComment;
 

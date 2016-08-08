@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class ArtistTopListVO implements Serializable {
     private String author_id;
     private String truename;
-    private BigDecimal invest_goal_money;
+    private BigDecimal invest_goal_money;//投资目标金额
     private BigDecimal turnover;
     private String username;
     private String picture;

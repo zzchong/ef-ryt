@@ -213,7 +213,7 @@ public class SigninController extends BaseController {
 //        return resultMap;
 //    }
 
-
+//注册
     @RequestMapping(value = "/app/register.do", method = RequestMethod.POST)
     @ResponseBody
     public Map register(HttpServletRequest request) {
@@ -349,7 +349,7 @@ public class SigninController extends BaseController {
     }
 
 
-
+    //用户绑定设备
     @RequestMapping(value = "/app/userBinding.do", method = RequestMethod.POST)
     @ResponseBody
     public Map JpushBinding(HttpServletRequest request) {
@@ -553,7 +553,7 @@ public class SigninController extends BaseController {
    }
 
 
-
+    //完善用户信息
     @RequestMapping(value = "/app/completeUserInfo.do", method = RequestMethod.POST)
     @ResponseBody
     public  Map completeUserInfo(HttpServletRequest request){//,@RequestParam MultiValueMap<String, Object> params, @RequestParam("headPortrait") MultipartFile headPortrait
@@ -681,7 +681,7 @@ public class SigninController extends BaseController {
 
 
 
-    //找回密码
+    //意见反馈
     @RequestMapping(value = "/app/feedBack.do", method = RequestMethod.POST)
     @ResponseBody
     public Map feedBack(HttpServletRequest request) {
@@ -782,7 +782,7 @@ public class SigninController extends BaseController {
         }
     }
 
-    //微信登录
+    //微信登录（目前不使用了）
     @RequestMapping(value = "/app/WxLogin.do", method = RequestMethod.POST)
     @ResponseBody
     public Map WxLogin(HttpServletRequest request) {

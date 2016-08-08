@@ -42,7 +42,7 @@ public class Master implements Serializable{
     private User user; //大师跟用户的关系映射
     private List<Artwork> artworks;
     private String artCategory;
-    private String titleCertificate;
+    private String titleCertificate;//大师认证
     private List<ArtMasterAttachment> workShopPhotos;//工作室照片
     private List<ArtMasterAttachment> worksPhotos;//作品照片
     private String feedback;//审批意见

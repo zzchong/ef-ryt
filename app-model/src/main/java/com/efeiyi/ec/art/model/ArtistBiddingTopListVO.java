@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 public class ArtistBiddingTopListVO implements Serializable {
     private String author_id;
     private String truename;
-    private BigDecimal bidding_rate;
+    private BigDecimal bidding_rate;//溢价率
     private String username;
     private String picture;
     public ArtistBiddingTopListVO(){

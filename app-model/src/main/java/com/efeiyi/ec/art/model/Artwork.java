@@ -30,11 +30,11 @@ public class Artwork implements Serializable {
     private Date investStartDatetime;//融资开始时间
     private Date investEndDatetime;//融资结束时间、创作开始时间
     private Date auctionStartDatetime;//拍卖开始时间
-    private Date auctionEndDatetime;
-    private User author;
+    private Date auctionEndDatetime;//拍卖结束时间
+    private User author;//项目作者
     //    private Master master;
     private Date createDatetime;
-    private List<ArtworkAttachment> artworkAttachment;
+    private List<ArtworkAttachment> artworkAttachment;//项目附件
     private List<ArtworkComment> artworkComments;//项目评论
     private List<ArtworkInvest> artworkInvests;//项目投资
 //    private List<ArtworkInvest> artworkInvestCount;//投资笔数
@@ -58,8 +58,8 @@ public class Artwork implements Serializable {
     private String feedback;//审批意见
     private Integer duration;//创作时长
 
-    private Artworkdirection artworkdirection;
-    private BigDecimal startingPrice;
+    private Artworkdirection artworkdirection;//制作说明和疑难解惑
+    private BigDecimal startingPrice;//起拍价格
 
     private Integer commentNum = 0;//评论数
     private Integer praiseNUm = 0;//点赞数
