@@ -322,7 +322,7 @@ public class ArtworkController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/investorArtWorkView.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/investorArtWorkView.do")
     @ResponseBody
     public MappingJacksonValue investorArtWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
@@ -464,7 +464,7 @@ public class ArtworkController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/investorArtWorkComment.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/investorArtWorkComment.do")
     @ResponseBody
     public MappingJacksonValue investorArtWorkComment(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
@@ -514,7 +514,7 @@ public class ArtworkController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/investorArtWorkInvest.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/investorArtWorkInvest.do")
     @ResponseBody
     public MappingJacksonValue investorArtWorkInvest(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录

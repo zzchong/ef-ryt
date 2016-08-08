@@ -133,7 +133,7 @@ public class AuctionController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/artWorkAuctionView.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/artWorkAuctionView.do")
     @ResponseBody
     public MappingJacksonValue artWorkAuctionView(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录

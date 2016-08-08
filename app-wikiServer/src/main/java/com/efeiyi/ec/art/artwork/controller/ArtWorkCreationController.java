@@ -129,7 +129,7 @@ public class ArtWorkCreationController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/artWorkCreationView.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/artWorkCreationView.do")
     @ResponseBody
     public MappingJacksonValue ArtWorkCreationView(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
