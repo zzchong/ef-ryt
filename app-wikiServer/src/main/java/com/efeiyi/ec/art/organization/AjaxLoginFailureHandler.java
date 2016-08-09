@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ming800.core.base.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -53,10 +54,14 @@ public class AjaxLoginFailureHandler implements AuthenticationFailureHandler {
             Map<String, Object> resultMap = new HashMap<String, Object>();
 
             resultMap = resultMapHandler.handlerResult("10003","用户名或密码错误",logBean);
-
-            //失败为-1
             JSONObject jsonData = new JSONObject(resultMap);
-            objectMapper.writeValue(jsonGenerator, jsonData);
+            //失败为-1
+            if (null != request.getParameter("callback") &&!request.getParameter("callback").equals("")){
+                String callback = request.getParameter("callback");
+                response.getWriter().write(callback+"("+ jsonData +")");
+            }else {
+                objectMapper.writeValue(jsonGenerator, jsonData);
+            }
         } catch (JsonProcessingException ex) {
             throw new HttpMessageNotWritableException("Could not write JSON: " + ex.getMessage(), ex);
         }
