@@ -52,8 +52,7 @@ public class AjaxLoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         ObjectMapper objectMapper = new ObjectMapper();
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
-        JsonGenerator jsonGenerator = objectMapper.getJsonFactory().createJsonGenerator(response.getOutputStream(),
-                JsonEncoding.UTF8);
+
         try {
            Map map = userManager.loginSuccess(AuthorizationUtil.getUser().getId());
             //成功为0
@@ -62,6 +61,8 @@ public class AjaxLoginSuccessHandler implements AuthenticationSuccessHandler {
                 String callback = request.getParameter("callback");
                 response.getWriter().write(callback+"("+ jsonData +")");
             }else {
+                JsonGenerator jsonGenerator = objectMapper.getJsonFactory().createJsonGenerator(response.getOutputStream(),
+                        JsonEncoding.UTF8);
                 objectMapper.writeValue(jsonGenerator, jsonData);
             }
 

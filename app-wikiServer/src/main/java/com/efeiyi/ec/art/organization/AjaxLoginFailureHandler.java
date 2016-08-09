@@ -42,8 +42,6 @@ public class AjaxLoginFailureHandler implements AuthenticationFailureHandler {
 
         ObjectMapper objectMapper = new ObjectMapper();
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
-        JsonGenerator jsonGenerator = objectMapper.getJsonFactory().createJsonGenerator(response.getOutputStream(),
-                JsonEncoding.UTF8);
         try {
             //日志
             LogBean logBean = new LogBean();
@@ -60,6 +58,8 @@ public class AjaxLoginFailureHandler implements AuthenticationFailureHandler {
                 String callback = request.getParameter("callback");
                 response.getWriter().write(callback+"("+ jsonData +")");
             }else {
+                JsonGenerator jsonGenerator = objectMapper.getJsonFactory().createJsonGenerator(response.getOutputStream(),
+                        JsonEncoding.UTF8);
                 objectMapper.writeValue(jsonGenerator, jsonData);
             }
         } catch (JsonProcessingException ex) {
