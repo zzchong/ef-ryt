@@ -770,9 +770,9 @@ public class ArtworkController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/artworkComment.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/artworkComment.do")
     @ResponseBody
-    public Map artworkComment(HttpServletRequest request) {
+    public MappingJacksonValue artworkComment(HttpServletRequest request) {
         LogBean logBean = new LogBean();
         Map<String, Object> resultMap = new HashMap<>();
         List objectList = null;
@@ -781,24 +781,24 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObject.toString());
             logBean.setApiName("artworkComment");
-            if (!CommonUtil.jsonObject(jsonObject)) {
+            /*if (!CommonUtil.jsonObject(jsonObject)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             if (!DigitalSignatureUtil.verify2(jsonObject)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+            }*/
 
             if (artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
-                return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+                return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
-        return resultMap;
+        return resultMapHandler.handlerResultType(request, resultMap);
     }
 
     /**
