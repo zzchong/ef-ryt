@@ -33,7 +33,7 @@ public class RestfulUsernamePasswordAuthenticationInterceptor extends AbstractAu
     @Autowired
     private UserManager userManager;
 
-    private boolean postOnly = true;
+    private boolean postOnly = false;
 
 
     protected RestfulUsernamePasswordAuthenticationInterceptor(){
