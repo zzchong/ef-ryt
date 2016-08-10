@@ -51,7 +51,7 @@ public class AjaxLoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         ObjectMapper objectMapper = new ObjectMapper();
-        response.setHeader("Content-Type", "application/json;charset=UTF-8");
+        response.setHeader("Content-Type", "application/javascript;application/json;charset=UTF-8");
 
         try {
            Map map = userManager.loginSuccess(AuthorizationUtil.getUser().getId());

@@ -41,7 +41,7 @@ public class AjaxLoginFailureHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        response.setHeader("Content-Type", "application/json;charset=UTF-8");
+        response.setHeader("Content-Type", "application/javascript;application/json;charset=UTF-8");
         try {
             //日志
             LogBean logBean = new LogBean();
