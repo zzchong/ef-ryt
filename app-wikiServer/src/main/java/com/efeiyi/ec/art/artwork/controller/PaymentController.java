@@ -529,7 +529,7 @@ public class PaymentController extends BaseController {
           bill.setTitle(title);
           bill.setFlowAccount(bcOrder.getChannelTradeNo());
           baseManager.saveOrUpdate(Bill.class.getName(),bill);
-          data.put("url", bcOrder.getUrl());
+          data.put("url", bcOrder.getUrl().replace(" ","%20"));
           data.put("resultCode","0");
           data.put("resultMsg","成功");
           modelMap.put("resultHtml",bcOrder.getHtml());

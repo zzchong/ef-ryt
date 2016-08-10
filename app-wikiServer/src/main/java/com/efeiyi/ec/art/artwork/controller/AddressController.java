@@ -370,7 +370,7 @@ public class AddressController extends BaseController {
             XQuery xQuery = new XQuery("listAddress_default1", request);
             xQuery.put("consumer_id", jsonObj.getString("currentUserId"));
             List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
-            if (consumerAddressList.size() != 1) {
+            if (consumerAddressList.size() > 1) {
                 resultMap.put("resultCode", "10005");
                 resultMap.put("resultMsg", "数据查询异常");
             } else if (!consumerAddressList.isEmpty()) {
