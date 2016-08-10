@@ -20,6 +20,7 @@ import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
+import com.sun.xml.internal.ws.resources.HttpserverMessages;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -85,13 +87,13 @@ public class ArtworkController extends BaseController {
             JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
 
 
-            Map<String,Object> paramMap = new HashMap<>();
+            Map<String, Object> paramMap = new HashMap<>();
 
             List<Artwork> artworkList = null;
             List<ArtWorkPraise> artWorkPraiseList = new ArrayList<>();
             List<ArtworkInvest> artworkInvestList = new ArrayList<>();
 
-            User user = (User) baseManager.getObject(User.class.getName(),jsonObject.getString("userId"));
+            User user = (User) baseManager.getObject(User.class.getName(), jsonObject.getString("userId"));
 
             PageEntity pageEntity = new PageEntity();
             pageEntity.setIndex(jsonObject.getInteger("pageIndex"));
@@ -104,31 +106,30 @@ public class ArtworkController extends BaseController {
             String action = jsonObject.getString("action");
 
 
-
-            if("index".equals(action)){
+            if ("index".equals(action)) {
                 XQuery query = new XQuery("plistArtwork_default", request);
                 query.setPageEntity(pageEntity);
-                query.put("type",type);
-                query.put("step",step);
+                query.put("type", type);
+                query.put("step", step);
                 artworkList = baseManager.listPageInfo(query).getList();
 
-            }else if("userMain".equals(action)){
-                XQuery query = new XQuery("plistArtwork_default",request);
+            } else if ("userMain".equals(action)) {
+                XQuery query = new XQuery("plistArtwork_default", request);
                 query.setPageEntity(pageEntity);
-                query.put("author_id",user.getId());
+                query.put("author_id", user.getId());
                 artworkList = baseManager.listPageInfo(query).getList();
 
-            }else if("invest".equals(action)){
+            } else if ("invest".equals(action)) {
                 artworkList = new ArrayList<>();
                 LinkedHashMap<String, Object> params = new LinkedHashMap<>();
                 params.put("userId", user.getId());
-                artworkInvestList = baseManager.listPageInfo(AppConfig.SQL_INVEST_ARTWORK,pageEntity, params).getList();
+                artworkInvestList = baseManager.listPageInfo(AppConfig.SQL_INVEST_ARTWORK, pageEntity, params).getList();
 
 //                XQuery query = new XQuery("plistArtworkInvest_byUser",request);
 //                query.setPageEntity(pageEntity);
 //                query.put("creator_id",user.getId());
 //                artworkInvestList = baseManager.listPageInfo(query).getList();
-                if(artworkInvestList!=null && artworkInvestList.size()>0) {
+                if (artworkInvestList != null && artworkInvestList.size() > 0) {
                     for (ArtworkInvest artworkInvest : artworkInvestList) {
                         Artwork artwork = artworkInvest.getArtwork();
                         //是否点赞
@@ -158,13 +159,13 @@ public class ArtworkController extends BaseController {
 //                paramMap.put("investTotal",investTotal==null?0:investTotal);
 //                paramMap.put("rewardTotal",rewardTotal==null?0:rewardTotal);
 //                paramMap.put("author",AuthorizationUtil.getUser());
-            }else if("praise".equals(action)){
+            } else if ("praise".equals(action)) {
                 artworkList = new ArrayList<>();
-                XQuery query = new XQuery("plistArtWorkPraise_byUser",request);
+                XQuery query = new XQuery("plistArtWorkPraise_byUser", request);
                 query.setPageEntity(pageEntity);
-                query.put("user_id",user.getId());
+                query.put("user_id", user.getId());
                 artWorkPraiseList = baseManager.listPageInfo(query).getList();
-                if(artWorkPraiseList!=null && artWorkPraiseList.size()>0) {
+                if (artWorkPraiseList != null && artWorkPraiseList.size() > 0) {
                     for (ArtWorkPraise artWorkPraise : artWorkPraiseList) {
                         Artwork artwork = artWorkPraise.getArtwork();
                         //是否点赞
@@ -189,12 +190,11 @@ public class ArtworkController extends BaseController {
             }
 
 
-
-            paramMap.put("artworkList",artworkList);
+            paramMap.put("artworkList", artworkList);
 
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "成功");
-            resultMap.put("data",paramMap);
+            resultMap.put("data", paramMap);
         } catch (Exception e) {
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -213,7 +213,7 @@ public class ArtworkController extends BaseController {
         try {
 
             JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
-            Map<String,Object> paramMap = new HashMap<>();
+            Map<String, Object> paramMap = new HashMap<>();
 
             //是否关注
             Boolean isFollowed = false;
@@ -228,10 +228,10 @@ public class ArtworkController extends BaseController {
                     }
                 }
             }
-            paramMap.put("isFollowed",isFollowed);
+            paramMap.put("isFollowed", isFollowed);
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "成功");
-            resultMap.put("data",paramMap);
+            resultMap.put("data", paramMap);
         } catch (Exception e) {
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
@@ -275,32 +275,31 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             String userId = "";
-            if(AuthorizationUtil.getUser()!=null)
+            if (AuthorizationUtil.getUser() != null)
                 userId = AuthorizationUtil.getUser().getId();
             System.out.println(userId);
             String hql = "from Artwork WHERE 1=1 and status = '1' and type='1' and step='14' order by createDatetime DESC";
             String sql = "SELECT COUNT(1) FROM ArtWorkPraise m where user.id=:userId and artwork.id=:artworkId and status !='0'";
             artworkList = (List<Artwork>) messageDao.getPageList(hql, (jsonObj.getInteger("pageIndex") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
             List<ArtWorkPraiseBean> objectList = new ArrayList<>();
-            LinkedHashMap<String,Object> map = new LinkedHashMap<>();
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
             map.put("userId", userId);
             for (Artwork artwork : artworkList) {
-                artwork.setInvestRestTime(TimeUtil.getDistanceTimes(artwork.getInvestEndDatetime(),new Date()));
+                artwork.setInvestRestTime(TimeUtil.getDistanceTimes(artwork.getInvestEndDatetime(), new Date()));
 //                if(artwork.getPicture_url()!=null) {
 //                    artwork.setHeight(ImgUtil.getHeight(artwork.getPicture_url()));
 //                    artwork.setWidth(ImgUtil.getWidth(artwork.getPicture_url()));
 //                }
-                map.put("artworkId",artwork.getId());
-                List<Long> count = (List<Long>) baseManager.listObject(sql,map);
-                if(count.get(0)==0) {
+                map.put("artworkId", artwork.getId());
+                List<Long> count = (List<Long>) baseManager.listObject(sql, map);
+                if (count.get(0) == 0) {
                     artwork.setPraise(false);
-                }
-                else {
+                } else {
                     artwork.setPraise(true);
                 }
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-            paramMap.put("artworkList",artworkList);
+            paramMap.put("artworkList", artworkList);
             if (artworkList != null && !artworkList.isEmpty()) {
                 resultMap.put("data", paramMap);
             } else {
@@ -352,7 +351,7 @@ public class ArtworkController extends BaseController {
             } else {
                 artwork.setViewNum(artwork.getViewNum() + 1);
             }
-            baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+            baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
             //投资人
             List<User> investPeople = null;
             LinkedHashMap<String, Object> params = new LinkedHashMap<>();
@@ -372,13 +371,13 @@ public class ArtworkController extends BaseController {
 
             List<UserFollowedBean> userFollowedBeanList = new ArrayList<>();
             //点赞列表
-            XQuery xQuery1 = new XQuery("listArtWorkPraise_byArtWorkId",request);
-            xQuery1.put("artwork_id",jsonObj.getString("artWorkId"));
+            XQuery xQuery1 = new XQuery("listArtWorkPraise_byArtWorkId", request);
+            xQuery1.put("artwork_id", jsonObj.getString("artWorkId"));
             List<ArtWorkPraise> artWorkPraiseList1 = baseManager.listObject(xQuery1);
             UserFollowedBean userFollowedBean = null;
-            for (ArtWorkPraise artWorkPraise :artWorkPraiseList1){
-                 boolean isFollowed = false;
-                  userFollowedBean = new UserFollowedBean();
+            for (ArtWorkPraise artWorkPraise : artWorkPraiseList1) {
+                boolean isFollowed = false;
+                userFollowedBean = new UserFollowedBean();
                 if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
                     XQuery xQuery = new XQuery("listArtUserFollowed_isFollowed", request);
                     xQuery.put("user_id", AuthorizationUtil.getUserId());
@@ -392,7 +391,7 @@ public class ArtworkController extends BaseController {
                 }
                 userFollowedBean.setUser(artWorkPraise.getUser());
                 userFollowedBean.setFollowed(isFollowed);
-                  userFollowedBeanList.add(userFollowedBean);
+                userFollowedBeanList.add(userFollowedBean);
             }
 
             //剩余时间
@@ -445,7 +444,7 @@ public class ArtworkController extends BaseController {
             data.put("artworkAttachmentList", artworkAttachmentList);
             data.put("artWorkPraiseList", userFollowedBeanList);
             data.put("isPraise", isPraise);
-            data.put("isFollowed",isFollowed);
+            data.put("isFollowed", isFollowed);
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
 
             resultMap.put("object", data);
@@ -617,12 +616,12 @@ public class ArtworkController extends BaseController {
             pageEntity.setSize(jsonObject.getInteger("size"));
             pageEntity.setIndex(jsonObject.getInteger("index"));
 
-            XQuery xQuery = new XQuery("plistArtWorkPraise_default",request);
-            xQuery.put("artwork_id",jsonObject.getString("artworkId"));
+            XQuery xQuery = new XQuery("plistArtWorkPraise_default", request);
+            xQuery.put("artwork_id", jsonObject.getString("artworkId"));
             xQuery.setPageEntity(pageEntity);
             List<ArtWorkPraise> artWorkPraiseList = baseManager.listPageInfo(xQuery).getList();
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-            resultMap.put("object",artWorkPraiseList);
+            resultMap.put("object", artWorkPraiseList);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -657,14 +656,14 @@ public class ArtworkController extends BaseController {
 
             Map paramMap = new HashMap();
             String action = jsonObject.getString("action");
-            paramMap.put("isPraise",action);
-            if("1".equals(action)) {
+            paramMap.put("isPraise", action);
+            if ("1".equals(action)) {
                 if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
                     resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                 } else {
                     return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
                 }
-            }else if("0".equals(action)) {
+            } else if ("0".equals(action)) {
 
                 if (artworkManager.cancelArtWorkPraise(request, jsonObject.getString("artworkId"))) {
                     resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
@@ -673,7 +672,7 @@ public class ArtworkController extends BaseController {
                 }
             }
 
-            resultMap.put("data",paramMap);
+            resultMap.put("data", paramMap);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1397,7 +1396,7 @@ public class ArtworkController extends BaseController {
                         }
                     }
                     artwork.setStep("23");
-                    baseManager.saveOrUpdate(Artwork.class.getName(),artwork);
+                    baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
                     resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                     resultMap.put("artwork", artwork);
                     return resultMap;
@@ -1474,8 +1473,8 @@ public class ArtworkController extends BaseController {
         Map<String, Object> map = new HashMap<String, Object>();
 
         /**investorIndex.do测试加密参数**/
-        map.put("pageSize","10");
-        map.put("pageNum","1");
+        map.put("pageSize", "10");
+        map.put("pageNum", "1");
         map.put("timestamp", timestamp);
         /**investorArtWorkView.do测试加密参数**/
 //        map.put("artWorkId", "qydeyugqqiugd2");
@@ -1648,23 +1647,23 @@ public class ArtworkController extends BaseController {
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(),jsonObj.getString("id"));
-            String type =jsonObj.getString("type");
-            if("invest".equals(type)) {
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("id"));
+            String type = jsonObj.getString("type");
+            if ("invest".equals(type)) {
                 if (artwork.getInvestsMoney().compareTo(artwork.getInvestGoalMoney()) >= 0 && "1".equals(artwork.getType())) {
                     artwork.setType("2");
                     artwork.setStep("21");
                     baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
                 }
-            }else if("auction".equals(type)){
+            } else if ("auction".equals(type)) {
                 artwork.setType("3");
-                XQuery xQuery = new XQuery("listArtworkBidding_default",request);
-                xQuery.put("artwork_id",artwork.getId());
+                XQuery xQuery = new XQuery("listArtworkBidding_default", request);
+                xQuery.put("artwork_id", artwork.getId());
                 List<ArtworkBidding> artworkBiddingList = baseManager.listObject(xQuery);
-                if(artworkBiddingList!=null && artworkBiddingList.size()>0){
+                if (artworkBiddingList != null && artworkBiddingList.size() > 0) {
                     artwork.setStep("32");
                     artwork.setWinner(artworkBiddingList.get(0).getCreator());
-                }else {
+                } else {
                     artwork.setStep("33");
                 }
                 baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
@@ -1674,6 +1673,52 @@ public class ArtworkController extends BaseController {
             e.printStackTrace();
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
+    }
+
+    @RequestMapping({"/app/artWorkNum.do"})
+    @ResponseBody
+    public MappingJacksonValue artWorkNum(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> resultMap;
+        LogBean logBean = new LogBean();
+        MappingJacksonValue mappingJacksonValue;
+        try {
+            LinkedHashMap<String, Object> queryParam = new LinkedHashMap<>();
+            queryParam.put("masterId", request.getParameter("masterId"));
+            String hql = "select obj from " + Artwork.class.getName() + " obj where obj.author.id=:masterId";
+            List<Artwork> artworkList = baseManager.listObject(hql, queryParam);
+            resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
+            resultMap.put("artworkList", artworkList);
+        } catch (Exception e) {
+            resultMap = resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+        mappingJacksonValue = new MappingJacksonValue(resultMap);
+        if (request.getParameter("callback") != null) {
+            mappingJacksonValue.setJsonpFunction(request.getParameter("callback"));
+        }
+        return mappingJacksonValue;
+    }
+
+    @RequestMapping({"/app/fansNum.do"})
+    @ResponseBody
+    public MappingJacksonValue fansNum(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> resultMap;
+        LogBean logBean = new LogBean();
+        MappingJacksonValue mappingJacksonValue;
+        try {
+            LinkedHashMap<String, Object> queryParam = new LinkedHashMap<>();
+            queryParam.put("masterId", request.getParameter("masterId"));
+            String hql = "select obj from " + ArtUserFollowed.class.getName() + " obj where obj.follower.id=:masterId";
+            List<ArtUserFollowed> artUserFollowedList = baseManager.listObject(hql, queryParam);
+            resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
+            resultMap.put("artUserFollowedList", artUserFollowedList);
+        } catch (Exception e) {
+            resultMap = resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+        mappingJacksonValue = new MappingJacksonValue(resultMap);
+        if (request.getParameter("callback") != null) {
+            mappingJacksonValue.setJsonpFunction(request.getParameter("callback"));
+        }
+        return mappingJacksonValue;
     }
 
 
