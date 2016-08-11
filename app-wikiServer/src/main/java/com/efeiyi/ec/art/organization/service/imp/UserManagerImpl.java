@@ -57,7 +57,6 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
     }
 
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
         System.out.println("loadUserByUsername");
@@ -77,6 +76,7 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
 
     /**
      * 登录成功
+     *
      * @param userId
      * @return
      */
@@ -94,7 +94,22 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
 
             //返回json
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-            resultMap.put("userInfo", user);
+            User userTemp = new User();
+            userTemp.setId(user.getId());
+            userTemp.setStatus(user.getStatus());
+            userTemp.setCreateDatetime(user.getCreateDatetime());
+            userTemp.setType(user.getType());
+            userTemp.setCityId(user.getCityId());
+            userTemp.setFansNum(user.getFansNum());
+            userTemp.setMaster(user.getMaster());
+            userTemp.setName(user.getName());
+            userTemp.setMasterWorkNum(user.getMasterWorkNum());
+            userTemp.setPictureUrl(user.getPictureUrl());
+            userTemp.setRole(user.getRole());
+            userTemp.setSex(user.getSex());
+            userTemp.setSignMessage(user.getSignMessage());
+            userTemp.setUsername(user.getUsername());
+            resultMap.put("userInfo", userTemp);
             //获取用户的关注数量  粉丝
             LinkedHashMap<String, Object> paramMap = new LinkedHashMap<String, Object>();
             paramMap.put("userId", user.getId());
@@ -176,40 +191,41 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
 
             return resultMap;
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            resultMap = resultMapHandler.handlerResult("10005","查询数据出现异常:"+e.getMessage(),logBean);
+            resultMap = resultMapHandler.handlerResult("10005", "查询数据出现异常:" + e.getMessage(), logBean);
             return resultMap;
         }
     }
 
     /**
      * 微信，手机登录验证
+     *
      * @param jsonObj
      * @return
      */
     @Override
-    public Map<String,String> usernameAuthentication(JSONObject jsonObj){
+    public Map<String, String> usernameAuthentication(JSONObject jsonObj) {
         Map<String, String> resultMap = new HashMap<String, String>();
-        if(!StringUtils.isEmpty(jsonObj.getString("unionid"))){//微信登录
+        if (!StringUtils.isEmpty(jsonObj.getString("unionid"))) {//微信登录
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
             map.put("unionid", jsonObj.getString("unionid"));
             MyUser user = null;
             try {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_WX_LOGIN, map);
-                if (user!=null && user.getId()!=null) {
-                    if(StringUtils.isEmpty(user.getUsername())){
-                        user.setUsername(System.currentTimeMillis()+"");
-                        user.setPassword(StringUtil.encodePassword("rongyitou","SHA1"));
-                        baseManager.saveOrUpdate(User.class.getName(),user);
+                if (user != null && user.getId() != null) {
+                    if (StringUtils.isEmpty(user.getUsername())) {
+                        user.setUsername(System.currentTimeMillis() + "");
+                        user.setPassword(StringUtil.encodePassword("rongyitou", "SHA1"));
+                        baseManager.saveOrUpdate(User.class.getName(), user);
                     }
-                    resultMap.put("username",user.getUsername());
-                    resultMap.put("password","rongyitou");
-                    return  resultMap;
-                }else {
+                    resultMap.put("username", user.getUsername());
+                    resultMap.put("password", "rongyitou");
+                    return resultMap;
+                } else {
                     user = new MyUser();
-                    user.setUsername(System.currentTimeMillis()+"");
-                    user.setPassword(StringUtil.encodePassword("rongyitou","SHA1"));
+                    user.setUsername(System.currentTimeMillis() + "");
+                    user.setPassword(StringUtil.encodePassword("rongyitou", "SHA1"));
                     user.setName(jsonObj.getString("nickname"));
                     user.setUnionid(jsonObj.getString("unionid"));
                     user.setPictureUrl(jsonObj.getString("headimgurl"));
@@ -220,35 +236,35 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
                     user.setStatus(1);
                     user.setUtype(2);
                     user.setCreateDatetime(new Date());
-                    baseManager.saveOrUpdate(MyUser.class.getName(),user);
+                    baseManager.saveOrUpdate(MyUser.class.getName(), user);
                     //给用户绑定一个账户
                     Account account = new Account();
                     account.setCurrentUsableBalance(new BigDecimal("0.00"));
                     account.setCurrentBalance(new BigDecimal("0.00"));
                     account.setCreateDatetime(new Date());
                     account.setStatus("1");
-                    account.setUser((User)baseManager.getObject(User.class.getName(),user.getId()));
-                    baseManager.saveOrUpdate(Account.class.getName(),account);
-                    resultMap.put("username",user.getUsername());
-                    resultMap.put("password","rongyitou");
-                    return  resultMap;
+                    account.setUser((User) baseManager.getObject(User.class.getName(), user.getId()));
+                    baseManager.saveOrUpdate(Account.class.getName(), account);
+                    resultMap.put("username", user.getUsername());
+                    resultMap.put("password", "rongyitou");
+                    return resultMap;
                 }
             } catch (Exception e) {
-                resultMap.put("errorMsg",e.getMessage());
-                return  resultMap;
+                resultMap.put("errorMsg", e.getMessage());
+                return resultMap;
             }
-        }else {//手机登录
+        } else {//手机登录
             String username = jsonObj.getString("username");
             String password = jsonObj.getString("password");
 
-            if(StringUtils.isEmpty(username))
+            if (StringUtils.isEmpty(username))
                 username = "";
-            if(StringUtils.isEmpty(password))
-                password="";
+            if (StringUtils.isEmpty(password))
+                password = "";
 
-            resultMap.put("username",username.trim());
-            resultMap.put("password",password);
-            return  resultMap;
+            resultMap.put("username", username.trim());
+            resultMap.put("password", password);
+            return resultMap;
 
         }
     }
