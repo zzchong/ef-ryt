@@ -41,7 +41,7 @@ public class AppConfig {
             " GROUP BY aw.id " +
             " ORDER BY Bidding_rate desc " +
             " LIMIT ";
-    public static final String GET_ARTIST_TOP_LIST3 = "SELECT ou.id as author_id,ou.username,ou.truename,ou.picture,(SUM(b.pr)-SUM(a.invest_goal_money))/SUM(a.invest_goal_money) AS bidding_rate "+
+    public static final String GET_ARTIST_TOP_LIST3 = "SELECT ou.id as author_id,ou.username,ou.truename,ou.picture,SUM(b.pr)/SUM(a.invest_goal_money) AS bidding_rate "+
            "FROM (select MAX(price) as pr,art_work_id from app_art_work_bidding GROUP BY art_work_id) b, "+
            "app_art_work a,organization_user ou "+
            "WHERE a.id = b.art_work_id AND ou.id = a.author_id AND a.type = '3' AND a.step = '32' AND a.status = '1' GROUP BY a.author_id ORDER BY bidding_rate desc LIMIT ";

@@ -91,6 +91,9 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
            XQuery xQuery = new XQuery("listArtWorkPraise_default",request);
             xQuery.put("artwork_id",artworkId);
+            if(null != request.getParameter("messageId") && !request.getParameter("messageId").equals("")){
+                xQuery.put("artworkMessage_id", request.getParameter("messageId"));
+            }
             xQuery.put("user_id",AuthorizationUtil.getUser().getId());
             List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
             if(artWorkPraiseList!=null && artWorkPraiseList.size()>0){

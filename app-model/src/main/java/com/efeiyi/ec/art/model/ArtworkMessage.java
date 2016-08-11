@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 import com.efeiyi.ec.art.organization.model.User;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -11,12 +13,11 @@ import java.util.List;
 
 /**
  * Created by Administrator on 2016/1/25.
- *
  */
 @Entity
 @Table(name = "app_art_work_message")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class ArtworkMessage implements Serializable{//项目动态
+public class ArtworkMessage implements Serializable {//项目动态
     private String id;
     private String content;
     private User creator;
@@ -29,6 +30,7 @@ public class ArtworkMessage implements Serializable{//项目动态
 
     private Integer commentNum = 0;//评论数
     private Integer praiseNum = 0; //点赞数
+
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -39,6 +41,7 @@ public class ArtworkMessage implements Serializable{//项目动态
     public void setId(String id) {
         this.id = id;
     }
+
     @Column(name = "content")
     public String getContent() {
         return content;
@@ -47,6 +50,7 @@ public class ArtworkMessage implements Serializable{//项目动态
     public void setContent(String content) {
         this.content = content;
     }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public User getCreator() {
@@ -95,8 +99,8 @@ public class ArtworkMessage implements Serializable{//项目动态
         this.artworkMessageAttachments = artworkMessageAttachments;
     }
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "artworkMessage")
-    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artworkMessage")
+    @Where(clause = "status=1")
     public List<ArtWorkPraise> getArtWorkPraiseList() {
         return artWorkPraiseList;
     }
@@ -105,7 +109,7 @@ public class ArtworkMessage implements Serializable{//项目动态
         this.artWorkPraiseList = artWorkPraiseList;
     }
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "artworkMessage")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "artworkMessage")
     @OrderBy(value = "createDatetime desc")
     public List<ArtworkComment> getArtworkCommentList() {
         return artworkCommentList;
@@ -118,7 +122,7 @@ public class ArtworkMessage implements Serializable{//项目动态
     @Transient
     public Integer getCommentNum() {
 
-        if (artworkCommentList!=null)
+        if (artworkCommentList != null)
             commentNum = artworkCommentList.size();
         return commentNum;
     }
@@ -129,7 +133,7 @@ public class ArtworkMessage implements Serializable{//项目动态
 
     @Transient
     public Integer getPraiseNum() {
-        if (artWorkPraiseList!=null)
+        if (artWorkPraiseList != null)
             praiseNum = artWorkPraiseList.size();
         return praiseNum;
     }
