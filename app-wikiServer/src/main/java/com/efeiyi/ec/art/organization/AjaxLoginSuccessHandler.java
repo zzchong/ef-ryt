@@ -1,6 +1,6 @@
 package com.efeiyi.ec.art.organization;
 
-
+import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.organization.dao.UserDao;
 import com.efeiyi.ec.art.organization.model.MyUser;
 import com.efeiyi.ec.art.organization.service.UserManager;
@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ming800.core.base.service.BaseManager;
-import net.sf.json.JSONObject;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotWritableException;
@@ -60,7 +59,7 @@ public class AjaxLoginSuccessHandler implements AuthenticationSuccessHandler {
             Map map = userManager.loginSuccess(AuthorizationUtil.getUser().getId());
             sessionFactory.getCurrentSession().close();
             //成功为0
-            JSONObject jsonData = JSONObject.fromObject(map);
+            JSONObject jsonData = new JSONObject(map);
             if (null != request.getParameter("callback") && !request.getParameter("callback").equals("")) {
                 String callback = request.getParameter("callback");
                 response.getWriter().write(callback + "(" + jsonData + ")");

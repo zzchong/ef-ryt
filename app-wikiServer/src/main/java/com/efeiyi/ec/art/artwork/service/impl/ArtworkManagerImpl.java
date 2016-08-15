@@ -88,14 +88,20 @@ public class ArtworkManagerImpl implements ArtworkManager {
     public boolean cancelArtWorkPraise(HttpServletRequest request,String artworkId){
 
         try {
-
-           XQuery xQuery = new XQuery("listArtWorkPraise_default",request);
-            xQuery.put("artwork_id",artworkId);
+            List<ArtWorkPraise> artWorkPraiseList = new ArrayList<>();
             if(null != request.getParameter("messageId") && !request.getParameter("messageId").equals("")){
+                XQuery xQuery = new XQuery("listArtWorkPraise_byArtWorkMessageId",request);
                 xQuery.put("artworkMessage_id", request.getParameter("messageId"));
+                xQuery.put("artwork_id",artworkId);
+                xQuery.put("user_id",AuthorizationUtil.getUser().getId());
+                artWorkPraiseList = baseManager.listObject(xQuery);
+            }else {
+                XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
+                xQuery.put("artwork_id",artworkId);
+                xQuery.put("user_id",AuthorizationUtil.getUser().getId());
+                artWorkPraiseList = baseManager.listObject(xQuery);
             }
-            xQuery.put("user_id",AuthorizationUtil.getUser().getId());
-            List<ArtWorkPraise> artWorkPraiseList = baseManager.listObject(xQuery);
+
             if(artWorkPraiseList!=null && artWorkPraiseList.size()>0){
                 ArtWorkPraise artWorkPraise = artWorkPraiseList.get(0);
                 artWorkPraise.setStatus("0");
@@ -259,6 +265,41 @@ public class ArtworkManagerImpl implements ArtworkManager {
         baseManager.saveOrUpdate(ConsumerAddress.class.getName(), consumerAddress);
         return consumerAddress;
     }
+
+    /**
+     *校验是否已经点赞
+     *
+     */
+    @Override
+    public boolean isPointedPraise(HttpServletRequest request, String artworkId){
+        try {
+            List<ArtWorkPraise> artWorkPraiseList = new ArrayList<>();
+            if(null != request.getParameter("messageId") && !request.getParameter("messageId").equals("")){
+                XQuery xQuery = new XQuery("listArtWorkPraise_byArtWorkMessageId",request);
+                xQuery.put("artworkMessage_id", request.getParameter("messageId"));
+                xQuery.put("artwork_id",artworkId);
+                xQuery.put("user_id",AuthorizationUtil.getUser().getId());
+                artWorkPraiseList = baseManager.listObject(xQuery);
+            }else {
+                XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
+                xQuery.put("artwork_id",artworkId);
+                xQuery.put("user_id",AuthorizationUtil.getUser().getId());
+                artWorkPraiseList = baseManager.listObject(xQuery);
+            }
+
+            if(artWorkPraiseList!=null && artWorkPraiseList.size()>0){
+                return true;
+            }else {
+                return false;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return  true;
+        }
+    }
+
+
+
 }
 
 

@@ -40,5 +40,7 @@ public interface ArtworkManager {
 
     ConsumerAddress saveConsumerAddress(JSONObject jsonObject,HttpServletRequest request) throws Exception;
 
+    boolean isPointedPraise(HttpServletRequest request,String artworkId);
+
 
 }

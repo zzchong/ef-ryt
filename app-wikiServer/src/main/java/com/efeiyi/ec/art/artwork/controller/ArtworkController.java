@@ -638,7 +638,7 @@ public class ArtworkController extends BaseController {
      */
     @RequestMapping(value = "/app/artworkPraise.do")
     @ResponseBody
-    public MappingJacksonValue artworkPraise(HttpServletRequest request) {
+    public synchronized MappingJacksonValue artworkPraise(HttpServletRequest request) {
         LogBean logBean = new LogBean();
         Map<String, Object> resultMap = new HashMap<>();
         List objectList = null;
@@ -652,17 +652,22 @@ public class ArtworkController extends BaseController {
             String action = jsonObject.getString("action");
             paramMap.put("isPraise", action);
             if ("1".equals(action)) {
-                if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
-                    if (null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")){
-                        resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-                        resultMap.put("artworkMessage", baseManager.getObject(ArtworkMessage.class.getName(), jsonObject.getString("messageId")));
-                    }else {
-                        resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
-                    }
+                if (!artworkManager.isPointedPraise(request, jsonObject.getString("artworkId"))){
+                    if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
+                        if (null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")){
+                            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+                            resultMap.put("artworkMessage", baseManager.getObject(ArtworkMessage.class.getName(), jsonObject.getString("messageId")));
+                        }else {
+                            resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+                        }
 
-                } else {
-                    return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+                    } else {
+                        return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+                    }
+                }else {
+                    return new MappingJacksonValue(resultMapHandler.handlerResult("100020", "点赞失败", logBean));
                 }
+
             } else if ("0".equals(action)) {
 
                 if (artworkManager.cancelArtWorkPraise(request, jsonObject.getString("artworkId"))) {
