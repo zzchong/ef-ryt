@@ -101,7 +101,7 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
             userTemp.setType(user.getType());
             userTemp.setCityId(user.getCityId());
             userTemp.setFansNum(user.getFansNum());
-            userTemp.setMaster(user.getMaster());
+            //userTemp.setMaster(user.getMaster());
             userTemp.setName(user.getName());
             userTemp.setMasterWorkNum(user.getMasterWorkNum());
             userTemp.setPictureUrl(user.getPictureUrl());

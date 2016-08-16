@@ -42,7 +42,11 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
 //            resultMap.put("resultMap",resultMapHandler.handlerResult("000000", "用户未登陆", logBean));
             request.setAttribute("resultMap", resultMap);
             out = response.getWriter();
-            out.print(JSONObject.toJSONString(resultMap));
+            if (null != request.getParameter("callback") && !request.getParameter("callback").equals("")){
+                out.write(request.getParameter("callback") + "(" + new JSONObject(resultMap) + ")");
+            }else {
+                out.print(JSONObject.toJSONString(resultMap));
+            }
             return false;
         }
 

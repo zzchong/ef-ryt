@@ -35,6 +35,9 @@
             <mvc:exclude-mapping path="/app/webhoot.do"/>
             <mvc:exclude-mapping path="/app/pay/paysuccess.do"/>
             <mvc:exclude-mapping path="/app/artworkInvest.do"/>
+            <mvc:exclude-mapping path="/app/verifyCode.do"/>
+            <mvc:exclude-mapping path="/app/sendCode.do"/>
+            <mvc:exclude-mapping path="/app/retrievePassword.do"/>
             <bean class="com.efeiyi.ec.art.interceptor.LoginInterceptor"/>
         </mvc:interceptor>
         <mvc:interceptor>
@@ -71,6 +74,7 @@
             <mvc:exclude-mapping path="/app/webhoot.do"/>
             <mvc:exclude-mapping path="/app/pay/paysuccess.do"/>
             <mvc:exclude-mapping path="/app/artworkInvest.do"/>
+            <mvc:exclude-mapping path="/app/verifyCode.do"/>
             <bean class="com.efeiyi.ec.art.interceptor.AppInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
