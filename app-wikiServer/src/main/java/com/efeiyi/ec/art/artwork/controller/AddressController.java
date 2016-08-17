@@ -385,7 +385,7 @@ public class AddressController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
         return resultMapHandler.handlerResultType(request, resultMap);

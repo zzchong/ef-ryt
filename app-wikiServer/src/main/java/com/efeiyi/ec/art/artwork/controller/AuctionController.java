@@ -196,7 +196,7 @@ public class AuctionController extends BaseController {
             resultMap.put("isSubmitDepositPrice", isSubmitDepositPrice);
         } catch (Exception e) {
             e.printStackTrace();
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
         return resultMapHandler.handlerResultType(request, resultMap);
@@ -228,7 +228,7 @@ public class AuctionController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
         return resultMapHandler.handlerResultType(request, resultMap);
@@ -409,7 +409,7 @@ public class AuctionController extends BaseController {
             resultMap.put("biddingTopThree", biddingTopThree);
         } catch (Exception e) {
             e.printStackTrace();
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
         return resultMapHandler.handlerResultType(request, resultMap);

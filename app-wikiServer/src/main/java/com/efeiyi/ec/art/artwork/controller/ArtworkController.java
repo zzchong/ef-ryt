@@ -343,7 +343,7 @@ public class ArtworkController extends BaseController {
             //项目详情
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artWorkId"));
             if (artwork == null) {
-                return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+                return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
             }
             //增加浏览数
             if (artwork.getViewNum() == null) {
@@ -451,7 +451,7 @@ public class ArtworkController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
         return resultMapHandler.handlerResultType(request, resultMap);
@@ -501,7 +501,7 @@ public class ArtworkController extends BaseController {
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
         return resultMapHandler.handlerResultType(request, resultMap);
@@ -581,7 +581,7 @@ public class ArtworkController extends BaseController {
             e.printStackTrace();
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误，请联系管理员");
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
 
         return resultMapHandler.handlerResultType(request, resultMap);
@@ -652,33 +652,33 @@ public class ArtworkController extends BaseController {
             String action = jsonObject.getString("action");
             paramMap.put("isPraise", action);
             if ("1".equals(action)) {
-                if (!artworkManager.isPointedPraise(request, jsonObject.getString("artworkId"))){
+                if (!artworkManager.isPointedPraise(request, jsonObject.getString("artworkId"))) {
                     if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
-                        if (null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")){
+                        if (null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")) {
                             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                             resultMap.put("artworkMessage", baseManager.getObject(ArtworkMessage.class.getName(), jsonObject.getString("messageId")));
-                        }else {
+                        } else {
                             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                         }
 
                     } else {
-                        return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+                        return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
                     }
-                }else {
-                    return new MappingJacksonValue(resultMapHandler.handlerResult("100020", "点赞失败", logBean));
+                } else {
+                    return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("100020", "点赞失败", logBean));
                 }
 
             } else if ("0".equals(action)) {
 
                 if (artworkManager.cancelArtWorkPraise(request, jsonObject.getString("artworkId"))) {
-                    if (null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")){
+                    if (null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")) {
                         resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                         resultMap.put("artworkMessage", baseManager.getObject(ArtworkMessage.class.getName(), jsonObject.getString("messageId")));
-                    }else {
+                    } else {
                         resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                     }
                 } else {
-                    return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+                    return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
                 }
             }
 
@@ -686,7 +686,7 @@ public class ArtworkController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
         return resultMapHandler.handlerResultType(request, resultMap);
     }
@@ -800,12 +800,12 @@ public class ArtworkController extends BaseController {
             if (artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
-                return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+                return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new MappingJacksonValue(resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
         }
         return resultMapHandler.handlerResultType(request, resultMap);
     }

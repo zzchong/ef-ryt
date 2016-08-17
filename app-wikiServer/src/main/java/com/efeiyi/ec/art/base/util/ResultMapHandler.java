@@ -27,7 +27,7 @@ public class ResultMapHandler {
     public Map handlerResult(String code, String msg, LogBean logBean) {
         HttpServletRequest request = getRequest();
         String flag = PlatformVersionUtil.CheckAgent(request);
-        Map<String, String> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("resultCode", code);
         resultMap.put("resultMsg", msg);
         logBean.setResultCode(code);
