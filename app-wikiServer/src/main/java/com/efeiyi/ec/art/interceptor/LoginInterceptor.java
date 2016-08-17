@@ -46,6 +46,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
             request.setAttribute("resultMap", resultMap);
             out = response.getWriter();
             if (null != request.getParameter("callback") && !request.getParameter("callback").equals("")){
+                response.setHeader("Content-Type", "application/javascript;charset=UTF-8");
                 out.write(request.getParameter("callback") + "(" + new JSONObject(resultMap) + ")");
             }else {
                 out.print(JSONObject.toJSONString(resultMap));

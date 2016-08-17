@@ -54,13 +54,14 @@ public class AjaxLoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         ObjectMapper objectMapper = new ObjectMapper();
-        response.setHeader("Content-Type", "application/javascript;application/json;charset=UTF-8");
+        response.setHeader("Content-Type", "application/json;charset=UTF-8");
         try {
             Map map = userManager.loginSuccess(AuthorizationUtil.getUser().getId());
-            sessionFactory.getCurrentSession().close();
+            //sessionFactory.getCurrentSession().close();
             //成功为0
             JSONObject jsonData = new JSONObject(map);
             if (null != request.getParameter("callback") && !request.getParameter("callback").equals("")) {
+                    response.setHeader("Content-Type", "application/javascript;charset=UTF-8");
                 String callback = request.getParameter("callback");
                 response.getWriter().write(callback + "(" + jsonData + ")");
             } else {

@@ -32,10 +32,13 @@ public class DriverInterceptor extends HandlerInterceptorAdapter {
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html;charset=utf-8");
         request.setCharacterEncoding("utf-8");
-        response.setHeader("Access-Control-Allow-Origin", "*");
+        if(null != request.getParameter("callback") && !request.getParameter("callback").equals("")){
+            response.setHeader("Content-Type", "application/javascript;charset=UTF-8");
+        }
+       /* response.setHeader("Access-Control-Allow-Origin", "*");
 //        response.setHeader("Access-Control-Allow-Origin","*");
         response.setHeader("Access-Control-Allow-Methods","POST");
-        response.setHeader("Access-Control-Allow-Headers","x-requested-with,content-type");
+        response.setHeader("Access-Control-Allow-Headers","x-requested-with,content-type");*/
         return true;
     }
 

@@ -441,10 +441,14 @@ public class PaymentController extends BaseController {
             xQuery.put("user_id",userId);
             List<MarginAccount> marginAccountList = baseManager.listObject(xQuery);
 
-            if(marginAccountList!=null && marginAccountList.size()>0)
-                marginAccount = marginAccountList.get(0);
-            else
+            if(marginAccountList!=null && marginAccountList.size()>0){
+                data.put("resultCode","100022");
+                data.put("resultMsg","已缴纳保证金,重复提交");
+                return data;
+            }
+            else{
                 marginAccount =  new MarginAccount();
+            }
 
             marginAccount.setStatus("0");
             marginAccount.setAccount(account);
