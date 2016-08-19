@@ -252,7 +252,7 @@ public class SigninController extends BaseController {
                 user = (MyUser) baseManager.getUniqueObjectByConditions(AppConfig.SQL_MYUSER_GET, map);
                 if (user!=null && user.getId()!=null) {
 
-                    return  resultMapHandler.handlerResult("-1","用户名已经存在",logBean);
+                    return  resultMapHandler.handlerResult("-1","用户名已注册",logBean);
                 }
             }catch(Exception e){
 
