@@ -65,7 +65,10 @@ public class checkProjectController {
 
             artwork.setStep(CheckConstant.ARTWORK_STEP_PASS);
             artwork.setType(CheckConstant.ARTWORK_STATUS_FINANCING);
-            artwork.setInvestStartDatetime(new Date());
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.setTime(new Date());
+            calendar1.add(Calendar.DAY_OF_MONTH,1);
+            artwork.setInvestStartDatetime(calendar1.getTime());
             //当前时间+30天
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
