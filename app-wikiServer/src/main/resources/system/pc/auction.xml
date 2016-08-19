@@ -25,6 +25,18 @@
                         <condition name="status" defaultValue="0" operation="ne"/>
                         <condition name="type" defaultValue="2" operation="eq"/>
                     </query>
+                    <query name="default4" label="待发货订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="1" operation="eq"/>
+                    </query>
+                    <query name="default5" label="当前用户项目订单" type="auto" orderBy="id:asc">
+                        <condition name="artwork.id" defaultValue="0" operation="eq"/>
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="1" operation="eq"/>
+                        <condition name="payStatus" defaultValue="3" operation="eq"/>
+                        <condition name="type" defaultValue="0" operation="eq"/>
+                    </query>
                 </do>
             </does>
         </entity>

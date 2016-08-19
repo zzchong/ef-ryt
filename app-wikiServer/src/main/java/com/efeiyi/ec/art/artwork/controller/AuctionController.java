@@ -279,14 +279,14 @@ public class AuctionController extends BaseController {
             if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            //校验数字签名
+           /* //校验数字签名
             if (!DigitalSignatureUtil.verify2(jsonObj)) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+            }*/
 
             String userId = AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId();
 
-            //获取订单(2、待付款 3、待收货 4、已完成 1、全部)
+            //获取订单(2、待付款 3、待收货 4、已完成 1、全部 5、待发货)
             if ("2".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("listAuctionOrder_default1", request);
                 xQuery.put("user_id", userId);
@@ -299,7 +299,11 @@ public class AuctionController extends BaseController {
                 XQuery xQuery = new XQuery("listAuctionOrder_default3", request);
                 xQuery.put("user_id", userId);
                 auctionOrderList = baseManager.listObject(xQuery);
-            } else {
+            }else if ("5".equals(jsonObj.getString("type"))){
+                XQuery xQuery = new XQuery("listAuctionOrder_default4", request);
+                xQuery.put("user_id", userId);
+                auctionOrderList = baseManager.listObject(xQuery);
+            }else {
                 XQuery xQuery = new XQuery("listAuctionOrder_default", request);
                 xQuery.put("user_id", userId);
                 auctionOrderList = baseManager.listObject(xQuery);
