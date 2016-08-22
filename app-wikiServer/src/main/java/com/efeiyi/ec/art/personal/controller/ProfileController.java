@@ -1191,24 +1191,15 @@ public class ProfileController extends BaseController {
             jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("userId")) ||
-                    "".equals(jsonObj.getString("timestamp"))) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-            }
-            String signmsg = jsonObj.getString("signmsg");
-            String userId = jsonObj.getString("userId");
+            String userId = AuthorizationUtil.getUser().getId();
             treeMap.put("userId", userId);
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (!verify) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+
             LinkedHashMap<String , Object> map = new LinkedHashMap<>();
             map.put("userId",userId);
             UserBrief userBrief = (UserBrief) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_BRIEF, map);
             resultMap = resultMapHandler.handlerResult("0", "请求成功", logBean);
             resultMap.put("userBrief",userBrief);
-            resultMap.put("user",userBrief==null?null:userBrief.getUser());
+            resultMap.put("user",baseManager.getObject(User.class.getName(), userId));
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
