@@ -244,12 +244,14 @@ public class ArtworkManagerImpl implements ArtworkManager {
         consumerAddress.setEmail(jsonObj.getString("email"));
         if("2".equals(jsonObj.getString("status"))){
             XQuery xQuery = new XQuery("listAddress_default1",request);
-            xQuery.put("consumer_id",jsonObj.getString("userId"));
+            //xQuery.put("consumer_id",jsonObj.getString("userId"));
+            xQuery.put("consumer_id", AuthorizationUtil.getUser().getId());
             List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
             if(consumerAddressList!=null && consumerAddressList.size()>0){
-                ConsumerAddress consumerAddress1 = consumerAddressList.get(0);
-                consumerAddress1.setStatus("1");
-                baseManager.saveOrUpdate(ConsumerAddress.class.getName(),consumerAddress1);
+                for (ConsumerAddress consumerAddress1:consumerAddressList){
+                    consumerAddress1.setStatus("1");
+                    baseManager.saveOrUpdate(ConsumerAddress.class.getName(), consumerAddress1);
+                }
             }
         }
         consumerAddress.setStatus(jsonObj.getString("status"));

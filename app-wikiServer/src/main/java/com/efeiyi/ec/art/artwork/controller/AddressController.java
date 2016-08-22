@@ -133,13 +133,13 @@ public class AddressController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("saveAddress");
-            if (!CommonUtil.jsonObject(jsonObj, "addressId")) {
+            /*if (!CommonUtil.jsonObject(jsonObj, "addressId")) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
             boolean verify = DigitalSignatureUtil.verify2(jsonObj);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+            }*/
 
             ConsumerAddress consumerAddress = artworkManager.saveConsumerAddress(jsonObj, request);
 
@@ -309,18 +309,18 @@ public class AddressController extends BaseController {
             if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            //校验数字签名
+            /*//校验数字签名
             String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", jsonObj.getString("currentUserId"));
+            treeMap.put("currentUserId", AuthorizationUtil.getUser().getId());
             treeMap.put("consumerAddressId", jsonObj.getString("consumerAddressId"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+            }*/
 
             XQuery xQuery = new XQuery("listAddress_default1", request);
-            xQuery.put("consumer_id", jsonObj.getString("currentUserId"));
+            xQuery.put("consumer_id", AuthorizationUtil.getUser().getId());
             List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
             if (consumerAddressList != null && consumerAddressList.size() > 0) {
                 for (ConsumerAddress consumerAddress : consumerAddressList) {
