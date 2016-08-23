@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -184,16 +185,32 @@ public class AuctionController extends BaseController {
             LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
             queryMap.put("userId", AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId());
             queryMap.put("artworkId", jsonObj.getString("artWorkId"));
-            MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
+            MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId AND a.status='0'" , queryMap);
             String isSubmitDepositPrice = "1";
             if (marginAccount != null && "0".equals(marginAccount.getStatus())) {
                 isSubmitDepositPrice = "0";
+            }
+
+            //是否关注
+            Boolean isFollowed = false;
+            if (!StringUtils.isEmpty(AuthorizationUtil.getUser())) {
+                XQuery xQuery1 = new XQuery("listArtUserFollowed_isFollowed", request);
+                xQuery1.put("user_id", AuthorizationUtil.getUser().getId());
+                xQuery1.put("follower_id", artwork.getAuthor().getId());
+                List<ArtUserFollowed> artUserFollowedList = baseManager.listObject(xQuery1);
+                if (artUserFollowedList != null) {
+                    if (artUserFollowedList.size() > 0) {
+                        isFollowed = true;
+                    }
+                }
             }
             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             resultMap.put("artwork", artwork);
             resultMap.put("artWorkBidding", artworkBiddingList);
             resultMap.put("artWorkMessage", artworkMessageList);
             resultMap.put("isSubmitDepositPrice", isSubmitDepositPrice);
+            resultMap.put("isFollowed", isFollowed);
+            resultMap.put("nowDate", new Date());
         } catch (Exception e) {
             e.printStackTrace();
             return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
@@ -417,6 +434,37 @@ public class AuctionController extends BaseController {
         }
 
         return resultMapHandler.handlerResultType(request, resultMap);
+    }
+
+    /**
+     *确认收货接口
+     */
+    @RequestMapping(value = "/app/confirmReceipt.do")
+    @ResponseBody
+    public Map confirmReceipt(HttpServletRequest request){
+        LogBean logBean = new LogBean();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("confirmReceipt");
+            String auctionOrderId = jsonObj.getString("auctionOrderId");
+            AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), auctionOrderId);
+            if (auctionOrder.getType().equals("3")){
+                auctionOrder.setType("2");
+                baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+                return resultMap;
+            }else {
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "订单参数不正确");
+                return resultMap;
+            }
+        } catch (Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
     }
 
 

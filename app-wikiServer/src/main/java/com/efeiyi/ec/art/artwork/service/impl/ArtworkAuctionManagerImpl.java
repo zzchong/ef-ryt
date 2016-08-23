@@ -75,7 +75,7 @@ public class ArtworkAuctionManagerImpl implements ArtworkAuctionManager {
             LinkedHashMap<String, Object> queryMap = new LinkedHashMap<>();
             queryMap.put("userId", AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId());
             queryMap.put("artworkId", jsonObj.getString("artWorkId"));
-            MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId", queryMap);
+            MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions("From MarginAccount a WHERE a.account.user.id = :userId AND a.artwork.id = :artworkId AND a.status='0'", queryMap);
             if (marginAccount == null || !"0".equals(marginAccount.getStatus())) {//未冻结拍卖保证金
                 return resultMapHandler.handlerResult("10019", "未冻结拍卖保证金", logBean);
             }

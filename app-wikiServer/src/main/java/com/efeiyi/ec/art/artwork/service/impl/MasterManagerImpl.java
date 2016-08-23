@@ -58,6 +58,7 @@ public class MasterManagerImpl implements MasterManager {
             masterWork.setPictureUrl("http://rongyitou2.efeiyi.com/"+url);
 
             masterWork.setType(request.getParameter("type"));
+            masterWork.setCreateYear(request.getParameter("createYear"));
 
             baseManager.saveOrUpdate(MasterWork.class.getName(),masterWork);
 
