@@ -271,16 +271,16 @@ public class PaymentController extends BaseController {
     }
 
 
-    //发送支付信息
+   /* //发送支付信息
 
-    /**
+    *//**
      * action 用来判断是投资支付(invest) 支付保证金(payMargin) 拍卖尾款支付(auction)
      * 充值(暂不支持)
      * @param request
      * @param modelMap
      * @return
      * @throws Exception
-     */
+     *//*
     @RequestMapping("/app/pay/main.do")
     @ResponseBody
     public Map payMain(HttpServletRequest request, ModelMap modelMap) throws Exception {
@@ -375,10 +375,9 @@ public class PaymentController extends BaseController {
                 auctionOrder.setArtwork(artwork);
                 auctionOrder.setFinalPayment(money);
                 auctionOrder.setAmount(auctionMoney);
-                auctionOrder.setStatus("0");
                 auctionOrder.setType("0");
                 auctionOrder.setStatus("1");
-                auctionOrder.setPayWay("1");
+                auctionOrder.setPayWay("0");
                 auctionOrder.setPayStatus("3");
                 auctionOrder.setUser(user);
 
@@ -528,7 +527,7 @@ public class PaymentController extends BaseController {
          map.put("isOk",isOk);
          if(isOk)
             map.put("artworkId",artwork.getId());
-         BCOrder  bcOrder = paymentManager.payBCOrder(billNo, title, money, map);
+         BCOrder  bcOrder = paymentManager.payBCOrder(billNo, title, money, map ,jsonObj.getString("action"));
           bill.setNumber(bcOrder.getObjectId());
           bill.setTitle(title);
           bill.setFlowAccount(bcOrder.getChannelTradeNo());
@@ -538,8 +537,74 @@ public class PaymentController extends BaseController {
           data.put("resultMsg","成功");
           modelMap.put("resultHtml",bcOrder.getHtml());
         return data;
-    }
+    }*/
 
+    //发送支付信息
+
+    /**
+     * action 用来判断是投资支付(invest) 支付保证金(payMargin) 拍卖尾款支付(auction)
+     * 充值(暂不支持)
+     * @param request
+     * @param modelMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/app/pay/main.do")
+    @ResponseBody
+    public Map payMain(HttpServletRequest request, ModelMap modelMap) throws Exception {
+        JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+
+        LogBean logBean = new LogBean();
+        logBean.setApiName("makeRecharge");
+        logBean.setCreateDate(new Date());
+        logBean.setRequestMessage(jsonObj.toString());
+
+        Map<String,Object> data = new HashMap<>();
+        //optional 参数
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", jsonObj.getString("action"));
+
+        //支付类型
+        String type = jsonObj.getString("type");
+        //用户Id
+        String userId = AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId();
+        if(StringUtils.isEmpty(userId)){
+            return resultMapHandler.handlerResult("10002", "用户为空", logBean);
+        }
+        //用户
+        User user = AuthorizationUtil.getUser();
+
+        //获取账户信息参数
+        LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+        param.put("userId", userId);
+        //账户
+        Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
+        Artwork artwork = null;
+        if (jsonObj.getString("action").equals("account")){
+            Map<String, Object> resMap = paymentManager.payByAction(request, artwork, jsonObj.getString("action"), type, user, account, jsonObj);
+            BCOrder bcOrder = (BCOrder)resMap.get("bcOrder");
+            map.put("url", bcOrder.getUrl().replace(" ","%20"));
+            map.put("resultCode","0");
+            map.put("resultMsg","成功");
+            modelMap.put("resultHtml", bcOrder.getHtml());
+            return map;
+        }else {
+            //项目Id
+            String artWorkId = jsonObj.getString("artWorkId");
+
+            if(!StringUtils.isEmpty(artWorkId)){
+                artwork = (Artwork)baseManager.getObject(Artwork.class.getName(),artWorkId);
+            }
+            //校验项目是否为空
+            if (artwork == null){
+                data.put("resultCode","1002");
+                data.put("resultMsg","项目为空");
+                return data;
+            }
+            data = paymentManager.payByAction(request, artwork, jsonObj.getString("action"), type, user, account, jsonObj);
+            return data;
+        }
+    }
 
     /**支付宝打款接口
      * action 用来判断是)  返还保证金(restoreMargin)  返利(reward)
@@ -602,6 +667,23 @@ public class PaymentController extends BaseController {
 
     @RequestMapping("/app/pay/paysuccess.do")
     public String paysuccess(HttpServletRequest request) {
+        String billId = request.getParameter("bill_id");
+        Bill bill = null;
+
+        if (billId != null){
+            bill = (Bill) baseManager.getObject(Bill.class.getName(), billId);
+            bill.setStatus("1");
+            baseManager.saveOrUpdate(Bill.class.getName(), bill);
+        }
+        String userId = AuthorizationUtil.getUser().getId();
+        //获取账户信息参数
+        LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
+        param.put("userId", userId);
+        //账户
+        Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
+        account.setCurrentBalance(account.getCurrentBalance().add(bill.getMoney()));
+        account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(bill.getMoney()));
+
         return "/paySuccess";
     }
 

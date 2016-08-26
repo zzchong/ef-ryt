@@ -76,6 +76,44 @@ public class ArtworkController extends BaseController {
     @Autowired
     private ArtworkManager artworkManager;
 
+    /**
+     *艺术家发起项目列表接口
+     */
+    @RequestMapping(value = "/app/getArtWorkListByAuthor")
+    @ResponseBody
+    public Map getArtWorkListByAuthor(HttpServletRequest request, HttpServletResponse response){
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
+            String type = jsonObject.getString("type");
+            if (null == type || type.equals("")){
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "必要参数为空");
+                return resultMap;
+            }
+            PageEntity pageEntity = new PageEntity();
+            pageEntity.setIndex(jsonObject.getInteger("pageIndex"));
+            pageEntity.setSize(jsonObject.getInteger("pageSize"));
+            User user = AuthorizationUtil.getUser();
+            if (type != null && !type.equals("")){
+                XQuery xQuery = new XQuery("plistArtwork_defaultByAuthor", request);
+                xQuery.put("type", type);
+                xQuery.put("author_id", user.getId());
+                xQuery.setPageEntity(pageEntity);
+                List<Artwork> artworkList = baseManager.listPageInfo(xQuery).getList();
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+                resultMap.put("artworkList", artworkList);
+            }else {
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "参数请求错误");
+            }
+        }catch (Exception e){
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误，请联系管理员");
+        }
+        return resultMap;
+    }
 
     @RequestMapping(value = "/app/getArtWorkList.do")
     @ResponseBody

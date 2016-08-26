@@ -76,6 +76,11 @@
                         <condition name="type" defaultValue="0" operation="eq"/>
                         <condition name="status" defaultValue="0" operation="ne"/>
                     </query>
+                    <query name="defaultByAuthor" label="各阶段阶段项目列表" type="auto" orderBy="createDatetime:desc">
+                        <condition name="author.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="1" operation="eq"/>
+                    </query>
                 </do>
                 <do name="listArtwork" access="" label="Artwork列表"
                     result="json">
