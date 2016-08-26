@@ -426,7 +426,7 @@ public class MessageController extends BaseController {
                         maptemp.put("userId",userId);
                         List<Message> objectMessageList = (List<Message>) baseManager.listObject(AppConfig.SQL_LSAT_MESSAGE, maptemp);
                         if(objectMessageList!=null)
-                            message.setContent(objectMessageList.get(0).getContent());
+                            //message.setContent(objectMessageList.get(0).getContent());
                         if(map1.containsKey(message.getFromUser().getId()))
                             message.setIsRead(map1.get(message.getFromUser().getId()));
                         else
