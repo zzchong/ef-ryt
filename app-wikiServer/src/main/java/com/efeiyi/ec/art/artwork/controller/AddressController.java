@@ -4,58 +4,27 @@ package com.efeiyi.ec.art.artwork.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.util.AppConfig;
-import com.efeiyi.ec.art.base.util.DigitalSignatureUtil;
-import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
-import com.efeiyi.ec.art.base.util.ResultMapHandler;
+import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
-import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
-import com.efeiyi.ec.art.organization.model.AddressCity;
-import com.efeiyi.ec.art.organization.model.AddressDistrict;
-import com.efeiyi.ec.art.organization.model.AddressProvince;
 import com.efeiyi.ec.art.organization.model.User;
 import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
-import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
-import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
-import com.ming800.core.taglib.PageEntity;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
+import net.sf.json.JSON;
 import org.apache.log4j.Logger;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by Administrator on 2016/1/29.
@@ -309,15 +278,6 @@ public class AddressController extends BaseController {
             if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            /*//校验数字签名
-            String signmsg = jsonObj.getString("signmsg");
-            treeMap.put("currentUserId", AuthorizationUtil.getUser().getId());
-            treeMap.put("consumerAddressId", jsonObj.getString("consumerAddressId"));
-            treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }*/
 
             XQuery xQuery = new XQuery("listAddress_default1", request);
             xQuery.put("consumer_id", AuthorizationUtil.getUser().getId());
@@ -359,13 +319,6 @@ public class AddressController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionPayDeposit");
-            /*if (!CommonUtil.jsonObject(jsonObj)) {
-                return new MappingJacksonValue(resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean));
-            }
-            //校验数字签名
-            if (!DigitalSignatureUtil.verify2(jsonObj)) {
-                return new MappingJacksonValue(resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean));
-            }*/
 
             XQuery xQuery = new XQuery("listAddress_default1", request);
             xQuery.put("consumer_id", jsonObj.getString("currentUserId"));
@@ -390,5 +343,24 @@ public class AddressController extends BaseController {
 
         return resultMapHandler.handlerResultType(request, resultMap);
     }
+
+    /**
+     *获取所有省及市
+     */
+    @RequestMapping(value = "/app/getProvinceInfo.do")
+    @ResponseBody
+    public Map getAllProvinceInformation(HttpServletRequest request){
+        LogBean logBean = new LogBean();
+        try {
+            logBean.setApiName("getProvinceInfo");
+            logBean.setCreateDate(new Date());
+            String jsonContext = ContextUtils.ReadFile(Thread.currentThread().getContextClassLoader().getResource("").getPath() + "setting/province.json");
+            JSON json = net.sf.json.JSONObject.fromObject(jsonContext);
+            return (Map) json;
+        }catch (Exception e){
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+    }
+
 
 }
