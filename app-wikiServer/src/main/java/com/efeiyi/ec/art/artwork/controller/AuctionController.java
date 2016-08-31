@@ -8,12 +8,15 @@ import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.service.SmsCheckManager;
+import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
 import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.does.model.XQuery;
+import com.ming800.core.p.PConst;
 import com.ming800.core.taglib.PageEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJacksonValue;
@@ -465,6 +468,77 @@ public class AuctionController extends BaseController {
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
+    }
+
+    /**
+     * 删除订单
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/app/deleteOrder.do")
+    @ResponseBody
+    public Map<String, Object> deleteOrder(HttpServletRequest request) throws Exception {
+        LogBean logBean = new LogBean();
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("deleteOrder");
+
+            String auctionOrderId = jsonObj.getString("auctionOrderId");
+
+            AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), auctionOrderId);
+            auctionOrder.setStatus("0");
+
+            baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
+
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "成功");
+        } catch(Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
+
+    /**
+     * 提醒发货
+     * @param request
+     * 绑定某个运维人员手机号码，然后把订单号以短信形式发过去，催促其发货
+     */
+    @RequestMapping("app/reminderDelivery.do")
+    @ResponseBody
+    public Map<String, Object> reminderDelivery(HttpServletRequest request) throws Exception {
+        LogBean logBean = new LogBean();
+        SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        String phoneNo = "15201351293";
+
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+
+            String auctionOrderId = jsonObj.getString("auctionOrderId");
+
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("reminderDelivery");
+
+            AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), auctionOrderId);
+
+            String message = smsCheckManager.send(phoneNo, null, "1104699", PConst.TIANYI);
+
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", message);
+        } catch(Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
     }
 
 
