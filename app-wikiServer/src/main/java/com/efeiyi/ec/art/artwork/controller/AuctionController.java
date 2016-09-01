@@ -530,7 +530,7 @@ public class AuctionController extends BaseController {
 
             AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), auctionOrderId);
 
-            String message = smsCheckManager.send(phoneNo, null, "1104699", PConst.TIANYI);
+            String message = smsCheckManager.send(phoneNo, auctionOrderId, "1548464", PConst.TIANYI);
 
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", message);
