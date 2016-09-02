@@ -305,28 +305,36 @@ public class AuctionController extends BaseController {
             }*/
 
             String userId = AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId();
+            PageEntity pageEntity = new PageEntity();
+            pageEntity.setSize(jsonObj.getInteger("pageSize"));
+            pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
 
             //获取订单(2、待付款 3、待收货 4、已完成 1、全部 5、待发货)
             if ("2".equals(jsonObj.getString("type"))) {
-                XQuery xQuery = new XQuery("listAuctionOrder_default1", request);
+                XQuery xQuery = new XQuery("plistAuctionOrder_default1", request);
                 xQuery.put("user_id", userId);
-                auctionOrderList = baseManager.listObject(xQuery);
+                xQuery.setPageEntity(pageEntity);
+                auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             } else if ("3".equals(jsonObj.getString("type"))) {
-                XQuery xQuery = new XQuery("listAuctionOrder_default2", request);
+                XQuery xQuery = new XQuery("plistAuctionOrder_default2", request);
                 xQuery.put("user_id", userId);
-                auctionOrderList = baseManager.listObject(xQuery);
+                xQuery.setPageEntity(pageEntity);
+                auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             } else if ("4".equals(jsonObj.getString("type"))) {
-                XQuery xQuery = new XQuery("listAuctionOrder_default3", request);
+                XQuery xQuery = new XQuery("plistAuctionOrder_default3", request);
                 xQuery.put("user_id", userId);
-                auctionOrderList = baseManager.listObject(xQuery);
+                xQuery.setPageEntity(pageEntity);
+                auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             }else if ("5".equals(jsonObj.getString("type"))){
-                XQuery xQuery = new XQuery("listAuctionOrder_default4", request);
+                XQuery xQuery = new XQuery("plistAuctionOrder_default4", request);
                 xQuery.put("user_id", userId);
-                auctionOrderList = baseManager.listObject(xQuery);
+                xQuery.setPageEntity(pageEntity);
+                auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             }else {
-                XQuery xQuery = new XQuery("listAuctionOrder_default", request);
+                XQuery xQuery = new XQuery("plistAuctionOrder_default", request);
                 xQuery.put("user_id", userId);
-                auctionOrderList = baseManager.listObject(xQuery);
+                xQuery.setPageEntity(pageEntity);
+                auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             }
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "订单获取成功");

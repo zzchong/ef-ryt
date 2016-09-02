@@ -36,11 +36,11 @@ public interface ArtworkManager {
      * @param fatherCommentId
      * @return
      */
-    boolean  saveArtWorkComment(String id,String content,String fatherCommentId,String messageId);
+    Map  saveArtWorkComment(String id,String content,String fatherCommentId,String messageId);
 
     ConsumerAddress saveConsumerAddress(JSONObject jsonObject,HttpServletRequest request) throws Exception;
 
-    boolean isPointedPraise(HttpServletRequest request,String artworkId);
+    boolean isPointedPraise(HttpServletRequest request,JSONObject jsonObject);
 
 
 }

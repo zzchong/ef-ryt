@@ -31,6 +31,18 @@ public class ArtworkMessage implements Serializable {//项目动态
     private Integer commentNum = 0;//评论数
     private Integer praiseNum = 0; //点赞数
 
+    //临时参数
+    private String praiseIsOrNot;
+
+    @Transient
+    public String getPraiseIsOrNot() {
+        return praiseIsOrNot;
+    }
+
+    public void setPraiseIsOrNot(String praiseIsOrNot) {
+        this.praiseIsOrNot = praiseIsOrNot;
+    }
+
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")

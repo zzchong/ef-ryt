@@ -267,6 +267,11 @@
                         <condition name="user.id" defaultValue="0" operation="eq"/>
                         <condition name="status" defaultValue="1" operation="eq"/>
                     </query>
+                    <query name="byArtworkMessage" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="1" operation="eq"/>
+                        <condition name="artworkMessage.id" defaultValue="1" operation="eq"/>
+                    </query>
                 </do>
             </does>
         </entity>
@@ -279,6 +284,10 @@
                     result="json">
                     <query name="default" label="默认" type="auto" orderBy="id:desc">
                         <condition name="id" defaultValue="0" operation="ne"/>
+                    </query>
+                    <query name="byArtwork" label="默认" type="auto" orderBy="id:desc">
+                        <condition name="artwork.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
                     </query>
                 </do>
                 <do name="listArtworkMessage" access="" label="ArtworkMessage列表"

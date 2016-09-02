@@ -38,6 +38,32 @@
                         <condition name="type" defaultValue="0" operation="eq"/>
                     </query>
                 </do>
+                <do name="plistAuctionOrder" access="" label="拍卖订单">
+                    <query name="default" label="全部订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                    </query>
+                    <query name="default1" label="待付款订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="0" operation="eq"/>
+                    </query>
+                    <query name="default2" label="待收货订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="3" operation="eq"/>
+                    </query>
+                    <query name="default3" label="已完成订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="2" operation="eq"/>
+                    </query>
+                    <query name="default4" label="待发货订单" type="auto" orderBy="createDatetime:desc">
+                        <condition name="user.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="ne"/>
+                        <condition name="type" defaultValue="1" operation="eq"/>
+                    </query>
+                </do>
             </does>
         </entity>
         <entity name="ArtworkBidding" label="Artwork"

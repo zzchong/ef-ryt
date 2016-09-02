@@ -2,6 +2,7 @@ package com.efeiyi.ec.art.artwork.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.efeiyi.ec.art.artwork.service.ArtworkPraiseManager;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
@@ -49,6 +50,9 @@ public class ArtWorkCreationController extends BaseController {
 
     @Autowired
     ResultMapHandler resultMapHandler;
+
+    @Autowired
+    ArtworkPraiseManager artworkPraiseManager;
 
 
     /**
@@ -174,8 +178,29 @@ public class ArtWorkCreationController extends BaseController {
                 }
             }
 
+            PageEntity pageEntity = new PageEntity();
+            if (jsonObj.getInteger("pageSize") != null && jsonObj.getInteger("pageIndex") != null && jsonObj.getInteger("pageSize")>0 && jsonObj.getInteger("pageIndex")>0){
+                pageEntity.setSize(jsonObj.getInteger("pageSize"));
+                pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
+            }
+            XQuery xQuery = new XQuery("plistArtworkMessage_byArtwork", request);
+            xQuery.put("artwork_id", artwork.getId());
+            xQuery.setPageEntity(pageEntity);
+            List<ArtworkMessage> artworkMessageList = baseManager.listPageInfo(xQuery).getList();
+            if (AuthorizationUtil.getUser() != null && artworkMessageList != null && artworkMessageList.size()>0){
+                //1.该用户已对该动态点赞 2.该用户未对该动态点赞
+                for (ArtworkMessage artworkMessage:artworkMessageList){
+                    if (artworkPraiseManager.isToArtworkMessagePraise(request, artworkMessage, AuthorizationUtil.getUser())){
+                        artworkMessage.setPraiseIsOrNot("1");
+                    }else {
+                        artworkMessage.setPraiseIsOrNot("0");
+                    }
+                }
+
+            }
+
             data.put("artwork",artwork);
-            data.put("artworkMessageList",artwork.getArtworkMessages());
+            data.put("artworkMessageList",artworkMessageList);
             data.put("createdTime",createdTime);
             data.put("restTime",restTime);
             data.put("isPraise",isPraise);

@@ -674,9 +674,9 @@ public class ArtworkController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/app/artworkPraise.do")
+    @RequestMapping(value = "/app/artworkPraise.do", method = RequestMethod.POST)
     @ResponseBody
-    public synchronized MappingJacksonValue artworkPraise(HttpServletRequest request) {
+    public synchronized Map artworkPraise(HttpServletRequest request) {
         LogBean logBean = new LogBean();
         Map<String, Object> resultMap = new HashMap<>();
         List objectList = null;
@@ -690,7 +690,7 @@ public class ArtworkController extends BaseController {
             String action = jsonObject.getString("action");
             paramMap.put("isPraise", action);
             if ("1".equals(action)) {
-                if (!artworkManager.isPointedPraise(request, jsonObject.getString("artworkId"))) {
+                if (!artworkManager.isPointedPraise(request, jsonObject)) {
                     if (artworkManager.saveArtWorkPraise(jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
                         if (null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")) {
                             resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
@@ -700,10 +700,10 @@ public class ArtworkController extends BaseController {
                         }
 
                     } else {
-                        return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+                        return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
                     }
                 } else {
-                    return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("100020", "点赞失败", logBean));
+                    return resultMapHandler.handlerResult("100020", "点赞失败", logBean);
                 }
 
             } else if ("0".equals(action)) {
@@ -716,7 +716,7 @@ public class ArtworkController extends BaseController {
                         resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                     }
                 } else {
-                    return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+                    return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
                 }
             }
 
@@ -724,9 +724,9 @@ public class ArtworkController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
-        return resultMapHandler.handlerResultType(request, resultMap);
+        return resultMap;
     }
 
     /**
@@ -822,7 +822,8 @@ public class ArtworkController extends BaseController {
     public MappingJacksonValue artworkComment(HttpServletRequest request) {
         LogBean logBean = new LogBean();
         Map<String, Object> resultMap = new HashMap<>();
-        List objectList = null;
+        Map<String, Object> map = new HashMap<>();
+                List objectList = null;
         try {
             JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
@@ -835,8 +836,11 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }*/
 
-            if (artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("messageId"))) {
-                resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
+            map = artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("messageId"));
+            if (map.get("resultCode").equals("0")) {
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+                resultMap.put("artworkComment", map.get("artworkComment"));
             } else {
                 return resultMapHandler.handlerResultType(request, resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean));
             }
@@ -1355,6 +1359,8 @@ public class ArtworkController extends BaseController {
                     //baseManager.saveOrUpdate(ArtworkMessage.class.getName(),artworkMessage);
                     resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                     resultMap.put("artworkId", artwork.getId());
+                    resultMap.put("artworkMessageId", artworkMessage.getId());
+                    resultMap.put("nowDate", new Date().getTime());
                     return resultMap;
 
                 } else {

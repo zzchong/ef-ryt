@@ -21,7 +21,7 @@ public class AuctionOrder implements Serializable {
     private Date createDatetime;//创建时间
     private String payWay;// 0 账户余额 1 支付宝 2 微信
     private String status;// 1 可用 0 作废
-    private String type;// 0 待付尾款 1 代发货 2交易成功  3待收货 4保证金冻结
+    private String type;// 0 待付尾款 1 代发货 2交易成功  3待收货
     private BigDecimal finalPayment;//尾款金额
     private String payStatus;// 0 支付成功 1 支付失败 3未支付
     private BigDecimal amount;//拍卖金额

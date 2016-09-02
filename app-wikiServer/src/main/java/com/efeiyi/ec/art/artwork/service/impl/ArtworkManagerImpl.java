@@ -116,10 +116,9 @@ public class ArtworkManagerImpl implements ArtworkManager {
     }
 
     @Override
-    public boolean saveArtWorkComment(String id, String content,String fatherCommentId,String messageId) {
+    public Map saveArtWorkComment(String id, String content,String fatherCommentId,String messageId) {
 
-
-
+        Map<String, Object> resultMap = new HashMap<>();
         String currentUserId =AuthorizationUtil.getUserId();
 
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), id);
@@ -181,13 +180,14 @@ public class ArtworkManagerImpl implements ArtworkManager {
             map.put("title","");
             map.put("content","有新消息了!");
             EfeiyiPush.sendPushToSingle(JPushConfig.appKey,JPushConfig.masterSecret,map);
-
+            resultMap.put("artworkComment", artworkComment);
+            resultMap.put("resultCode", "0");
         }catch (Exception e){
             e.printStackTrace();
-            return false;
+            resultMap.put("resultCode", "1");
         }
 
-        return true;
+        return resultMap;
     }
 
 
@@ -273,29 +273,32 @@ public class ArtworkManagerImpl implements ArtworkManager {
      *
      */
     @Override
-    public boolean isPointedPraise(HttpServletRequest request, String artworkId){
+    public boolean isPointedPraise(HttpServletRequest request, JSONObject jsonObject){
         try {
             List<ArtWorkPraise> artWorkPraiseList = new ArrayList<>();
-            if(null != request.getParameter("messageId") && !request.getParameter("messageId").equals("")){
-                XQuery xQuery = new XQuery("listArtWorkPraise_byArtWorkMessageId",request);
-                xQuery.put("artworkMessage_id", request.getParameter("messageId"));
-                xQuery.put("artwork_id",artworkId);
-                xQuery.put("user_id",AuthorizationUtil.getUser().getId());
-                artWorkPraiseList = baseManager.listObject(xQuery);
+            if (null != jsonObject.getString("artworkId") && !jsonObject.getString("artworkId").equals("")){
+                if(null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")){
+                    XQuery xQuery = new XQuery("listArtWorkPraise_byArtWorkMessageId",request);
+                    xQuery.put("artworkMessage_id", request.getParameter("messageId"));
+                    xQuery.put("artwork_id",jsonObject.getString("artworkId"));
+                    xQuery.put("user_id",AuthorizationUtil.getUser().getId());
+                    artWorkPraiseList = baseManager.listObject(xQuery);
+                }else {
+                    XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
+                    xQuery.put("artwork_id",jsonObject.getString("artworkId"));
+                    xQuery.put("user_id",AuthorizationUtil.getUser().getId());
+                    artWorkPraiseList = baseManager.listObject(xQuery);
+                }
+                if(artWorkPraiseList!=null && artWorkPraiseList.size()>0){
+                    return true;
+                }else {
+                    return false;
+                }
             }else {
-                XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
-                xQuery.put("artwork_id",artworkId);
-                xQuery.put("user_id",AuthorizationUtil.getUser().getId());
-                artWorkPraiseList = baseManager.listObject(xQuery);
+                return true;
             }
 
-            if(artWorkPraiseList!=null && artWorkPraiseList.size()>0){
-                return true;
-            }else {
-                return false;
-            }
         }catch (Exception e){
-            e.printStackTrace();
             return  true;
         }
     }
