@@ -54,4 +54,8 @@ public class DictionaryController extends BaseController{
     }
 
     //github test
+
+    public void test() {
+        System.out.print("test");
+    }
 }
