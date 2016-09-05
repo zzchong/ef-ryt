@@ -52,4 +52,10 @@ public class DictionaryController extends BaseController{
 
         return resultMap;
     }
+
+    //github test
+
+    public void test() {
+        System.out.print("test");
+    }
 }
