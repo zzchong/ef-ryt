@@ -19,8 +19,8 @@ import java.util.Date;
 public class ArtworkMessageAttachment implements Serializable{//项目和动态附件
     private String id;
     private ArtworkMessage artworkMessage;
-    private String FileUri;
-    private String FileType;
+    private String fileUri;
+    private String fileType;
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -34,11 +34,11 @@ public class ArtworkMessageAttachment implements Serializable{//项目和动态�
 
     @Column(name = "FileUri")
     public String getFileUri() {
-        return FileUri;
+        return fileUri;
     }
 
     public void setFileUri(String fileUri) {
-        FileUri = fileUri;
+        this.fileUri = fileUri;
     }
 
     @JsonIgnore
@@ -53,11 +53,11 @@ public class ArtworkMessageAttachment implements Serializable{//项目和动态�
     }
     @Column(name = "FileType")
     public String getFileType() {
-        return FileType;
+        return fileType;
     }
 
     public void setFileType(String fileType) {
-        FileType = fileType;
+        this.fileType = fileType;
     }
 }
 

@@ -214,6 +214,53 @@ public class ArtWorkCreationController extends BaseController {
         return resultMapHandler.handlerResultType(request, resultMap);
     }
 
+    /**
+     * 创作动态接口
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/app/plistArtWorkMessage.do")
+    @ResponseBody
+    public Map PlistArtWorkMessage(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<String, Object>();
+        List<Artwork> artworkList = null;
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("plistArtWorkMessage");
+
+            PageEntity pageEntity = new PageEntity();
+            pageEntity.setSize(jsonObj.getInteger("pageSize"));
+            pageEntity.setIndex(jsonObj.getInteger("pageIndex"));
+            XQuery xQuery = new XQuery("plistArtworkMessage_byArtwork", request);
+            xQuery.put("artwork_id", jsonObj.getString("artworkId"));
+            xQuery.setPageEntity(pageEntity);
+            List<ArtworkMessage> artworkMessageList = baseManager.listPageInfo(xQuery).getList();
+            if (AuthorizationUtil.getUser() != null && artworkMessageList != null && artworkMessageList.size()>0){
+                //1.该用户已对该动态点赞 2.该用户未对该动态点赞
+                for (ArtworkMessage artworkMessage:artworkMessageList){
+                    if (artworkPraiseManager.isToArtworkMessagePraise(request, artworkMessage, AuthorizationUtil.getUser())){
+                        artworkMessage.setPraiseIsOrNot("1");
+                    }else {
+                        artworkMessage.setPraiseIsOrNot("0");
+                    }
+                }
+
+            }
+            data.put("artworkMessageList", artworkMessageList);
+            resultMap = resultMapHandler.handlerResult("0","成功",logBean);
+            resultMap.put("data",data);
+        } catch(Exception e){
+            e.printStackTrace();
+            return resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
+        return resultMap;
+    }
+
 
     public  static  void  main(String [] arg) throws Exception {
 

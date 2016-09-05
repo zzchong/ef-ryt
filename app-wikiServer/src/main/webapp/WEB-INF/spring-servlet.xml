@@ -62,7 +62,8 @@
             <mvc:exclude-mapping path="/app/pay/paysuccess.do"/>
             <mvc:exclude-mapping path="/app/artworkInvest.do"/>
             <mvc:exclude-mapping path="/app/verifyCode.do"/>
-            <mvc:exclude-mapping path="/app/test.do"/>
+            <mvc:exclude-mapping path="/app/getProvinceInfo.do"/>
+            <mvc:exclude-mapping path="/app/plistArtWorkMessage.do"/>
             <bean class="com.efeiyi.ec.art.interceptor.LoginInterceptor"/>
         </mvc:interceptor>
         <mvc:interceptor>
@@ -100,7 +101,8 @@
             <mvc:exclude-mapping path="/app/pay/paysuccess.do"/>
             <mvc:exclude-mapping path="/app/artworkInvest.do"/>
             <mvc:exclude-mapping path="/app/verifyCode.do"/>
-            <mvc:exclude-mapping path="/app/test.do"/>
+            <mvc:exclude-mapping path="/app/getProvinceInfo.do"/>
+            <mvc:exclude-mapping path="/app/plistArtWorkMessage.do"/>
             <bean class="com.efeiyi.ec.art.interceptor.AppInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
