@@ -78,6 +78,9 @@ public class PCDController {
             resultMap.put("resultMsg","查无数据，稍后再试");
             resultMap.put("districtList",new ArrayList<Object>());
         }
+
+
+        System.out.print("test");
         return resultMap;
     }
 
