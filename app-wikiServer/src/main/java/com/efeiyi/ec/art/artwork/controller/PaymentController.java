@@ -709,10 +709,7 @@ public class PaymentController extends BaseController {
             if (!CommonUtil.jsonObject(jsonObj)) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
-            boolean verify = DigitalSignatureUtil.verify2(jsonObj);
-            if (verify != true) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
+
             String userId = AuthorizationUtil.getUser()==null?"":AuthorizationUtil.getUser().getId();
             LinkedHashMap<String,Object> map = new LinkedHashMap<>();
             map.put("userId",userId);
