@@ -1191,7 +1191,12 @@ public class ProfileController extends BaseController {
             jsonObj = JsonAcceptUtil.receiveJson(request);
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            String userId = AuthorizationUtil.getUser().getId();
+            String userId = jsonObj.getString("userId");
+            if (userId.equals("")){
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "请求参数错误");
+                return resultMap;
+            }
             treeMap.put("userId", userId);
 
             LinkedHashMap<String , Object> map = new LinkedHashMap<>();

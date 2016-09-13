@@ -307,12 +307,14 @@ public class PaymentManagerImpl implements PaymentManager {
                 }*/
                 String consumerAddressId = jsonObject.getString("consumerAddressId");
                 if (consumerAddressId == null || consumerAddressId.equals("")){
-                    map.put("10002", "收货地址为空");
+                    map.put("resultCode", "10002");
+                    map.put("resultMsg", "收货地址为空");
                     return map;
                 }
                 consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(), consumerAddressId);
                 if (consumerAddress == null){
-                    map.put("10002", "收货地址错误");
+                    map.put("resultCode", "10002");
+                    map.put("resultMsg", "收货地址错误");
                     return map;
                 }
 

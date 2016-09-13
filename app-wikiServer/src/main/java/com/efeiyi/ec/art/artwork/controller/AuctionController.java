@@ -549,5 +549,44 @@ public class AuctionController extends BaseController {
         return resultMap;
     }
 
+    /**
+     * 更新订单地址
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/app/updateAuctionOrderAddress.do")
+    @ResponseBody
+    public Map<String, Object> updateAuctionOrderAddress(HttpServletRequest request) throws Exception {
+        LogBean logBean = new LogBean();
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try{
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
+
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+            logBean.setApiName("updateAuctionOrderAddress");
+
+            String auctionOrderId = jsonObj.getString("auctionOrderId");
+            String consumerAddressId = jsonObj.getString("consumerAddressId");
+            if (auctionOrderId==null || auctionOrderId.equals("") || consumerAddressId==null || consumerAddressId.equals("")) {
+                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
+            }
+
+            AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), auctionOrderId);
+            ConsumerAddress consumerAddress = (ConsumerAddress) baseManager.getObject(ConsumerAddress.class.getName(), consumerAddressId);
+            auctionOrder.setConsumerAddress(consumerAddress);
+
+            baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
+
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "成功");
+        } catch(Exception e) {
+            return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
+        }
+
+        return resultMap;
+    }
 
 }
