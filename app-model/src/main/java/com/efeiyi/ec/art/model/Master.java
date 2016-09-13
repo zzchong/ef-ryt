@@ -52,6 +52,9 @@ public class Master implements Serializable{
 
     private  String name;//真实姓名
     private String phone;//手机号
+    private String email;//邮箱
+    private String presentCity;//当前城市
+
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -298,5 +301,23 @@ public class Master implements Serializable{
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    @Column(name = "email")
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Column(name = "present_city")
+    public String getPresentCity() {
+        return presentCity;
+    }
+
+    public void setPresentCity(String presentCity) {
+        this.presentCity = presentCity;
     }
 }

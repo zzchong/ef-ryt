@@ -18,6 +18,9 @@ public class ArtMasterAttachment implements Serializable {
     private String id;
     private Master master;
     private String url;//图片路径
+    private String paperType;//证件类型
+    private String paperNo;//证件号码
+    private String remark;//备注
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -47,5 +50,29 @@ public class ArtMasterAttachment implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @Column(name = "paper_type")
+    public String getPaperType() {
+        return paperType;
+    }
+    public void setPaperType(String paperType) {
+        this.paperType = paperType;
+    }
+
+    @Column(name = "paper_no")
+    public String getPaperNo() {
+        return paperNo;
+    }
+    public void setPaperNo(String paperNo) {
+        this.paperNo = paperNo;
+    }
+
+    @Column(name = "remark")
+    public String getRemark() {
+        return remark;
+    }
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

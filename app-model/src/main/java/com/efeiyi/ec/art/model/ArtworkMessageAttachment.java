@@ -21,6 +21,8 @@ public class ArtworkMessageAttachment implements Serializable{//项目和动态�
     private ArtworkMessage artworkMessage;
     private String fileUri;
     private String fileType;
+    private String videoPicture;
+
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
     @GeneratedValue(generator = "id")
@@ -59,6 +61,10 @@ public class ArtworkMessageAttachment implements Serializable{//项目和动态�
     public void setFileType(String fileType) {
         this.fileType = fileType;
     }
+
+    @Column(name = "video_picture")
+    public String getVideoPicture() { return videoPicture; }
+    public void setVideoPicture(String videoPicture) { this.videoPicture = videoPicture; }
 }
 
 

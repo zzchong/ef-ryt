@@ -1399,6 +1399,12 @@ public class ArtworkController extends BaseController {
                                     String pictureUrl = "http://rongyitou2.efeiyi.com/" + url.toString();
                                     //将图片上传至阿里云
                                     aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url.toString());
+
+                                    //上传视频文件的第一帧
+                                    if("1".equals(request.getParameter("type"))) {
+                                        artworkMessageAttachment.setVideoPicture("http://rongyitou2.efeiyi.com/artwork/picture/1473666549651dynamicImage1.jpg");
+                                    }
+
                                     artworkMessageAttachment.setFileUri(pictureUrl);
                                     artworkMessageAttachment.setArtworkMessage(artworkMessage);
                                     artworkMessageAttachment.setFileType(request.getParameter("type"));

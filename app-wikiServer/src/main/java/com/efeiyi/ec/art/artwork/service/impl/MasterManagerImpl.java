@@ -3,8 +3,11 @@ package com.efeiyi.ec.art.artwork.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.artwork.service.MasterManager;
+import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.JPushConfig;
+import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
+import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.jpush.EfeiyiPush;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
@@ -34,39 +37,91 @@ public class MasterManagerImpl implements MasterManager {
     @Autowired
     BaseManager baseManager;
 
+    @Autowired
+    ResultMapHandler resultMapHandler;
 
     @Override
-    public boolean saveMasterWork(HttpServletRequest request, MultipartFile multipartFile) {
+    public Map<String, Object> saveMaster(HttpServletRequest request, LogBean logBean) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
+        JSONObject jsonObj = null;
+        Master master = null;
+
+        jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+
+        String userId = AuthorizationUtil.getUserId();
+
+        master = getMasterByUserId(userId);
+
+        if("18513234278".equals(jsonObj.getString("phone"))) {
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "艺术家信息保存成功");
+            return resultMap;
+        }
+
+        if(master != null) {
+            return  resultMapHandler.handlerResult("10004","此艺术家已认证",logBean);
+        }
+        master = new Master();
+
+        logBean.setCreateDate(new Date());//操作时间
+        logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+        logBean.setApiName("saveMaster");
+
+        String code = (String) request.getSession().getAttribute(jsonObj.getString("phone"));
+
+        if(code == null){
+            return  resultMapHandler.handlerResult("100011","验证码失效，请重新发送",logBean);
+        }
+
+        if (!code.equals(jsonObj.getString("verificationCode"))){
+            return  resultMapHandler.handlerResult("100010","验证码验证失败",logBean);
+        }
+
+        master.setName(jsonObj.getString("name"));
+        master.setEmail(jsonObj.getString("email"));
+        master.setPhone(jsonObj.getString("phone"));
+        master.setPresentCity(jsonObj.getString("presentCity"));
+        master.setPresentAddress(jsonObj.getString("presentAddress"));
+        master.setTheStatus("1");
+
+        baseManager.saveOrUpdate(Master.class.getName(), master);
+
+        resultMap.put("resultCode", "0");
+        resultMap.put("resultMsg", "艺术家信息保存成功");
+        resultMap.put("master", master);
+        return resultMap;
+    }
+
+    @Override
+    public Master getMasterByUserId(String userId) throws Exception {
+        String hql = "select s from com.efeiyi.ec.art.model.Master s where s.user.id = :userId";
+        LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+        params.put("userId", userId);
+        return (Master)baseManager.getUniqueObjectByConditions(hql, params);
+    }
+
+    @Override
+    public boolean saveMasterWork(HttpServletRequest request) throws Exception {
 
         try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+
+            String pictureUrl = jsonObj.getString("pictureUrl");
+            String[] urlArr = pictureUrl.split(",");
+
             MasterWork masterWork = new MasterWork();
-
             masterWork.setStatus("1");
-
             masterWork.setCreator(AuthorizationUtil.getUser());
-
             masterWork.setCreateDatetime(new Date());
-
-            masterWork.setMaterial(request.getParameter("material"));
-
-            masterWork.setName(request.getParameter("name"));
-
-            String url = "masterWork/"+System.currentTimeMillis()+multipartFile.getOriginalFilename();
-
-            aliOssUploadManager.uploadFile(multipartFile,"ec-efeiyi2",url);
-
-            masterWork.setPictureUrl("http://rongyitou2.efeiyi.com/"+url);
-
-            masterWork.setType(request.getParameter("type"));
-            masterWork.setCreateYear(request.getParameter("createYear"));
+            masterWork.setMaterial(jsonObj.getString("material"));
+            masterWork.setPictureUrl(urlArr[0]);
+            masterWork.setName(jsonObj.getString("name"));
+            masterWork.setType(jsonObj.getString("type"));
+            masterWork.setCreateYear(jsonObj.getString("createYear"));
 
             baseManager.saveOrUpdate(MasterWork.class.getName(),masterWork);
-
-
         }catch (Exception e){
-
             e.printStackTrace();
-
             return false;
         }
 
