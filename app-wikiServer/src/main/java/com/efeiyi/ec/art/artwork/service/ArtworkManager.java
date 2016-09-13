@@ -2,9 +2,11 @@ package com.efeiyi.ec.art.artwork.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
+import com.efeiyi.ec.art.model.Artwork;
 import com.efeiyi.ec.art.model.ConsumerAddress;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,4 +45,8 @@ public interface ArtworkManager {
     boolean isPointedPraise(HttpServletRequest request,JSONObject jsonObject);
 
 
+    /**
+     * 项目创建或修改
+     */
+    Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq) throws Exception;
 }

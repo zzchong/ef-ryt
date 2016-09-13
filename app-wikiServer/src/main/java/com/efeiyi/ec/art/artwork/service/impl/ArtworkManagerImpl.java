@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -303,6 +304,45 @@ public class ArtworkManagerImpl implements ArtworkManager {
         }
     }
 
+    @Override
+    public Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq) throws Exception {
+        if (!title.equals("")){
+            artwork.setTitle(title);
+        }
+        if (!material.equals("")){
+            artwork.setMaterial(material);
+        }
+        if (!brief.equals("")){
+            artwork.setBrief(brief);
+        }
+        if (!investGoalMoney.equals("")){
+            artwork.setInvestGoalMoney(new BigDecimal(investGoalMoney));
+            artwork.setStartingPrice(new BigDecimal(investGoalMoney));
+        }
+        if (!duration.equals("")){
+            artwork.setDescription(duration);
+        }
+        artwork.setCreateDatetime(new Date());
+        artwork.setAuthor(AuthorizationUtil.getUser());
+        if (!makeInstru.equals("")){
+            Artworkdirection artworkdirection = null;
+            if (artwork.getArtworkdirection()==null){
+                artworkdirection = new Artworkdirection();
+            }else {
+                artworkdirection = artwork.getArtworkdirection();
+            }
+            artworkdirection.setMake_instru(makeInstru);
+            artworkdirection.setArtwork(artwork);
+            baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);
+        }
+        if (!financingAq.equals("")){
+            Artworkdirection artworkdirection = artwork.getArtworkdirection();
+            artworkdirection.setFinancing_aq(financingAq);
+            baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);
+        }
+        baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+        return artwork;
+    }
 
 
 }

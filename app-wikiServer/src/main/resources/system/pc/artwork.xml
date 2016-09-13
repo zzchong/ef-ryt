@@ -88,6 +88,11 @@
                         <condition name="author.id" defaultValue="0" operation="eq"/>
                         <condition name="status" defaultValue="0" operation="ne"/>
                     </query>
+                    <query name="byBuffered" label="缓存的" type="auto" orderBy="createDatetime:desc">
+                        <condition name="author.id" defaultValue="0" operation="eq"/>
+                        <condition name="status" defaultValue="0" operation="eq"/>
+                        <condition name="buffer" defaultValue="yes" operation="eq"/>
+                    </query>
                 </do>
 
                 <do name="listArtwork2" access="" label="Artwork列表"

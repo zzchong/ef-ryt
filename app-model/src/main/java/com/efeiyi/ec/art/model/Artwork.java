@@ -11,6 +11,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,9 +40,9 @@ public class Artwork implements Serializable {
     private List<ArtworkInvest> artworkInvests;//项目投资
 //    private List<ArtworkInvest> artworkInvestCount;//投资笔数
     private List<ArtworkMessage> artworkMessages;//项目制作动态 //后台制作动态查询应用
-    private List<ArtworkBidding> artworkBiddings;//项目竞价记录 //艺术家个人信息统计应用
+    private List<ArtworkBidding> artworkBiddings = new ArrayList<>();//项目竞价记录 //艺术家个人信息统计应用
     private List<ArtWorkPraise> artWorkPraiseList;//点赞数
-    private ArtworkDraw artworkDraw;
+    private ArtworkDraw artworkDraw;//创作时长（天）
     private String picture_url;
     private String step; //1 : 审核阶段
     private BigDecimal investsMoney;//已筹金额
@@ -74,6 +75,27 @@ public class Artwork implements Serializable {
 
     private Integer height=0;
     private Integer width=0;
+
+    private String material;//材质
+    private String buffer;//是否是缓存状态  “yes”缓存状态  “no”正常状态
+
+    @Column(name = "buffer")
+    public String getBuffer() {
+        return buffer;
+    }
+
+    public void setBuffer(String buffer) {
+        this.buffer = buffer;
+    }
+
+    @Column(name = "material")
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
+    }
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
