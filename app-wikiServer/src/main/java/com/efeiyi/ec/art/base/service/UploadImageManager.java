@@ -8,6 +8,6 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/9/13.
  */
-public interface UploadPictureManager {
-    public List uplaodPicture(HttpServletRequest request) throws Exception;
+public interface UploadImageManager {
+    public List uplaodImage(HttpServletRequest request) throws Exception;
 }

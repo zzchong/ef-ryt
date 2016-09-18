@@ -4,7 +4,7 @@ package com.efeiyi.ec.art.artwork.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.service.UploadPictureManager;
+import com.efeiyi.ec.art.base.service.UploadImageManager;
 import com.efeiyi.ec.art.base.util.*;
 import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
@@ -21,7 +21,6 @@ import com.ming800.core.does.model.PageInfo;
 import com.ming800.core.does.model.XQuery;
 import com.ming800.core.p.service.AliOssUploadManager;
 import com.ming800.core.taglib.PageEntity;
-import com.sun.xml.internal.ws.resources.HttpserverMessages;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -39,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -52,8 +50,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.junit.*;
@@ -78,7 +74,7 @@ public class ArtworkController extends BaseController {
     private ArtworkManager artworkManager;
 
     @Autowired
-    private UploadPictureManager uploadPictureManager;
+    private UploadImageManager uploadImageManager;
 
     /**
      *艺术家发起项目列表接口
@@ -1064,17 +1060,17 @@ public class ArtworkController extends BaseController {
                         resultMap.put("resultCode", "0");
                         resultMap.put("resultMsg", "成功");
                         resultMap.put("artwork", artwork);
-                    }
+                    }//rk.class.getName(), artworkId);
+                    //artwork = artworkManager.saveOrUpdateArtwork(art
                 }else {
-                    Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
-                    artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq);
+                    /*Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), title, material, brief, investGoalMoney, duration, makeInstru, financingAq);
                     artwork.setStatus("1");
                     artwork.setBuffer("no");
                     artwork.setStep("10");
                     baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
-                    resultMap.put("artwork", artwork);
+                    resultMap.put("artwork", artwork);*/
                 }
             }
            // net.sf.json.JSONObject object = net.sf.json.JSONObject.fromObject(resultMap);
@@ -1133,7 +1129,7 @@ public class ArtworkController extends BaseController {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             String artworkId = jsonObj.getString("artworkId");
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
-            List<String> list = uploadPictureManager.uplaodPicture(request);
+            List<String> list = uploadImageManager.uplaodImage(request);
             for (String url:list){
                 ArtworkAttachment artworkAttachment = new ArtworkAttachment();
                 artworkAttachment.setArtwork(artwork);

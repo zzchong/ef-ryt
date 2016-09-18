@@ -1,10 +1,9 @@
 package com.efeiyi.ec.art.base.controller;
 
 import com.efeiyi.ec.art.base.model.LogBean;
-import com.efeiyi.ec.art.base.service.UploadPictureManager;
+import com.efeiyi.ec.art.base.service.UploadImageManager;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.ming800.core.base.controller.BaseController;
-import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,13 +14,13 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class UploadPictureController extends BaseController {
+public class UploadImageController extends BaseController {
 
     @Autowired
     ResultMapHandler resultMapHandler;
 
     @Autowired
-    UploadPictureManager uploadPictureManager;
+    UploadImageManager uploadImageManager;
 
     @RequestMapping("/app/uploadPicture.do")
     @ResponseBody
@@ -31,7 +30,7 @@ public class UploadPictureController extends BaseController {
         List list = null;
 
         try{
-            list = uploadPictureManager.uplaodPicture(request);
+            list = uploadImageManager.uplaodImage(request);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }

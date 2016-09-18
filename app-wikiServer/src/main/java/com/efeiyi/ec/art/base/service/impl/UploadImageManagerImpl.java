@@ -1,9 +1,7 @@
 package com.efeiyi.ec.art.base.service.impl;
 
-import com.efeiyi.ec.art.base.service.UploadPictureManager;
+import com.efeiyi.ec.art.base.service.UploadImageManager;
 import com.ming800.core.p.service.AliOssUploadManager;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,13 +19,13 @@ import java.util.List;
  */
 
 @Service
-public class UploadPictureManagerImpl implements UploadPictureManager {
+public class UploadImageManagerImpl implements UploadImageManager {
 
     @Autowired
     private AliOssUploadManager aliOssUploadManager;
 
     @Override
-    public List uplaodPicture(HttpServletRequest request) throws Exception {
+    public List uplaodImage(HttpServletRequest request) throws Exception {
         List list = new ArrayList();
 
         //创建一个通用的多部分解析器
