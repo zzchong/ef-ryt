@@ -22,13 +22,10 @@ public class ArtMasterAttachmentManagerImpl implements ArtMasterAttachmentManage
     private AliOssUploadManager aliOssUploadManager;
 
     @Override
-    public void saveMasterAttachment(ArtMasterAttachment masterAttachment, MultipartFile picture) throws Exception {
-
-        String url = "masterAttachment/"+System.currentTimeMillis()+picture.getOriginalFilename();
-
-        aliOssUploadManager.uploadFile(picture,"ec-efeiyi2",url);
-
-        masterAttachment.setUrl(url);
+    public void saveMasterAttachment(ArtMasterAttachment masterAttachment, String[] imageArr) throws Exception {
+        if(imageArr != null) {
+            masterAttachment.setUrl(imageArr[0]);
+        }
         baseManager.saveOrUpdate(ArtMasterAttachment.class.getName(), masterAttachment);
     }
 }

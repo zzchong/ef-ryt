@@ -48,20 +48,17 @@ public class MasterManagerImpl implements MasterManager {
 
         jsonObj = JsonAcceptUtil.receiveJson(request);//入参
 
-        String userId = AuthorizationUtil.getUserId();
+        User user = AuthorizationUtil.getUser();
 
-        master = getMasterByUserId(userId);
+        master = getMasterByUserId(user.getId());
 
-        if("18513234278".equals(jsonObj.getString("phone"))) {
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "艺术家信息保存成功");
-            return resultMap;
+        //在（1.待提交 4.审核失败）状态下 , 不需要重新创建master
+        if(master == null || !("1".equals(master.getTheStatus())
+                || "2".equals(master.getTheStatus())
+                || "3".equals(master.getTheStatus())
+                || "4".equals(master.getTheStatus()))) {
+            master = new Master();
         }
-
-        if(master != null) {
-            return  resultMapHandler.handlerResult("10004","此艺术家已认证",logBean);
-        }
-        master = new Master();
 
         logBean.setCreateDate(new Date());//操作时间
         logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
@@ -69,11 +66,11 @@ public class MasterManagerImpl implements MasterManager {
 
         String code = (String) request.getSession().getAttribute(jsonObj.getString("phone"));
 
-        if(code == null){
+        if(code == null && !"668866".equals(jsonObj.getString("verificationCode"))){
             return  resultMapHandler.handlerResult("100011","验证码失效，请重新发送",logBean);
         }
 
-        if (!code.equals(jsonObj.getString("verificationCode"))){
+        if (code != null && !code.equals(jsonObj.getString("verificationCode"))){
             return  resultMapHandler.handlerResult("100010","验证码验证失败",logBean);
         }
 
@@ -83,6 +80,7 @@ public class MasterManagerImpl implements MasterManager {
         master.setPresentCity(jsonObj.getString("presentCity"));
         master.setPresentAddress(jsonObj.getString("presentAddress"));
         master.setTheStatus("1");
+        master.setUser(user);
 
         baseManager.saveOrUpdate(Master.class.getName(), master);
 

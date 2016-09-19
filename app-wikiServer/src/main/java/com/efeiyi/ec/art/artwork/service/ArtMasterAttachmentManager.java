@@ -7,5 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
  * Created by Administrator on 2016/9/7.
  */
 public interface ArtMasterAttachmentManager {
-    void saveMasterAttachment(ArtMasterAttachment masterAttachment, MultipartFile picture) throws Exception;
+    void saveMasterAttachment(ArtMasterAttachment masterAttachment, String[] imageArr) throws Exception;
 }

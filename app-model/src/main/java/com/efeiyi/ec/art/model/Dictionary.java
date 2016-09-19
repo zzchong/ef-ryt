@@ -1,9 +1,12 @@
 package com.efeiyi.ec.art.model;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/4/19.
@@ -16,8 +19,20 @@ public class Dictionary implements Serializable {
     private String label; //标签
     private char status; //状态  默认为0：可用
     private Integer type;//类型
-    private Dictionary dictionary; //关联父字典表
+    private Dictionary dictionary;//父级
     private String description;//描述
+    private List<Dictionary> children;//子集合
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    @JsonIgnore
+    public Dictionary getDictionary() {
+        return dictionary;
+    }
+
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
+    }
 
     @Id
     @GeneratedValue(generator = "id")
@@ -66,15 +81,6 @@ public class Dictionary implements Serializable {
         this.type = type;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    public Dictionary getDictionary() {
-        return dictionary;
-    }
-
-    public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
-    }
 
     @Column(name = "description")
     public String getDescription() {
@@ -84,4 +90,14 @@ public class Dictionary implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dictionary")
+    public List<Dictionary> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Dictionary> children) {
+        this.children = children;
+    }
+
 }

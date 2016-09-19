@@ -11,6 +11,7 @@ import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -32,6 +33,7 @@ public class DictionaryController extends BaseController{
     ResultMapHandler resultMapHandler;
 
     @RequestMapping("/app/getDictionaryList.do")
+    @ResponseBody
     public Map<String, Object> getDictionaryList(HttpServletRequest request) {
         LogBean logBean = new LogBean();
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -45,7 +47,10 @@ public class DictionaryController extends BaseController{
             logBean.setRequestMessage(jsonObj.toString());
 
             List<Dictionary> dicList = dictionaryManager.getDictionaryByType(type);
-            resultMap.put("dictionaryList", JSONArray.fromObject(dicList));
+
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "成功");
+            resultMap.put("dataList", dicList);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }

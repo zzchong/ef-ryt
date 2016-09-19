@@ -77,45 +77,18 @@ public class ArtMasterAttachmentController extends BaseController {
             masterAttachment.setPaperType(jsonObj.getString("paperType"));
             masterAttachment.setRemark(jsonObj.getString("remark"));
 
-            MultipartFile attachmentFile = null;
-
-            //创建一个通用的多部分解析器
-            CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-            //判断 request 是否有文件上传,即多部分请求
-            if (multipartResolver.isMultipart(request)) {
-                //转换成多部分request
-                MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
-                //取得request中的所有文件名
-                Iterator<String> iter = multiRequest.getFileNames();
-
-                while (iter.hasNext()) {
-                    //取得上传文件
-                    MultipartFile file = multiRequest.getFile(iter.next());
-                    if (file != null) {
-                        //取得当前上传文件的文件名称
-                        String myFileName = file.getOriginalFilename();
-                        //如果名称不为“”,说明该文件存在，否则说明该文件不存在
-                        if (myFileName.trim() != "") {
-                            //重命名上传后的文件名
-                            StringBuilder url = new StringBuilder("master/");
-
-                            url.append("picture/" + new Date().getTime() + myFileName);
-
-                            String pictureUrl = "http://rongyitou2.efeiyi.com/" + url.toString();
-                            //将图片上传至阿里云
-                            aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url.toString());
-                            if("file0".equals(file.getName())) {
-                                master.setIdentityFront(pictureUrl);
-                                attachmentFile = file;
-                            } else if("file1".equals(file.getName())) {
-                                master.setIdentityBack(pictureUrl);
-                            }
-                        }
-                    }
-                }
+            String imageStr = jsonObj.getString("image");
+            String[] imageArr = null;
+            if(imageStr != null) {
+                imageArr = imageStr.split(",");
             }
 
-            attachmentManager.saveMasterAttachment(masterAttachment, attachmentFile);
+            if(imageStr != null) {
+                master.setIdentityFront(imageArr[0]);
+                master.setIdentityBack(imageArr[1]);
+            }
+
+            attachmentManager.saveMasterAttachment(masterAttachment, imageArr);
 
             master.setTheStatus("2");//把状态改为审核中
             baseManager.saveOrUpdate(Master.class.getName(), master);

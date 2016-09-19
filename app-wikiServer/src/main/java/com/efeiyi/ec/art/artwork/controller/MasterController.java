@@ -13,6 +13,7 @@ import com.efeiyi.ec.art.message.dao.MessageDao;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.modelConvert.ArtWorkInvestBean;
 import com.efeiyi.ec.art.organization.model.User;
+import com.efeiyi.ec.art.organization.util.AuthorizationUtil;
 import com.efeiyi.ec.art.organization.util.CommonUtil;
 import com.efeiyi.ec.art.organization.util.TimeUtil;
 import com.ming800.core.base.controller.BaseController;
@@ -77,7 +78,7 @@ public class MasterController extends BaseController {
      * 艺术家认证-基本信息页
      * @param request
      */
-    @RequestMapping("/appveMaster.do")
+    @RequestMapping("/app/saveMaster.do")
     @ResponseBody
     public Map saveMaster(HttpServletRequest request) {
         LogBean logBean = new LogBean();
@@ -91,12 +92,36 @@ public class MasterController extends BaseController {
         return resultMap;
     }
 
+    @RequestMapping("/app/getMaster.do")
+    @ResponseBody
+    public Map getMaster(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        User user = AuthorizationUtil.getUser();
+        Map<String, Object> resultMap = new HashMap<>();
+        Master master = null;
+
+        try{
+            master = masterManager.getMasterByUserId(user.getId());
+            if(master == null) {
+                return  resultMapHandler.handlerResult("100011","第一次验证没有缓冲数据",logBean);
+            }
+
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "艺术家获取成功");
+            resultMap.put("master", master);
+        } catch (Exception e) {
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
+        return resultMap;
+    }
+
     /**
      * 艺术家 发布作品
      * @param request
      * @return
      */
-    @RequestMapping(value = "/appveMasterWork.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/saveMasterWork.do", method = RequestMethod.POST)
     @ResponseBody
     public Map saveMasterWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
