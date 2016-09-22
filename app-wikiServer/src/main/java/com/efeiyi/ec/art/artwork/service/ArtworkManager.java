@@ -48,5 +48,5 @@ public interface ArtworkManager {
     /**
      * 项目创建或修改
      */
-    Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq) throws Exception;
+    Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq, String description) throws Exception;
 }

@@ -20,12 +20,14 @@ public class MasterWork implements Serializable{
     private String id;
     private String name;//作品名称
     private String type;//是否出售 0 非卖品 1 可售 2 已售
-    private String status;//状态
+    private String status;//状态 0 假删  1 存在
     private String material;//材质
     private Date createDatetime;//创建时间
     private User creator;//大师
     private String pictureUrl;//作品图片
     private String createYear;//作品年代
+    private String width;//图片宽
+    private String height;//图片高
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")
@@ -110,6 +112,24 @@ public class MasterWork implements Serializable{
 
     public void setCreateYear(String createYear) {
         this.createYear = createYear;
+    }
+
+    @Column(name = "width")
+    public String getWidth() {
+        return width;
+    }
+
+    public void setWidth(String width) {
+        this.width = width;
+    }
+
+    @Column(name = "height")
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
     }
 }
 

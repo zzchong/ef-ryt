@@ -1028,6 +1028,7 @@ public class ArtworkController extends BaseController {
             String duration = jsonObj.getString("duration");//创作时长（天）
             String makeInstru = jsonObj.getString("makeInstru");//制作说明
             String financingAq = jsonObj.getString("financiongAg");//资讯解惑
+            String description = jsonObj.getString("description");//描述(详细介绍)
             //String artworkDirectionId = jsonObj.getString("artworkDirectionId");//项目创作过程及融资解惑
 
             String identification = jsonObj.getString("identification");//标识：“000”代表不校验存入，“111”校验存入
@@ -1043,26 +1044,32 @@ public class ArtworkController extends BaseController {
                 resultMap.put("resultCode", "10002");
                 resultMap.put("resultMsg", "参数有误");
             }else {
-                if (identification.equals("000")){//不校验存入
+                //if (identification.equals("000")){//不校验存入
                     if (artworkId.equals("")){//新录入
                         Artwork artwork = new Artwork();
-                        artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq);
+                        artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq, description);
                         artwork.setStatus("1");
+                        artwork.setType("0");
                         artwork.setBuffer("yes");
                         artwork.setStep("100");
                         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+
                         resultMap.put("resultCode", "0");
                         resultMap.put("resultMsg", "成功");
                         resultMap.put("artwork", artwork);
                     }else {
                         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
-                        artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq);
+                        artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq, description);
+                        if (!financingAq.equals("")){
+                            artwork.setStatus("1");
+                            baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+                        }
                         resultMap.put("resultCode", "0");
                         resultMap.put("resultMsg", "成功");
                         resultMap.put("artwork", artwork);
                     }//rk.class.getName(), artworkId);
                     //artwork = artworkManager.saveOrUpdateArtwork(art
-                }else {
+                //}else {
                     /*Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), title, material, brief, investGoalMoney, duration, makeInstru, financingAq);
                     artwork.setStatus("1");
                     artwork.setBuffer("no");
@@ -1071,7 +1078,7 @@ public class ArtworkController extends BaseController {
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
                     resultMap.put("artwork", artwork);*/
-                }
+                //}
             }
            // net.sf.json.JSONObject object = net.sf.json.JSONObject.fromObject(resultMap);
             return resultMap;
@@ -1128,17 +1135,47 @@ public class ArtworkController extends BaseController {
 
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             String artworkId = jsonObj.getString("artworkId");
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
-            List<String> list = uploadImageManager.uplaodImage(request);
-            for (String url:list){
-                ArtworkAttachment artworkAttachment = new ArtworkAttachment();
-                artworkAttachment.setArtwork(artwork);
-                artworkAttachment.setFileType(url.substring(url.lastIndexOf("."), url.length()));
-                artworkAttachment.setFileName(url);
-                baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+            String type = jsonObj.getString("type");//111表示是封面上传，000表示概念图（附件）上传
+            if (type.equals("")){
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "传输参数有误");
+                return resultMap;
             }
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "成功");
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
+            List<Map<String, Object>> list = uploadImageManager.uplaodImage(request);
+            if (type.equals("000")){
+                List<ArtworkAttachment> list1 = artwork.getArtworkAttachment();
+                if (list1.size()>0){
+                    for (ArtworkAttachment artworkAttachment:list1){
+                        artworkAttachment.setStatus("0");
+                        baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+                    }
+                }
+                for (Map<String, Object> map : list){
+                    ArtworkAttachment artworkAttachment = new ArtworkAttachment();
+                    artworkAttachment.setArtwork(artwork);
+                    artworkAttachment.setFileType(map.get("pictureUrl").toString().substring(map.get("pictureUrl").toString()
+                            .lastIndexOf("."), map.get("pictureUrl").toString().length()));
+                    artworkAttachment.setFileName(map.get("pictureUrl").toString());
+                    artworkAttachment.setWidth(Integer.parseInt(map.get("width").toString()));
+                    artworkAttachment.setHeight(Integer.parseInt(map.get("height").toString()));
+                    artworkAttachment.setStatus("1");
+                    baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+                }
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+            }else if (type.equals("111")){
+                artwork.setPicture_url(list.get(0).get("pictureUrl").toString());
+                artwork.setWidth(Integer.parseInt(list.get(0).get("width").toString()));
+                artwork.setHeight(Integer.parseInt(list.get(0).get("height").toString()));
+                baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+            }else {
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "传输参数有误");
+                return resultMap;
+            }
         }catch (Exception e){
             resultMap.put("resultCode", "10004");
             resultMap.put("resultMsg", "未知错误,请联系管理员");

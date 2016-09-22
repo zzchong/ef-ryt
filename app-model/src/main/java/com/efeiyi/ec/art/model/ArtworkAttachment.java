@@ -22,6 +22,16 @@ public class ArtworkAttachment implements Serializable {
 
     private Integer width;//图片宽度
     private Integer height;//图片高度
+    private String status;
+
+    @Column(name = "status")
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     @Id
     @GenericGenerator(name = "id", strategy = "com.ming800.core.p.model.M8idGenerator")

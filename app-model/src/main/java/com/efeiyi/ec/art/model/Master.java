@@ -6,6 +6,7 @@ import com.efeiyi.ec.art.organization.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -46,14 +47,20 @@ public class Master implements Serializable{
     private List<ArtMasterAttachment> workShopPhotos;//工作室照片
     private List<ArtMasterAttachment> worksPhotos;//作品照片
     private String feedback;//审批意见
-    private String identityFront;//身份证正面
-    private String identityBack;//身份证反面
     private List<ArtMasterAttachment> certificatePhotos;//证书附件
 
     private  String name;//真实姓名
     private String phone;//手机号
     private String email;//邮箱
     private String presentCity;//当前城市
+
+    private String identityCardType;//证件类型
+    private String identityCardNo;//证件号码
+    private String identityFront;//证明材料证明
+    private String identityBack;//证明材料反面
+    private List<ArtMasterAttachment> artMasterAttachments;//大师附件
+    private String remark;//备注
+
 
     @JsonIgnore
     @OneToOne
@@ -319,5 +326,42 @@ public class Master implements Serializable{
 
     public void setPresentCity(String presentCity) {
         this.presentCity = presentCity;
+    }
+
+
+    @Column(name = "identity_card_type")
+    public String getIdentityCardType() {
+        return identityCardType;
+    }
+
+    public void setIdentityCardType(String identityCardType) {
+        this.identityCardType = identityCardType;
+    }
+
+    @Column(name = "identity_card_no")
+    public String getIdentityCardNo() {
+        return identityCardNo;
+    }
+
+    public void setIdentityCardNo(String identityCardNo) {
+        this.identityCardNo = identityCardNo;
+    }
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "master")
+    @Where(clause = "type=1")
+    public List<ArtMasterAttachment> getArtMasterAttachments() {
+        return artMasterAttachments;
+    }
+    public void setArtMasterAttachments(List<ArtMasterAttachment> artMasterAttachments) {
+        this.artMasterAttachments = artMasterAttachments;
+    }
+
+    @Column(name = "remark")
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

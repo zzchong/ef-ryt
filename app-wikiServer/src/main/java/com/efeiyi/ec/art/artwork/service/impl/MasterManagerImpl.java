@@ -1,5 +1,6 @@
 package com.efeiyi.ec.art.artwork.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.artwork.service.MasterManager;
@@ -41,7 +42,7 @@ public class MasterManagerImpl implements MasterManager {
     ResultMapHandler resultMapHandler;
 
     @Override
-    public Map<String, Object> saveMaster(HttpServletRequest request, LogBean logBean) throws Exception {
+    public Map<String, Object> saveMasterBasic(HttpServletRequest request, LogBean logBean) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
         JSONObject jsonObj = null;
         Master master = null;
@@ -86,7 +87,56 @@ public class MasterManagerImpl implements MasterManager {
 
         resultMap.put("resultCode", "0");
         resultMap.put("resultMsg", "艺术家信息保存成功");
-        resultMap.put("master", master);
+        resultMap.put("data", master);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> saveMasterIdentity(HttpServletRequest request, LogBean logBean) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
+        User user = AuthorizationUtil.getUser();
+        Master master = null;
+
+        JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+
+        logBean.setCreateDate(new Date());//操作时间
+        logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+        logBean.setApiName("saveMasterIdentity");
+
+        master = getMasterByUserId(user.getId());
+
+        if(master == null) {
+            return  resultMapHandler.handlerResult("100010","艺术家信息获取错误",logBean);
+        }
+
+        master.setIdentityCardNo(jsonObj.getString("paperNo"));
+        master.setIdentityCardType(jsonObj.getString("paperType"));
+        master.setRemark(jsonObj.getString("remark"));
+
+        String imageStr = jsonObj.getString("image");
+        String[] imageArr = null;
+        if(imageStr != null) {
+            imageArr = imageStr.split(",");
+        }
+
+        if(imageStr != null && imageArr.length == 1) {
+            master.setIdentityFront(imageArr[0]);
+        }
+        if(imageStr != null && imageArr.length == 2) {
+            master.setIdentityBack(imageArr[1]);
+        }
+
+        String submitMark = jsonObj.getString("submitMark");
+        //选择了提交审核 ， 更新状态为待审核
+        if("1".equals(submitMark)) {
+            master.setTheStatus("2");
+        }
+
+        baseManager.saveOrUpdate(Master.class.getName(), master);
+
+        resultMap.put("resultCode", "0");
+        resultMap.put("resultMsg", "艺术家信息保存成功");
+        resultMap.put("data", master);
         return resultMap;
     }
 
@@ -99,32 +149,53 @@ public class MasterManagerImpl implements MasterManager {
     }
 
     @Override
-    public boolean saveMasterWork(HttpServletRequest request) throws Exception {
+    public MasterWork saveMasterWork(HttpServletRequest request) throws Exception {
+        JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
 
-        try {
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+        String pictureUrl = jsonObj.getString("pictureUrl");
 
-            String pictureUrl = jsonObj.getString("pictureUrl");
-            String[] urlArr = pictureUrl.split(",");
+        JSONArray jsonArr = JSONArray.parseArray(pictureUrl);
 
-            MasterWork masterWork = new MasterWork();
-            masterWork.setStatus("1");
-            masterWork.setCreator(AuthorizationUtil.getUser());
-            masterWork.setCreateDatetime(new Date());
-            masterWork.setMaterial(jsonObj.getString("material"));
-            masterWork.setPictureUrl(urlArr[0]);
-            masterWork.setName(jsonObj.getString("name"));
-            masterWork.setType(jsonObj.getString("type"));
-            masterWork.setCreateYear(jsonObj.getString("createYear"));
+        MasterWork masterWork = new MasterWork();
+        masterWork.setStatus("1");
+        masterWork.setCreator(AuthorizationUtil.getUser());
+        masterWork.setCreateDatetime(new Date());
+        masterWork.setMaterial(jsonObj.getString("material"));
 
-            baseManager.saveOrUpdate(MasterWork.class.getName(),masterWork);
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
+        if(jsonArr.size() > 0) {
+            masterWork.setPictureUrl(jsonArr.getJSONObject(0).getString("pictureUrl"));
+            masterWork.setWidth(jsonArr.getJSONObject(0).getString("width"));
+            masterWork.setHeight(jsonArr.getJSONObject(0).getString("height"));
         }
 
-        return true;
+        masterWork.setName(jsonObj.getString("name"));
+        masterWork.setType(jsonObj.getString("type"));
+        masterWork.setCreateYear(jsonObj.getString("createYear"));
+
+        baseManager.saveOrUpdate(MasterWork.class.getName(),masterWork);
+
+        return masterWork;
     }
+
+    @Override
+    public Map<String, Object> getMasterWorks(HttpServletRequest request, LogBean logBean) throws Exception {
+        String userId = AuthorizationUtil.getUserId();
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        String hql = "select s from com.efeiyi.ec.art.model.MasterWork s where s.creator.id = :userId and s.status = :status";
+        LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+        params.put("userId", userId);
+        params.put("status", "1");
+        List<MasterWork> masterWorks = baseManager.listObject(hql, params);
+
+        resultMap.put("resultCode", "0");
+        resultMap.put("resultMsg", "获取大师作品成功");
+        resultMap.put("dataList", masterWorks);
+
+        return resultMap;
+    }
+
 }
 
 

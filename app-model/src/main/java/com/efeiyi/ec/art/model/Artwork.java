@@ -235,7 +235,6 @@ public class Artwork implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
     @OrderBy(value = "createDatetime desc")
-    @JsonIgnore
     public List<ArtworkBidding> getArtworkBiddings() {
         return artworkBiddings;
     }
@@ -453,7 +452,7 @@ public class Artwork implements Serializable {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "artwork_direction_id")
-    @JsonIgnore
+    @Where(clause = "status=1")
     public Artworkdirection getArtworkdirection() {
         return artworkdirection;
     }
@@ -539,7 +538,7 @@ public class Artwork implements Serializable {
         this.investRestTime = investRestTime;
     }
 
-    @Transient
+    @Column(name = "height")
     public Integer getHeight() {
         return height;
     }
@@ -548,7 +547,7 @@ public class Artwork implements Serializable {
         this.height = height;
     }
 
-    @Transient
+    @Column(name = "width")
     public Integer getWidth() {
         return width;
     }

@@ -49,57 +49,35 @@ public class ArtMasterAttachmentController extends BaseController {
     @Autowired
     private AliOssUploadManager aliOssUploadManager;
 
-    @RequestMapping("/app/saveMasterAttachment.do")
+    @RequestMapping("/app/saveArtMasterAttachment.do")
     @ResponseBody
-    public Map saveMasterAttachment(HttpServletRequest request) {
+    public Map saveArtMasterAttachment(HttpServletRequest request) {
+        Map<String, Object> resultMap = null;
         LogBean logBean = new LogBean();
-        Map<String, Object> resultMap = new HashMap<>();
-        Master master = null;
 
-        try{
-            String userId = AuthorizationUtil.getUserId();
-
-            master = masterManager.getMasterByUserId(userId);
-
-            if(master == null) {
-                return  resultMapHandler.handlerResult("10004","艺术家为空",logBean);
-            }
-
-            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);
-
-            logBean.setCreateDate(new Date());//操作时间
-            logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
-            logBean.setApiName("saveMasterAttachment");
-
-            ArtMasterAttachment masterAttachment = new ArtMasterAttachment();
-            masterAttachment.setMaster(master);
-            masterAttachment.setPaperNo(jsonObj.getString("paperNo"));
-            masterAttachment.setPaperType(jsonObj.getString("paperType"));
-            masterAttachment.setRemark(jsonObj.getString("remark"));
-
-            String imageStr = jsonObj.getString("image");
-            String[] imageArr = null;
-            if(imageStr != null) {
-                imageArr = imageStr.split(",");
-            }
-
-            if(imageStr != null) {
-                master.setIdentityFront(imageArr[0]);
-                master.setIdentityBack(imageArr[1]);
-            }
-
-            attachmentManager.saveMasterAttachment(masterAttachment, imageArr);
-
-            master.setTheStatus("2");//把状态改为审核中
-            baseManager.saveOrUpdate(Master.class.getName(), master);
-
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "审核提交成功");
-        } catch (Exception e) {
-            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        try {
+            resultMap = attachmentManager.saveArtMasterAttachment(request, logBean);
+        } catch(Exception e) {
+            return  resultMapHandler.handlerResult("100011","保存附件失败",logBean);
         }
 
         return resultMap;
     }
+
+    @RequestMapping("/app/deleteArtMasterAttachment.do")
+    @ResponseBody
+    public Map deleteArtMasterAttachment(HttpServletRequest request) {
+        Map<String, Object> resultMap = null;
+        LogBean logBean = new LogBean();
+
+        try {
+            resultMap = attachmentManager.deleteArtMasterAttachment(request, logBean);
+        } catch(Exception e) {
+            return  resultMapHandler.handlerResult("100011","删除附件失败",logBean);
+        }
+
+        return resultMap;
+    }
+
 
 }

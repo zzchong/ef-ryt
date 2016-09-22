@@ -305,7 +305,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
     }
 
     @Override
-    public Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq) throws Exception {
+    public Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq, String description) throws Exception {
         if (!title.equals("")){
             artwork.setTitle(title);
         }
@@ -320,12 +320,15 @@ public class ArtworkManagerImpl implements ArtworkManager {
             artwork.setStartingPrice(new BigDecimal(investGoalMoney));
         }
         if (!duration.equals("")){
-            artwork.setDescription(duration);
+            artwork.setDuration(Integer.valueOf(duration));
+        }
+        if (!description.equals("")){
+            artwork.setDescription(description);
         }
         artwork.setCreateDatetime(new Date());
         artwork.setAuthor(AuthorizationUtil.getUser());
+        Artworkdirection artworkdirection = null;
         if (!makeInstru.equals("")){
-            Artworkdirection artworkdirection = null;
             if (artwork.getArtworkdirection()==null){
                 artworkdirection = new Artworkdirection();
             }else {
@@ -336,11 +339,12 @@ public class ArtworkManagerImpl implements ArtworkManager {
             baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);
         }
         if (!financingAq.equals("")){
-            Artworkdirection artworkdirection = artwork.getArtworkdirection();
+            artworkdirection = artwork.getArtworkdirection();
             artworkdirection.setFinancing_aq(financingAq);
             baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);
         }
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+        artwork.setArtworkdirection(artworkdirection);
         return artwork;
     }
 

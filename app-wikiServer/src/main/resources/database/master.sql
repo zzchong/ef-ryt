@@ -33,3 +33,16 @@ ADD COLUMN `province_str`  varchar(16) NULL AFTER `consignee`,
 ADD COLUMN `city_str`  varchar(16) NULL AFTER `province_str`,
 ADD COLUMN `district_str`  varchar(16) NULL AFTER `city_str`;
 
+
+ALTER TABLE `app_art_work_attachment`
+ADD COLUMN `status`  varchar(1) NULL AFTER `file_name`;
+
+ALTER TABLE 'app_art_work_message_attachment'
+ADD COLUMN 'video_picture' varchar(100) NULL after 'FileType';
+
+ALTER TABLE 'app_master'
+ADD COLUMN 'email' VARCHAR(50) NULL after 'phone',
+ADD COLUMN 'present_city' VARCHAR(10) NULL after 'email',
+ADD COLUMN 'identity_card_type' VARCHAR(10) null after 'present_city',
+ADD COLUMN 'identity_card_no' VARCHAR(30) null after 'identity_card_type',
+ADD COLUMN 'remark' VARCHAR(255) null after 'identity_card_no';

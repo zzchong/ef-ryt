@@ -8,11 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.awt.image.BufferedImage;
+import java.util.*;
 
 /**
  * Created by Administrator on 2016/9/13.
@@ -26,7 +25,7 @@ public class UploadImageManagerImpl implements UploadImageManager {
 
     @Override
     public List uplaodImage(HttpServletRequest request) throws Exception {
-        List list = new ArrayList();
+        List<Map<String, Object>> list = new ArrayList();
 
         //创建一个通用的多部分解析器
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
@@ -35,31 +34,33 @@ public class UploadImageManagerImpl implements UploadImageManager {
         if (multipartResolver.isMultipart(request)) {
             //转换成多部分request
             MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
-            //取得request中的所有文件名
-            Iterator<String> iter = multiRequest.getFileNames();
-            while (iter.hasNext()) {
-                //取得上传文件
-                MultipartFile file = multiRequest.getFile(iter.next());
 
-                //取得当前上传文件的文件名称
-                String myFileName = file.getOriginalFilename();
-                //如果名称不为“”,说明该文件存在，否则说明该文件不存在
-                if (myFileName.trim() != "") {
-                    //重命名上传后的文件名
+            Map<String, MultipartFile> fileMap = multiRequest.getFileMap();
+            for(String key : fileMap.keySet()) {
+                MultipartFile file = fileMap.get(key);
+                BufferedImage bi = ImageIO.read(file.getInputStream());
+                String fileName = file.getOriginalFilename();
+
+                if(!"".equals(fileName.trim())) {
                     StringBuilder url = new StringBuilder("master/");
 
-                    url.append("picture/" + new Date().getTime() + myFileName);
+                    url.append("picture/" + new Date().getTime() + fileName);
 
                     String pictureUrl = "http://rongyitou2.efeiyi.com/" + url.toString();
 
                     //将图片上传至阿里云
                     aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url.toString());
 
-                    list.add(pictureUrl);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("pictureUrl", pictureUrl);
+                    map.put("width", bi.getWidth());
+                    map.put("height", bi.getHeight());
+                    list.add(map);
                 }
             }
         }
 
         return list;
     }
+
 }

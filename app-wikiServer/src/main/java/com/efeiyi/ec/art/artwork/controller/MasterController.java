@@ -85,10 +85,25 @@ public class MasterController extends BaseController {
         Map<String, Object> resultMap;
 
         try{
-            resultMap = masterManager.saveMaster(request, logBean);
+            resultMap = masterManager.saveMasterBasic(request, logBean);
         } catch (Exception e) {
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
+        return resultMap;
+    }
+
+    @RequestMapping("/app/saveMasterIdentity.do")
+    @ResponseBody
+    public Map saveMasterIdentity(HttpServletRequest request) {
+        LogBean logBean = new LogBean();
+        Map<String, Object> resultMap = null;
+
+        try{
+            resultMap = masterManager.saveMasterIdentity(request, logBean);
+        } catch (Exception e) {
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+
         return resultMap;
     }
 
@@ -108,7 +123,7 @@ public class MasterController extends BaseController {
 
             resultMap.put("resultCode", "0");
             resultMap.put("resultMsg", "艺术家获取成功");
-            resultMap.put("master", master);
+            resultMap.put("data", master);
         } catch (Exception e) {
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
@@ -126,24 +141,35 @@ public class MasterController extends BaseController {
     public Map saveMasterWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
-        Map<String, Object> data = new HashMap<String, Object>();
-        TreeMap map = new TreeMap();
-        List objectList = null;
+
         try{
             logBean.setCreateDate(new Date());//操作时间
             logBean.setApiName("saveMasterWork");
 
-            boolean mark = masterManager.saveMasterWork(request);
+            MasterWork masterWork = masterManager.saveMasterWork(request);
 
-            if(mark){
-                return resultMapHandler.handlerResult("0","成功",logBean);
-            }else {
-                return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
-            }
-
+            resultMap.put("resultCode", "0");
+            resultMap.put("resultMsg", "作品上传成功");
+            resultMap.put("data", masterWork);
         } catch(Exception e){
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
+
+        return resultMap;
+    }
+
+    @RequestMapping("/app/getMasterWorks.do")
+    @ResponseBody
+    public Map getMasterWorks(HttpServletRequest request) {
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = null;
+
+        try{
+            resultMap = masterManager.getMasterWorks(request, logBean);
+        } catch (Exception e) {
+            return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
+        }
+        return resultMap;
     }
 
 
