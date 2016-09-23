@@ -1032,55 +1032,32 @@ public class ArtworkController extends BaseController {
             //String artworkDirectionId = jsonObj.getString("artworkDirectionId");//项目创作过程及融资解惑
 
             String identification = jsonObj.getString("identification");//标识：“000”代表不校验存入，“111”校验存入
-            //List<String> artworkAttachmentList = new ArrayList();
-/*            for (int i=0;i<8;i++){
-                if (!jsonObj.getString("artworkAttachmentId"+i).equals("")){
-                    artworkAttachmentList.add(jsonObj.getString("artworkAttachment"+i));
-                }
-            }*/
 
-            //判断存入类型
-            if (identification.equals("")){
-                resultMap.put("resultCode", "10002");
-                resultMap.put("resultMsg", "参数有误");
+
+            if (artworkId.equals("")){//新录入
+                Artwork artwork = new Artwork();
+                artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq, description);
+                artwork.setStatus("2");
+                artwork.setType("0");
+                artwork.setBuffer("yes");
+                artwork.setStep("100");
+                baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+                resultMap.put("artwork", artwork);
             }else {
-                //if (identification.equals("000")){//不校验存入
-                    if (artworkId.equals("")){//新录入
-                        Artwork artwork = new Artwork();
-                        artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq, description);
-                        artwork.setStatus("1");
-                        artwork.setType("0");
-                        artwork.setBuffer("yes");
-                        artwork.setStep("100");
-                        baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
-
-                        resultMap.put("resultCode", "0");
-                        resultMap.put("resultMsg", "成功");
-                        resultMap.put("artwork", artwork);
-                    }else {
-                        Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
-                        artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq, description);
-                        if (!financingAq.equals("")){
-                            artwork.setStatus("1");
-                            baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
-                        }
-                        resultMap.put("resultCode", "0");
-                        resultMap.put("resultMsg", "成功");
-                        resultMap.put("artwork", artwork);
-                    }//rk.class.getName(), artworkId);
-                    //artwork = artworkManager.saveOrUpdateArtwork(art
-                //}else {
-                    /*Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), title, material, brief, investGoalMoney, duration, makeInstru, financingAq);
+                Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
+                artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq, description);
+                if (!financingAq.equals("")){
                     artwork.setStatus("1");
-                    artwork.setBuffer("no");
-                    artwork.setStep("10");
                     baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
-                    resultMap.put("resultCode", "0");
-                    resultMap.put("resultMsg", "成功");
-                    resultMap.put("artwork", artwork);*/
-                //}
+                }
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+                resultMap.put("artwork", artwork);
             }
-           // net.sf.json.JSONObject object = net.sf.json.JSONObject.fromObject(resultMap);
+
             return resultMap;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1088,6 +1065,32 @@ public class ArtworkController extends BaseController {
             }
 
     }
+
+    /**
+     * 提交项目审核接口
+     */
+/*
+    @RequestMapping(value = "/app/submitNewArtWork.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map submitNewArtWork(HttpServletRequest request){
+        Map<String, Object> resultMap = new HashMap();
+        try {
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            String artworkId = jsonObj.getString("artworkId");
+            String financingAq = jsonObj.getString("financingAq");
+            if (artworkId.equals("") || financingAq.equals("")){
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "请求参数有误");
+                return resultMap;
+            }
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
+
+        }catch (Exception e){
+
+        }
+    }
+*/
+
 
     /**
      * 获取当前用户缓存项目接口
@@ -1144,13 +1147,14 @@ public class ArtworkController extends BaseController {
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
             List<Map<String, Object>> list = uploadImageManager.uplaodImage(request);
             if (type.equals("000")){
-                List<ArtworkAttachment> list1 = artwork.getArtworkAttachment();
+                /*List<ArtworkAttachment> list1 = artwork.getArtworkAttachment();
                 if (list1.size()>0){
                     for (ArtworkAttachment artworkAttachment:list1){
                         artworkAttachment.setStatus("0");
                         baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
                     }
-                }
+                }*/
+                List<ArtworkAttachment> artworkAttachments = new ArrayList<>();
                 for (Map<String, Object> map : list){
                     ArtworkAttachment artworkAttachment = new ArtworkAttachment();
                     artworkAttachment.setArtwork(artwork);
@@ -1161,7 +1165,9 @@ public class ArtworkController extends BaseController {
                     artworkAttachment.setHeight(Integer.parseInt(map.get("height").toString()));
                     artworkAttachment.setStatus("1");
                     baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+                    artworkAttachments.add(artworkAttachment);
                 }
+                resultMap.put("artworkAttachmentList", artworkAttachments);
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "成功");
             }else if (type.equals("111")){
@@ -1169,6 +1175,7 @@ public class ArtworkController extends BaseController {
                 artwork.setWidth(Integer.parseInt(list.get(0).get("width").toString()));
                 artwork.setHeight(Integer.parseInt(list.get(0).get("height").toString()));
                 baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+                resultMap.put("artwork", artwork);
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "成功");
             }else {
@@ -1183,6 +1190,61 @@ public class ArtworkController extends BaseController {
         return resultMap;
     }
 
+    /**
+     * 单张删除创建项目图片接口
+     */
+    @RequestMapping(value = "/app/deleteArtworkPicture.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map deleteArtworkPicture(HttpServletRequest request){
+        LogBean logBean = new LogBean();//日志记录
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        TreeMap treeMap = new TreeMap();
+        try {
+            logBean.setCreateDate(new Date());//操作时间
+            logBean.setApiName("deleteArtworkPicture");
+
+            JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+            String artworkAttachmentId = jsonObj.getString("artworkAttachmentId");
+            String artworkId = jsonObj.getString("artworkId");
+            String type = jsonObj.getString("type");//111表示是封面删除，000表示概念图（附件）删除
+            if (type.equals("")){
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "请求参数有误");
+                return resultMap;
+            }
+            if (type.equals("000")){
+                if (artworkAttachmentId.equals("")){
+                    resultMap.put("resultCode", "10002");
+                    resultMap.put("resultMsg", "请求参数有误");
+                    return resultMap;
+                }
+                ArtworkAttachment artworkAttachment = (ArtworkAttachment) baseManager.getObject(ArtworkAttachment.class.getName(), artworkAttachmentId);
+                artworkAttachment.setStatus("0");
+                baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+            }else if (type.equals("111")){
+                if (artworkId.equals("")){
+                    resultMap.put("resultCode", "10002");
+                    resultMap.put("resultMsg", "请求参数有误");
+                    return resultMap;
+                }
+                Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
+                artwork.setPicture_url("");
+                baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+                resultMap.put("resultCode", "0");
+                resultMap.put("resultMsg", "成功");
+            }else {
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "请求参数有误");
+                return resultMap;
+            }
+        }catch (Exception e){
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误,请联系管理员");
+        }
+        return resultMap;
+    }
 
     /**
      * 艺术家发起新的项目接口 二

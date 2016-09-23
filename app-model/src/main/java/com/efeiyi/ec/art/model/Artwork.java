@@ -26,7 +26,7 @@ public class Artwork implements Serializable {
     private String title;//标题
     private String brief;//简介
     private String description;//描述
-    private String status;  //0 废弃  1 可用
+    private String status;  //0 废弃  1 可用   2 缓存状态
     private BigDecimal investGoalMoney;//融资目标金额
     private Date investStartDatetime;//融资开始时间
     private Date investEndDatetime;//融资结束时间、创作开始时间
@@ -201,7 +201,8 @@ public class Artwork implements Serializable {
 
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "artwork")
-    @JsonIgnore
+    @Where(clause = "status=1")
+    //@JsonIgnore
     public List<ArtworkAttachment> getArtworkAttachment() {
         return artworkAttachment;
     }

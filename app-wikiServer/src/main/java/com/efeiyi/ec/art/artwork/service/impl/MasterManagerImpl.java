@@ -149,12 +149,27 @@ public class MasterManagerImpl implements MasterManager {
     }
 
     @Override
-    public MasterWork saveMasterWork(HttpServletRequest request) throws Exception {
-        JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+    public Map saveMasterWork(HttpServletRequest request, LogBean logBean) throws Exception {
+        JSONObject jsonObj = null;
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try{
+            jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  resultMapHandler.handlerResult("100010","获取传入参数失败",logBean);
+        }
+
 
         String pictureUrl = jsonObj.getString("pictureUrl");
 
-        JSONArray jsonArr = JSONArray.parseArray(pictureUrl);
+        JSONArray jsonArr = null;
+        try{
+            jsonArr = JSONArray.parseArray(pictureUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  resultMapHandler.handlerResult("100010","解析图片信息失败",logBean);
+        }
 
         MasterWork masterWork = new MasterWork();
         masterWork.setStatus("1");
@@ -162,7 +177,7 @@ public class MasterManagerImpl implements MasterManager {
         masterWork.setCreateDatetime(new Date());
         masterWork.setMaterial(jsonObj.getString("material"));
 
-        if(jsonArr.size() > 0) {
+        if(jsonArr != null && jsonArr.size() > 0) {
             masterWork.setPictureUrl(jsonArr.getJSONObject(0).getString("pictureUrl"));
             masterWork.setWidth(jsonArr.getJSONObject(0).getString("width"));
             masterWork.setHeight(jsonArr.getJSONObject(0).getString("height"));
@@ -172,9 +187,18 @@ public class MasterManagerImpl implements MasterManager {
         masterWork.setType(jsonObj.getString("type"));
         masterWork.setCreateYear(jsonObj.getString("createYear"));
 
-        baseManager.saveOrUpdate(MasterWork.class.getName(),masterWork);
+        try{
+            baseManager.saveOrUpdate(MasterWork.class.getName(),masterWork);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  resultMapHandler.handlerResult("100010","保存艺术家作品失败",logBean);
+        }
 
-        return masterWork;
+        resultMap.put("resultCode", "0");
+        resultMap.put("resultMsg", "作品上传成功");
+        resultMap.put("data", masterWork);
+
+        return resultMap;
     }
 
     @Override

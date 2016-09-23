@@ -3,6 +3,7 @@ package com.efeiyi.ec.art.base.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.base.service.DictionaryManager;
+import com.efeiyi.ec.art.base.util.ContextUtils;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.base.util.ResultMapHandler;
 import com.efeiyi.ec.art.model.Dictionary;
@@ -49,7 +50,7 @@ public class DictionaryController extends BaseController{
             List<Dictionary> dicList = dictionaryManager.getDictionaryByType(type);
 
             resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "成功");
+            resultMap.put("resultMsg", "获取字典数据成功");
             resultMap.put("dataList", dicList);
         } catch (Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
@@ -58,9 +59,4 @@ public class DictionaryController extends BaseController{
         return resultMap;
     }
 
-    //github test
-
-    public void test() {
-        System.out.print("test");
-    }
 }

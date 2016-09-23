@@ -69,7 +69,7 @@ public class ArtworkAttachment implements Serializable {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-    @Transient
+    @Column(name = "width")
     public Integer getWidth() {
         return width;
     }
@@ -78,7 +78,7 @@ public class ArtworkAttachment implements Serializable {
     public void setWidth(Integer width) {
         this.width = width;
     }
-    @Transient
+    @Column(name = "height")
     public Integer getHeight() {
         return height;
     }

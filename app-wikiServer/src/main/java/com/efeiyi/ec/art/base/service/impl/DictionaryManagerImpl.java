@@ -21,9 +21,17 @@ public class DictionaryManagerImpl implements DictionaryManager {
     @Override
     public List<Dictionary> getDictionaryByType(Integer type) {
         LinkedHashMap<String, Object> queryParamMap = new LinkedHashMap<String, Object>();
-        queryParamMap.put("type", type);
-        String hql = "select s from com.efeiyi.ec.art.model.Dictionary s where s.type = :type";
-        return xdoDao.getObjectList(hql, queryParamMap);
-    }
 
+        StringBuffer sb = new StringBuffer();
+        sb.append("select s from com.efeiyi.ec.art.model.Dictionary s where 1=1 ");
+
+        if(type != null) {
+            sb.append("and s.type = :type");
+            queryParamMap.put("type", type);
+        } else {
+            sb.append("and s.type != 2");
+        }
+
+        return xdoDao.getObjectList(sb.toString(), queryParamMap);
+    }
 }

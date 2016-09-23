@@ -46,3 +46,18 @@ ADD COLUMN 'present_city' VARCHAR(10) NULL after 'email',
 ADD COLUMN 'identity_card_type' VARCHAR(10) null after 'present_city',
 ADD COLUMN 'identity_card_no' VARCHAR(30) null after 'identity_card_type',
 ADD COLUMN 'remark' VARCHAR(255) null after 'identity_card_no';
+
+
+ALTER TABLE `app_art_work_attachment`
+ADD COLUMN `width`  int(10) NULL AFTER `status`,
+ADD COLUMN `height`  int(10) NULL AFTER `width`;
+
+ALTER TABLE 'app_master_attachment'
+ADD COLUMN 'type' VARCHAR(2) null after 'url',
+ADD COLUMN 'width' VARCHAR(10) null after 'type',
+ADD COLUMN 'height' VARCHAR(10) null after 'width';
+
+ALTER TABLE 'app_master_work'
+ADD COLUMN 'width' VARCHAR(10) null after 'type',
+ADD COLUMN 'height' VARCHAR(10) null after 'width';
+

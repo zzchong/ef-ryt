@@ -21,7 +21,7 @@ public interface MasterManager {
 
     Master getMasterByUserId(String userId) throws Exception;
 
-    MasterWork saveMasterWork(HttpServletRequest request) throws Exception;
+    Map<String, Object> saveMasterWork(HttpServletRequest request, LogBean logBean) throws Exception;
 
     Map<String, Object> getMasterWorks(HttpServletRequest request, LogBean logBean) throws Exception;
 

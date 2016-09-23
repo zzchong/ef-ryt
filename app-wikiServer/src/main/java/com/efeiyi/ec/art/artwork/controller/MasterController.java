@@ -140,18 +140,15 @@ public class MasterController extends BaseController {
     @ResponseBody
     public Map saveMasterWork(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
-        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> resultMap = null;
+
+        logBean.setCreateDate(new Date());//操作时间
+        logBean.setApiName("saveMasterWork");
 
         try{
-            logBean.setCreateDate(new Date());//操作时间
-            logBean.setApiName("saveMasterWork");
-
-            MasterWork masterWork = masterManager.saveMasterWork(request);
-
-            resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", "作品上传成功");
-            resultMap.put("data", masterWork);
+            resultMap = masterManager.saveMasterWork(request, logBean);
         } catch(Exception e){
+            e.printStackTrace();
             return  resultMapHandler.handlerResult("10004","未知错误，请联系管理员",logBean);
         }
 
