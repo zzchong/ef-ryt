@@ -40,7 +40,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static jdk.nashorn.internal.objects.NativeDate.getDate;
 
 /**
  * Created by Administrator on 2015/12/22.
@@ -336,10 +339,13 @@ public class MessageController extends BaseController {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
+
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
                 logBean.setResultCode("10001");
                 logBean.setMsg("必选参数为空，请仔细检查");
@@ -348,13 +354,15 @@ public class MessageController extends BaseController {
                 resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                 return resultMap;
             }
+
             //校验数字签名
             String signmsg = jsonObj.getString("signmsg");
             treeMap.put("type", jsonObj.getString("type"));
             treeMap.put("pageSize", jsonObj.getString("pageSize"));
             treeMap.put("pageIndex", jsonObj.getString("pageIndex"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
+
+            /*boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
             if (verify != true) {
                 logBean.setResultCode("10002");
                 logBean.setMsg("参数校验不合格，请仔细检查");
@@ -362,7 +370,7 @@ public class MessageController extends BaseController {
                 resultMap.put("resultCode", "10002");
                 resultMap.put("resultMsg", "参数校验不合格，请仔细检查");
                 return resultMap;
-            }
+            }*/
 
             String userId = AuthorizationUtil.getUserId();
             //查询数据参数
@@ -382,10 +390,15 @@ public class MessageController extends BaseController {
                     resultMap.put("resultMsg", "必选参数为空，请仔细检查");
                     return resultMap;
                 } else if ("0".equals(type)) {
-                    String hql = "from Notification WHERE targetUser.id=" + "'" + userId + "'" + " AND status<>'0'  order by isWatch asc,createDatetime desc";
-                    objectList = (List<Notification>) messageDao.getPageList(hql, (jsonObj.getInteger("pageIndex") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("from Notification WHERE targetUser.id=" + "'" + userId + "'" + " AND status<>'0'");
+                    if(jsonObj.getDate("lastUpdateDate") != null) {
+                        sb.append(" and createDatetime > '" + sdf.format(jsonObj.getDate("lastUpdateDate")) + "'");
+                    }
+                    sb.append(" order by isWatch asc,createDatetime desc");
+
+                    objectList = (List<Notification>) messageDao.getPageList(sb.toString(), (jsonObj.getInteger("pageIndex") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
                     updateWatch(request,"listNotification_default",userId,"");
-//                    objectList =  (List<Notification>)baseManager.listObject(AppConfig.SQL_NOTICE_GET_APP, map);
                 } else if ("1".equals(type)) {
                     objectList = new ArrayList();
                     String hql = "from ArtworkComment WHERE fatherComment.creator.id= " + "'" + userId + "'" + " AND status<>'0'  order by isWatch asc, createDatetime desc";
@@ -450,6 +463,7 @@ public class MessageController extends BaseController {
                     baseManager.saveOrUpdate(LogBean.class.getName(), logBean);
                     resultMap.put("resultCode", "0");
                     resultMap.put("resultMsg", "成功");
+                    resultMap.put("lastUpdateDate", new Date());
                     resultMap.put("objectList", objectList);
                 } else {
                     logBean.setResultCode("10008");
