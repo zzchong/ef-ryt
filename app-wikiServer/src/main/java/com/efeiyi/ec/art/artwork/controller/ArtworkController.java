@@ -1027,7 +1027,7 @@ public class ArtworkController extends BaseController {
             String investGoalMoney = jsonObj.getString("investGoalMoney");//融资目标金额
             String duration = jsonObj.getString("duration");//创作时长（天）
             String makeInstru = jsonObj.getString("makeInstru");//制作说明
-            String financingAq = jsonObj.getString("financiongAg");//资讯解惑
+            String financingAq = jsonObj.getString("financingAq");//资讯解惑
             String description = jsonObj.getString("description");//描述(详细介绍)
             //String artworkDirectionId = jsonObj.getString("artworkDirectionId");//项目创作过程及融资解惑
 
@@ -1049,10 +1049,10 @@ public class ArtworkController extends BaseController {
             }else {
                 Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
                 artwork = artworkManager.saveOrUpdateArtwork(artwork, title, material, brief, investGoalMoney, duration, makeInstru, financingAq, description);
-                if (!financingAq.equals("")){
-                    artwork.setStatus("1");
-                    baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
-                }
+//                if (!financingAq.equals("")){
+//                    artwork.setStatus("1");
+//                    baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+//                }
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "成功");
                 resultMap.put("artwork", artwork);
@@ -1069,7 +1069,6 @@ public class ArtworkController extends BaseController {
     /**
      * 提交项目审核接口
      */
-/*
     @RequestMapping(value = "/app/submitNewArtWork.do", method = RequestMethod.POST)
     @ResponseBody
     public Map submitNewArtWork(HttpServletRequest request){
@@ -1084,12 +1083,38 @@ public class ArtworkController extends BaseController {
                 return resultMap;
             }
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
-
+            if (artwork.getTitle().equals("")||artwork.getMaterial().equals("")||artwork.getBrief().equals("")||artwork.getInvestGoalMoney().equals("")||artwork.getDuration().equals("")||artwork.getPicture_url().equals("")){
+                resultMap.put("resultCode", "10002");
+                resultMap.put("resultMsg", "请求参数有误");
+                return resultMap;
+            }else {
+                if (artwork.getArtworkdirection()==null || artwork.getArtworkAttachment().size()<1 || artwork.getArtworkAttachment().size()>8){
+                    resultMap.put("resultCode", "10002");
+                    resultMap.put("resultMsg", "请求参数有误");
+                    return resultMap;
+                }else {
+                    if (artwork.getArtworkdirection().getMake_instru().equals("")){
+                        resultMap.put("resultCode", "10002");
+                        resultMap.put("resultMsg", "请求参数有误");
+                        return resultMap;
+                    }else {
+                        //校验完成的操作
+                        Artworkdirection artworkdirection = artwork.getArtworkdirection();
+                        artworkdirection.setFinancing_aq(financingAq);
+                        baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);
+                        artwork.setStatus("1");
+                        baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+                        resultMap.put("resultCode", "0");
+                        resultMap.put("resultMsg", "成功");
+                    }
+                }
+            }
         }catch (Exception e){
-
+            resultMap.put("resultCode", "10004");
+            resultMap.put("resultMsg", "未知错误,请联系管理员");
         }
+        return resultMap;
     }
-*/
 
 
     /**
