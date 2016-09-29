@@ -44,20 +44,15 @@ public class MasterManagerImpl implements MasterManager {
     @Override
     public Map<String, Object> saveMasterBasic(HttpServletRequest request, LogBean logBean) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
-        JSONObject jsonObj = null;
-        Master master = null;
 
-        jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+        JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
 
         User user = AuthorizationUtil.getUser();
 
-        master = getMasterByUserId(user.getId());
+        Master master = getMasterByUserId(user.getId());
 
         //在（1.待提交 4.审核失败）状态下 , 不需要重新创建master
-        if(master == null || !("1".equals(master.getTheStatus())
-                || "2".equals(master.getTheStatus())
-                || "3".equals(master.getTheStatus())
-                || "4".equals(master.getTheStatus()))) {
+        if(master == null) {
             master = new Master();
         }
 
@@ -80,7 +75,6 @@ public class MasterManagerImpl implements MasterManager {
         master.setPhone(jsonObj.getString("phone"));
         master.setPresentCity(jsonObj.getString("presentCity"));
         master.setPresentAddress(jsonObj.getString("presentAddress"));
-        master.setTheStatus("1");
         master.setUser(user);
 
         baseManager.saveOrUpdate(Master.class.getName(), master);
@@ -113,23 +107,10 @@ public class MasterManagerImpl implements MasterManager {
         master.setIdentityCardType(jsonObj.getString("paperType"));
         master.setRemark(jsonObj.getString("remark"));
 
-        String imageStr = jsonObj.getString("image");
-        String[] imageArr = null;
-        if(imageStr != null) {
-            imageArr = imageStr.split(",");
-        }
-
-        if(imageStr != null && imageArr.length == 1) {
-            master.setIdentityFront(imageArr[0]);
-        }
-        if(imageStr != null && imageArr.length == 2) {
-            master.setIdentityBack(imageArr[1]);
-        }
-
         String submitMark = jsonObj.getString("submitMark");
         //选择了提交审核 ， 更新状态为待审核
         if("1".equals(submitMark)) {
-            master.setTheStatus("2");
+            master.setTheStatus("1");
         }
 
         baseManager.saveOrUpdate(Master.class.getName(), master);

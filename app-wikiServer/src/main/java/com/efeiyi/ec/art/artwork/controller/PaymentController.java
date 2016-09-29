@@ -716,8 +716,9 @@ public class PaymentController extends BaseController {
             //总投资
             BigDecimal investMoney = new BigDecimal("0.00");
             Object tempInvestMoney =  baseManager.getUniqueObjectByConditions(AppConfig.SQL_INVEST_TOTAL,map);
-            if(tempInvestMoney!=null)
-                investMoney.add(new BigDecimal(tempInvestMoney.toString()));
+            if(tempInvestMoney!=null){
+                investMoney = investMoney.add(new BigDecimal(tempInvestMoney.toString()));
+            }
 
             //总收益
 //            BigDecimal rewardMoney = new BigDecimal("0.00");
@@ -739,7 +740,7 @@ public class PaymentController extends BaseController {
             xQuery1.put("user_id",userId);
             List<Account> accountList = baseManager.listObject(xQuery1);
             if(accountList!=null && accountList.size()>0){
-                restMoney = accountList.get(0).getCurrentBalance();
+                restMoney = accountList.get(0).getCurrentUsableBalance();
             }
 
             data.put("restMoney",restMoney);

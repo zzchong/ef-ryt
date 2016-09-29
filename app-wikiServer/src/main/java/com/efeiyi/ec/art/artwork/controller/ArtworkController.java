@@ -45,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -1619,6 +1620,8 @@ public class ArtworkController extends BaseController {
                                     aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url);
                                     if (i == 0) {
                                         artwork.setPicture_url(pictureUrl);
+                                        artwork.setHeight(ImageIO.read(file.getInputStream()).getHeight());
+                                        artwork.setWidth(ImageIO.read(file.getInputStream()).getWidth());
                                     } else if (i == 1) {
                                         artwork.setPictureBottom(pictureUrl);
                                     } else if (i == 2) {

@@ -37,7 +37,7 @@ public class Master implements Serializable{
     private String backgroundUrl;
     private String provinceName;//籍贯/详细地址
     private AddressProvince originProvince; //籍贯（省）
-    private String theStatus;         // 0 删除 1 待提交 2 审核中 3审核成功 4 审核失败
+    private String theStatus;         // 0 删除 1 待审核  2 审核中 3审核成功 4 审核失败
     private String logoUrl;
     private String masterSpeech;
     private User user; //大师跟用户的关系映射
