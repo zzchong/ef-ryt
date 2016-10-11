@@ -93,7 +93,8 @@ public class checkProjectController {
             //当前时间+30天
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
-            calendar.add(Calendar.DAY_OF_MONTH,30);
+            //calendar.add(Calendar.DAY_OF_MONTH,30);
+            calendar.add(Calendar.MINUTE, 5);
             artwork.setAuctionEndDatetime(calendar.getTime());
             InvestTrigger investTrigger = new InvestTrigger();
             investTrigger.execute(artwork.getId(),artwork.getAuctionEndDatetime(),"auction");
@@ -125,4 +126,5 @@ public class checkProjectController {
         }
         return new ModelAndView("redirect:/basic/xm.do?qm=plistCheckArtwork_checkDefault&checkProject=checkProject");
     }
+
 }
