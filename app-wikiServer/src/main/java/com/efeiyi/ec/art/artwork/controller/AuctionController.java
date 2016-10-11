@@ -62,9 +62,11 @@ public class AuctionController extends BaseController {
         List artworkList;
         try {
             JSONObject jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+
             logBean.setCreateDate(new Date());//操作时间
             logBean.setRequestMessage(jsonObj.toString());//************记录请求报文
             logBean.setApiName("artWorkAuctionList");
+
             if ("".equals(jsonObj.getString("signmsg")) || "".equals(jsonObj.getString("timestamp"))) {
                 return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
             }
@@ -74,7 +76,7 @@ public class AuctionController extends BaseController {
 
             Map paramMap = new HashMap<>();
             //项目信息
-            String hql = "from Artwork WHERE 1=1 and status = '1' and type = '3' order by investStartDatetime asc";
+            String hql = "from Artwork WHERE 1=1 and status = '1' and type = '3' order by auctionStartDatetime desc";
             artworkList = messageDao.getPageList(hql, (jsonObj.getInteger("pageIndex") - 1) * (jsonObj.getInteger("pageSize")), jsonObj.getInteger("pageSize"));
             for (Object artwork : artworkList) {
                 Artwork artworkTemp = (Artwork) artwork;
