@@ -498,6 +498,11 @@ public class SigninController extends BaseController {
             String verificationCode = VerificationCodeGenerator.createVerificationCode();
             request.getSession().setAttribute(jsonObj.getString("username"), verificationCode);
             String message = this.smsCheckManager.send(jsonObj.getString("username"), verificationCode, "1104699", PConst.TIANYI);
+
+            if("请求参数格式错误".equals(message)) {
+                return resultMapHandler.handlerResult("10002","参数校验不合格，请仔细检查",logBean);
+            }
+
             CookieTool.addCookie(resultMapHandler.getResponse(), jsonObj.getString("username").toString(),verificationCode, 120);
             resultMap = resultMapHandler.handlerResult("0","成功",logBean);
             resultMap.put("message",message);//响应的用户信息
@@ -699,7 +704,6 @@ public class SigninController extends BaseController {
                 return resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
             }
             String signmsg = jsonObj.getString("signmsg");
-//            treeMap.put("userId", jsonObj.getString("userId"));
             treeMap.put("content", jsonObj.getString("content"));
             treeMap.put("timestamp", jsonObj.getString("timestamp"));
             boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
@@ -709,21 +713,18 @@ public class SigninController extends BaseController {
 
             User user = null;
             try {
-//                user = (User)baseManager.getObject(User.class.getName(),jsonObj.getString("userId"));
                 user = AuthorizationUtil.getUser();
-                if (user!=null && user.getId()!=null) {
-                    UserFeedBack userFeedBack = new UserFeedBack();
-                    userFeedBack.setCreateDatetime(new Date());
-                    userFeedBack.setStatus("1");
-                    userFeedBack.setContent(jsonObj.getString("content"));
-                    userFeedBack.setUser(user);
-                    userFeedBack.setEmail(jsonObj.getString("email"));
-                    baseManager.saveOrUpdate(UserFeedBack.class.getName(),userFeedBack);
-                    return  resultMapHandler.handlerResult("0","成功",logBean);
-                }else {
 
-                    return  resultMapHandler.handlerResult("10007","用户名不存在",logBean);
-                }
+                UserFeedBack userFeedBack = new UserFeedBack();
+                userFeedBack.setCreateDatetime(new Date());
+                userFeedBack.setStatus("1");
+                userFeedBack.setContent(jsonObj.getString("content"));
+                userFeedBack.setUser(user);
+                userFeedBack.setEmail(jsonObj.getString("email"));
+
+                baseManager.saveOrUpdate(UserFeedBack.class.getName(),userFeedBack);
+
+                return  resultMapHandler.handlerResult("0","成功",logBean);
             } catch (Exception e) {
                 return  resultMapHandler.handlerResult("10005","查询数据出现异常",logBean);
             }

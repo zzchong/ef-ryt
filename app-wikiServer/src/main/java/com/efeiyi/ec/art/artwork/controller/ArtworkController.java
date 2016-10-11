@@ -1104,6 +1104,7 @@ public class ArtworkController extends BaseController {
                         artworkdirection.setFinancing_aq(financingAq);
                         baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);
                         artwork.setStatus("1");
+                        artwork.setStep("10");
                         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
                         resultMap.put("resultCode", "0");
                         resultMap.put("resultMsg", "成功");
@@ -1131,6 +1132,12 @@ public class ArtworkController extends BaseController {
             logBean.setApiName("getBufferedArtwork");
 
             String userId = AuthorizationUtil.getUser().getId();
+
+            /*String hql = "select s from com.efeiyi.ec.art.model.Artwork s where s.author.id = :userId and s.step = :step and s.status = :status";
+            LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+            params.put("userId", userId);
+            params.put("step", "100");
+            params.put("status", "2");*/
             XQuery xQuery = new XQuery("listArtwork_byBuffered", request);
             xQuery.put("author_id", userId);
             List artworkList = baseManager.listObject(xQuery);
@@ -1413,7 +1420,6 @@ public class ArtworkController extends BaseController {
             logBean.setCreateDate(new Date());//操作时间
             logBean.setApiName("updateArtWork");
             JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
-//            logBean.setRequestMessage(request.getParameter("title") + " " + request.getParameter("brief"));//************记录请求报文
             if ("".equals(jsonObject.getString("signmsg"))
                     || "".equals(jsonObject.getString("timestamp"))
                     || "".equals(jsonObject.getString("userId"))
@@ -1437,6 +1443,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
             artwork.setStep(jsonObject.getString("step"));
+            artwork.setStatus("1");
             baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
             return resultMapHandler.handlerResult("0", "成功", logBean);
         } catch (Exception e) {

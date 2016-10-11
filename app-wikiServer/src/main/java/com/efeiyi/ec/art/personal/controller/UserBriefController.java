@@ -90,15 +90,16 @@ public class UserBriefController  extends BaseController {
             }
             userBrief.setUser(user);
             userBrief.setStatus("1");
+            //type 1.签名  2简介
             if ("1".equals(jsonObj.getString("type"))){
                 if("".equals(jsonObj.getString("signer"))){
                     return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
                 }
                 userBrief.setContent(jsonObj.getString("signer"));//编辑签名
             } else{
-                if("".equals(jsonObj.getString("content"))){
+                /*if("".equals(jsonObj.getString("content"))){
                     return  resultMapHandler.handlerResult("10001","必选参数为空，请仔细检查",logBean);
-                }
+                }*/
                 userBrief.setContent(jsonObj.getString("content"));
             }
 

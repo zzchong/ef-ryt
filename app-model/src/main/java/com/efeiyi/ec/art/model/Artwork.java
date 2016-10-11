@@ -44,7 +44,9 @@ public class Artwork implements Serializable {
     private List<ArtWorkPraise> artWorkPraiseList;//点赞数
     private ArtworkDraw artworkDraw;//创作时长（天）
     private String picture_url;
-    private String step; //1 : 审核阶段
+    private String step; //项目阶段状态 100:编辑阶段，尚未提交 10.融资待审核 11.融资审核中 12.融资审核通过 13.融资审核未通过，已驳回
+    // 14.融资中 15.融资完成 20.创作前 21.创作中 22.创作延时 23.创作完成待审核 24.创作完成审核中 25.创作完成被驳回 30.拍卖前
+    // 31.拍卖中 32.拍卖结束 33.流拍 34.待支付尾款 35.待发放 36.已发放
     private BigDecimal investsMoney;//已筹金额
     private Date creationEndDatetime;//创作完成时间=融资结束时间+30(默认)
     private String type;//1 融资阶段  2 制作阶段  3 拍卖阶段  4 抽奖阶段   0 发起阶段  5驳回   6拍卖结束

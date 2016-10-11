@@ -475,7 +475,7 @@ public class PaymentManagerImpl implements PaymentManager {
                 baseManager.saveOrUpdate(Bill.class.getName(), bill);
 
                 String title = "充值";
-                String billNo = account.getId();
+                String billNo = bill.getId();
                 map1.put("action", action);
                 map1.put("Bill_id",bill.getId());
 
