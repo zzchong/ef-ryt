@@ -1,6 +1,5 @@
 package com.efeiyi.ec.quartz.trigger;
 
-//import com.efeiyi.ec.quartz.job.AuctionJob;
 import com.efeiyi.ec.quartz.job.InvestJob;
 import com.efeiyi.ec.virtual.util.DigitalSignatureUtil;
 import org.quartz.*;
@@ -18,15 +17,11 @@ import static org.quartz.SimpleScheduleBuilder.*;
  */
 public class InvestTrigger {
 
-
-
     //type  invest 投资   auction 拍卖
     public void execute(String id, Date time,String type){
 
         try {
-
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-            scheduler.start();
 
             Long timestamp = System.currentTimeMillis();
             Map<String, Object> map = new TreeMap<>();
@@ -36,14 +31,11 @@ public class InvestTrigger {
 
             String signmsg = DigitalSignatureUtil.encrypt(map);
 
-
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put("id",id);
             jobDataMap.put("type",type);
             jobDataMap.put("timestamp",timestamp);
             jobDataMap.put("signmsg",signmsg);
-
-
 
             JobDetail job = newJob(InvestJob.class)
                     .withIdentity(id,"group")
@@ -54,13 +46,15 @@ public class InvestTrigger {
                     .withIdentity(id,"group")
                     .forJob(job)
                     .startAt(time)
-                    .withSchedule(simpleSchedule()
-                    .withRepeatCount(0)
-                    )
+                    .withSchedule(simpleSchedule().withRepeatCount(0))
                     .build();
 
+            if(scheduler.checkExists(job.getKey())) {
+                scheduler.deleteJob(job.getKey());
+            }
+
             scheduler.scheduleJob(job,trigger);
-//            scheduler.shutdown();
+            scheduler.start();
         }catch (SchedulerException se){
            se.printStackTrace();
         } catch (Exception e) {

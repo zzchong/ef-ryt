@@ -1,6 +1,10 @@
 package com.efeiyi.ec.quartz.job;
 
 import com.alibaba.fastjson.JSONObject;
+import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.model.ArtworkBidding;
+import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.does.model.XQuery;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -9,14 +13,17 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2016/6/14.
@@ -24,10 +31,12 @@ import java.io.InputStreamReader;
 @DisallowConcurrentExecution
 public class InvestJob implements Job {
 
+    @Autowired
+    protected BaseManager baseManager;
 
-//    private static final String URL = "http://192.168.1.75:8080/app/updateCreationStatus.do";
+    private static final String URL = "http://192.168.1.80:8080/app/updateCreationStatus.do";
 
-    private static final String URL = "http://ryt.efeiyi.com/app/updateCreationStatus.do";
+    //private static final String URL = "http://ryt.efeiyi.com/app/updateCreationStatus.do";
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {

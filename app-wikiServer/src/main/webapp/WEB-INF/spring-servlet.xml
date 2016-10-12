@@ -66,6 +66,7 @@
             <mvc:exclude-mapping path="/app/plistArtWorkMessage.do"/>
             <mvc:exclude-mapping path="/app/getDictionaryList.do"/>
             <mvc:exclude-mapping path="/app/feedBack.do"/>
+            <mvc:exclude-mapping path="/app/updateCreationStatus.do"/>
             <bean class="com.efeiyi.ec.art.interceptor.LoginInterceptor"/>
         </mvc:interceptor>
         <mvc:interceptor>
@@ -107,6 +108,7 @@
             <mvc:exclude-mapping path="/app/plistArtWorkMessage.do"/>
             <mvc:exclude-mapping path="/app/getDictionaryList.do"/>
             <mvc:exclude-mapping path="/app/feedBack.do"/>
+            <mvc:exclude-mapping path="/app/updateCreationStatus.do"/>
             <bean class="com.efeiyi.ec.art.interceptor.AppInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
