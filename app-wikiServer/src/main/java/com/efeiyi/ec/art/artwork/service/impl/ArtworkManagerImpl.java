@@ -348,6 +348,34 @@ public class ArtworkManagerImpl implements ArtworkManager {
         return artwork;
     }
 
+    @Override
+    public void saveAuctionOrder(Artwork artwork) throws Exception {
+        AuctionOrder auctionOrder = null;
+
+        String hql = "select s from com.efeiyi.ec.art.model.AuctionOrder s where s.user.id = :userId and s.artwork.id = :artworkId";
+        LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+        params.put("userId", artwork.getWinner().getId());
+        params.put("artworkId", artwork.getId());
+        auctionOrder = (AuctionOrder) baseManager.getUniqueObjectByConditions(hql, params);
+
+        if(auctionOrder != null) {
+            return;
+        }
+
+        auctionOrder = new AuctionOrder();
+        auctionOrder.setArtwork(artwork);
+        auctionOrder.setUser(artwork.getWinner());
+        auctionOrder.setCreateDatetime(new Date());
+        auctionOrder.setStatus("1");
+        auctionOrder.setType("2");
+        auctionOrder.setPayStatus("3");
+        auctionOrder.setPayWay("0");
+        auctionOrder.setAmount(artwork.getNewBidingPrice());
+        auctionOrder.setFinalPayment(artwork.getNewBidingPrice().subtract(artwork.getInvestGoalMoney().multiply(new BigDecimal("0.1"))));
+
+        baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
+    }
+
 
 }
 

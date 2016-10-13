@@ -1908,6 +1908,8 @@ public class ArtworkController extends BaseController {
                 if (artworkBiddingList != null && artworkBiddingList.size() > 0) {
                     artwork.setStep("32");
                     artwork.setWinner(artworkBiddingList.get(0).getCreator());
+
+                    artworkManager.saveAuctionOrder(artwork);
                 } else {
                     artwork.setStep("33");
                 }

@@ -362,7 +362,7 @@ public class PaymentManagerImpl implements PaymentManager {
                 //更新订单状态
                 auctionOrder.setPayStatus("0");
                 auctionOrder.setPayWay("0");
-                auctionOrder.setType("1");
+                auctionOrder.setType("5");
                 baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
 
                 //更改项目为拍卖结束

@@ -3,6 +3,7 @@ package com.efeiyi.ec.art.artwork.service;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.base.model.LogBean;
 import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.model.AuctionOrder;
 import com.efeiyi.ec.art.model.ConsumerAddress;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,4 +50,6 @@ public interface ArtworkManager {
      * 项目创建或修改
      */
     Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq, String description) throws Exception;
+
+    void saveAuctionOrder(Artwork artwork) throws Exception;
 }
