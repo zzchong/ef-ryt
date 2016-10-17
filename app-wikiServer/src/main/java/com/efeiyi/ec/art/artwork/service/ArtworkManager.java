@@ -30,7 +30,7 @@ public interface ArtworkManager {
      * @param artworkId
      * @return
      */
-     boolean cancelArtWorkPraise(HttpServletRequest request,String artworkId);
+     boolean cancelArtWorkPraise(HttpServletRequest request,String artworkId, String messageId);
 
     /**
      * 评论

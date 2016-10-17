@@ -34,9 +34,9 @@ public class InvestJob implements Job {
     @Autowired
     protected BaseManager baseManager;
 
-    private static final String URL = "http://192.168.1.80:8080/app/updateCreationStatus.do";
+    //private static final String URL = "http://192.168.1.75:8080/app/updateCreationStatus.do";
 
-    //private static final String URL = "http://ryt.efeiyi.com/app/updateCreationStatus.do";
+    private static final String URL = "http://ryt.efeiyi.com/app/updateCreationStatus.do";
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {

@@ -709,7 +709,7 @@ public class ArtworkController extends BaseController {
 
             } else if ("0".equals(action)) {
 
-                if (artworkManager.cancelArtWorkPraise(request, jsonObject.getString("artworkId"))) {
+                if (artworkManager.cancelArtWorkPraise(request, jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
                     if (null != jsonObject.getString("messageId") && !jsonObject.getString("messageId").equals("")) {
                         resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                         resultMap.put("artworkMessage", baseManager.getObject(ArtworkMessage.class.getName(), jsonObject.getString("messageId")));
@@ -754,7 +754,7 @@ public class ArtworkController extends BaseController {
                 return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
             }
 
-            if (artworkManager.cancelArtWorkPraise(request, jsonObject.getString("artworkId"))) {
+            if (artworkManager.cancelArtWorkPraise(request, jsonObject.getString("artworkId"), jsonObject.getString("messageId"))) {
                 resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
             } else {
                 return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);

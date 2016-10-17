@@ -315,21 +315,25 @@ public class AuctionController extends BaseController {
             if ("2".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("plistAuctionOrder_default1", request);
                 xQuery.put("user_id", userId);
+                xQuery.put("type", jsonObj.getString("type"));
                 xQuery.setPageEntity(pageEntity);
                 auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             } else if ("3".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("plistAuctionOrder_default2", request);
                 xQuery.put("user_id", userId);
+                xQuery.put("type", jsonObj.getString("type"));
                 xQuery.setPageEntity(pageEntity);
                 auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             } else if ("4".equals(jsonObj.getString("type"))) {
                 XQuery xQuery = new XQuery("plistAuctionOrder_default3", request);
                 xQuery.put("user_id", userId);
+                xQuery.put("type", jsonObj.getString("type"));
                 xQuery.setPageEntity(pageEntity);
                 auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             }else if ("5".equals(jsonObj.getString("type"))){
                 XQuery xQuery = new XQuery("plistAuctionOrder_default4", request);
                 xQuery.put("user_id", userId);
+                xQuery.put("type", jsonObj.getString("type"));
                 xQuery.setPageEntity(pageEntity);
                 auctionOrderList = baseManager.listPageInfo(xQuery).getList();
             }else {

@@ -337,33 +337,38 @@ public class PaymentManagerImpl implements PaymentManager {
                 }
 
                 AuctionOrder auctionOrder = null;
-                XQuery xQuery1 = new XQuery("listAuctionOrder_default5", request);
-                List<AuctionOrder> auctionOrderList = baseManager.listObject(xQuery1);
-                if (null != auctionOrderList && auctionOrderList.size()>0){
-                    auctionOrder = auctionOrderList.get(0);
-                }else {
+                //XQuery xQuery1 = new XQuery("listAuctionOrder_default5", request);
+                //List<AuctionOrder> auctionOrderList = baseManager.listObject(xQuery1);
+
+                String hql = "select s from com.efeiyi.ec.art.model.AuctionOrder s where s.status != 0 and s.user.id = :userId and s.artwork.id = :artworkId";
+                LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+                params.put("userId", user.getId());
+                params.put("artworkId", artwork.getId());
+                auctionOrder = (AuctionOrder) baseManager.getUniqueObjectByConditions(hql, params);
+
+                if (auctionOrder == null){
                     auctionOrder = new AuctionOrder();
                     auctionOrder.setArtwork(artwork);
                     auctionOrder.setUser(user);
                     auctionOrder.setCreateDatetime(new Date());
                     auctionOrder.setStatus("1");
-                    auctionOrder.setConsumerAddress(consumerAddress);
                     auctionOrder.setAmount(artwork.getNewBidingPrice());
                     auctionOrder.setFinalPayment(artwork.getNewBidingPrice().subtract(artwork.getInvestGoalMoney().multiply(new BigDecimal("0.1"))));
-                    auctionOrder.setPayStatus("3");
-                    auctionOrder.setType("0");
+                    //auctionOrder.setPayStatus("3");
+                    //auctionOrder.setType("0");
                 }
+                //更新订单状态
+                auctionOrder.setConsumerAddress(consumerAddress);
+                auctionOrder.setPayStatus("0");
+                auctionOrder.setPayWay("0");
+                auctionOrder.setType("5");
                 baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
                 //操作账户
                 account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(artwork.getNewBidingPrice()));
                 account.setCurrentBalance(account.getCurrentBalance().subtract(artwork.getNewBidingPrice()));
                 baseManager.saveOrUpdate(Account.class.getName(),account);
 
-                //更新订单状态
-                auctionOrder.setPayStatus("0");
-                auctionOrder.setPayWay("0");
-                auctionOrder.setType("5");
-                baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
+                //baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
 
                 //更改项目为拍卖结束
                 artwork.setType("6");
@@ -380,7 +385,7 @@ public class PaymentManagerImpl implements PaymentManager {
                 bill.setType("7");
                 bill.setOutOrIn("0");
                 bill.setPayWay("3");
-                baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
+                //baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
                 baseManager.saveOrUpdate(Bill.class.getName(), bill);
 
                 map.put("resultCode","0");

@@ -49,18 +49,15 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
             artWorkPraise.setWatch("0");
 
-            artWorkPraise.setArtwork(artwork);
+            if(messageId == null || "".equals(messageId)) {
+                artWorkPraise.setArtwork(artwork);
+            }
 
             if(!"".equals(messageId) && !StringUtils.isEmpty(messageId)){
 
                 ArtworkMessage artworkMessage = (ArtworkMessage) baseManager.getObject(ArtworkMessage.class.getName(),messageId);
 
                 artWorkPraise.setArtworkMessage(artworkMessage);
-
-//                saveNotification(artwork,"有人回复了!",currentUser,fatherComment.getCreator());
-
-//                cidList.add(fatherComment.getCreator().getId());
-
             }
 
             Notification notification = saveNotification(artwork,"有人点赞了!",currentUser,artwork.getAuthor());
@@ -86,16 +83,20 @@ public class ArtworkManagerImpl implements ArtworkManager {
     }
 
     @Override
-    public boolean cancelArtWorkPraise(HttpServletRequest request,String artworkId){
+    public boolean cancelArtWorkPraise(HttpServletRequest request,String artworkId, String messageId){
 
         try {
             List<ArtWorkPraise> artWorkPraiseList = new ArrayList<>();
-            if(null != request.getParameter("messageId") && !request.getParameter("messageId").equals("")){
-                XQuery xQuery = new XQuery("listArtWorkPraise_byArtWorkMessageId",request);
-                xQuery.put("artworkMessage_id", request.getParameter("messageId"));
-                xQuery.put("artwork_id",artworkId);
-                xQuery.put("user_id",AuthorizationUtil.getUser().getId());
-                artWorkPraiseList = baseManager.listObject(xQuery);
+            if(null != messageId && !messageId.equals("")){
+                String hql = "select s from com.efeiyi.ec.art.model.ArtWorkPraise s where s.artworkMessage.id = :messageId and s.user.id = :userId";
+                LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+                params.put("messageId", messageId);
+                params.put("userId", AuthorizationUtil.getUser().getId());
+                //XQuery xQuery = new XQuery("listArtWorkPraise_byArtWorkMessageId",request);
+                //xQuery.put("artworkMessage_id", messageId);
+                //xQuery.put("artwork_id",artworkId);
+                //xQuery.put("user_id",AuthorizationUtil.getUser().getId());
+                artWorkPraiseList = baseManager.listObject(hql, params);
             }else {
                 XQuery xQuery = new XQuery("listArtWorkPraise_default", request);
                 xQuery.put("artwork_id",artworkId);
