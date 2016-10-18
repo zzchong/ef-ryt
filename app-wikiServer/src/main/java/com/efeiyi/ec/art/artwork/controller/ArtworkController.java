@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import org.junit.*;
@@ -1035,12 +1036,11 @@ public class ArtworkController extends BaseController {
             if(investGoalMoney == null) {
                 return resultMapHandler.handlerResult("10005", "融资总额不能为空", logBean);
             }
-            if(Integer.parseInt(investGoalMoney) < 100) {
+            if(Double.parseDouble(investGoalMoney) < 100) {
                 return resultMapHandler.handlerResult("10006", "融资总额不能小于100元", logBean);
             }
 
             String identification = jsonObj.getString("identification");//标识：“000”代表不校验存入，“111”校验存入
-
 
             if (artworkId.equals("")){//新录入
                 Artwork artwork = new Artwork();
