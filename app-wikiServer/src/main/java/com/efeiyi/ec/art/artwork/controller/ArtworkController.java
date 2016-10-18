@@ -1025,12 +1025,19 @@ public class ArtworkController extends BaseController {
             String title = jsonObj.getString("title");//标题
             String material = jsonObj.getString("material");//类型
             String brief = jsonObj.getString("brief");//简介
-            String investGoalMoney = jsonObj.getString("investGoalMoney");//融资目标金额
             String duration = jsonObj.getString("duration");//创作时长（天）
             String makeInstru = jsonObj.getString("makeInstru");//制作说明
             String financingAq = jsonObj.getString("financingAq");//资讯解惑
             String description = jsonObj.getString("description");//描述(详细介绍)
             //String artworkDirectionId = jsonObj.getString("artworkDirectionId");//项目创作过程及融资解惑
+
+            String investGoalMoney = jsonObj.getString("investGoalMoney");//融资目标金额
+            if(investGoalMoney == null) {
+                return resultMapHandler.handlerResult("10005", "融资总额不能为空", logBean);
+            }
+            if(Integer.parseInt(investGoalMoney) < 100) {
+                return resultMapHandler.handlerResult("10006", "融资总额不能小于100元", logBean);
+            }
 
             String identification = jsonObj.getString("identification");//标识：“000”代表不校验存入，“111”校验存入
 

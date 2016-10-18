@@ -803,10 +803,14 @@ public class PaymentController extends BaseController {
                 return resultMapHandler.handlerResult("10007", "用户不存在", logBean);
             //余额
             BigDecimal restMoney = new BigDecimal("0.00");
-            XQuery xQuery1 = new XQuery("listAccount_default",request);
-            xQuery1.put("user_id",jsonObj.getString("userId"));
-            List<Account> accountList = baseManager.listObject(xQuery1);
-            if(accountList==null && accountList.size()==0){
+
+            String hql = "select s from com.efeiyi.ec.art.model.Account s where s.user.id = :userId and s.status <> '0'";
+            LinkedHashMap params = new LinkedHashMap<>();
+            params.put("userId", user.getId());
+            //XQuery xQuery1 = new XQuery("listAccount_default",request);
+            //xQuery1.put("user_id",jsonObj.getString("userId"));
+            List<Account> accountList = baseManager.listObject(hql, params);
+            if(accountList.size()==0){
                 return resultMapHandler.handlerResult("10007", "用户不存在", logBean);
             }
             BigDecimal money = new BigDecimal(jsonObj.getString("money"));
