@@ -277,7 +277,11 @@ public class SigninController extends BaseController {
             account.setCurrentBalance(new BigDecimal("0.00"));
             account.setCreateDatetime(new Date());
             account.setStatus("1");
-            account.setUser((User)baseManager.getObject(User.class.getName(),myUser.getId()));
+
+            User tmpUser = new User();
+            tmpUser.setId(myUser.getId());
+
+            account.setUser(tmpUser);
             baseManager.saveOrUpdate(Account.class.getName(),account);
             resultMap = resultMapHandler.handlerResult("0","注册成功！",logBean);
             resultMap.put("userInfo",myUser);//响应的用户信息

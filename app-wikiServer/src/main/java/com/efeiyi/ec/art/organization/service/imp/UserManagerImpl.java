@@ -243,7 +243,15 @@ public class UserManagerImpl implements UserManager, UserDetailsService {
                     account.setCurrentBalance(new BigDecimal("0.00"));
                     account.setCreateDatetime(new Date());
                     account.setStatus("1");
-                    account.setUser((User) baseManager.getObject(User.class.getName(), user.getId()));
+
+                    User tmpUser = new User();
+                    tmpUser.setId(user.getId());
+                    if(tmpUser == null) {
+                        resultMap.put("errorMsg", "user 为 null");
+                        return resultMap;
+                    }
+
+                    account.setUser(tmpUser);
                     baseManager.saveOrUpdate(Account.class.getName(), account);
                     resultMap.put("username", user.getUsername());
                     resultMap.put("password", "rongyitou");
