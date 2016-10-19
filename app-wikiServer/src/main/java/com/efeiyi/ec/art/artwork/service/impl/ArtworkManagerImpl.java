@@ -119,57 +119,34 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
     @Override
     public Map saveArtWorkComment(String id, String content,String fatherCommentId,String messageId) {
-
         Map<String, Object> resultMap = new HashMap<>();
-        String currentUserId =AuthorizationUtil.getUserId();
-
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), id);
-
         User currentUser = AuthorizationUtil.getUser();
-
         Map<String,Object> map = new HashMap();
-
         List<String> cidList = new ArrayList<>();
 
         try {
-
             ArtworkComment artworkComment = new ArtworkComment();
-
             artworkComment.setIsWatch("0");
-
             artworkComment.setCreateDatetime(new Date());
-
             artworkComment.setContent(content);
-
-            artworkComment.setArtwork(artwork);
-
             artworkComment.setCreator(currentUser);
-
             artworkComment.setStatus("1");
 
-            if(!"".equals(fatherCommentId) && !StringUtils.isEmpty(fatherCommentId)){
-
-                ArtworkComment fatherComment = (ArtworkComment)baseManager.getObject(ArtworkComment.class.getName(),fatherCommentId);
-
-                artworkComment.setFatherComment(fatherComment);
-
-                saveNotification(artwork,"有人回复了!",currentUser,fatherComment.getCreator());
-
-                cidList.add(fatherComment.getCreator().getId());
-
+            if("".equals(messageId) || messageId == null) {
+                artworkComment.setArtwork(artwork);
             }
 
+            if(!"".equals(fatherCommentId) && !StringUtils.isEmpty(fatherCommentId)){
+                ArtworkComment fatherComment = (ArtworkComment)baseManager.getObject(ArtworkComment.class.getName(),fatherCommentId);
+                artworkComment.setFatherComment(fatherComment);
+                saveNotification(artwork,"有人回复了!",currentUser,fatherComment.getCreator());
+                cidList.add(fatherComment.getCreator().getId());
+            }
 
             if(!"".equals(messageId) && !StringUtils.isEmpty(messageId)){
-
                 ArtworkMessage artworkMessage = (ArtworkMessage) baseManager.getObject(ArtworkMessage.class.getName(),messageId);
-
                 artworkComment.setArtworkMessage(artworkMessage);
-
-//                saveNotification(artwork,"有人回复了!",currentUser,fatherComment.getCreator());
-
-//                cidList.add(fatherComment.getCreator().getId());
-
             }
 
             baseManager.saveOrUpdate(ArtworkComment.class.getName(),artworkComment);

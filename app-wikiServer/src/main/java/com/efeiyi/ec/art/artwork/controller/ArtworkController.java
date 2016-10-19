@@ -825,20 +825,18 @@ public class ArtworkController extends BaseController {
         LogBean logBean = new LogBean();
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
-                List objectList = null;
+        List objectList = null;
+
         try {
             JSONObject jsonObject = JsonAcceptUtil.receiveJson(request);
+
             logBean.setCreateDate(new Date());
             logBean.setRequestMessage(jsonObject.toString());
             logBean.setApiName("artworkComment");
-            /*if (!CommonUtil.jsonObject(jsonObject)) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-            }
-            if (!DigitalSignatureUtil.verify2(jsonObject)) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }*/
 
-            map = artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"), jsonObject.getString("fatherCommentId"), jsonObject.getString("messageId"));
+            map = artworkManager.saveArtWorkComment(jsonObject.getString("artworkId"), jsonObject.getString("content"),
+                    jsonObject.getString("fatherCommentId"), jsonObject.getString("messageId"));
+
             if (map.get("resultCode").equals("0")) {
                 resultMap.put("resultCode", "0");
                 resultMap.put("resultMsg", "成功");
