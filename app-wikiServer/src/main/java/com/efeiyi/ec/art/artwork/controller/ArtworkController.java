@@ -1,6 +1,7 @@
 package com.efeiyi.ec.art.artwork.controller;
 
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.ArtworkManager;
 import com.efeiyi.ec.art.base.model.LogBean;
@@ -1469,32 +1470,23 @@ public class ArtworkController extends BaseController {
         LogBean logBean = new LogBean();//日志记录
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
+        JSONObject jsonObj = null;
+
+        try{
+            jsonObj = JsonAcceptUtil.receiveJson(request);//入参
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  resultMapHandler.handlerResult("100010","获取传入参数失败",logBean);
+        }
+
         try {
-            logBean.setCreateDate(new Date());//操作时间
-            logBean.setRequestMessage(request.getParameter("artworkId") + " ...");//************记录请求报文
-            logBean.setApiName("releaseArtworkDynamic");
-            if ("".equals(request.getParameter("signmsg")) || "".equals(request.getParameter("timestamp"))
 
-                    || "".equals(request.getParameter("artworkId")) || "".equals(request.getParameter("type"))
-                    ) {
-                return resultMapHandler.handlerResult("10001", "必选参数为空，请仔细检查", logBean);
-            }
-            //校验数字签名
-            String signmsg = request.getParameter("signmsg");
-            treeMap.put("artworkId", request.getParameter("artworkId"));
-            treeMap.put("timestamp", request.getParameter("timestamp"));
-            boolean verify = DigitalSignatureUtil.verify(treeMap, signmsg);
-            if (verify != true) {
-                return resultMapHandler.handlerResult("10002", "参数校验不合格，请仔细检查", logBean);
-            }
-
-
-            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), request.getParameter("artworkId"));
+            Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), jsonObj.getString("artworkId"));
             try {
                 if (artwork != null && artwork.getId() != null) {
 
                     ArtworkMessage artworkMessage = new ArtworkMessage();
-                    artworkMessage.setContent(!"".equals(request.getParameter("content")) ? request.getParameter("content") : "");
+                    artworkMessage.setContent(!"".equals(jsonObj.getString("content")) ? jsonObj.getString("content") : "");
                     artworkMessage.setCreator(artwork.getAuthor());
                     artworkMessage.setArtwork(artwork);
                     artworkMessage.setStatus("1");
@@ -1520,10 +1512,11 @@ public class ArtworkController extends BaseController {
                                 if (myFileName.trim() != "") {
                                     //重命名上传后的文件名
                                     StringBuilder url = new StringBuilder("artwork/");
+                                    String fileType = jsonObj.getString("type");
 
-                                    if ("0".equals(request.getParameter("type"))) {
+                                    if ("0".equals(fileType)) {
                                         url.append("picture/" + new Date().getTime() + myFileName);
-                                    } else if ("1".equals(request.getParameter("type"))) {
+                                    } else if ("1".equals(fileType)) {
                                         url.append("video/" + new Date().getTime() + myFileName);
                                     } else {
                                         url.append(new Date().getTime() + myFileName);
@@ -1534,23 +1527,21 @@ public class ArtworkController extends BaseController {
                                     aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url.toString());
 
                                     //上传视频文件的第一帧
-                                    if("1".equals(request.getParameter("type"))) {
+                                    String videoPicture = jsonObj.getString("pictureUrl[][pictureUrl]");
+                                    if("1".equals(fileType) && videoPicture != null) {
+                                        artworkMessageAttachment.setVideoPicture(videoPicture);
+                                    } else if("1".equals(fileType)) {
                                         artworkMessageAttachment.setVideoPicture("http://rongyitou2.efeiyi.com/artwork/picture/1473666549651dynamicImage1.jpg");
                                     }
 
                                     artworkMessageAttachment.setFileUri(pictureUrl);
                                     artworkMessageAttachment.setArtworkMessage(artworkMessage);
-                                    artworkMessageAttachment.setFileType(request.getParameter("type"));
-                                    //artworkMessageAttachments.add(artworkMessageAttachment);
+                                    artworkMessageAttachment.setFileType(fileType);
                                     baseManager.saveOrUpdate(ArtworkMessageAttachment.class.getName(), artworkMessageAttachment);
-                                    //artworkMessage.getArtworkMessageAttachments().add(artworkMessageAttachment);
                                 }
                             }
                         }
                     }
-                    //artworkMessage.setCreateDatetime(new Date());
-                    //artworkMessage.setArtworkMessageAttachments(artworkMessageAttachments);
-                    //baseManager.saveOrUpdate(ArtworkMessage.class.getName(),artworkMessage);
                     resultMap = resultMapHandler.handlerResult("0", "成功", logBean);
                     resultMap.put("artworkId", artwork.getId());
                     resultMap.put("artworkMessageId", artworkMessage.getId());
@@ -1564,7 +1555,6 @@ public class ArtworkController extends BaseController {
                 e.printStackTrace();
                 return resultMapHandler.handlerResult("10005", "查询数据出现异常", logBean);
             }
-
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -71,6 +71,8 @@ public class MasterManagerImpl implements MasterManager {
         }
 
         master.setName(jsonObj.getString("name"));
+        master.setTitle(jsonObj.getString("title"));
+        master.setLevel(jsonObj.getString("level"));
         master.setEmail(jsonObj.getString("email"));
         master.setPhone(jsonObj.getString("phone"));
         master.setPresentCity(jsonObj.getString("presentCity"));
