@@ -17,6 +17,7 @@
     authentication-manager-ref="authenticationManager">
     <custom-filter after="FORM_LOGIN_FILTER"
     ref="ajaxLoginFilter" />
+        <logout invalidate-session="true" logout-success-url="/" logout-url="/app/j_spring_security_logout"/>
         <!--<intercept-url pattern="/app/" access="isAuthenticated()"/>-->
         <!--<remember-me user-service-ref="userManager" data-source-ref="dataSource" token-validity-seconds="1209600" remember-me-parameter="remember-me"/>-->
     <csrf disabled="true" />
