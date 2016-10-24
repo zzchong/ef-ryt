@@ -11,13 +11,13 @@
 </head>
 <body class="app_page">
 <div class="bd logo"></div>
-<div class="bd btn_down"><a href="" title="融易投app下载"></a></div>
+<div class="bd btn_down"><a href="" title="融艺投app下载"></a></div>
 <div class="bd">
     <img class="bd" src="<c:url value="/scripts/shop20160614/images/app_1.jpg"/> " alt="">
     <img class="bd" src="<c:url value="/scripts/shop20160614/images/app_2.jpg"/>" alt="">
     <img class="bd" src="<c:url value="/scripts/shop20160614/images/app_3.jpg"/>" alt="">
 </div>
-<div class="bd btn_down"><a href="" title="融易投app下载"></a>
+<div class="bd btn_down"><a href="" title="融艺投app下载"></a>
 </div>
 </body>
 <script>

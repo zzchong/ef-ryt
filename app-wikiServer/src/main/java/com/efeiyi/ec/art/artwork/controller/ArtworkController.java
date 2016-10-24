@@ -1186,13 +1186,6 @@ public class ArtworkController extends BaseController {
             Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), artworkId);
             List<Map<String, Object>> list = uploadImageManager.uplaodImage(request);
             if (type.equals("000")){
-                /*List<ArtworkAttachment> list1 = artwork.getArtworkAttachment();
-                if (list1.size()>0){
-                    for (ArtworkAttachment artworkAttachment:list1){
-                        artworkAttachment.setStatus("0");
-                        baseManager.saveOrUpdate(ArtworkAttachment.class.getName(), artworkAttachment);
-                    }
-                }*/
                 List<ArtworkAttachment> artworkAttachments = new ArrayList<>();
                 for (Map<String, Object> map : list){
                     ArtworkAttachment artworkAttachment = new ArtworkAttachment();

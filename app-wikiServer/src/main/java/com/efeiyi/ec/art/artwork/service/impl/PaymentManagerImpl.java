@@ -151,7 +151,7 @@ public class PaymentManagerImpl implements PaymentManager {
 
                 Bill bill = new Bill();
                 bill.setStatus("1");
-                bill.setTitle("融易投-保证金退还");
+                bill.setTitle("融艺投-保证金退还");
                 bill.setMoney(marginAccount.getCurrentBalance());
                 bill.setAuthor(marginAccount.getUser());
                 bill.setPayWay("1");
@@ -184,7 +184,7 @@ public class PaymentManagerImpl implements PaymentManager {
 
                 Bill bill = new Bill();
                 bill.setStatus("1");
-                bill.setTitle("融易投-保证金退还");
+                bill.setTitle("融艺投-保证金退还");
                 bill.setMoney(roiRecord.getCurrentBalance().add(roiRecord.getInvestMoney()));
                 bill.setAuthor(roiRecord.getUser());
                 bill.setPayWay("1");
@@ -197,20 +197,8 @@ public class PaymentManagerImpl implements PaymentManager {
                 url = BCPay.startTransfer(param);
                 System.out.println(url);
                 baseManager.saveOrUpdate(Bill.class.getName(),bill);
-//                ALITransferData data = new ALITransferData(transferId,"1055303387@qq.com","青石",transferFee,transferNote);
-//                list.add(data);
-//                billList.add(bill);
             }
-
         }
-
-//        TransfersParameter para = new TransfersParameter();
-//        para.setBatchNo(batchNo);
-//        para.setAccountName(ACCOUNT_NO);
-//        para.setTransferDataList(list);
-//        para.setChannel(BCEumeration.PAY_CHANNEL.ALI);
-//        url = BCPay.startTransfers(para);
-//        baseManager.batchSaveOrUpdate("save",Bill.class.getName(),billList);
         return url;
     }
 
@@ -219,19 +207,6 @@ public class PaymentManagerImpl implements PaymentManager {
         Map<String, Object> map = new HashMap<>();
         if (action.equals("payMargin")){//余额支付保证金
             try {
-                /*ConsumerAddress consumerAddress = null;
-                XQuery xQuery = new XQuery("listAddress_default1",request);
-                xQuery.put("consumer_id",user.getId());
-                List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
-                if(consumerAddressList!=null && consumerAddressList.size()>0)
-                    consumerAddress = consumerAddressList.get(0);
-
-                if(consumerAddress==null){
-                    map.put("resultCode", "10002");
-                    map.put("resultMsg", "收货地址为空");
-                    return map;
-                }*/
-
                 //保证金
                 if (1 == isPayMarginAccount(request,user,artwork)){
                     map.put("resultCode","100022");

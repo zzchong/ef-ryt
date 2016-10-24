@@ -13,11 +13,11 @@
     <http pattern="/**/*.gif" security="none"/>
     <http pattern="/**/*.png" security="none"/>
     <http pattern="/js/*.js" security="none"/>
+
     <http pattern="/**/*" entry-point-ref="restfulAuthenticationEntryPointInterceptor"
-    authentication-manager-ref="authenticationManager">
-    <custom-filter after="FORM_LOGIN_FILTER"
-    ref="ajaxLoginFilter" />
-        <logout invalidate-session="true" logout-success-url="/" logout-url="/app/j_spring_security_logout"/>
+        authentication-manager-ref="authenticationManager">
+        <custom-filter after="FORM_LOGIN_FILTER" ref="ajaxLoginFilter" />
+        <logout invalidate-session="true" logout-url="/app/j_spring_security_logout" success-handler-ref="loginOutSuccessHandler"/>
         <!--<intercept-url pattern="/app/" access="isAuthenticated()"/>-->
         <!--<remember-me user-service-ref="userManager" data-source-ref="dataSource" token-validity-seconds="1209600" remember-me-parameter="remember-me"/>-->
     <csrf disabled="true" />
@@ -31,7 +31,7 @@
                 <!--success-handler-ref="loginOutSuccessHandler"/>-->
         <!--<remember-me user-service-ref="userManager" data-source-ref="dataSource" token-validity-seconds="1209600" remember-me-parameter="remember-me"/>-->
     <!--</http>-->
-    <!--<b:bean id="loginOutSuccessHandler" class="com.efeiyi.ec.art.organization.LoginOutSuccessHandler"/>-->
+    <b:bean id="loginOutSuccessHandler" class="com.efeiyi.ec.art.organization.LoginOutSuccessHandler"/>
     <global-method-security pre-post-annotations="disabled"/>
 
     <authentication-manager alias="authenticationManager">

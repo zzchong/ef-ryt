@@ -832,7 +832,7 @@ public class PaymentController extends BaseController {
             bill.setPayNumber(jsonObj.getString("number"));
             bill.setAuthor(user);
             bill.setMoney(money);
-            bill.setTitle("融易投-余额提现");
+            bill.setTitle("融艺投-余额提现");
             bill.setRestMoney(account.getCurrentUsableBalance().subtract(money));
             baseManager.saveOrUpdate(Bill.class.getName(),bill);
 

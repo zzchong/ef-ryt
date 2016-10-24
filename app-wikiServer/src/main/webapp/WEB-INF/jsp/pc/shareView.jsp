@@ -11,7 +11,7 @@
 
 <div class="container">
     <div class="sleft">
-        <h1 class="icon">融易投</h1>
+        <h1 class="icon">融艺投</h1>
         <ul class="info">
             <li><i></i>创新的艺术投资玩法，2元“玩”进艺术圈</li>
             <li><i></i>看得见的创作过程：作品创作过程及时分享，现场图片、视频记录精彩瞬间，满足你的好奇心与求知欲。</li>

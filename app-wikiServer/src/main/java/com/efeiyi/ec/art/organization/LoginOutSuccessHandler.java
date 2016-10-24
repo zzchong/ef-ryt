@@ -1,6 +1,7 @@
 package com.efeiyi.ec.art.organization;
 
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
@@ -22,9 +23,12 @@ public class LoginOutSuccessHandler extends
             (HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
 
-
-        response.sendRedirect(request.getContextPath() + "/pc/login.do");
-        super.onLogoutSuccess(request, response, authentication);
+        JSONObject obj = new JSONObject();
+        obj.put("resultCode", "0");
+        obj.put("resultMsg", "退出成功");
+        response.getWriter().print(obj);
+        //response.sendRedirect(request.getContextPath() + "/pc/login.do");
+        //super.onLogoutSuccess(request, response, authentication);
     }
 }
 
