@@ -1035,8 +1035,14 @@ public class ArtworkController extends BaseController {
             if(investGoalMoney == null) {
                 return resultMapHandler.handlerResult("10005", "融资总额不能为空", logBean);
             }
-            if(Double.parseDouble(investGoalMoney) < 100) {
+
+            BigDecimal money = new BigDecimal(investGoalMoney);
+
+            if(money.compareTo(BigDecimal.valueOf(100)) == -1) {
                 return resultMapHandler.handlerResult("10006", "融资总额不能小于100元", logBean);
+            }
+            if(investGoalMoney.length() > 15) {
+                return resultMapHandler.handlerResult("10006", "目前暂不支持如此大的融资额度", logBean);
             }
 
             String identification = jsonObj.getString("identification");//标识：“000”代表不校验存入，“111”校验存入
