@@ -1470,6 +1470,7 @@ public class ArtworkController extends BaseController {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         TreeMap treeMap = new TreeMap();
         JSONObject jsonObj = null;
+        String tmpFileUrl = "";
 
         try{
             jsonObj = JsonAcceptUtil.receiveJson(request);//入参
@@ -1522,6 +1523,7 @@ public class ArtworkController extends BaseController {
                                     }
 
                                     String pictureUrl = "http://rongyitou2.efeiyi.com/" + url.toString();
+                                    tmpFileUrl = pictureUrl;
                                     //将图片上传至阿里云
                                     aliOssUploadManager.uploadFile(file, "ec-efeiyi2", url.toString());
 
@@ -1545,6 +1547,7 @@ public class ArtworkController extends BaseController {
                     resultMap.put("artworkId", artwork.getId());
                     resultMap.put("artworkMessageId", artworkMessage.getId());
                     resultMap.put("nowDate", new Date().getTime());
+                    resultMap.put("fileUrl", tmpFileUrl);
                     return resultMap;
 
                 } else {

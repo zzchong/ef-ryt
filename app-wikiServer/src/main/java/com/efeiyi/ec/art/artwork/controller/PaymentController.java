@@ -676,13 +676,15 @@ public class PaymentController extends BaseController {
             baseManager.saveOrUpdate(Bill.class.getName(), bill);
         }
         String userId = AuthorizationUtil.getUser().getId();
-        //获取账户信息参数
         LinkedHashMap<String, Object> param = new LinkedHashMap<String, Object>();
         param.put("userId", userId);
         //账户
         Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
-        account.setCurrentBalance(account.getCurrentBalance().add(bill.getMoney()));
-        account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(bill.getMoney()));
+        //account.setCurrentBalance(account.getCurrentBalance().add(bill.getMoney()));
+        account.setCurrentBalance(account.getCurrentBalance().add(new BigDecimal(2.00)));
+        //account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(bill.getMoney()));
+        account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(new BigDecimal(2.00)));
+        baseManager.saveOrUpdate(Account.class.getName(), account);
 
         return "/paySuccess";
     }
