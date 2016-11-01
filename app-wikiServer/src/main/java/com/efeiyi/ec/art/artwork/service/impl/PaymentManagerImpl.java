@@ -5,6 +5,7 @@ import cn.beecloud.BeeCloud;
 import cn.beecloud.bean.*;
 import com.alibaba.fastjson.JSONObject;
 import com.efeiyi.ec.art.artwork.service.PaymentManager;
+import com.efeiyi.ec.art.base.util.AppConfig;
 import com.efeiyi.ec.art.base.util.JsonAcceptUtil;
 import com.efeiyi.ec.art.model.*;
 import com.efeiyi.ec.art.organization.model.User;
@@ -140,14 +141,12 @@ public class PaymentManagerImpl implements PaymentManager {
                 Integer transferFee = marginAccount.getCurrentBalance().multiply(new BigDecimal(100)).intValue();
                 String  transferNo = System.currentTimeMillis()+autoSerialManager.nextSerial("transferId");
 
-
                 param.setTransferNo(transferNo);//打款单号
                 param.setTotalFee(transferFee);//打款金额
                 param.setDescription(transferNote);//打款说明
                 param.setChannelUserId("362622735@qq.com");
                 param.setChannelUserName("离心力");
                 param.setAccountName(ACCOUNT_NAME);
-
 
                 Bill bill = new Bill();
                 bill.setStatus("1");
@@ -274,12 +273,7 @@ public class PaymentManagerImpl implements PaymentManager {
             try {
                 //收货地址
                 ConsumerAddress consumerAddress = null;
-                /*XQuery xQuery = new XQuery("listAddress_default1",request);
-                xQuery.put("consumer_id",user.getId());
-                List<ConsumerAddress> consumerAddressList = baseManager.listObject(xQuery);
-                if(consumerAddressList!=null && consumerAddressList.size()>0){
-                    consumerAddress = consumerAddressList.get(0);
-                }*/
+
                 String consumerAddressId = jsonObject.getString("consumerAddressId");
                 if (consumerAddressId == null || consumerAddressId.equals("")){
                     map.put("resultCode", "10002");
@@ -362,6 +356,31 @@ public class PaymentManagerImpl implements PaymentManager {
                 bill.setPayWay("3");
                 //baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
                 baseManager.saveOrUpdate(Bill.class.getName(), bill);
+
+                //返回投资收益
+                String biddingHql = "select s from com.efeiyi.ec.art.model.ArtworkBidding where s.artwork.id = :artworkId and s.status = '1' ORDER BY s.price desc LIMIT 0,1";
+                ArtworkBidding artworkBidding = (ArtworkBidding) baseManager.getUniqueObjectByConditions(biddingHql, params);
+                BigDecimal rate = artworkBidding.getPrice().divide(artwork.getInvestGoalMoney());
+
+                String investHql = "select s from com.efeiyi.ec.art.model.ArtworkInvest s where s.artwork.id = :artworkId  and s.status<>'0'";
+                List<ArtworkInvest>  artworkInvests = baseManager.listObject(investHql, params);
+                for(ArtworkInvest artworkInvest  :  artworkInvests){
+                    Account acc = artworkInvest.getAccount();
+                    acc.setCurrentBalance(acc.getCurrentBalance().add(artworkInvest.getPrice().multiply(rate)));
+                    acc.setCurrentUsableBalance(acc.getCurrentUsableBalance().add(artworkInvest.getPrice().multiply(rate)));
+                    baseManager.saveOrUpdate(Account.class.getName(),acc);
+                    //生成投资收益记录
+                    ROIRecord roiRecord = new ROIRecord();
+                    roiRecord.setAccount(acc);
+                    roiRecord.setStatus("1");
+                    roiRecord.setCurrentBalance(artworkInvest.getPrice().multiply(rate));
+                    roiRecord.setArtwork(artworkInvest.getArtwork());
+                    roiRecord.setCreateDatetime(new Date());
+                    roiRecord.setUser(artworkInvest.getCreator());
+                    roiRecord.setArtworkInvest(artworkInvest);
+                    roiRecord.setDetails("投资"+artworkInvest.getArtwork().getTitle()+"收益");
+                    baseManager.saveOrUpdate(ROIRecord.class.getName(),roiRecord);
+                }
 
                 map.put("resultCode","0");
                 map.put("resultMsg","成功");

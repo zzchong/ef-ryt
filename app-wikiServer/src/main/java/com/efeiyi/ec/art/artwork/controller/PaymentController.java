@@ -680,10 +680,10 @@ public class PaymentController extends BaseController {
         param.put("userId", userId);
         //账户
         Account account = (Account) baseManager.getUniqueObjectByConditions(AppConfig.SQL_GET_USER_ACCOUNT, param);
-        //account.setCurrentBalance(account.getCurrentBalance().add(bill.getMoney()));
-        account.setCurrentBalance(account.getCurrentBalance().add(new BigDecimal(2.00)));
-        //account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(bill.getMoney()));
-        account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(new BigDecimal(2.00)));
+        account.setCurrentBalance(account.getCurrentBalance().add(bill.getMoney()));
+        //account.setCurrentBalance(account.getCurrentBalance().add(new BigDecimal(2.00)));
+        account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(bill.getMoney()));
+        //account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(new BigDecimal(2.00)));
         baseManager.saveOrUpdate(Account.class.getName(), account);
 
         return "/paySuccess";

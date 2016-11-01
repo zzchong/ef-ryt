@@ -353,19 +353,26 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
         baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
 
-        /*String marginHql = "select s from com.efeiyi.ec.art.model.MarginAccount s where s.artwork.id = :artworkId";
+        String marginHql = "select s from com.efeiyi.ec.art.model.MarginAccount s where s.artwork.id = :artworkId and s.user.id <> :userId and s.status = 0";
         List<MarginAccount> marginAccountList = baseManager.listObject(marginHql, params);
         for(MarginAccount margin : marginAccountList) {
+            String  transferNote = "参与《"+margin.getArtwork().getTitle()+"》项目的保证金";
+
             Account account = (Account) baseManager.getObject(Account.class.getName(), margin.getAccount().getId());
             if(account == null) {
-                return;
+                break;
             }
+
             account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(margin.getCurrentBalance()));
             baseManager.saveOrUpdate(Account.class.getName(),account);
 
+            margin.setStatus("2");
+            margin.setEndDatetime(new Date());
+            baseManager.saveOrUpdate(MarginAccount.class.getName(), margin);
+
             Bill bill = new Bill();
-            bill.setDetail(artwork.getTitle()+"-返还保证金-"+margin.getCurrentBalance()+"元");
-            bill.setTitle(artwork.getTitle()+"-返还保证金");
+            bill.setDetail(transferNote);
+            bill.setTitle("融艺投-保证金退还");
             bill.setStatus("1");
             bill.setMoney(margin.getCurrentBalance());
             bill.setAuthor(margin.getUser());
@@ -374,7 +381,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
             bill.setOutOrIn("1");
             bill.setPayWay("3");
             baseManager.saveOrUpdate(Bill.class.getName(), bill);
-        }*/
+        }
     }
 
 
