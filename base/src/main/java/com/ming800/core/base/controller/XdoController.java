@@ -60,7 +60,6 @@ public class XdoController {
         request.setAttribute("qm", qm);
         request.setAttribute("menuId", menuId);
 
-
         if (qm.startsWith("plist")) {       /*分页*/
             String conditions = request.getParameter("conditions");
             request.setAttribute("conditions", conditions);
@@ -80,27 +79,6 @@ public class XdoController {
                 resultPage = tempDo.getResult();
             }
 
-            /*判断是否自定义了  xpage*/
-  /*          List<Page> tempPageList = new ArrayList<>();
-
-
-            String export = request.getParameter("resultPage");
-            Page tempPage = null;
-            if (tempPageList != null && tempPageList.size() > 0) {
-                tempPage = tempPageList.get(0);
-            } else if ((export != null && export.equals("xexcel")) || resultPage.startsWith("xpage")) {
-                if (tempDo.getPageList() == null || tempDo.getPageList().size() == 0) {
-                    throw new Exception("缺少页面配置,无法导出!");
-                }
-                tempPage = tempDo.getPageList().get(0);
-            }
-            modelMap.put("tempPage", tempPage);*/
-
-/*            *//*如果自定义了xpage  而且不是导出， 进入通用页面*//*
-            if (export == null && tempPageList != null && tempPageList.size() > 0) {
-                resultPage = "xpage";
-            }*/
-
             PageEntity pageEntity = new PageEntity();
             String pageIndex = request.getParameter("pageEntity.index");
             String pageSize = request.getParameter("pageEntity.size");
@@ -109,37 +87,14 @@ public class XdoController {
                 pageEntity.setSize(Integer.parseInt(pageSize));
             }
 
-/*            *//*导出，  通用， 普通jsp页面*//*
-            if (export != null && export.equals("xexcel")) {            //导出
-                modelMap.put("objectList", xdoManager.list(tempDo, tempDoQuery, conditions));
-//                resultPage = "export_excel_view_list";
-                request.setAttribute("modelMap", modelMap);
-                resultPage = "forward:/excelExportController/buildExcelDocument.do";*/
-/*            } else if (resultPage.startsWith("xpage")) {
-                if (conditions != null) {
-                    String tempConditions = java.net.URLEncoder.encode(conditions, "utf-8");
-                    modelMap.put("tempConditions", tempConditions);
-                }
-
-                modelMap.put("pageEntity", pageEntity);
-/*                if (resultPage.equals("xpage")) {
-                    resultPage = "/core/base/xlistPage";
-                } else {
-                    modelMap.put("index", request.getParameter("index"));
-                    resultPage = "/core/base/relatedPage";
-                }*/
-/*            } else {*/
-
             modelMap.put("tabTitle", tempDoQuery.getLabel());
-//                resultPage = "/pc/choiceness";
+            //resultPage = "/pc/choiceness";
             PageInfo pageInfo = xdoManager.listPage(tempDo, tempDoQuery, conditions, pageEntity);
             modelMap.put("pageInfo", pageInfo);
             modelMap.put("pageEntity", pageInfo.getPageEntity());
 
-//                返回列表
+            //返回列表
             xdoSupportManager.generateTempPageConditions(request.getRequestURI(), map, pageEntity.getIndex() + "", pageEntity.getSize() + "");
-            // xdoSupportManager.generateTempPageConditions(request.getRequestURI(), map, 1 + "", 20 + "");
-
 
             if (tempDo.getExecute() != null && !tempDo.getExecute().equals("")) {
                 modelMap = xdoSupportManager.execute(tempDo, modelMap, request);

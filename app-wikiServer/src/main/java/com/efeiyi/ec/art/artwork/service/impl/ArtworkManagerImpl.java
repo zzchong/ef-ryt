@@ -330,11 +330,11 @@ public class ArtworkManagerImpl implements ArtworkManager {
     public void saveAuctionOrder(Artwork artwork) throws Exception {
         AuctionOrder auctionOrder = null;
 
-        String hql = "select s from com.efeiyi.ec.art.model.AuctionOrder s where s.user.id = :userId and s.artwork.id = :artworkId";
+        String acutionhql = "select s from com.efeiyi.ec.art.model.AuctionOrder s where s.user.id = :userId and s.artwork.id = :artworkId";
         LinkedHashMap<String, Object> params = new LinkedHashMap<>();
         params.put("userId", artwork.getWinner().getId());
         params.put("artworkId", artwork.getId());
-        auctionOrder = (AuctionOrder) baseManager.getUniqueObjectByConditions(hql, params);
+        auctionOrder = (AuctionOrder) baseManager.getUniqueObjectByConditions(acutionhql, params);
 
         if(auctionOrder != null) {
             return;
@@ -352,6 +352,29 @@ public class ArtworkManagerImpl implements ArtworkManager {
         auctionOrder.setFinalPayment(artwork.getNewBidingPrice().subtract(artwork.getInvestGoalMoney().multiply(new BigDecimal("0.1"))));
 
         baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
+
+        /*String marginHql = "select s from com.efeiyi.ec.art.model.MarginAccount s where s.artwork.id = :artworkId";
+        List<MarginAccount> marginAccountList = baseManager.listObject(marginHql, params);
+        for(MarginAccount margin : marginAccountList) {
+            Account account = (Account) baseManager.getObject(Account.class.getName(), margin.getAccount().getId());
+            if(account == null) {
+                return;
+            }
+            account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(margin.getCurrentBalance()));
+            baseManager.saveOrUpdate(Account.class.getName(),account);
+
+            Bill bill = new Bill();
+            bill.setDetail(artwork.getTitle()+"-返还保证金-"+margin.getCurrentBalance()+"元");
+            bill.setTitle(artwork.getTitle()+"-返还保证金");
+            bill.setStatus("1");
+            bill.setMoney(margin.getCurrentBalance());
+            bill.setAuthor(margin.getUser());
+            bill.setCreateDatetime(new Date());
+            bill.setType("4");
+            bill.setOutOrIn("1");
+            bill.setPayWay("3");
+            baseManager.saveOrUpdate(Bill.class.getName(), bill);
+        }*/
     }
 
 

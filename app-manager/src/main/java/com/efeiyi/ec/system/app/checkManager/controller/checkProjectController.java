@@ -61,8 +61,6 @@ public class checkProjectController {
             artwork.setStep(CheckConstant.ARTWORK_STEP_CREATION_CHECKING);
         }
         if (CheckConstant.ARTWORK_STEP_CHECKING.equals(type)){
-
-
             artwork.setStep(CheckConstant.ARTWORK_STEP_PASS);
             artwork.setType(CheckConstant.ARTWORK_STATUS_FINANCING);
             Calendar calendar1 = Calendar.getInstance();
@@ -78,11 +76,6 @@ public class checkProjectController {
             calendar.add(Calendar.DAY_OF_MONTH,artwork.getDuration());
             artwork.setCreationEndDatetime(calendar.getTime());
 
-           //定时器
-//            Calendar calenda11 = Calendar.getInstance();
-//            calenda11.setTime(new Date());
-//            calenda11.add(Calendar.MINUTE,1);
-//            System.out.println(calenda11.getTime());
             InvestTrigger investTrigger = new InvestTrigger();
             investTrigger.execute(artwork.getId(),artwork.getInvestEndDatetime(),"invest");
         }
@@ -100,7 +93,6 @@ public class checkProjectController {
             investTrigger.execute(artwork.getId(),artwork.getAuctionEndDatetime(),"auction");
         }
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
-
 
         if (null != resultPage && "V".equals(resultPage.trim())){
             return new ModelAndView("redirect:/basic/xm.do?qm=viewCheckArtwork&checkProject=checkProject&id=" + id);
