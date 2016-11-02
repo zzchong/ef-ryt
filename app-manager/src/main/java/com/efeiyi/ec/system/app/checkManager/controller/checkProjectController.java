@@ -1,10 +1,13 @@
 package com.efeiyi.ec.system.app.checkManager.controller;
 
 import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.organization.service.SmsCheckManager;
+import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
 import com.efeiyi.ec.quartz.job.InvestJob;
 import com.efeiyi.ec.quartz.trigger.InvestTrigger;
 import com.efeiyi.ec.system.app.checkManager.CheckConstant;
 import com.ming800.core.base.service.BaseManager;
+import com.ming800.core.p.PConst;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,6 +46,7 @@ public class checkProjectController {
 
     @RequestMapping("/checkPass.do")
     public ModelAndView checkPassProject(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
         String id = request.getParameter("id");
         String type = request.getParameter("type");
         String resultPage = request.getParameter("resultPage");
@@ -94,6 +98,20 @@ public class checkProjectController {
         }
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
 
+        String phoneNo = artwork.getAuthor().getMaster().getPhone();
+        String description = "已通过审核";
+        String content = "#title#=" + artwork.getTitle() + "&#description#=" + description;
+
+        Thread t = new Thread(
+                new Runnable(){
+                    @Override
+                    public void run() {
+                        smsCheckManager.send(phoneNo, content, "1617058", PConst.TIANYI);
+                    }
+                }
+        );
+        t.start();
+
         if (null != resultPage && "V".equals(resultPage.trim())){
             return new ModelAndView("redirect:/basic/xm.do?qm=viewCheckArtwork&checkProject=checkProject&id=" + id);
         }
@@ -102,7 +120,9 @@ public class checkProjectController {
 
     @RequestMapping("/checkReject.do")
     public ModelAndView checkRejectProject(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
         String id = request.getParameter("id");
+        String type = request.getParameter("type");
         String resultPage = request.getParameter("resultPage");
         String message = request.getParameter("message");
         if (null == id || "".equals(id.trim())){
@@ -110,9 +130,30 @@ public class checkProjectController {
         }
 
         Artwork artwork = (Artwork) baseManager.getObject(Artwork.class.getName(), id);
-        artwork.setStep(CheckConstant.ARTWORK_STEP_REJECT);
+
+        if (CheckConstant.ARTWORK_STEP_CHECKING.equals(type)){
+            artwork.setStep(CheckConstant.ARTWORK_STEP_REJECT);
+        } else if(CheckConstant.ARTWORK_STEP_CREATION_CHECKING.equals(type)){
+            artwork.setStep(CheckConstant.ARTWORK_STEP_CREATION_REJECT);
+        }
+
         artwork.setFeedback(message);
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
+
+        String phoneNo = artwork.getAuthor().getMaster().getPhone();
+        String description = "未通过审核";
+        String content = "#title#=" + artwork.getTitle() + "&#description#=" + description;
+
+        Thread t = new Thread(
+                new Runnable(){
+                    @Override
+                    public void run() {
+                        smsCheckManager.send(phoneNo, content, "1617058", PConst.TIANYI);
+                    }
+                }
+        );
+        t.start();
+
         if (null != resultPage && "V".equals(resultPage.trim())){
             return new ModelAndView("redirect:/basic/xm.do?qm=viewCheckArtwork&checkProject=checkProject&id=" + id);
         }

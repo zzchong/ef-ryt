@@ -544,10 +544,18 @@ public class AuctionController extends BaseController {
 
             AuctionOrder auctionOrder = (AuctionOrder) baseManager.getObject(AuctionOrder.class.getName(), auctionOrderId);
 
-            String message = smsCheckManager.send(phoneNo, auctionOrderId, "1548464", PConst.TIANYI);
+            Thread t = new Thread(
+                new Runnable(){
+                    @Override
+                    public void run() {
+                        smsCheckManager.send(phoneNo, auctionOrderId, "1548464", PConst.TIANYI);
+                    }
+                }
+            );
+            t.start();
 
             resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", message);
+            resultMap.put("resultMsg", "提醒发货成功");
         } catch(Exception e) {
             return resultMapHandler.handlerResult("10004", "未知错误，请联系管理员", logBean);
         }
