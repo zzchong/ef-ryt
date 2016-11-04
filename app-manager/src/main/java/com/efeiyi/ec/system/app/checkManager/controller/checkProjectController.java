@@ -1,11 +1,12 @@
 package com.efeiyi.ec.system.app.checkManager.controller;
 
 import com.efeiyi.ec.art.model.Artwork;
-import com.efeiyi.ec.art.organization.service.SmsCheckManager;
-import com.efeiyi.ec.art.organization.service.imp.SmsCheckManagerImpl;
+
 import com.efeiyi.ec.quartz.job.InvestJob;
 import com.efeiyi.ec.quartz.trigger.InvestTrigger;
 import com.efeiyi.ec.system.app.checkManager.CheckConstant;
+import com.efeiyi.ec.system.service.SmsCheckManager;
+import com.efeiyi.ec.system.service.impl.SmsCheckManagerImpl;
 import com.ming800.core.base.service.BaseManager;
 import com.ming800.core.p.PConst;
 import org.quartz.Trigger;
@@ -99,18 +100,18 @@ public class checkProjectController {
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
 
         String phoneNo = artwork.getAuthor().getMaster().getPhone();
-        String description = "已通过审核";
-        String content = "#title#=" + artwork.getTitle() + "&#description#=" + description;
 
-        Thread t = new Thread(
-                new Runnable(){
-                    @Override
-                    public void run() {
-                        smsCheckManager.send(phoneNo, content, "1617058", PConst.TIANYI);
+        if(!CheckConstant.ARTWORK_STEP_WAIT.equals(type) && !CheckConstant.ARTWORK_STEP_CREATION_WAIT.equals(type)) {
+            Thread t = new Thread(
+                    new Runnable(){
+                        @Override
+                        public void run() {
+                            smsCheckManager.send(phoneNo, artwork.getTitle(), "1617058", PConst.TIANYI);
+                        }
                     }
-                }
-        );
-        t.start();
+            );
+            t.start();
+        }
 
         if (null != resultPage && "V".equals(resultPage.trim())){
             return new ModelAndView("redirect:/basic/xm.do?qm=viewCheckArtwork&checkProject=checkProject&id=" + id);
@@ -141,14 +142,12 @@ public class checkProjectController {
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
 
         String phoneNo = artwork.getAuthor().getMaster().getPhone();
-        String description = "未通过审核";
-        String content = "#title#=" + artwork.getTitle() + "&#description#=" + description;
 
         Thread t = new Thread(
                 new Runnable(){
                     @Override
                     public void run() {
-                        smsCheckManager.send(phoneNo, content, "1617058", PConst.TIANYI);
+                        smsCheckManager.send(phoneNo, artwork.getTitle(), "1617172", PConst.TIANYI);
                     }
                 }
         );
