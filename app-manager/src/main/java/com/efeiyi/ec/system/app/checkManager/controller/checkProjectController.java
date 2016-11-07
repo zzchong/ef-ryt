@@ -169,7 +169,7 @@ public class checkProjectController {
     public ModelAndView returnIncome(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView("redirect:/basic/xm.do?qm=plistCheckArtwork_checkDefault&checkProject=checkProject");
 
-        String artworkId = request.getParameter("artworkId");
+        String artworkId = request.getParameter("id");
         try {
             checkProjectManager.returnIncome(artworkId);
         } catch (Exception e) {

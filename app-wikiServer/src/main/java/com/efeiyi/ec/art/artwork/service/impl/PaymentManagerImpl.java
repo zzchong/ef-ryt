@@ -338,9 +338,13 @@ public class PaymentManagerImpl implements PaymentManager {
                 artwork.setIsReturnIncome("1");
                 baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
 
+                //获得保证金
+                String marginHql = "select s from com.efeiyi.ec.art.model.MarginAccount s where s.user.id = :userId and s.artwork.id = :artworkId";
+                MarginAccount marginAccount = (MarginAccount) baseManager.getUniqueObjectByConditions(marginHql, params);
+
                 //操作账户
-                account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(artwork.getNewBidingPrice()));
-                account.setCurrentBalance(account.getCurrentBalance().subtract(artwork.getNewBidingPrice()));
+                account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(artwork.getNewBidingPrice().subtract(marginAccount.getCurrentBalance())));
+                account.setCurrentBalance(account.getCurrentBalance().subtract(artwork.getNewBidingPrice().subtract(marginAccount.getCurrentBalance())));
                 baseManager.saveOrUpdate(Account.class.getName(),account);
 
                 //生成账单
