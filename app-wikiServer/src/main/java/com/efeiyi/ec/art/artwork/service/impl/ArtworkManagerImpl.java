@@ -352,12 +352,21 @@ public class ArtworkManagerImpl implements ArtworkManager {
         auctionOrder.setFinalPayment(artwork.getNewBidingPrice().subtract(artwork.getInvestGoalMoney().multiply(new BigDecimal("0.1"))));
 
         baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
+    }
 
-        String marginHql = "select s from com.efeiyi.ec.art.model.MarginAccount s where s.artwork.id = :artworkId and s.user.id <> :userId and s.status = 0";
+    public void returnMargin(String artworkId, String winnerId) throws Exception {
+        LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+        //params.put("userId", artwork.getWinner().getId());
+        params.put("artworkId", artworkId);
+        String marginHql = "select s from com.efeiyi.ec.art.model.MarginAccount s where s.artwork.id = :artworkId and s.status = 0";
         List<MarginAccount> marginAccountList = baseManager.listObject(marginHql, params);
         for(MarginAccount margin : marginAccountList) {
-            String  transferNote = "参与《"+margin.getArtwork().getTitle()+"》项目的保证金";
+            //如果是流拍，保证金都返回。如果不是，保证金不返还拍得的人。
+            if(winnerId != null && winnerId.equals(margin.getUser().getId())) {
+                continue;
+            }
 
+            String  transferNote = "参与《"+margin.getArtwork().getTitle()+"》项目的保证金";
             Account account = (Account) baseManager.getObject(Account.class.getName(), margin.getAccount().getId());
             if(account == null) {
                 break;
@@ -372,10 +381,36 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
             Bill bill = new Bill();
             bill.setDetail(transferNote);
-            bill.setTitle("融艺投-保证金退还");
+            bill.setTitle(margin.getArtwork().getTitle() + "-保证金退还");
             bill.setStatus("1");
             bill.setMoney(margin.getCurrentBalance());
             bill.setAuthor(margin.getUser());
+            bill.setCreateDatetime(new Date());
+            bill.setType("4");
+            bill.setOutOrIn("1");
+            bill.setPayWay("3");
+            baseManager.saveOrUpdate(Bill.class.getName(), bill);
+        }
+    }
+
+    public void returnInvestmentFunds(Artwork artwork) throws Exception {
+        LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+        params.put("artworkId", artwork.getId());
+        String investHql = "select s from com.efeiyi.ec.art.model.ArtworkInvest s where s.artwork.id = :artworkId  and s.status<>'0'";
+        List<ArtworkInvest>  artworkInvests = baseManager.listObject(investHql, params);
+        for(ArtworkInvest artworkInvest  :  artworkInvests){
+            Account account = artworkInvest.getAccount();
+
+            account.setCurrentBalance(account.getCurrentBalance().add(artworkInvest.getPrice()));
+            account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(artworkInvest.getPrice()));
+            baseManager.saveOrUpdate(Account.class.getName(),account);
+
+            Bill bill = new Bill();
+            bill.setDetail(artwork.getTitle() + "-投资金额退还");
+            bill.setTitle(artwork.getTitle() + "-投资金额退还");
+            bill.setStatus("1");
+            bill.setMoney(artworkInvest.getPrice());
+            bill.setAuthor(artworkInvest.getCreator());
             bill.setCreateDatetime(new Date());
             bill.setType("4");
             bill.setOutOrIn("1");

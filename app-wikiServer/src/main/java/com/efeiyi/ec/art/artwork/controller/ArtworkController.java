@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -1873,6 +1874,7 @@ public class ArtworkController extends BaseController {
 
     @RequestMapping(value = "/app/updateCreationStatus.do", method = RequestMethod.POST)
     @ResponseBody
+    @Transactional
     public Map updateCreationStatus(HttpServletRequest request) {
         LogBean logBean = new LogBean();//日志记录
         TreeMap treeMap = new TreeMap();
@@ -1905,10 +1907,12 @@ public class ArtworkController extends BaseController {
                 if (artworkBiddingList != null && artworkBiddingList.size() > 0) {
                     artwork.setStep("32");
                     artwork.setWinner(artworkBiddingList.get(0).getCreator());
-
                     artworkManager.saveAuctionOrder(artwork);
+                    artworkManager.returnMargin(artwork.getId(), artwork.getWinner().getId());
                 } else {
                     artwork.setStep("33");
+                    artworkManager.returnMargin(artwork.getId(), null);
+                    artworkManager.returnInvestmentFunds(artwork);
                 }
                 baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
             }

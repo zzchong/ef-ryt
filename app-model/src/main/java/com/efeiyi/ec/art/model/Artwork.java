@@ -81,6 +81,8 @@ public class Artwork implements Serializable {
     private String material;//材质
     private String buffer;//是否是缓存状态  “yes”缓存状态  “no”正常状态
 
+    private String isReturnIncome;//是否返还投资收益 0或null:无须返还  1:可返还   2:已返还
+
     @Column(name = "buffer")
     public String getBuffer() {
         return buffer;
@@ -557,5 +559,14 @@ public class Artwork implements Serializable {
 
     public void setWidth(Integer width) {
         this.width = width;
+    }
+
+    @Column(name = "is_return_income")
+    public String getIsReturnIncome() {
+        return isReturnIncome;
+    }
+
+    public void setIsReturnIncome(String isReturnIncome) {
+        this.isReturnIncome = isReturnIncome;
     }
 }

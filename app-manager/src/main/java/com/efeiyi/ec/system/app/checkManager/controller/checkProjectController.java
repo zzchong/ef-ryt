@@ -1,10 +1,11 @@
 package com.efeiyi.ec.system.app.checkManager.controller;
 
-import com.efeiyi.ec.art.model.Artwork;
+import com.efeiyi.ec.art.model.*;
 
 import com.efeiyi.ec.quartz.job.InvestJob;
 import com.efeiyi.ec.quartz.trigger.InvestTrigger;
 import com.efeiyi.ec.system.app.checkManager.CheckConstant;
+import com.efeiyi.ec.system.app.checkManager.service.CheckProjectManager;
 import com.efeiyi.ec.system.service.SmsCheckManager;
 import com.efeiyi.ec.system.service.impl.SmsCheckManagerImpl;
 import com.ming800.core.base.service.BaseManager;
@@ -17,9 +18,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/4/7.
@@ -31,6 +35,8 @@ public class checkProjectController {
 
     @Autowired
     private BaseManager baseManager;
+    @Autowired
+    private CheckProjectManager checkProjectManager;
 
     @RequestMapping("/remove.do")
     public ModelAndView removeCheckProject(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -157,6 +163,20 @@ public class checkProjectController {
             return new ModelAndView("redirect:/basic/xm.do?qm=viewCheckArtwork&checkProject=checkProject&id=" + id);
         }
         return new ModelAndView("redirect:/basic/xm.do?qm=plistCheckArtwork_checkDefault&checkProject=checkProject");
+    }
+
+    @RequestMapping("returnIncome")
+    public ModelAndView returnIncome(HttpServletRequest request) {
+        ModelAndView mv = new ModelAndView("redirect:/basic/xm.do?qm=plistCheckArtwork_checkDefault&checkProject=checkProject");
+
+        String artworkId = request.getParameter("artworkId");
+        try {
+            checkProjectManager.returnIncome(artworkId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return mv;
     }
 
 }

@@ -335,50 +335,12 @@ public class PaymentManagerImpl implements PaymentManager {
 
                 //更改项目为拍卖结束
                 artwork.setType("6");
+                artwork.setIsReturnIncome("1");
                 baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
-
-                //返回投资收益
-                String biddingHql = "select s from com.efeiyi.ec.art.model.ArtworkBidding s where s.artwork.id = :artworkId and s.status = '1' ORDER BY s.price desc";
-                LinkedHashMap<String, Object> params1 = new LinkedHashMap<>();
-                params1.put("artworkId", artwork.getId());
-                List<ArtworkBidding> biddingList = baseManager.listObject(biddingHql, params1);
-                BigDecimal rate = biddingList.get(0).getPrice().divide(artwork.getInvestGoalMoney(), 2).subtract(new BigDecimal("1.00"));//溢价率
-
-                ArtworkInvest tmpArtworkInvest = null;
-
-                String investHql = "select s from com.efeiyi.ec.art.model.ArtworkInvest s where s.artwork.id = :artworkId  and s.status<>'0'";
-                List<ArtworkInvest>  artworkInvests = baseManager.listObject(investHql, params1);
-                for(ArtworkInvest artworkInvest  :  artworkInvests){
-                    Account acc = artworkInvest.getAccount();
-
-                    //生成投资收益记录
-                    ROIRecord roiRecord = new ROIRecord();
-                    roiRecord.setAccount(acc);
-                    roiRecord.setStatus("1");
-                    roiRecord.setCurrentBalance(artworkInvest.getPrice().multiply(rate));
-                    roiRecord.setArtwork(artworkInvest.getArtwork());
-                    roiRecord.setCreateDatetime(new Date());
-                    roiRecord.setUser(artworkInvest.getCreator());
-                    roiRecord.setArtworkInvest(artworkInvest);
-                    roiRecord.setDetails("投资"+artworkInvest.getArtwork().getTitle()+"收益");
-                    baseManager.saveOrUpdate(ROIRecord.class.getName(),roiRecord);
-
-                    if(acc.getId().equals(account.getId())) {
-                        tmpArtworkInvest = artworkInvest;
-                        continue;
-                    }
-                    acc.setCurrentBalance(acc.getCurrentBalance().add(artworkInvest.getPrice().multiply(rate)).add(artworkInvest.getPrice()));
-                    acc.setCurrentUsableBalance(acc.getCurrentUsableBalance().add(artworkInvest.getPrice().multiply(rate)).add(artworkInvest.getPrice()));
-                    baseManager.saveOrUpdate(Account.class.getName(),acc);
-                }
 
                 //操作账户
                 account.setCurrentUsableBalance(account.getCurrentUsableBalance().subtract(artwork.getNewBidingPrice()));
                 account.setCurrentBalance(account.getCurrentBalance().subtract(artwork.getNewBidingPrice()));
-                if(tmpArtworkInvest != null) {
-                    account.setCurrentBalance(account.getCurrentBalance().add(tmpArtworkInvest.getPrice().multiply(rate)).add(tmpArtworkInvest.getPrice()));
-                    account.setCurrentUsableBalance(account.getCurrentUsableBalance().add(tmpArtworkInvest.getPrice().multiply(rate)).add(tmpArtworkInvest.getPrice()));
-                }
                 baseManager.saveOrUpdate(Account.class.getName(),account);
 
                 //生成账单

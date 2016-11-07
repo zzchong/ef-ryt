@@ -52,4 +52,8 @@ public interface ArtworkManager {
     Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq, String description) throws Exception;
 
     void saveAuctionOrder(Artwork artwork) throws Exception;
+
+    void returnMargin(String artworkId, String winnerId) throws Exception;
+
+    void returnInvestmentFunds(Artwork artwork) throws Exception;
 }

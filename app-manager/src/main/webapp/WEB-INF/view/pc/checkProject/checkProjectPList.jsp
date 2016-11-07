@@ -58,6 +58,10 @@
                       <%--onclick="window.location.href='<c:url value="/checkProject/checkReject.do?id=${artwork.id}&resultPage=L"/>'"--%>
                       class="am-btn am-btn-default am-btn-xs am-hide-sm-only">驳回</button>
             </c:if>
+            <c:if test="${artwork.isReturnIncome == '1'}">
+            <button onclick="window.location.href='<c:url value="/checkProject/returnIncome.do?id=${artwork.id}&resultPage=L"/>'"
+                    class="am-btn am-btn-default am-btn-xs am-hide-sm-only">返还收益</button>
+            </c:if>
             <%--<c:if test="${artwork.step == '12'}">--%>
               <%--<button onclick="window.location.href='<c:url value=""/>'"--%>
                       <%--class="am-btn am-btn-default am-btn-xs am-hide-sm-only">撤销通过</button>--%>
