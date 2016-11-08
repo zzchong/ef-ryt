@@ -15,6 +15,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -354,6 +355,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
         baseManager.saveOrUpdate(AuctionOrder.class.getName(), auctionOrder);
     }
 
+    @Transactional
     public void returnMargin(String artworkId, String winnerId) throws Exception {
         LinkedHashMap<String, Object> params = new LinkedHashMap<>();
         //params.put("userId", artwork.getWinner().getId());
@@ -393,6 +395,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
         }
     }
 
+    @Transactional
     public void returnInvestmentFunds(Artwork artwork) throws Exception {
         LinkedHashMap<String, Object> params = new LinkedHashMap<>();
         params.put("artworkId", artwork.getId());

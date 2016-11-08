@@ -65,6 +65,30 @@ public class CheckProjectManagerImpl implements CheckProjectManager {
             accout.setCurrentBalance(accout.getCurrentBalance().add(map.get(accout).multiply(roi)).add(map.get(accout)));
             accout.setCurrentUsableBalance(accout.getCurrentUsableBalance().add(map.get(accout).multiply(roi)).add(map.get(accout)));
             baseManager.saveOrUpdate(Account.class.getName(),accout);
+
+            Bill billSY = new Bill();
+            billSY.setDetail(artwork.getTitle() + "-投资收益");
+            billSY.setTitle(artwork.getTitle() + "-投资收益");
+            billSY.setStatus("1");
+            billSY.setMoney(map.get(accout).multiply(roi));
+            billSY.setAuthor(accout.getUser());
+            billSY.setCreateDatetime(new Date());
+            billSY.setType("5");
+            billSY.setOutOrIn("1");
+            billSY.setPayWay("3");
+            baseManager.saveOrUpdate(Bill.class.getName(), billSY);
+
+            Bill billBQ = new Bill();
+            billBQ.setDetail(artwork.getTitle() + "-投资金额返还");
+            billBQ.setTitle(artwork.getTitle() + "-投资金额返还");
+            billBQ.setStatus("1");
+            billBQ.setMoney(map.get(accout));
+            billBQ.setAuthor(accout.getUser());
+            billBQ.setCreateDatetime(new Date());
+            billBQ.setType("5");
+            billBQ.setOutOrIn("1");
+            billBQ.setPayWay("3");
+            baseManager.saveOrUpdate(Bill.class.getName(), billBQ);
         }
 
         artwork.setIsReturnIncome("2");
