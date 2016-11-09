@@ -1,6 +1,7 @@
 package com.efeiyi.ec.art.organization.model;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,8 +26,10 @@ public interface SmsProvider {
      * @param content
      * @return
      */
-    public SendCode post(String phone, String content, String tpl_id);
+    SendCode post(String phone, String content, String tpl_id);
 
-    public String checkAmount() throws IOException;
+    String post(String url, Map<String, String> paramsMap);
+
+    String checkAmount() throws IOException;
 
 }

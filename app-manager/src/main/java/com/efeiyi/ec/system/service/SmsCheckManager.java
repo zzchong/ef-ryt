@@ -10,14 +10,10 @@ package com.efeiyi.ec.system.service;
  */
 public interface SmsCheckManager {
 
-    public String createCheckCode();
+    String createCheckCode();
 
-  //  public Boolean validate(String phone, String code);
+    String send(String phone, String content, String tpl_id, Integer company);
 
-    public String send(String phone, String content, String tpl_id, Integer company);
-
-//    public void send(String phone, String content, String branchName,String tpl_id) throws Exception;
-
-    public Boolean checkPhoneRegistered(String phone);
+    String send(String mobile, String tpl_id, String tpl_value);
 
 }

@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -101,6 +102,10 @@ public class TianXinBoYiSmsProvider implements SmsProvider {
         return conversion(data);
     }
 
+    @Override
+    public String post(String url, Map<String, String> paramsMap) {
+        return null;
+    }
 
     /**
      * 返回结果

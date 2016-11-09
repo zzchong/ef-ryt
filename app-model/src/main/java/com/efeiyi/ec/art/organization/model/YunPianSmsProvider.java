@@ -3,7 +3,9 @@ package com.efeiyi.ec.art.organization.model;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 
 import java.io.DataInputStream;
@@ -13,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,7 +26,6 @@ import java.net.URLEncoder;
  */
 
 public class YunPianSmsProvider implements SmsProvider {
-
 
     /**
      * 服务http地址
@@ -40,19 +42,48 @@ public class YunPianSmsProvider implements SmsProvider {
     /**
      * 查账户信息的http地址
      */
-    private static String URI_GET_USER_INFO = BASE_URI + "/" + VERSION + "/user/get.json";
+    public static String URI_GET_USER_INFO = BASE_URI + "/" + VERSION + "/user/get.json";
     /**
      * 通用发送接口的http地址
      */
-    private static String URI_SEND_SMS = BASE_URI + "/" + VERSION + "/sms/send.json";
+    public static String URI_SEND_SMS = BASE_URI + "/" + VERSION + "/sms/send.json";
     /**
      * 模板发送接口的http地址
      */
-    private static String URI_TPL_SEND_SMS = BASE_URI + "/" + VERSION + "/sms/tpl_send.json";
+    public static String URI_TPL_SEND_SMS = BASE_URI + "/" + VERSION + "/sms/tpl_send.json";
 
+    public final static String apikey = "b802cb40c7a0db20e787884bf29f1e6d";
 
-    final static String apikey = "b802cb40c7a0db20e787884bf29f1e6d";
-
+    /**
+     * 基于HttpClient 3.1的通用POST方法
+     *
+     * @param url       提交的URL
+     * @param paramsMap 提交<参数，值>Map
+     * @return 提交响应
+     */
+    @Override
+    public String post(String url, Map<String, String> paramsMap) {
+        HttpClient client = new HttpClient();
+        try {
+            PostMethod method = new PostMethod(url);
+            if (paramsMap != null) {
+                NameValuePair[] namePairs = new NameValuePair[paramsMap.size()];
+                int i = 0;
+                for (Map.Entry<String, String> param : paramsMap.entrySet()) {
+                    NameValuePair pair = new NameValuePair(param.getKey(), param.getValue());
+                    namePairs[i++] = pair;
+                }
+                method.setRequestBody(namePairs);
+                HttpMethodParams param = method.getParams();
+                param.setContentCharset(ENCODING);
+            }
+            client.executeMethod(method);
+            return method.getResponseBodyAsString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
     /**
      * 发送, 并返回结果
@@ -66,18 +97,12 @@ public class YunPianSmsProvider implements SmsProvider {
 
         try {
             content = URLEncoder.encode("#code#=" + content , ENCODING);//+ "&#company#=e飞蚁", ENCODING)
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         String postData = "apikey=" + apikey + "&mobile=" + phone + "&tpl_id=" + tpl_id + "&tpl_value=" + content + "";
 
-
-        System.out.println(postData);
-
-
         String data = null;
-
         try {
             URL dataUrl = new URL(URI_TPL_SEND_SMS);
             HttpURLConnection con = (HttpURLConnection) dataUrl.openConnection();
@@ -103,7 +128,6 @@ public class YunPianSmsProvider implements SmsProvider {
         return conversion(data);
     }
 
-
     /**
      * 返回结果
      * 通过JSON解析
@@ -115,7 +139,6 @@ public class YunPianSmsProvider implements SmsProvider {
         SendCode postResult = JSON.parseObject(data, SendCode.class);
         return postResult;
     }
-
 
     /**
      * 查询余额
@@ -131,8 +154,6 @@ public class YunPianSmsProvider implements SmsProvider {
         client.executeMethod(method);
         String jsonBody = method.getResponseBodyAsString();
         return jsonBody;
-
     }
-
 
 }

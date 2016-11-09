@@ -18,12 +18,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
+
 
 /**
  * Created by Administrator on 2016/4/7.
@@ -37,6 +37,8 @@ public class checkProjectController {
     private BaseManager baseManager;
     @Autowired
     private CheckProjectManager checkProjectManager;
+
+    private static String ENCODING = "UTF-8";
 
     @RequestMapping("/remove.do")
     public ModelAndView removeCheckProject(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -54,6 +56,7 @@ public class checkProjectController {
     @RequestMapping("/checkPass.do")
     public ModelAndView checkPassProject(HttpServletRequest request, HttpServletResponse response) throws Exception {
         SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
+        String smsDescription = null;
         String id = request.getParameter("id");
         String type = request.getParameter("type");
         String resultPage = request.getParameter("resultPage");
@@ -89,6 +92,8 @@ public class checkProjectController {
 
             InvestTrigger investTrigger = new InvestTrigger();
             investTrigger.execute(artwork.getId(),artwork.getInvestEndDatetime(),"invest");
+
+            smsDescription = "发布审核成功";
         }
         if(CheckConstant.ARTWORK_STEP_CREATION_CHECKING.equals(type)){
             artwork.setStep(CheckConstant.ARTWORK_STEP_CREATION_PASS);
@@ -102,17 +107,21 @@ public class checkProjectController {
             artwork.setAuctionEndDatetime(calendar.getTime());
             InvestTrigger investTrigger = new InvestTrigger();
             investTrigger.execute(artwork.getId(),artwork.getAuctionEndDatetime(),"auction");
+
+            smsDescription = "创作审核成功";
         }
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
 
-        String phoneNo = artwork.getAuthor().getMaster().getPhone();
-
         if(!CheckConstant.ARTWORK_STEP_WAIT.equals(type) && !CheckConstant.ARTWORK_STEP_CREATION_WAIT.equals(type)) {
+            String mobile = artwork.getAuthor().getMaster().getPhone();
+            String tpl_value = URLEncoder.encode("#title#", ENCODING) + "=" + URLEncoder.encode(artwork.getTitle(), ENCODING) + "&"
+                    + URLEncoder.encode("#description#", ENCODING) + "=" + URLEncoder.encode(smsDescription, ENCODING);
+
             Thread t = new Thread(
                     new Runnable(){
                         @Override
                         public void run() {
-                            smsCheckManager.send(phoneNo, artwork.getTitle(), "1617058", PConst.TIANYI);
+                            smsCheckManager.send(mobile, "1617172", tpl_value);
                         }
                     }
             );
@@ -128,6 +137,8 @@ public class checkProjectController {
     @RequestMapping("/checkReject.do")
     public ModelAndView checkRejectProject(HttpServletRequest request, HttpServletResponse response) throws Exception {
         SmsCheckManager smsCheckManager = new SmsCheckManagerImpl();
+        String smsDescription = null;
+
         String id = request.getParameter("id");
         String type = request.getParameter("type");
         String resultPage = request.getParameter("resultPage");
@@ -140,20 +151,23 @@ public class checkProjectController {
 
         if (CheckConstant.ARTWORK_STEP_CHECKING.equals(type)){
             artwork.setStep(CheckConstant.ARTWORK_STEP_REJECT);
+            smsDescription = "发布审核未通过";
         } else if(CheckConstant.ARTWORK_STEP_CREATION_CHECKING.equals(type)){
             artwork.setStep(CheckConstant.ARTWORK_STEP_CREATION_REJECT);
+            smsDescription = "创作审核未通过";
         }
 
         artwork.setFeedback(message);
         baseManager.saveOrUpdate(Artwork.class.getName(), artwork);
 
-        String phoneNo = artwork.getAuthor().getMaster().getPhone();
-
+        String mobile = artwork.getAuthor().getMaster().getPhone();
+        String tpl_value = URLEncoder.encode("#title#", ENCODING) + "=" + URLEncoder.encode(artwork.getTitle(), ENCODING) + "&"
+                + URLEncoder.encode("#description#", ENCODING) + "=" + URLEncoder.encode(smsDescription, ENCODING);
         Thread t = new Thread(
                 new Runnable(){
                     @Override
                     public void run() {
-                        smsCheckManager.send(phoneNo, artwork.getTitle(), "1617172", PConst.TIANYI);
+                        smsCheckManager.send(mobile, "1617172", tpl_value);
                     }
                 }
         );
