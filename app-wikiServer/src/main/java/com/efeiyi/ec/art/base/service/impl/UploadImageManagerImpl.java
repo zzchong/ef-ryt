@@ -39,6 +39,12 @@ public class UploadImageManagerImpl implements UploadImageManager {
             for(String key : fileMap.keySet()) {
                 MultipartFile file = fileMap.get(key);
                 BufferedImage bi = ImageIO.read(file.getInputStream());
+                int width = 0;
+                int height = 0;
+                if(bi != null) {
+                    width = bi.getWidth();
+                    height = bi.getHeight();
+                }
                 String fileName = file.getOriginalFilename();
 
                 if(!"".equals(fileName.trim())) {
@@ -53,8 +59,8 @@ public class UploadImageManagerImpl implements UploadImageManager {
 
                     Map<String, Object> map = new HashMap<>();
                     map.put("pictureUrl", pictureUrl);
-                    map.put("width", bi.getWidth());
-                    map.put("height", bi.getHeight());
+                    map.put("width", width);
+                    map.put("height", height);
                     list.add(map);
                 }
             }

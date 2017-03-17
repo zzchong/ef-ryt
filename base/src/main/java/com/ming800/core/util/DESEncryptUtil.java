@@ -153,7 +153,8 @@ public class DESEncryptUtil {
 	public static void main(String[] args) throws Exception {
 
 		String key = "i am key,let me encrypt you! 1234haha";
-		String src = "efyadmin123";
+		//String src = "efyadmin123";
+		String src = "root";
 
 		log.debug("密钥:" + key);
 		log.debug("明文:" + src);

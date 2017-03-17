@@ -285,29 +285,29 @@ public class ArtworkManagerImpl implements ArtworkManager {
 
     @Override
     public Artwork saveOrUpdateArtwork(Artwork artwork, String title, String material, String brief, String investGoalMoney, String duration, String makeInstru, String financingAq, String description) throws Exception {
-        if (!title.equals("")){
+        if (!"".equals(title)){
             artwork.setTitle(title);
         }
-        if (!material.equals("")){
+        if (!"".equals(material)){
             artwork.setMaterial(material);
         }
-        if (!brief.equals("")){
+        if (!"".equals(brief)){
             artwork.setBrief(brief);
         }
-        if (!investGoalMoney.equals("")){
+        if (!"".equals(investGoalMoney)){
             artwork.setInvestGoalMoney(new BigDecimal(investGoalMoney));
             artwork.setStartingPrice(new BigDecimal(investGoalMoney));
         }
-        if (!duration.equals("")){
+        if (!"".equals(duration)){
             artwork.setDuration(Integer.valueOf(duration));
         }
-        if (!description.equals("")){
+        if (!"".equals(description)){
             artwork.setDescription(description);
         }
         artwork.setCreateDatetime(new Date());
         artwork.setAuthor(AuthorizationUtil.getUser());
         Artworkdirection artworkdirection = null;
-        if (!makeInstru.equals("")){
+        if (!"".equals(makeInstru)){
             if (artwork.getArtworkdirection()==null){
                 artworkdirection = new Artworkdirection();
             }else {
@@ -317,7 +317,7 @@ public class ArtworkManagerImpl implements ArtworkManager {
             artworkdirection.setArtwork(artwork);
             baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);
         }
-        if (!financingAq.equals("")){
+        if (!"".equals(financingAq)){
             artworkdirection = artwork.getArtworkdirection();
             artworkdirection.setFinancing_aq(financingAq);
             baseManager.saveOrUpdate(Artworkdirection.class.getName(), artworkdirection);

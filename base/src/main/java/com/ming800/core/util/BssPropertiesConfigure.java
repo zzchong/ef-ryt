@@ -69,7 +69,7 @@ protected String resolvePlaceholder(String strVal,Properties props,int systemPro
 		
 		if ((!StringUtil2.isEmpty(placeholder))&&(placeholder.startsWith("BSS_ENCRYPT."))) {
 			logger.info(placeholder);
-        String value=props.getProperty(placeholder);
+        	String value=props.getProperty(placeholder);
 			logger.debug("敏感的加密属性数据, 属性名称:{},属性值:{}"
 					+ new Object[] { placeholder ,value});
 			logger.info(value);
